@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Produkty Brunimat | Sklep za Stodołą</title>
+  <meta name="robots" content="noindex, nofollow" />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌾</text></svg>">
+  <style>
+    .produkt-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 2rem;
+      margin-top: 3rem;
+    }
+    .produkt-karta {
+      background: var(--biel);
+      border: 1px solid var(--linia);
+      overflow: hidden;
+      transition: box-shadow 0.25s, transform 0.25s;
+    }
+    .produkt-karta:hover {
+      box-shadow: 0 12px 32px rgba(0,0,0,0.1);
+      transform: translateY(-4px);
+    }
+    .produkt-karta img {
+      width: 100%;
+      height: 260px;
+      object-fit: cover;
+      background: var(--kremowy);
+    }
+    .produkt-karta-body { padding: 1.8rem; }
+    .produkt-karta-body h3 { color: var(--zielony); margin-bottom: 0.5rem; font-size: 1.2rem; }
+    .produkt-karta-body p { font-size: 0.92rem; margin-bottom: 1rem; }
+    .produkt-badge {
+      display: inline-block;
+      background: var(--akcent);
+      color: var(--zielony);
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 0.3rem 0.8rem;
+      margin-bottom: 1rem;
+    }
+    .spec-lista { list-style: none; margin: 1rem 0; }
+    .spec-lista li {
+      font-size: 0.88rem;
+      color: var(--szary);
+      padding: 0.3rem 0;
+      border-bottom: 1px solid var(--linia);
+      display: flex;
+      gap: 0.5rem;
+    }
+    .spec-lista li:last-child { border-bottom: none; }
+    .spec-lista li::before { content: "✓"; color: var(--zielony); font-weight: 600; flex-shrink: 0; }
+    .hero-ukryta {
+      background: var(--zielony);
+      padding: 3rem 2rem;
+      text-align: center;
+      color: var(--biel);
+    }
+    .hero-ukryta h1 { color: var(--biel); font-size: clamp(1.6rem, 3vw, 2.4rem); }
+    .hero-ukryta p { color: rgba(255,255,255,0.75); margin-top: 0.5rem; }
+    .zdjecie-placeholder {
+      width: 100%; height: 260px;
+      background: linear-gradient(135deg, #e8f4e0 0%, #d0e8c0 100%);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 3rem;
+    }
+    .info-box {
+      background: #fff8e1;
+      border: 1px solid #ffe082;
+      border-left: 3px solid #f9a825;
+      padding: 1.2rem 1.5rem;
+      margin-bottom: 3rem;
+      font-size: 0.9rem;
+      color: #5d4037;
+    }
+    .info-box strong { color: #e65100; }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <a href="index.html" class="nav-logo">Sklep za Stodołą</a>
+    <button class="hamburger" onclick="toggleMenu()" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+    <ul class="nav-links" id="nav-links">
+      <li><a href="index.html">Start</a></li>
+      <li><a href="rolnik.html">Dla rolników</a></li>
+      <li><a href="oferta.html">Maszyny i serwis</a></li>
+      <li><a href="kontakt.html">Kontakt</a></li>
+    </ul>
+  </nav>
+
+  <div class="hero-ukryta">
+    <h1>Katalog produktów Brunimat</h1>
+    <p>Oficjalny dystrybutor na Polskę · Sprzedaż i leasing · Serwis w całej Polsce</p>
+  </div>
+
+  <section class="section">
+
+    <div class="info-box">
+      <strong>📸 Uwaga:</strong> Ta strona wymaga uzupełnienia zdjęciami z brunimat.ch. Wejdź na stronę producenta, zapisz zdjęcia produktów i wgraj je do folderu <code>img/brunimat/</code>. Nazwy plików podane są przy każdym produkcie poniżej.
+    </div>
+
+    <!-- FILTROWANIE -->
+    <div style="display:flex; gap:0.8rem; flex-wrap:wrap; margin-bottom:2rem;">
+      <button class="btn btn-outline" style="margin-top:0; padding:0.4rem 1.2rem; font-size:0.75rem;" onclick="filtruj('wszystkie')">Wszystkie</button>
+      <button class="btn btn-outline" style="margin-top:0; padding:0.4rem 1.2rem; font-size:0.75rem;" onclick="filtruj('automat')">Automaty do mleka</button>
+      <button class="btn btn-outline" style="margin-top:0; padding:0.4rem 1.2rem; font-size:0.75rem;" onclick="filtruj('chłodnia')">Chłodnie</button>
+      <button class="btn btn-outline" style="margin-top:0; padding:0.4rem 1.2rem; font-size:0.75rem;" onclick="filtruj('akcesoria')">Akcesoria</button>
+    </div>
+
+    <div class="produkt-grid" id="produkty">
+
+      <!-- PRODUKT 1 -->
+      <div class="produkt-karta" data-kategoria="automat">
+        <img src="img/automat.jpg" alt="Brunimat automat do mleka" />
+        <div class="produkt-karta-body">
+          <span class="produkt-badge">Automat do mleka</span>
+          <h3>Brunimat Milk Fresh & Cool</h3>
+          <p>Flagowy automat do sprzedaży świeżego surowego mleka. Stal nierdzewna, system chłodzenia, panel dotykowy. Dostępny całą dobę bez obsługi.</p>
+          <ul class="spec-lista">
+            <li>Zbiornik: 50–200L (różne modele)</li>
+            <li>Chłodzenie do 4°C</li>
+            <li>Płatności monetami i banknotami</li>
+            <li>Ekran dotykowy z instrukcją</li>
+            <li>Automatyczne mycie CIP</li>
+            <li>Możliwość brandu własnego</li>
+          </ul>
+          <a href="kontakt.html" class="btn" style="margin-top:0.5rem;">Zapytaj o cenę i leasing</a>
+        </div>
+      </div>
+
+      <!-- PRODUKT 2 -->
+      <div class="produkt-karta" data-kategoria="automat">
+        <div class="zdjecie-placeholder">🥛</div>
+        <div class="produkt-karta-body">
+          <span class="produkt-badge">Automat do mleka</span>
+          <h3>Brunimat Mini</h3>
+          <p>Kompaktowy automat do mniejszych gospodarstw lub punktów sprzedaży z ograniczoną przestrzenią. Idealne rozwiązanie na start.</p>
+          <ul class="spec-lista">
+            <li>Zbiornik: 30–60L</li>
+            <li>Mniejszy gabarytem — łatwy montaż</li>
+            <li>System chłodzenia zintegrowany</li>
+            <li>Niższy koszt inwestycji</li>
+            <li>Pełna kompatybilność serwisowa</li>
+          </ul>
+          <p style="font-size:0.78rem; color:var(--brazowy); margin-top:0.5rem;">📸 Wgraj zdjęcie: <code>img/brunimat/mini.jpg</code></p>
+          <a href="kontakt.html" class="btn" style="margin-top:0.5rem;">Zapytaj o cenę i leasing</a>
+        </div>
+      </div>
+
+      <!-- PRODUKT 3 -->
+      <div class="produkt-karta" data-kategoria="chłodnia">
+        <div class="zdjecie-placeholder">❄️</div>
+        <div class="produkt-karta-body">
+          <span class="produkt-badge">Chłodnia</span>
+          <h3>Brunimat Chłodnia zbiornikowa</h3>
+          <p>Zbiornik chłodniczy do przechowywania i schładzania mleka po udoju. Niezbędny element każdego nowoczesnego gospodarstwa mleczarskiego.</p>
+          <ul class="spec-lista">
+            <li>Pojemność: 200–2000L</li>
+            <li>Chłodzenie do 4°C w 3h</li>
+            <li>Stal nierdzewna AISI 304</li>
+            <li>Mieszadło zapobiegające śmietanie</li>
+            <li>Zapis temperatury i danych</li>
+          </ul>
+          <p style="font-size:0.78rem; color:var(--brazowy); margin-top:0.5rem;">📸 Wgraj zdjęcie: <code>img/brunimat/chlodnia.jpg</code></p>
+          <a href="kontakt.html" class="btn" style="margin-top:0.5rem;">Zapytaj o cenę i leasing</a>
+        </div>
+      </div>
+
+      <!-- PRODUKT 4 -->
+      <div class="produkt-karta" data-kategoria="chłodnia">
+        <div class="zdjecie-placeholder">🧊</div>
+        <div class="produkt-karta-body">
+          <span class="produkt-badge">Chłodnia</span>
+          <h3>Brunimat Chłodnia mobilna</h3>
+          <p>Przenośna chłodnia do transportu mleka i produktów mleczarskich. Utrzymuje temperaturę przez cały czas transportu do punktu sprzedaży.</p>
+          <ul class="spec-lista">
+            <li>Pojemność: 50–500L</li>
+            <li>Zasilanie 12V / 230V</li>
+            <li>Izolacja wielowarstwowa</li>
+            <li>Certyfikat transportu żywności</li>
+          </ul>
+          <p style="font-size:0.78rem; color:var(--brazowy); margin-top:0.5rem;">📸 Wgraj zdjęcie: <code>img/brunimat/chlodnia-mobilna.jpg</code></p>
+          <a href="kontakt.html" class="btn" style="margin-top:0.5rem;">Zapytaj o cenę i leasing</a>
+        </div>
+      </div>
+
+      <!-- PRODUKT 5 -->
+      <div class="produkt-karta" data-kategoria="akcesoria">
+        <div class="zdjecie-placeholder">🍶</div>
+        <div class="produkt-karta-body">
+          <span class="produkt-badge">Akcesoria</span>
+          <h3>Butelki szklane wielorazowe</h3>
+          <p>Butelki szklane z logo do sprzedaży przy automacie. Klient płaci kaucję, wraca po nowe mleko — butelka zostaje w obiegu.</p>
+          <ul class="spec-lista">
+            <li>Pojemność: 0,5L i 1L</li>
+            <li>Możliwość nadruku własnego logo</li>
+            <li>Szkło bezpieczne, certyfikowane</li>
+            <li>System kaucji zwiększa powroty klientów</li>
+          </ul>
+          <p style="font-size:0.78rem; color:var(--brazowy); margin-top:0.5rem;">📸 Wgraj zdjęcie: <code>img/brunimat/butelki.jpg</code></p>
+          <a href="kontakt.html" class="btn" style="margin-top:0.5rem;">Zapytaj o wycenę</a>
+        </div>
+      </div>
+
+      <!-- PRODUKT 6 -->
+      <div class="produkt-karta" data-kategoria="akcesoria">
+        <div class="zdjecie-placeholder">🔧</div>
+        <div class="produkt-karta-body">
+          <span class="produkt-badge">Akcesoria</span>
+          <h3>Zestaw czyszczący CIP</h3>
+          <p>Profesjonalny zestaw do mycia i dezynfekcji automatów. Zapewnia higienę i zgodność z normami sanitarnymi dla sprzedaży mleka surowego.</p>
+          <ul class="spec-lista">
+            <li>Środki czyszczące certyfikowane do mleka</li>
+            <li>Automatyczny program mycia</li>
+            <li>Kompatybilny ze wszystkimi modelami Brunimat</li>
+            <li>Dostawa w zestawach miesięcznych</li>
+          </ul>
+          <p style="font-size:0.78rem; color:var(--brazowy); margin-top:0.5rem;">📸 Wgraj zdjęcie: <code>img/brunimat/cip.jpg</code></p>
+          <a href="kontakt.html" class="btn" style="margin-top:0.5rem;">Zapytaj o wycenę</a>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <div class="band">
+    <h2>Interesuje Cię któryś produkt?</h2>
+    <p>Skontaktuj się z nami — wycenimy, porównamy opcje sprzedaży i leasingu, sprawdzimy dostępność dofinansowania ARiMR.</p>
+    <div style="display:flex; gap:1rem; justify-content:center; flex-wrap:wrap; margin-top:2rem;">
+      <a href="tel:533200652" class="btn btn-biel">📞 533 200 652</a>
+      <a href="kontakt.html" class="btn" style="border-color:rgba(255,255,255,0.4); background:transparent;">Formularz kontaktowy</a>
+    </div>
+  </div>
+
+  <footer>
+    <div class="footer-inner">
+      <div>
+        <h4>Sklep za Stodołą</h4>
+        <p>Oficjalny dystrybutor Brunimat w Polsce<br>Sprzedaż · Leasing · Serwis</p>
+        <div class="footer-social">
+          <a href="#" title="Facebook">FB</a>
+          <a href="#" title="Instagram">IG</a>
+        </div>
+      </div>
+      <div>
+        <h4>Nawigacja</h4>
+        <p>
+          <a href="index.html">Strona główna</a><br>
+          <a href="rolnik.html">Dla rolników</a><br>
+          <a href="oferta.html">Maszyny i serwis</a><br>
+          <a href="kontakt.html">Kontakt</a>
+        </p>
+      </div>
+      <div>
+        <h4>Kontakt</h4>
+        <p>
+          <a href="tel:533200652">533 200 652</a><br>
+          <a href="tel:690000923">690 000 923</a><br>
+          <a href="mailto:kontakt@sklepzastodola.pl">kontakt@sklepzastodola.pl</a>
+        </p>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Sklep za Stodołą · Oficjalny dystrybutor Brunimat</span>
+      <span><a href="#">Polityka prywatności</a></span>
+    </div>
+  </footer>
+
+  <script>
+    function toggleMenu() { document.getElementById('nav-links').classList.toggle('open'); }
+
+    function filtruj(kategoria) {
+      const karty = document.querySelectorAll('.produkt-karta');
+      karty.forEach(k => {
+        if (kategoria === 'wszystkie' || k.dataset.kategoria === kategoria) {
+          k.style.display = 'block';
+        } else {
+          k.style.display = 'none';
+        }
+      });
+    }
+  </script>
+</body>
+</html>

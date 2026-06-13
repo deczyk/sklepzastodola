@@ -1,0 +1,212 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=Inter:wght@300;400;500;600&display=swap');
+
+:root {
+  --zielony:     #2d5016;
+  --zielony-jas: #4a7c2a;
+  --kremowy:     #f7f3ec;
+  --brazowy:     #8b6914;
+  --ciemny:      #1a1a1a;
+  --szary:       #666;
+  --biel:        #fff;
+  --linia:       #ddd5c5;
+  --akcent:      #e8f4e0;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body { font-family: 'Inter', sans-serif; font-weight: 300; background: var(--biel); color: var(--ciemny); line-height: 1.7; }
+
+a { text-decoration: none; color: inherit; }
+h1, h2, h3 { font-family: 'Playfair Display', serif; line-height: 1.2; }
+h1 { font-size: clamp(2.2rem, 5vw, 3.6rem); }
+h2 { font-size: clamp(1.6rem, 3vw, 2.2rem); }
+h3 { font-size: 1.15rem; font-family: 'Inter', sans-serif; font-weight: 600; }
+p  { color: var(--szary); font-size: 1rem; }
+
+/* NAV */
+nav {
+  position: sticky; top: 0; z-index: 100;
+  background: var(--biel); border-bottom: 1px solid var(--linia);
+  padding: 0 2rem; display: flex; align-items: center;
+  justify-content: space-between; height: 64px;
+}
+.nav-logo { font-family: 'Playfair Display', serif; font-size: 1.2rem; color: var(--zielony); }
+.nav-links { display: flex; gap: 2rem; list-style: none; }
+.nav-links a { font-size: 0.8rem; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ciemny); transition: color 0.2s; }
+.nav-links a:hover, .nav-links a.active { color: var(--zielony); }
+.hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; background: none; border: none; padding: 4px; }
+.hamburger span { display: block; width: 24px; height: 2px; background: var(--ciemny); transition: 0.3s; }
+
+/* HERO LANDING */
+.hero-landing {
+  min-height: 100vh;
+  background: var(--zielony);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  text-align: center; padding: 4rem 2rem;
+  position: relative; overflow: hidden;
+}
+.hero-landing::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: url('img/hero.jpg') center/cover no-repeat;
+  opacity: 0.2;
+}
+.hero-landing-content { position: relative; z-index: 1; max-width: 800px; }
+.hero-landing h1 { color: var(--biel); margin-bottom: 1rem; }
+.hero-landing .podtytul { color: rgba(255,255,255,0.8); font-size: 1.15rem; margin-bottom: 3rem; max-width: 600px; margin-left: auto; margin-right: auto; }
+
+.karty-wyboru { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-top: 1rem; width: 100%; max-width: 760px; }
+.karta-wyboru {
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.25);
+  padding: 2.5rem 2rem;
+  cursor: pointer; transition: all 0.25s;
+  display: flex; flex-direction: column; align-items: center; gap: 1rem;
+}
+.karta-wyboru:hover { background: rgba(255,255,255,0.18); transform: translateY(-4px); border-color: rgba(255,255,255,0.5); }
+.karta-wyboru .ikona { font-size: 2.8rem; }
+.karta-wyboru h3 { color: var(--biel); font-size: 1.1rem; text-align: center; }
+.karta-wyboru p { color: rgba(255,255,255,0.7); font-size: 0.88rem; text-align: center; }
+.karta-wyboru .strzalka { color: rgba(255,255,255,0.5); font-size: 1.4rem; margin-top: 0.5rem; transition: transform 0.2s; }
+.karta-wyboru:hover .strzalka { transform: translateX(5px); color: var(--biel); }
+
+/* PAGE HERO */
+.page-hero {
+  background: var(--zielony); padding: 5rem 2rem 4rem;
+  text-align: center; color: var(--biel); position: relative; overflow: hidden;
+}
+.page-hero::before {
+  content: ''; position: absolute; inset: 0;
+  background: url('img/hero.jpg') center/cover; opacity: 0.15;
+}
+.page-hero-content { position: relative; z-index: 1; }
+.page-hero h1 { color: var(--biel); letter-spacing: 0.04em; }
+.page-hero p { color: rgba(255,255,255,0.75); margin-top: 0.8rem; font-size: 1.05rem; max-width: 600px; margin-left: auto; margin-right: auto; }
+
+/* SEKCJE */
+.section { padding: 5rem 2rem; max-width: 1100px; margin: 0 auto; }
+.section-center { text-align: center; }
+.section-label { display: inline-block; font-size: 0.72rem; font-weight: 500; letter-spacing: 0.18em; text-transform: uppercase; color: var(--brazowy); margin-bottom: 0.8rem; }
+.section h2 { margin-bottom: 1rem; color: var(--zielony); }
+.divider { width: 48px; height: 2px; background: var(--brazowy); margin: 0.8rem 0 1.5rem; }
+.divider-center { margin-left: auto; margin-right: auto; }
+
+/* BAND */
+.band { background: var(--zielony); color: var(--biel); padding: 4rem 2rem; text-align: center; }
+.band h2 { color: var(--biel); margin-bottom: 0.8rem; }
+.band p { color: rgba(255,255,255,0.8); max-width: 640px; margin: 0 auto; }
+.band-kremowy { background: var(--kremowy); }
+.band-kremowy h2 { color: var(--zielony); }
+.band-kremowy p { color: var(--szary); }
+
+/* BTN */
+.btn {
+  display: inline-block; padding: 0.8rem 2.2rem;
+  background: var(--zielony); color: var(--biel);
+  font-size: 0.8rem; font-weight: 500; letter-spacing: 0.12em;
+  text-transform: uppercase; border: 2px solid var(--zielony);
+  transition: all 0.2s; cursor: pointer; margin-top: 1.5rem;
+}
+.btn:hover { background: transparent; color: var(--zielony); }
+.btn-biel { background: var(--biel); color: var(--zielony); border-color: var(--biel); }
+.btn-biel:hover { background: transparent; color: var(--biel); }
+.btn-outline { background: transparent; color: var(--zielony); }
+.btn-outline:hover { background: var(--zielony); color: var(--biel); }
+
+/* KROKI */
+.kroki { display: flex; flex-direction: column; gap: 0; margin-top: 2rem; }
+.krok-item {
+  display: flex; gap: 1.5rem; align-items: flex-start;
+  padding: 1.5rem 0; border-bottom: 1px solid var(--linia);
+  position: relative;
+}
+.krok-item:last-child { border-bottom: none; }
+.krok-num {
+  min-width: 48px; height: 48px; border-radius: 50%;
+  background: var(--zielony); color: var(--biel);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Playfair Display', serif; font-size: 1.1rem; font-weight: 600;
+  flex-shrink: 0;
+}
+.krok-tekst h3 { color: var(--zielony); margin-bottom: 0.3rem; }
+.krok-tekst p { font-size: 0.95rem; }
+.krok-tekst .tag {
+  display: inline-block; margin-top: 0.5rem;
+  background: var(--akcent); color: var(--zielony-jas);
+  font-size: 0.75rem; font-weight: 500; padding: 0.2rem 0.7rem;
+  letter-spacing: 0.08em; text-transform: uppercase;
+}
+
+/* GRID 2 */
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center; }
+.grid-2 img { width: 100%; height: 520px; object-fit: cover; object-position: center top; }
+.grid-2 img.pionowe { height: 580px; object-fit: contain; background: var(--kremowy); }
+.grid-2.odwrocony .grid-tekst { order: -1; }
+
+/* KARTY PRODUKTÓW */
+.karty { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; margin-top: 2.5rem; }
+.karta {
+  border: 1px solid var(--linia); background: var(--biel);
+  padding: 2rem; transition: box-shadow 0.25s, transform 0.25s;
+}
+.karta:hover { box-shadow: 0 8px 32px rgba(0,0,0,0.08); transform: translateY(-3px); }
+.karta-ikona { font-size: 2rem; margin-bottom: 1rem; }
+.karta h3 { color: var(--zielony); margin-bottom: 0.5rem; }
+.karta p { font-size: 0.92rem; }
+
+/* CECHY */
+.cechy { display: flex; flex-wrap: wrap; gap: 0.6rem; margin-top: 1.5rem; }
+.cecha { background: var(--akcent); border: 1px solid #c5e0b0; padding: 0.4rem 1rem; font-size: 0.8rem; font-weight: 500; color: var(--zielony); letter-spacing: 0.06em; }
+
+/* HIGHLIGHT BOX */
+.highlight {
+  background: var(--akcent); border-left: 3px solid var(--zielony);
+  padding: 1.5rem 2rem; margin: 2rem 0;
+}
+.highlight strong { color: var(--zielony); font-size: 1.1rem; }
+.highlight p { color: var(--ciemny); margin-top: 0.4rem; }
+
+/* KONTAKT */
+.kontakt-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; margin-top: 3rem; }
+.kontakt-info p { color: var(--ciemny); margin-bottom: 0.4rem; }
+.kontakt-info a { color: var(--zielony); }
+.godziny { margin-top: 2rem; padding: 1.5rem; background: var(--kremowy); border: 1px solid var(--linia); }
+.godziny h3 { color: var(--zielony); margin-bottom: 1rem; }
+.godziny-row { display: flex; justify-content: space-between; font-size: 0.9rem; padding: 0.4rem 0; border-bottom: 1px solid var(--linia); color: var(--ciemny); }
+.godziny-row:last-child { border-bottom: none; }
+.formularz { display: flex; flex-direction: column; gap: 1rem; }
+.formularz input, .formularz textarea, .formularz select {
+  width: 100%; padding: 0.85rem 1rem;
+  border: 1px solid var(--linia); background: var(--biel);
+  font-family: 'Inter', sans-serif; font-size: 0.95rem;
+  color: var(--ciemny); outline: none; transition: border-color 0.2s;
+}
+.formularz input:focus, .formularz textarea:focus, .formularz select:focus { border-color: var(--zielony); }
+.formularz textarea { height: 140px; resize: vertical; }
+
+/* STOPKA */
+footer { background: #111; color: rgba(255,255,255,0.65); padding: 3rem 2rem; }
+.footer-inner { max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: 1.5fr 1fr 1fr; gap: 3rem; }
+footer h4 { font-family: 'Playfair Display', serif; color: var(--biel); margin-bottom: 1rem; }
+footer p, footer a { font-size: 0.88rem; line-height: 2; color: rgba(255,255,255,0.6); }
+footer a:hover { color: var(--biel); }
+.footer-social { display: flex; gap: 0.8rem; margin-top: 1rem; }
+.footer-social a { width: 34px; height: 34px; border: 1px solid rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; font-size: 0.75rem; transition: 0.2s; }
+.footer-social a:hover { border-color: var(--biel); color: var(--biel); }
+.footer-bottom { max-width: 1100px; margin: 2rem auto 0; padding-top: 1.5rem; border-top: 1px solid rgba(255,255,255,0.1); display: flex; justify-content: space-between; font-size: 0.78rem; color: rgba(255,255,255,0.3); }
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+  .nav-links { display: none; position: absolute; top: 64px; left: 0; right: 0; background: var(--biel); flex-direction: column; padding: 1.5rem 2rem; border-bottom: 1px solid var(--linia); gap: 1.2rem; }
+  .nav-links.open { display: flex; }
+  .hamburger { display: flex; }
+  .karty-wyboru { grid-template-columns: 1fr; }
+  .grid-2 { grid-template-columns: 1fr; gap: 2rem; }
+  .grid-2 img { height: 240px; }
+  .grid-2.odwrocony .grid-tekst { order: 0; }
+  .kontakt-grid { grid-template-columns: 1fr; gap: 2rem; }
+  .footer-inner { grid-template-columns: 1fr; gap: 2rem; }
+  .footer-bottom { flex-direction: column; gap: 0.5rem; }
+  .section { padding: 3rem 1.2rem; }
+}
