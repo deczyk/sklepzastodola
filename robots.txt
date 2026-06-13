@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /brunimat-produkty.html
+
+Sitemap: https://www.sklepzastodola.pl/sitemap.xml
