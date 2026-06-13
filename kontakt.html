@@ -90,7 +90,11 @@
             <option value="inne">Inne</option>
           </select>
           <textarea name="wiadomosc" placeholder="Opisz swoje potrzeby — np. rodzaj gospodarstwa, co Cię interesuje, kiedy chcesz zainwestować..."></textarea>
-          <button type="submit" class="btn" style="margin-top:0;">Wyślij zapytanie</button>
+          <label style="display:flex; gap:0.75rem; align-items:flex-start; font-size:0.85rem; color:var(--szary); cursor:pointer; margin-top:0.5rem;">
+            <input type="checkbox" name="rodo" required style="margin-top:3px; min-width:16px; height:16px; cursor:pointer;" />
+            <span>Wyrażam zgodę na przetwarzanie moich danych osobowych przez Sklep za Stodołą sp. z o.o. w celu odpowiedzi na moje zapytanie. <a href="polityka.html" style="color:var(--zielony); text-decoration:underline;">Polityka prywatności</a></span>
+          </label>
+          <button type="submit" class="btn" style="margin-top:0.5rem;">Wyślij zapytanie</button>
           <p style="font-size:0.78rem; margin-top:0.5rem;">Oddzwonimy lub odpiszemy w ciągu 24 godzin.</p>
         </form>
 
