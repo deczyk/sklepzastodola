@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Maszyny i Serwis | Sklep za Stodołą</title>
+  <meta name="description" content="Automaty do mleka, sprzęt rolniczy, instalacja i serwis. Szwajcarska jakość, polska obsługa. Dofinansowanie ARiMR do 65%." />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌾</text></svg>">
+</head>
+<body>
+
+  <nav>
+    <a href="index.html" class="nav-logo">Sklep za Stodołą</a>
+    <button class="hamburger" onclick="toggleMenu()" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+    <ul class="nav-links" id="nav-links">
+      <li><a href="index.html">Start</a></li>
+      <li><a href="rolnik.html">Dla rolników</a></li>
+      <li><a href="oferta.html" class="active">Maszyny i serwis</a></li>
+      <li><a href="kontakt.html">Kontakt</a></li>
+    </ul>
+  </nav>
+
+  <div class="page-hero">
+    <div class="page-hero-content">
+      <h1>Maszyny i Serwis</h1>
+      <p>Szwajcarska jakość, pełna obsługa, dofinansowanie do 65%</p>
+    </div>
+  </div>
+
+  <!-- AUTOMAT DO MLEKA -->
+  <section class="section">
+    <div class="grid-2">
+      <img src="img/automat.jpg" alt="Automat do mleka" onerror="this.style.background='#e8e0d0';" />
+      <div class="grid-tekst">
+        <span class="section-label">Produkt flagowy</span>
+        <h2>Automat do świeżego mleka</h2>
+        <div class="divider"></div>
+        <p>Nowoczesny automat do sprzedaży surowego mleka prosto z gospodarstwa. Działa całą dobę bez obsługi — Ty śpisz, automat zarabia.</p>
+        <p style="margin-top:1rem;">Idealne rozwiązanie dla gospodarstw mlecznych które chcą sprzedawać mleko bezpośrednio, z pominięciem pośredników. Wyższa marża, lojalni klienci, stały przychód.</p>
+
+        <div class="cechy">
+          <span class="cecha">Dostępny 24/7</span>
+          <span class="cecha">Łatwa obsługa</span>
+          <span class="cecha">Szwajcarska jakość</span>
+          <span class="cecha">Chłodzenie mleka</span>
+          <span class="cecha">Płatności gotówką</span>
+          <span class="cecha">Ekran dotykowy</span>
+        </div>
+
+        <div class="highlight" style="margin-top:1.5rem;">
+          <strong>💰 Z dofinansowaniem ARiMR płacisz nawet 3× mniej</strong>
+          <p>Pomagamy złożyć wniosek — zwrot do 65% kosztów zakupu.</p>
+        </div>
+
+        <a href="kontakt.html" class="btn">Zapytaj o cenę i dostępność</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- INNE PRODUKTY -->
+  <div class="band-kremowy band">
+    <h2>Pełna oferta sprzętu</h2>
+    <div class="divider divider-center" style="margin: 1rem auto;"></div>
+    <p>Oferujemy szeroki wybór maszyn i urządzeń rolniczych. Skontaktuj się z nami — dobierzemy sprzęt odpowiedni do Twojego gospodarstwa.</p>
+  </div>
+
+  <section class="section">
+    <div class="karty">
+      <div class="karta">
+        <div class="karta-ikona">🥛</div>
+        <h3>Automaty do mleka</h3>
+        <p>Automaty różnych pojemności do sprzedaży bezpośredniej. Modele wolnostojące i wbudowane. Idealne do sklepów przy gospodarstwach i targowisk.</p>
+        <a href="kontakt.html" style="display:inline-block; margin-top:1rem; font-size:0.8rem; color:var(--zielony); font-weight:500; text-transform:uppercase; letter-spacing:0.08em;">Zapytaj →</a>
+      </div>
+      <div class="karta">
+        <div class="karta-ikona">🧴</div>
+        <h3>Sprzęt do przetwórstwa mleka</h3>
+        <p>Urządzenia do pasteryzacji, schładzania i pakowania mleka oraz produktów mlecznych. Kompletne linie technologiczne.</p>
+        <a href="kontakt.html" style="display:inline-block; margin-top:1rem; font-size:0.8rem; color:var(--zielony); font-weight:500; text-transform:uppercase; letter-spacing:0.08em;">Zapytaj →</a>
+      </div>
+      <div class="karta">
+        <div class="karta-ikona">🌿</div>
+        <h3>Sprzęt do sprzedaży bezpośredniej</h3>
+        <p>Chłodnie, lady, witryny i automaty do sprzedaży produktów rolnych. Idealne do sklepów przy gospodarstwach.</p>
+        <a href="kontakt.html" style="display:inline-block; margin-top:1rem; font-size:0.8rem; color:var(--zielony); font-weight:500; text-transform:uppercase; letter-spacing:0.08em;">Zapytaj →</a>
+      </div>
+    </div>
+
+    <p style="margin-top:2.5rem; color:var(--szary); font-style:italic;">Nie widzisz potrzebnego sprzętu? Skontaktuj się z nami — postaramy się znaleźć rozwiązanie dla Twojego gospodarstwa.</p>
+  </section>
+
+  <!-- SERWIS -->
+  <section class="section" style="background:var(--kremowy); max-width:100%; padding:4rem 2rem;">
+    <div style="max-width:1100px; margin:0 auto;">
+      <div class="grid-2 odwrocony">
+        <img src="img/serwis.jpg" alt="Serwis maszyn" onerror="this.style.background='#e8e0d0';" />
+        <div class="grid-tekst">
+          <span class="section-label">Obsługa posprzedażowa</span>
+          <h2>Serwis i wsparcie techniczne</h2>
+          <div class="divider"></div>
+          <p>Nie znikamy po podpisaniu umowy. Zapewniamy pełną opiekę techniczną przez cały okres użytkowania sprzętu.</p>
+
+          <div class="kroki" style="margin-top:1.5rem;">
+            <div class="krok-item" style="padding:1rem 0;">
+              <div class="krok-num" style="min-width:36px; height:36px; font-size:0.9rem;">✓</div>
+              <div class="krok-tekst">
+                <h3>Instalacja pod klucz</h3>
+                <p>Dostarczamy, montujemy i uruchamiamy sprzęt w Twoim gospodarstwie.</p>
+              </div>
+            </div>
+            <div class="krok-item" style="padding:1rem 0;">
+              <div class="krok-num" style="min-width:36px; height:36px; font-size:0.9rem;">✓</div>
+              <div class="krok-tekst">
+                <h3>Przeglądy okresowe</h3>
+                <p>Regularne inspekcje techniczne zapewniające bezawaryjną pracę urządzeń.</p>
+              </div>
+            </div>
+            <div class="krok-item" style="padding:1rem 0;">
+              <div class="krok-num" style="min-width:36px; height:36px; font-size:0.9rem;">✓</div>
+              <div class="krok-tekst">
+                <h3>Szybkie naprawy</h3>
+                <p>Reagujemy sprawnie na zgłoszenia — minimalizujemy czas przestoju.</p>
+              </div>
+            </div>
+            <div class="krok-item" style="padding:1rem 0; border-bottom:none;">
+              <div class="krok-num" style="min-width:36px; height:36px; font-size:0.9rem;">✓</div>
+              <div class="krok-tekst">
+                <h3>Części zamienne</h3>
+                <p>Posiadamy magazyn części — nie czekasz tygodniami na zamówienie z zagranicy.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- DLACZEGO SZWAJCARIA -->
+  <section class="section section-center">
+    <span class="section-label">Jakość</span>
+    <h2>Dlaczego sprzęt ze Szwajcarii?</h2>
+    <div class="divider divider-center"></div>
+    <p style="max-width:600px; margin:0 auto 2.5rem;">Szwajcarskie maszyny rolnicze to synonim precyzji i trwałości. Wyższe koszty początkowe zwracają się w wieloletniej, bezawaryjnej eksploatacji.</p>
+
+    <div class="karty">
+      <div class="karta">
+        <div class="karta-ikona">🎯</div>
+        <h3>Precyzja wykonania</h3>
+        <p>Rygorystyczne normy jakości i kontrola produkcji gwarantują niezawodność przez lata.</p>
+      </div>
+      <div class="karta">
+        <div class="karta-ikona">⏳</div>
+        <h3>Długa żywotność</h3>
+        <p>Sprzęt projektowany z myślą o intensywnym użytkowaniu przez dekady, nie kilka sezonów.</p>
+      </div>
+      <div class="karta">
+        <div class="karta-ikona">🛡️</div>
+        <h3>Gwarancja i certyfikaty</h3>
+        <p>Pełna gwarancja producenta, certyfikaty EU i zgodność z normami sanitarnymi dla sprzętu spożywczego.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <div class="band">
+    <h2>Interesuje Cię konkretna maszyna?</h2>
+    <p>Napisz lub zadzwoń — bezpłatnie doradzimy, wycenimy i sprawdzimy dostępność dofinansowania ARiMR dla Twojego przypadku.</p>
+    <div style="display:flex; gap:1rem; justify-content:center; flex-wrap:wrap; margin-top:2rem;">
+      <a href="tel:533200652" class="btn btn-biel">📞 533 200 652</a>
+      <a href="kontakt.html" class="btn" style="border-color:rgba(255,255,255,0.4); background:transparent;">Formularz kontaktowy</a>
+    </div>
+  </div>
+
+  <footer>
+    <div class="footer-inner">
+      <div>
+        <h4>Sklep za Stodołą</h4>
+        <p>Maszyny rolnicze · Dofinansowania ARiMR<br>Instalacja · Serwis · Sklep rolniczy</p>
+        <div class="footer-social">
+          <a href="#" title="Facebook">FB</a>
+          <a href="#" title="Instagram">IG</a>
+        </div>
+      </div>
+      <div>
+        <h4>Nawigacja</h4>
+        <p>
+          <a href="index.html">Strona główna</a><br>
+          <a href="rolnik.html">Dla rolników</a><br>
+          <a href="oferta.html">Maszyny i serwis</a><br>
+          <a href="kontakt.html">Kontakt</a>
+        </p>
+      </div>
+      <div>
+        <h4>Kontakt</h4>
+        <p>
+          <a href="tel:533200652">533 200 652</a><br>
+          <a href="tel:690000923">690 000 923</a><br>
+          <a href="mailto:kontakt@sklepzastodola.pl">kontakt@sklepzastodola.pl</a>
+        </p>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Sklep za Stodołą</span>
+      <span><a href="#">Polityka prywatności</a></span>
+    </div>
+  </footer>
+
+  <script>
+    function toggleMenu() { document.getElementById('nav-links').classList.toggle('open'); }
+  </script>
+</body>
+</html>
