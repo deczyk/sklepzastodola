@@ -69,7 +69,7 @@
         <h2>Formularz kontaktowy</h2>
         <div class="divider"></div>
 
-        <form class="formularz" id="kontakt-form" action="https://formspree.io/f/WSTAW_SWOJ_KOD" method="POST">
+        <form class="formularz" id="kontakt-form" action="https://formspree.io/f/mqeogyjd" method="POST">
           <input type="text" name="imie" placeholder="Imię i nazwisko *" required />
           <input type="tel" name="telefon" placeholder="Telefon *" required />
           <input type="email" name="email" placeholder="Adres e-mail" />
@@ -130,14 +130,6 @@
 
   <script>
     function toggleMenu() { document.getElementById('nav-links').classList.toggle('open'); }
-
-    document.getElementById('kontakt-form').addEventListener('submit', function(e) {
-      if (this.action.includes('https://formspree.io/f/mqeogyjd')) {
-        e.preventDefault();
-        this.style.display = 'none';
-        document.getElementById('potwierdzenie').style.display = 'block';
-      }
-    });
   </script>
 </body>
 </html>
