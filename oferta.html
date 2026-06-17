@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Maszyny i Serwis | Sklep za Stodołą</title>
   <meta name="description" content="Automaty do mleka i sprzęt rolniczy — sprzedaż i leasing. Instalacja i serwis w całej Polsce. Dofinansowanie ARiMR do 65%." />
-  <meta name="keywords" content="automat do mleka cena, automat do mleka leasing, sprzęt mleczarski, maszyny rolnicze sprzedaż, serwis maszyn rolniczych, Brunimat Polska" />
+  <meta name="keywords" content="automat do mleka cena, automat do mleka leasing, sprzęt mleczarski, maszyny rolnicze sprzedaż, serwis maszyn rolniczych, Brunimat Polska, pawilon handlowy drewniany, pawilon pod mlekomat" />
   <meta name="robots" content="index, follow" />
   <link rel="canonical" href="https://www.sklepzastodola.pl/oferta.html" />
   <meta property="og:title" content="Maszyny i Serwis | Sprzedaż i leasing — Sklep za Stodołą" />
@@ -15,6 +15,101 @@
   <meta property="og:site_name" content="Sklep za Stodołą" />
   <link rel="stylesheet" href="style.css" />
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌾</text></svg>">
+  <style>
+    /* ===== GALERIA PAWILONÓW ===== */
+    .pawilony-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1.5rem;
+      margin-top: 2rem;
+    }
+    .pawylon-card {
+      background: var(--kremowy, #faf8f4);
+      border: 1px solid var(--linia, #e5ddd0);
+      border-radius: 4px;
+      overflow: hidden;
+      transition: box-shadow 0.2s ease;
+    }
+    .pawylon-card:hover { box-shadow: 0 4px 20px rgba(0,0,0,0.10); }
+    .pawylon-img-wrap {
+      width: 100%;
+      aspect-ratio: 4/3;
+      overflow: hidden;
+      background: #e8e4dc;
+      display: flex; align-items: center; justify-content: center;
+      position: relative;
+    }
+    .pawylon-img-wrap img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      transition: transform 0.3s ease;
+    }
+    .pawylon-card:hover .pawylon-img-wrap img { transform: scale(1.04); }
+    .pawylon-img-placeholder {
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      color: #a09880; font-size: 0.8rem; text-align: center;
+      padding: 1rem; gap: 8px;
+      position: absolute; inset: 0;
+    }
+    .pawylon-img-placeholder span { font-size: 2.5rem; }
+    .pawylon-info {
+      padding: 1rem 1.2rem;
+    }
+    .pawylon-info h3 {
+      font-size: 1rem;
+      color: var(--zielony, #2e5c1a);
+      margin-bottom: 0.4rem;
+    }
+    .pawylon-info p {
+      font-size: 0.83rem;
+      color: #666;
+      line-height: 1.5;
+    }
+    .pawylon-badge {
+      display: inline-block;
+      font-size: 0.68rem;
+      padding: 2px 8px;
+      border-radius: 10px;
+      background: #c8e6c9;
+      color: #1a5c2a;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+    /* ===== LIGHTBOX PROSTY ===== */
+    .lightbox-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,0.88); z-index: 9999;
+      align-items: center; justify-content: center;
+    }
+    .lightbox-overlay.active { display: flex; }
+    .lightbox-overlay img {
+      max-width: 90vw; max-height: 88vh;
+      object-fit: contain; border-radius: 4px;
+    }
+    .lightbox-close {
+      position: absolute; top: 1.2rem; right: 1.5rem;
+      color: white; font-size: 2rem; cursor: pointer;
+      background: none; border: none; line-height: 1;
+    }
+    .lightbox-caption {
+      position: absolute; bottom: 1.5rem; left: 50%;
+      transform: translateX(-50%);
+      color: rgba(255,255,255,0.8); font-size: 0.85rem;
+      background: rgba(0,0,0,0.4); padding: 6px 14px; border-radius: 20px;
+    }
+    .pawylon-img-wrap img { cursor: pointer; }
+    /* ===== REALIZACJE BANNER ===== */
+    .realizacje-note {
+      background: #fff8e1;
+      border-left: 4px solid #f9a825;
+      padding: 12px 18px;
+      font-size: 0.83rem;
+      color: #555;
+      border-radius: 0 6px 6px 0;
+      margin-top: 1.5rem;
+    }
+  </style>
 </head>
 <body>
 
@@ -80,7 +175,6 @@
         <div style="font-size:2.5rem; margin-bottom:1rem;">🛒</div>
         <h3 style="color:var(--zielony); font-size:1.4rem; margin-bottom:1rem;">Sprzedaż bezpośrednia</h3>
         <p>Kupujesz maszynę od razu — pełna własność od pierwszego dnia. Najlepsza opcja jeśli planujesz ubiegać się o dofinansowanie ARiMR, bo refundacja trafia bezpośrednio do Ciebie.</p>
-
         <div class="kroki" style="margin-top:1.5rem;">
           <div class="krok-item" style="padding:0.8rem 0;">
             <div class="krok-num" style="min-width:32px; height:32px; font-size:0.85rem;">✓</div>
@@ -99,10 +193,9 @@
             <div class="krok-tekst"><p style="color:var(--ciemny); font-size:0.92rem;">Jednorazowy koszt, brak rat</p></div>
           </div>
         </div>
-
         <div class="highlight" style="margin-top:auto; padding-top:1.5rem;">
           <strong>Przykład</strong>
-          <p>Przykład: automat w cenie X zł — po dofinansowaniu ARiMR 65% płacisz tylko <strong style="color:var(--zielony);">35% wartości</strong>. Ceny zależą od modelu — zapytaj o wycenę.</p>
+          <p>Automat w cenie X zł — po dofinansowaniu ARiMR 65% płacisz tylko <strong style="color:var(--zielony);">35% wartości</strong>. Ceny zależą od modelu — zapytaj o wycenę.</p>
         </div>
         <a href="kontakt.html" class="btn" style="margin-top:1.5rem; text-align:center;">Zapytaj o cenę</a>
       </div>
@@ -112,7 +205,6 @@
         <div style="font-size:2.5rem; margin-bottom:1rem;">📋</div>
         <h3 style="color:var(--zielony); font-size:1.4rem; margin-bottom:1rem;">Leasing</h3>
         <p>Rozkładasz koszt maszyny na wygodne raty miesięczne. Minimalne zaangażowanie własnego kapitału — sprzęt pracuje i zarabia na siebie od pierwszego dnia użytkowania.</p>
-
         <div class="kroki" style="margin-top:1.5rem;">
           <div class="krok-item" style="padding:0.8rem 0;">
             <div class="krok-num" style="min-width:32px; height:32px; font-size:0.85rem;">✓</div>
@@ -131,7 +223,6 @@
             <div class="krok-tekst"><p style="color:var(--ciemny); font-size:0.92rem;">Wykup maszyny po zakończeniu umowy</p></div>
           </div>
         </div>
-
         <div class="highlight" style="margin-top:auto; padding-top:1.5rem;">
           <strong>Przykład</strong>
           <p>Leasing na 5 lat — rata zależna od wartości maszyny. Automat zarabia od pierwszego dnia i spłaca się sam. Zapytaj o indywidualną wycenę.</p>
@@ -181,6 +272,166 @@
       </div>
     </div>
   </section>
+
+  <!-- ========================================= -->
+  <!-- NOWA SEKCJA: REALIZACJE — PAWILONY        -->
+  <!-- ========================================= -->
+  <div class="band-kremowy band" id="pawilony">
+    <h2>Realizacje — Pawilony handlowe</h2>
+    <div class="divider divider-center" style="margin:1rem auto;"></div>
+    <p>Drewniane pawilony pod mlekomat i sklep gospodarczy — projektujemy, budujemy, dostarczamy</p>
+  </div>
+
+  <section class="section">
+    <div class="grid-2" style="align-items:start; gap:3rem;">
+
+      <!-- LEWA: OPIS -->
+      <div class="grid-tekst">
+        <span class="section-label">Własna produkcja</span>
+        <h2>Pawilon drewniany — kompleksowo</h2>
+        <div class="divider"></div>
+        <p>Dostarczamy gotowe, drewniane pawilony handlowe skrojone pod automat do mleka lub sklep przy gospodarstwu. Solidna konstrukcja, estetyczny wygląd, szybki montaż na miejscu.</p>
+        <p style="margin-top:1rem;">Każdy pawilon dopasowujemy do potrzeb klienta — rozmiar, układ okien, drzwi, kolor elewacji. Możliwość dodania logo i oznaczeń.</p>
+
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-top:1.5rem;">
+          <div style="background:var(--kremowy,#faf8f4); border:1px solid var(--linia,#e5ddd0); padding:1rem; border-radius:4px;">
+            <div style="font-size:1.4rem; margin-bottom:0.4rem;">🏠</div>
+            <strong style="color:var(--zielony,#2e5c1a); font-size:0.9rem;">Sklep gospodarczy</strong>
+            <p style="font-size:0.82rem; color:#666; margin-top:0.4rem;">Pawilon z witryną, miejscem na ekspozycję i automatem do mleka — kompletny punkt sprzedaży przy Twoim gospodarstwie.</p>
+          </div>
+          <div style="background:var(--kremowy,#faf8f4); border:1px solid var(--linia,#e5ddd0); padding:1rem; border-radius:4px;">
+            <div style="font-size:1.4rem; margin-bottom:0.4rem;">🥛</div>
+            <strong style="color:#1565c0; font-size:0.9rem;">Tylko pod mlekomat</strong>
+            <p style="font-size:0.82rem; color:#666; margin-top:0.4rem;">Kompaktowy pawilon zaprojektowany wyłącznie pod automat do mleka. Niższy koszt, szybszy montaż.</p>
+          </div>
+        </div>
+
+        <div class="kroki" style="margin-top:2rem;">
+          <div class="krok-item" style="padding:0.8rem 0;">
+            <div class="krok-num" style="min-width:36px; height:36px; font-size:0.85rem;">1</div>
+            <div class="krok-tekst"><h3>Wycena i projekt</h3><p>Ustalamy wymiary, układ i wykończenie. Bezpłatna wycena.</p></div>
+          </div>
+          <div class="krok-item" style="padding:0.8rem 0;">
+            <div class="krok-num" style="min-width:36px; height:36px; font-size:0.85rem;">2</div>
+            <div class="krok-tekst"><h3>Produkcja</h3><p>Budujemy pawilon zgodnie z projektem — termin ustalamy indywidualnie.</p></div>
+          </div>
+          <div class="krok-item" style="padding:0.8rem 0;">
+            <div class="krok-num" style="min-width:36px; height:36px; font-size:0.85rem;">3</div>
+            <div class="krok-tekst"><h3>Dostawa i montaż</h3><p>Przywozimy i stawiamy na wskazanym miejscu. Podłączenie prądu opcjonalnie.</p></div>
+          </div>
+          <div class="krok-item" style="padding:0.8rem 0; border-bottom:none;">
+            <div class="krok-num" style="min-width:36px; height:36px; font-size:0.85rem;">✓</div>
+            <div class="krok-tekst"><h3>Gotowe do użytku</h3><p>Instalujemy automat do mleka i szkolimy z obsługi — wszystko w jednym miejscu.</p></div>
+          </div>
+        </div>
+
+        <a href="kontakt.html" class="btn" style="margin-top:2rem;">Zapytaj o pawilon</a>
+      </div>
+
+      <!-- PRAWA: GALERIA -->
+      <div>
+        <!-- DWA TYPY PAWILONÓW — układ 2 kolumny -->
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:2rem; margin-top:1rem;">
+
+          <!-- TYP 1: SKLEP GOSPODARCZY -->
+          <div>
+            <div style="font-size:0.8rem; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; color:var(--zielony,#2e5c1a); margin-bottom:0.8rem;">Typ 1 — Sklep gospodarczy</div>
+            <!-- Zdjęcie 1 -->
+            <div class="pawylon-card" style="margin-bottom:1rem;">
+              <div class="pawylon-img-wrap">
+                <img src="img/pawilony/sklep-01.jpg" alt="Pawilon drewniany – sklep gospodarczy" onclick="openLightbox(this)"
+                  onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+                <div class="pawylon-img-placeholder" style="display:none;"><span>🏠</span><strong>Zdjęcie wkrótce</strong><small>img/pawilony/sklep-01.jpg</small></div>
+              </div>
+              <div class="pawylon-info">
+                <div class="pawylon-badge">Sklep gospodarczy</div>
+                <h3>Pawilon z witryną i sklepem</h3>
+                <p>Drewniany pawilon z przeszklonym frontem — miejsce na automat do mleka i ekspozycję produktów z gospodarstwa.</p>
+              </div>
+            </div>
+            <!-- Zdjęcie 2 — dodaj kolejne wg schematu sklep-02.jpg, sklep-03.jpg itd. -->
+            <div class="pawylon-card" style="margin-bottom:1rem;">
+              <div class="pawylon-img-wrap">
+                <img src="img/pawilony/sklep-02.jpg" alt="Pawilon drewniany – sklep gospodarczy 2" onclick="openLightbox(this)"
+                  onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+                <div class="pawylon-img-placeholder" style="display:none;"><span>🏠</span><strong>Zdjęcie wkrótce</strong><small>img/pawilony/sklep-02.jpg</small></div>
+              </div>
+              <div class="pawylon-info">
+                <div class="pawylon-badge">Sklep gospodarczy</div>
+                <h3>Pawilon — widok wnętrza</h3>
+                <p>Przestronne wnętrze z miejscem na ladę, chłodnię i ekspozycję produktów lokalnych.</p>
+              </div>
+            </div>
+            <div class="pawylon-card">
+              <div class="pawylon-img-wrap">
+                <img src="img/pawilony/sklep-03.jpg" alt="Pawilon drewniany – sklep gospodarczy 3" onclick="openLightbox(this)"
+                  onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+                <div class="pawylon-img-placeholder" style="display:none;"><span>🏠</span><strong>Zdjęcie wkrótce</strong><small>img/pawilony/sklep-03.jpg</small></div>
+              </div>
+              <div class="pawylon-info">
+                <div class="pawylon-badge">Sklep gospodarczy</div>
+                <h3>Realizacja — woj. śląskie</h3>
+                <p>Gotowa instalacja z mleKomatem, oświetleniem LED i monitoringiem. Wrzuć zdjęcie do img/pawilony/sklep-03.jpg</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- TYP 2: TYLKO MLEKOMAT -->
+          <div>
+            <div style="font-size:0.8rem; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; color:var(--zielony,#2e5c1a); margin-bottom:0.8rem;">Typ 2 — Pawilon pod mlekomat</div>
+            <div class="pawylon-card" style="margin-bottom:1rem;">
+              <div class="pawylon-img-wrap">
+                <img src="img/pawilony/mlekomat-01.jpg" alt="Pawilon drewniany pod mlekomat" onclick="openLightbox(this)"
+                  onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+                <div class="pawylon-img-placeholder" style="display:none;"><span>🥛</span><strong>Zdjęcie wkrótce</strong><small>img/pawilony/mlekomat-01.jpg</small></div>
+              </div>
+              <div class="pawylon-info">
+                <div class="pawylon-badge" style="background:#bbdefb;color:#1565c0;">Mlekomat</div>
+                <h3>Pawilon kompaktowy — sam mlekomat</h3>
+                <p>Minimalistyczny pawilon zaprojektowany wyłącznie pod automat do mleka. Niższy koszt, szybszy montaż.</p>
+              </div>
+            </div>
+            <div class="pawylon-card" style="margin-bottom:1rem;">
+              <div class="pawylon-img-wrap">
+                <img src="img/pawilony/mlekomat-02.jpg" alt="Pawilon pod mlekomat 2" onclick="openLightbox(this)"
+                  onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+                <div class="pawylon-img-placeholder" style="display:none;"><span>🥛</span><strong>Zdjęcie wkrótce</strong><small>img/pawilony/mlekomat-02.jpg</small></div>
+              </div>
+              <div class="pawylon-info">
+                <div class="pawylon-badge" style="background:#bbdefb;color:#1565c0;">Mlekomat</div>
+                <h3>Widok boczny z maszyną</h3>
+                <p>Automat Brunimat wbudowany w pawilon — ochrona przed pogodą, estetyczny wygląd, dostępny 24/7.</p>
+              </div>
+            </div>
+            <div class="pawylon-card">
+              <div class="pawylon-img-wrap">
+                <img src="img/pawilony/mlekomat-03.jpg" alt="Pawilon pod mlekomat 3" onclick="openLightbox(this)"
+                  onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+                <div class="pawylon-img-placeholder" style="display:none;"><span>🥛</span><strong>Zdjęcie wkrótce</strong><small>img/pawilony/mlekomat-03.jpg</small></div>
+              </div>
+              <div class="pawylon-info">
+                <div class="pawylon-badge" style="background:#bbdefb;color:#1565c0;">Mlekomat</div>
+                <h3>Realizacja — woj. łódzkie</h3>
+                <p>Pawilon z logo rolnika i podświetlanym szyldem. Wrzuć zdjęcie do img/pawilony/mlekomat-03.jpg</p>
+              </div>
+            </div>
+          </div>
+
+        </div><!-- /dwa typy -->
+
+        <div class="realizacje-note">
+          📷 <strong>Jak dodać zdjęcia:</strong> Wrzuć pliki JPG/WebP do folderu <code>img/pawilony/</code> w repo.<br>
+          Sklep gospodarczy: <code>sklep-01.jpg</code>, <code>sklep-02.jpg</code>, <code>sklep-03.jpg</code><br>
+          Pawilon pod mlekomat: <code>mlekomat-01.jpg</code>, <code>mlekomat-02.jpg</code>, <code>mlekomat-03.jpg</code><br>
+          Chcesz więcej zdjęć? Skopiuj kolejną kartę i zmień numer pliku.
+        </div>
+      </div><!-- /prawa kolumna -->
+
+    </div><!-- /grid-2 -->
+  </section>
+  <!-- ========================================= -->
+  <!-- KONIEC SEKCJI PAWILONY                    -->
+  <!-- ========================================= -->
 
   <!-- SERWIS -->
   <section class="section" style="background:var(--kremowy); max-width:100%; padding:4rem 2rem;">
@@ -233,7 +484,7 @@
     <div class="footer-inner">
       <div>
         <h4>Sklep za Stodołą</h4>
-        <p>Maszyny rolnicze · Leasing · Dofinansowania ARiMR<br>Instalacja · Serwis</p>
+        <p>Maszyny rolnicze · Leasing · Dofinansowania ARiMR<br>Instalacja · Serwis · Pawilony handlowe</p>
         <div class="footer-social">
           <a href="https://www.facebook.com/profile.php?id=61590896125832" title="Facebook">FB</a>
           <a href="https://www.instagram.com/sklepzastodola/" title="Instagram">IG</a>
@@ -245,6 +496,7 @@
           <a href="index.html">Strona główna</a><br>
           <a href="rolnik.html">Dla rolników</a><br>
           <a href="oferta.html">Maszyny i serwis</a><br>
+          <a href="oferta.html#pawilony">Pawilony handlowe</a><br>
           <a href="kontakt.html">Kontakt</a>
         </p>
       </div>
@@ -263,8 +515,28 @@
     </div>
   </footer>
 
+  <!-- LIGHTBOX -->
+  <div class="lightbox-overlay" id="lightbox" onclick="closeLightbox()">
+    <button class="lightbox-close" onclick="closeLightbox()">✕</button>
+    <img id="lightbox-img" src="" alt="" />
+    <div class="lightbox-caption" id="lightbox-caption"></div>
+  </div>
+
   <script>
     function toggleMenu() { document.getElementById('nav-links').classList.toggle('open'); }
+
+    function openLightbox(img) {
+      document.getElementById('lightbox-img').src = img.src;
+      document.getElementById('lightbox-img').alt = img.alt;
+      document.getElementById('lightbox-caption').textContent = img.alt;
+      document.getElementById('lightbox').classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+    function closeLightbox() {
+      document.getElementById('lightbox').classList.remove('active');
+      document.body.style.overflow = '';
+    }
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLightbox(); });
   </script>
 </body>
 </html>
