@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cennik Brunimat – Mlekomaty | Sklep za Stodołą</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: #f4f7f4; color: #222; }
+  
+  .header {
+    background: linear-gradient(135deg, #1a5c2a 0%, #2e7d45 100%);
+    color: white; padding: 32px 40px; display: flex;
+    justify-content: space-between; align-items: center;
+  }
+  .header h1 { font-size: 1.6rem; font-weight: 700; }
+  .header .sub { font-size: 0.9rem; opacity: 0.85; margin-top: 4px; }
+  .logo { font-size: 1.1rem; font-weight: 800; letter-spacing: 1px;
+    background: rgba(255,255,255,0.15); padding: 10px 18px; border-radius: 8px; }
+
+  .notice {
+    background: #fff8e1; border-left: 4px solid #f9a825;
+    padding: 14px 40px; font-size: 0.85rem; color: #555;
+    display: flex; gap: 20px; flex-wrap: wrap;
+  }
+  .notice span { display: flex; align-items: center; gap: 6px; }
+  .notice strong { color: #333; }
+
+  .container { max-width: 1100px; margin: 0 auto; padding: 32px 20px; }
+
+  h2 { font-size: 1.2rem; color: #1a5c2a; margin: 32px 0 12px;
+    padding-bottom: 6px; border-bottom: 2px solid #c8e6c9; }
+  h2:first-of-type { margin-top: 0; }
+
+  .badge { display: inline-block; background: #1a5c2a; color: white;
+    font-size: 0.7rem; padding: 2px 8px; border-radius: 10px;
+    margin-left: 8px; vertical-align: middle; font-weight: 600; }
+  .badge.blue { background: #1565c0; }
+
+  table { width: 100%; border-collapse: collapse; margin-bottom: 8px;
+    background: white; border-radius: 10px; overflow: hidden;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.08); }
+  thead tr { background: #1a5c2a; color: white; }
+  thead th { padding: 12px 16px; text-align: left; font-size: 0.82rem;
+    font-weight: 600; letter-spacing: 0.3px; }
+  thead th.right { text-align: right; }
+  tbody tr { border-bottom: 1px solid #f0f0f0; transition: background 0.15s; }
+  tbody tr:hover { background: #f1f8f2; }
+  tbody tr:last-child { border-bottom: none; }
+  td { padding: 11px 16px; font-size: 0.88rem; }
+  td.price { text-align: right; font-weight: 700; color: #1a5c2a;
+    white-space: nowrap; font-size: 0.92rem; }
+  td.desc { color: #666; font-size: 0.8rem; }
+  .dim { color: #888; font-size: 0.78rem; margin-top: 2px; }
+  .highlight { background: #e8f5e9 !important; }
+
+  .options-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 12px; margin-bottom: 8px; }
+  .option-card { background: white; border-radius: 10px; padding: 16px 18px;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.08); display: flex;
+    justify-content: space-between; align-items: center; gap: 10px; }
+  .option-card .name { font-size: 0.88rem; font-weight: 600; color: #333; }
+  .option-card .detail { font-size: 0.78rem; color: #888; margin-top: 2px; }
+  .option-card .p { font-weight: 800; color: #1a5c2a; white-space: nowrap;
+    font-size: 0.95rem; }
+  .option-card.selected { border: 2px solid #f9a825; background: #fffde7; }
+  .option-card.selected .p { color: #e65100; }
+
+  .footer-note { background: white; border-radius: 10px; padding: 18px 20px;
+    font-size: 0.82rem; color: #666; margin-top: 24px;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.06); }
+  .footer-note strong { color: #1a5c2a; }
+
+  .currency-note { text-align: right; font-size: 0.78rem; color: #999;
+    margin-bottom: 4px; font-style: italic; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div>
+    <div class="sub">Cennik ważny od 01.04.2025 | Ceny bez VAT | Ab Werk (loco fabryka)</div>
+    <h1>Mlekomaty Brunimat.ch – Cennik dla Odsprzedawców</h1>
+  </div>
+  <div class="logo">🐄 Sklep za Stodołą</div>
+</div>
+
+<div class="notice">
+  <span>📦 <strong>Dostawa:</strong> Płatna osobno (wg wyceny transportu)</span>
+  <span>💳 <strong>Płatność:</strong> Przed dostawą (przedpłata)</span>
+  <span>🏅 <strong>Certyfikat Premium:</strong> +150 EUR (CE-MID, zaplombowana dozownia)</span>
+  <span>💱 <strong>Waluta:</strong> EUR (ceny orientacyjne – kurs dzienny)</span>
+</div>
+
+<div class="container">
+
+  <!-- MLEKOMATY PREMIUM -->
+  <h2>🥛 Mlekomaty Premium <span class="badge">CE-MID • Czujnik temperatury • Monitoring pustego zbiornika</span></h2>
+  <div class="currency-note">Ceny w EUR netto, ab werk (loco fabryka Szwajcaria)</div>
+  <table>
+    <thead>
+      <tr>
+        <th>Model</th>
+        <th>Pojemność / Opis</th>
+        <th>Wymiary wewnętrzne</th>
+        <th>Wymiary zewnętrzne</th>
+        <th class="right">Cena EUR</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>BRUNIMAT 650 Premium</strong></td>
+        <td>1 zbiornik do 200 L</td>
+        <td class="dim">620 × 700 × 1400 mm</td>
+        <td class="dim">740 × 1020 × 2050 mm</td>
+        <td class="price">6 000</td>
+      </tr>
+      <tr>
+        <td><strong>BRUNIMAT 650 Premium DUO</strong></td>
+        <td>Max. 2 × 50 L kanny</td>
+        <td class="dim">620 × 700 × 1400 mm</td>
+        <td class="dim">740 × 1020 × 2050 mm</td>
+        <td class="price">6 400</td>
+      </tr>
+      <tr>
+        <td><strong>BRUNIMAT 650 Premium BAG</strong></td>
+        <td>4–8 worków mleka, auto-zmiana</td>
+        <td class="dim">620 × 700 × 1400 mm</td>
+        <td class="dim">740 × 1020 × 2050 mm</td>
+        <td class="price">6 600</td>
+      </tr>
+      <tr class="highlight">
+        <td><strong>BRUNIMAT 1300 Premium DUO</strong></td>
+        <td>2 zbiorniki do 200 L</td>
+        <td class="dim">1340 × 700 × 1400 mm</td>
+        <td class="dim">1480 × 1020 × 2000 mm</td>
+        <td class="price">7 600</td>
+      </tr>
+      <tr>
+        <td><strong>BRUNIMAT 1300 Premium QUATTRO</strong></td>
+        <td>4 × 50 L kanny</td>
+        <td class="dim">1340 × 700 × 1400 mm</td>
+        <td class="dim">1480 × 1020 × 2000 mm</td>
+        <td class="price">8 200</td>
+      </tr>
+      <tr>
+        <td><strong>BRUNIMAT 650 Premium Bi-fluid</strong></td>
+        <td>2 różne płyny, 2 × 50 L kanny</td>
+        <td class="dim">620 × 700 × 1400 mm</td>
+        <td class="dim">740 × 1020 × 2050 mm</td>
+        <td class="price">7 600</td>
+      </tr>
+      <tr>
+        <td><strong>BRUNIMAT 1300 Premium Bi-fluid</strong></td>
+        <td>2 różne płyny do 200 L</td>
+        <td class="dim">1340 × 700 × 1400 mm</td>
+        <td class="dim">1480 × 1020 × 2000 mm</td>
+        <td class="price">8 600</td>
+      </tr>
+      <tr>
+        <td><strong>BRUNIMAT Premium MINI</strong></td>
+        <td>Obudowa ze stali nierdzewnej, w połączeniu z tankiem fermowym</td>
+        <td class="dim">—</td>
+        <td class="dim">600 × 750 × 800 mm</td>
+        <td class="price">5 000</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- OPCJE DODATKOWE -->
+  <h2>⚙️ Opcje dodatkowe <span class="badge blue">Tylko dla modeli Premium</span></h2>
+
+  <div class="options-grid">
+    <div class="option-card">
+      <div>
+        <div class="name">GSM – powiadomienia SMS</div>
+        <div class="detail">Różne alarmy SMS</div>
+      </div>
+      <div class="p">500 EUR</div>
+    </div>
+    <div class="option-card">
+      <div>
+        <div class="name">GSM – alarm niskiego poziomu mleka</div>
+        <div class="detail">Np. alarm przy 50 L</div>
+      </div>
+      <div class="p">160 EUR</div>
+    </div>
+    <div class="option-card">
+      <div>
+        <div class="name">System płatności – monety (standard)</div>
+        <div class="detail">Bez wydawania reszty – w zestawie</div>
+      </div>
+      <div class="p">0 EUR</div>
+    </div>
+    <div class="option-card">
+      <div>
+        <div class="name">Wydawanie reszty (bilonarka)</div>
+        <div class="detail">Automatyczny wydatek reszty</div>
+      </div>
+      <div class="p">700 EUR</div>
+    </div>
+    <div class="option-card">
+      <div>
+        <div class="name">Czytnik banknotów</div>
+        <div class="detail">Akceptacja banknotów</div>
+      </div>
+      <div class="p">550 EUR</div>
+    </div>
+    <div class="option-card selected">
+      <div>
+        <div class="name">Reszta + banknoty (combo)</div>
+        <div class="detail">⭐ Najpopularniejszy wybór</div>
+      </div>
+      <div class="p">1 250 EUR</div>
+    </div>
+    <div class="option-card">
+      <div>
+        <div class="name">Płatność kartą (Nayax)</div>
+        <div class="detail">Terminal bezstykowy</div>
+      </div>
+      <div class="p">650 EUR</div>
+    </div>
+    <div class="option-card">
+      <div>
+        <div class="name">Drukarka paragonów</div>
+        <div class="detail">Wydruk potwierdzenia zakupu</div>
+      </div>
+      <div class="p">530 EUR</div>
+    </div>
+    <div class="option-card selected">
+      <div>
+        <div class="name">Automatyczne płukanie strefy dozowania</div>
+        <div class="detail">⭐ Po każdej sprzedaży mleka</div>
+      </div>
+      <div class="p">200 EUR</div>
+    </div>
+    <div class="option-card">
+      <div>
+        <div class="name">Ogrzewanie termostatyczne</div>
+        <div class="detail">System Anti-Frost na mrozy</div>
+      </div>
+      <div class="p">100 EUR</div>
+    </div>
+    <div class="option-card">
+      <div>
+        <div class="name">Alarm + syrena antywłamaniowa</div>
+        <div class="detail">SMS przy naruszeniu szafy sterowniczej</div>
+      </div>
+      <div class="p">200 EUR</div>
+    </div>
+    <div class="option-card">
+      <div>
+        <div class="name">Żetony (1 żeton = 1 litr)</div>
+        <div class="detail">100 sztuk</div>
+      </div>
+      <div class="p">55 EUR</div>
+    </div>
+    <div class="option-card">
+      <div>
+        <div class="name">Wózek do kannych 50 L</div>
+        <div class="detail">Ułatwia wymianę zbiornika</div>
+      </div>
+      <div class="p">280 EUR</div>
+    </div>
+  </div>
+
+  <!-- ZBIORNIKI -->
+  <h2>🪣 Zbiorniki i kanny (ze szczelnymi pokrywami)</h2>
+  <div class="options-grid">
+    <div class="option-card">
+      <div><div class="name">Kanna 50 L – stal nierdzewna</div><div class="detail">Z pokrywą 100% szczelną do transportu</div></div>
+      <div class="p">230 EUR</div>
+    </div>
+    <div class="option-card">
+      <div><div class="name">Zbiornik 100 L – stal nierdzewna</div></div>
+      <div class="p">350 EUR</div>
+    </div>
+    <div class="option-card">
+      <div><div class="name">Zbiornik 150 L – stal nierdzewna</div></div>
+      <div class="p">400 EUR</div>
+    </div>
+    <div class="option-card">
+      <div><div class="name">Zbiornik 200 L – stal nierdzewna</div></div>
+      <div class="p">450 EUR</div>
+    </div>
+  </div>
+
+  <!-- MLEKOSPENDER -->
+  <h2>🔘 Mlekospender (bez pobierania opłat)</h2>
+  <p style="font-size:0.83rem;color:#888;margin-bottom:12px;">Brak akceptora monet – wydawanie mleka przyciskiem. Idealne do serwisu pracowniczego lub dystrybucji zamkniętej.</p>
+  <table>
+    <thead>
+      <tr>
+        <th>Model</th>
+        <th>Opis</th>
+        <th>Wymiary wewnętrzne</th>
+        <th>Wymiary zewnętrzne</th>
+        <th class="right">Cena EUR</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Mlekospender 650</strong></td>
+        <td>Podstawowy</td>
+        <td class="dim">620 × 700 × 1400 mm</td>
+        <td class="dim">740 × 845 × 2030 mm</td>
+        <td class="price">4 600</td>
+      </tr>
+      <tr>
+        <td><strong>Mlekospender 650 Plus</strong></td>
+        <td>2 przyciski porcji, płukanie strefy dozowania</td>
+        <td class="dim">620 × 700 × 1400 mm</td>
+        <td class="dim">740 × 845 × 2030 mm</td>
+        <td class="price">5 200</td>
+      </tr>
+      <tr>
+        <td><strong>Mlekospender 650 Bi-Fluid</strong></td>
+        <td>1 przycisk na typ mleka, płukanie</td>
+        <td class="dim">620 × 700 × 1400 mm</td>
+        <td class="dim">740 × 845 × 2030 mm</td>
+        <td class="price">5 900</td>
+      </tr>
+      <tr class="highlight">
+        <td><strong>Mlekospender 650 Plus Bi-Fluid</strong></td>
+        <td>2 przyciski (1+2 L) na każdy typ, płukanie</td>
+        <td class="dim">620 × 700 × 1400 mm</td>
+        <td class="dim">740 × 845 × 2030 mm</td>
+        <td class="price">7 000</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="footer-note">
+    <strong>BRUNIMAT GmbH</strong> | Sonnental 11, CH-9313 Muolen, Szwajcaria<br>
+    📞 +41 (0) 71 414 72 72 | ✉️ info@brunimat.ch | 🌐 www.brunimat.ch<br><br>
+    <strong>Dystrybutor na Polskę wyłącznie:</strong> Sklep za Stodołą Sp. z o.o. | 🌐 www.sklepzastodola.pl<br>
+    <em>Ceny bez VAT. Erychowanie/certyfikacja Premium: +150 EUR. Obowiązuje płatność przed dostawą. Transport wyceniany osobno.</em>
+  </div>
+
+</div>
+</body>
+</html>
