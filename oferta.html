@@ -328,102 +328,90 @@
         <a href="kontakt.html" class="btn" style="margin-top:2rem;">Zapytaj o pawilon</a>
       </div>
 
-      <!-- PRAWA: GALERIA -->
+      <!-- PRAWA: GALERIA 4 zdjęcia -->
       <div>
-        <!-- DWA TYPY PAWILONÓW — układ 2 kolumny -->
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:2rem; margin-top:1rem;">
 
-          <!-- TYP 1: SKLEP GOSPODARCZY -->
-          <div>
-            <div style="font-size:0.8rem; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; color:var(--zielony,#2e5c1a); margin-bottom:0.8rem;">Typ 1 — Sklep gospodarczy</div>
-            <!-- Zdjęcie 1 -->
-            <div class="pawylon-card" style="margin-bottom:1rem;">
-              <div class="pawylon-img-wrap">
-                <img src="img/pawilony/sklep-01.jpg" alt="Pawilon drewniany – sklep gospodarczy" onclick="openLightbox(this)"
-                  onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
-                <div class="pawylon-img-placeholder" style="display:none;"><span>🏠</span><strong>Zdjęcie wkrótce</strong><small>img/pawilony/sklep-01.jpg</small></div>
-              </div>
-              <div class="pawylon-info">
-                <div class="pawylon-badge">Sklep gospodarczy</div>
-                <h3>Pawilon z witryną i sklepem</h3>
-                <p>Drewniany pawilon z przeszklonym frontem — miejsce na automat do mleka i ekspozycję produktów z gospodarstwa.</p>
-              </div>
+        <!-- DUŻE ZDJĘCIE GŁÓWNE (pawilon-1 / pawilon-1 z bliska) -->
+        <div class="pawylon-card" style="margin-bottom:1rem;">
+          <div class="pawylon-img-wrap" style="aspect-ratio:16/9;">
+            <img
+              src="img/pawilony/pawilon-1.jpg"
+              alt="Pawilon handlowy ze sklepem i mleKomatem — widok z przodu"
+              onclick="openLightbox(this)"
+              onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+            />
+            <div class="pawylon-img-placeholder" style="display:none;"><span>🏠</span><strong>Zdjęcie wkrótce</strong><small>img/pawilony/pawilon-1.jpg</small></div>
+          </div>
+          <div class="pawylon-info">
+            <div class="pawylon-badge">Sklep gospodarczy</div>
+            <h3>Pawilon z mleKomatem i sklepem — widok frontowy</h3>
+            <p>Drewniany pawilon z otwartym wejściem do sklepu, automatem do produktów rolnych po lewej i mleKomatem po prawej.</p>
+          </div>
+        </div>
+
+        <!-- TRZY MNIEJSZE W RZĘDZIE -->
+        <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:0.75rem;">
+
+          <!-- pawilon-2: widok z dystansu -->
+          <div class="pawylon-card">
+            <div class="pawylon-img-wrap" style="aspect-ratio:4/3;">
+              <img
+                src="img/pawilony/pawilon-2.jpg"
+                alt="Pawilon drewniany — widok z dystansu, front i bok"
+                onclick="openLightbox(this)"
+                onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+              />
+              <div class="pawylon-img-placeholder" style="display:none;"><span>🏠</span><strong>Wkrótce</strong><small>pawilon-2.jpg</small></div>
             </div>
-            <!-- Zdjęcie 2 — dodaj kolejne wg schematu sklep-02.jpg, sklep-03.jpg itd. -->
-            <div class="pawylon-card" style="margin-bottom:1rem;">
-              <div class="pawylon-img-wrap">
-                <img src="img/pawilony/sklep-02.jpg" alt="Pawilon drewniany – sklep gospodarczy 2" onclick="openLightbox(this)"
-                  onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
-                <div class="pawylon-img-placeholder" style="display:none;"><span>🏠</span><strong>Zdjęcie wkrótce</strong><small>img/pawilony/sklep-02.jpg</small></div>
-              </div>
-              <div class="pawylon-info">
-                <div class="pawylon-badge">Sklep gospodarczy</div>
-                <h3>Pawilon — widok wnętrza</h3>
-                <p>Przestronne wnętrze z miejscem na ladę, chłodnię i ekspozycję produktów lokalnych.</p>
-              </div>
-            </div>
-            <div class="pawylon-card">
-              <div class="pawylon-img-wrap">
-                <img src="img/pawilony/sklep-03.jpg" alt="Pawilon drewniany – sklep gospodarczy 3" onclick="openLightbox(this)"
-                  onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
-                <div class="pawylon-img-placeholder" style="display:none;"><span>🏠</span><strong>Zdjęcie wkrótce</strong><small>img/pawilony/sklep-03.jpg</small></div>
-              </div>
-              <div class="pawylon-info">
-                <div class="pawylon-badge">Sklep gospodarczy</div>
-                <h3>Realizacja — woj. śląskie</h3>
-                <p>Gotowa instalacja z mleKomatem, oświetleniem LED i monitoringiem. Wrzuć zdjęcie do img/pawilony/sklep-03.jpg</p>
-              </div>
+            <div class="pawylon-info" style="padding:0.7rem 0.9rem;">
+              <div class="pawylon-badge">Sklep gospodarczy</div>
+              <h3 style="font-size:0.85rem;">Widok zewnętrzny</h3>
+              <p style="font-size:0.78rem;">Pawilon drewniany z boku — widoczna bryła i dach z okapem.</p>
             </div>
           </div>
 
-          <!-- TYP 2: TYLKO MLEKOMAT -->
-          <div>
-            <div style="font-size:0.8rem; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; color:var(--zielony,#2e5c1a); margin-bottom:0.8rem;">Typ 2 — Pawilon pod mlekomat</div>
-            <div class="pawylon-card" style="margin-bottom:1rem;">
-              <div class="pawylon-img-wrap">
-                <img src="img/pawilony/mlekomat-01.jpg" alt="Pawilon drewniany pod mlekomat" onclick="openLightbox(this)"
-                  onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
-                <div class="pawylon-img-placeholder" style="display:none;"><span>🥛</span><strong>Zdjęcie wkrótce</strong><small>img/pawilony/mlekomat-01.jpg</small></div>
-              </div>
-              <div class="pawylon-info">
-                <div class="pawylon-badge" style="background:#bbdefb;color:#1565c0;">Mlekomat</div>
-                <h3>Pawilon kompaktowy — sam mlekomat</h3>
-                <p>Minimalistyczny pawilon zaprojektowany wyłącznie pod automat do mleka. Niższy koszt, szybszy montaż.</p>
-              </div>
+          <!-- pawilon-3: wnętrze sklepu -->
+          <div class="pawylon-card">
+            <div class="pawylon-img-wrap" style="aspect-ratio:4/3;">
+              <img
+                src="img/pawilony/pawilon-3.jpg"
+                alt="Wnętrze sklepu gospodarczego — chłodnie i ekspozycja"
+                onclick="openLightbox(this)"
+                onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+              />
+              <div class="pawylon-img-placeholder" style="display:none;"><span>🏠</span><strong>Wkrótce</strong><small>pawilon-3.jpg</small></div>
             </div>
-            <div class="pawylon-card" style="margin-bottom:1rem;">
-              <div class="pawylon-img-wrap">
-                <img src="img/pawilony/mlekomat-02.jpg" alt="Pawilon pod mlekomat 2" onclick="openLightbox(this)"
-                  onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
-                <div class="pawylon-img-placeholder" style="display:none;"><span>🥛</span><strong>Zdjęcie wkrótce</strong><small>img/pawilony/mlekomat-02.jpg</small></div>
-              </div>
-              <div class="pawylon-info">
-                <div class="pawylon-badge" style="background:#bbdefb;color:#1565c0;">Mlekomat</div>
-                <h3>Widok boczny z maszyną</h3>
-                <p>Automat Brunimat wbudowany w pawilon — ochrona przed pogodą, estetyczny wygląd, dostępny 24/7.</p>
-              </div>
-            </div>
-            <div class="pawylon-card">
-              <div class="pawylon-img-wrap">
-                <img src="img/pawilony/mlekomat-03.jpg" alt="Pawilon pod mlekomat 3" onclick="openLightbox(this)"
-                  onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
-                <div class="pawylon-img-placeholder" style="display:none;"><span>🥛</span><strong>Zdjęcie wkrótce</strong><small>img/pawilony/mlekomat-03.jpg</small></div>
-              </div>
-              <div class="pawylon-info">
-                <div class="pawylon-badge" style="background:#bbdefb;color:#1565c0;">Mlekomat</div>
-                <h3>Realizacja — woj. łódzkie</h3>
-                <p>Pawilon z logo rolnika i podświetlanym szyldem. Wrzuć zdjęcie do img/pawilony/mlekomat-03.jpg</p>
-              </div>
+            <div class="pawylon-info" style="padding:0.7rem 0.9rem;">
+              <div class="pawylon-badge">Wnętrze</div>
+              <h3 style="font-size:0.85rem;">Wnętrze sklepu</h3>
+              <p style="font-size:0.78rem;">Chłodnie, regały, ekspozycja produktów rolnych — gotowe do sprzedaży.</p>
             </div>
           </div>
 
-        </div><!-- /dwa typy -->
+          <!-- pawilon-5: bliskie ujęcie frontu -->
+          <div class="pawylon-card">
+            <div class="pawylon-img-wrap" style="aspect-ratio:4/3;">
+              <img
+                src="img/pawilony/pawilon-4.jpg"
+                alt="Pawilon handlowy — ujęcie bliskie wejścia z mleKomatem"
+                onclick="openLightbox(this)"
+                onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+              />
+              <div class="pawylon-img-placeholder" style="display:none;"><span>🥛</span><strong>Wkrótce</strong><small>pawilon-4.jpg</small></div>
+            </div>
+            <div class="pawylon-info" style="padding:0.7rem 0.9rem;">
+              <div class="pawylon-badge">Sklep + mlekomat</div>
+              <h3 style="font-size:0.85rem;">Wejście i mlekomat</h3>
+              <p style="font-size:0.78rem;">Bliskie ujęcie — wejście do sklepu i mleKomat po prawej, dostępny 24/7.</p>
+            </div>
+          </div>
 
-        <div class="realizacje-note">
-          📷 <strong>Jak dodać zdjęcia:</strong> Wrzuć pliki JPG/WebP do folderu <code>img/pawilony/</code> w repo.<br>
-          Sklep gospodarczy: <code>sklep-01.jpg</code>, <code>sklep-02.jpg</code>, <code>sklep-03.jpg</code><br>
-          Pawilon pod mlekomat: <code>mlekomat-01.jpg</code>, <code>mlekomat-02.jpg</code>, <code>mlekomat-03.jpg</code><br>
-          Chcesz więcej zdjęć? Skopiuj kolejną kartę i zmień numer pliku.
+        </div><!-- /3 małe -->
+
+        <div class="realizacje-note" style="margin-top:1rem;">
+          📷 <strong>Nazwy plików w repo:</strong>
+          <code>img/pawilony/pawilon-1.jpg</code> (duże),
+          <code>pawilon-2.jpg</code>, <code>pawilon-3.jpg</code>, <code>pawilon-4.jpg</code> (małe)
         </div>
       </div><!-- /prawa kolumna -->
 
