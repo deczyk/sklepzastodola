@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Notatki — Do Zrobienia NOWE | Sklep za Stodołą</title>
+<style>
+:root{--z:#1a5c2a;--zl:#e8f5e9;--a:#e65100;--al:#fff3e0;--b:#1565c0;--bl:#e3f2fd;--k:#faf8f4;--l:#e5ddd0;--c:#1a1a1a;--s:#666}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:#f0f2f0;color:var(--c);line-height:1.6}
+.header{background:var(--z);color:#fff;padding:2rem 1.5rem;text-align:center}
+.header h1{font-size:1.6rem;font-weight:800}
+.header p{opacity:.8;font-size:.9rem;margin-top:.4rem}
+.container{max-width:960px;margin:0 auto;padding:2rem 1.5rem}
+.toc{background:#fff;border:1px solid var(--l);border-radius:.75rem;padding:1.5rem;margin-bottom:2rem}
+.toc h2{font-size:1rem;font-weight:700;color:var(--z);margin-bottom:1rem}
+.toc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:.5rem}
+.toc-item{background:var(--zl);border:1px solid #a5d6a7;border-radius:.4rem;padding:.6rem .9rem;font-size:.82rem;font-weight:600;color:var(--z);text-decoration:none;display:flex;align-items:center;gap:.5rem}
+.toc-item:hover{background:#c8e6c9}
+.card{background:#fff;border:1px solid var(--l);border-radius:.75rem;margin-bottom:1.5rem;overflow:hidden}
+.card-header{background:var(--z);color:#fff;padding:1rem 1.5rem;display:flex;align-items:center;gap:.8rem}
+.card-header .icon{font-size:1.4rem}
+.card-header h2{font-size:1rem;font-weight:700}
+.card-body{padding:1.5rem}
+.card-body h3{font-size:.95rem;font-weight:700;color:var(--z);margin:1.2rem 0 .5rem;padding-bottom:.3rem;border-bottom:1px solid var(--l)}
+.card-body h3:first-child{margin-top:0}
+.card-body p{font-size:.88rem;color:var(--c);margin-bottom:.6rem}
+.card-body ul,.card-body ol{margin:.5rem 0 .8rem 1.4rem;font-size:.87rem}
+.card-body li{margin-bottom:.3rem}
+.card-body code{background:#f5f5f5;border:1px solid #ddd;border-radius:.25rem;padding:.1rem .4rem;font-family:monospace;font-size:.82rem}
+.card-body pre{background:#1a1a1a;color:#a5d6a7;border-radius:.5rem;padding:1rem;font-family:monospace;font-size:.8rem;overflow-x:auto;margin:.8rem 0;line-height:1.7}
+.highlight{background:var(--al);border-left:3px solid var(--a);padding:.7rem 1rem;border-radius:0 .4rem .4rem 0;margin:.8rem 0;font-size:.86rem}
+.success{background:var(--zl);border-left:3px solid var(--z);padding:.7rem 1rem;border-radius:0 .4rem .4rem 0;margin:.8rem 0;font-size:.86rem}
+.info{background:var(--bl);border-left:3px solid var(--b);padding:.7rem 1rem;border-radius:0 .4rem .4rem 0;margin:.8rem 0;font-size:.86rem}
+.tag{display:inline-block;font-size:.68rem;padding:2px 7px;border-radius:8px;font-weight:600;margin-left:6px;vertical-align:middle}
+.tag-red{background:#ffcdd2;color:#c62828}
+.tag-green{background:var(--zl);color:var(--z)}
+.tag-blue{background:var(--bl);color:var(--b)}
+.tag-amber{background:var(--al);color:var(--a)}
+table{width:100%;border-collapse:collapse;margin:.8rem 0;font-size:.83rem}
+th{background:var(--z);color:#fff;padding:.5rem .7rem;text-align:left}
+td{padding:.45rem .7rem;border-bottom:1px solid var(--l)}
+tr:nth-child(even) td{background:var(--k)}
+.cost-summary{background:var(--z);color:#fff;border-radius:.75rem;padding:1.5rem;margin-top:1rem;display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:1rem;text-align:center}
+.cost-item .label{font-size:.7rem;opacity:.7;text-transform:uppercase;letter-spacing:.06em;margin-bottom:.3rem}
+.cost-item .val{font-size:1.5rem;font-weight:800}
+.cost-item .sub{font-size:.72rem;opacity:.65}
+.checklist-item{display:flex;align-items:flex-start;gap:.7rem;padding:.5rem 0;border-bottom:1px solid var(--l);font-size:.87rem}
+.checklist-item:last-child{border-bottom:none}
+.ch-box{width:18px;height:18px;border-radius:.25rem;flex-shrink:0;margin-top:2px;display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700}
+.ch-todo{background:#fff3e0;border:2px solid var(--a);color:var(--a)}
+.ch-done{background:var(--zl);border:2px solid var(--z);color:var(--z)}
+footer{background:var(--z);color:#fff;padding:1.5rem;text-align:center;font-size:.8rem;margin-top:3rem;opacity:.9}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>📋 Notatki operacyjne — Sklep za Stodołą</h1>
+  <p>Zawartość karty "Do Zrobienia NOWE" z Trello | Czerwiec 2026</p>
+</div>
+
+<div class="container">
+
+<!-- TOC -->
+<div class="toc">
+  <h2>📑 Spis treści</h2>
+  <div class="toc-grid">
+    <a class="toc-item" href="#prawne">⚖️ Prawno-rejestracyjne</a>
+    <a class="toc-item" href="#finansowe">💰 Finansowe & Budżet</a>
+    <a class="toc-item" href="#ksiegowosc">📊 Księgowość & KSeF</a>
+    <a class="toc-item" href="#import">🚢 Import & Cło</a>
+    <a class="toc-item" href="#transport">🚛 Transport & Logistyka</a>
+    <a class="toc-item" href="#brunimat">🤝 Umowa z Brunimat</a>
+    <a class="toc-item" href="#sprzedaz">🛒 Sprzedaż & Cennik</a>
+    <a class="toc-item" href="#serwis">🔧 Serwis & Instalacja</a>
+    <a class="toc-item" href="#marketing">📣 Marketing & Strona</a>
+    <a class="toc-item" href="#dotacje">🎯 Dotacje & BGK</a>
+    <a class="toc-item" href="#podatki">🧾 Podatki & VAT</a>
+    <a class="toc-item" href="#ubezpieczenia">🛡️ Ubezpieczenia</a>
+  </div>
+</div>
+
+<!-- 1. PRAWNO-REJESTRACYJNE -->
+<div class="card" id="prawne">
+  <div class="card-header"><span class="icon">⚖️</span><h2>Prawno-rejestracyjne — rejestracja sp. z o.o., CRBR, VAT, EORI, kody PKD</h2></div>
+  <div class="card-body">
+    <h3>Rejestracja przez S24</h3>
+    <p>S24 (online) — <strong>350 zł</strong>, 1–5 dni, robisz sam przez <code>ekrs.ms.gov.pl/s24</code> z Profilem Zaufanym.</p>
+    <div class="highlight">⚠️ Po podpisaniu umowy w S24 masz <strong>7 dni</strong> na złożenie wniosku — po tym czasie zaczynasz od nowa!</div>
+
+    <h3>Dokumenty potrzebne przed rejestracją</h3>
+    <ul>
+      <li>Nazwa spółki — sprawdź unikalność na ekrs.ms.gov.pl</li>
+      <li>Adres siedziby — <strong>ważne:</strong> jeśli chcesz dotację LGD Brynica → siedziba w gminie Świerklaniec/Ożarowice</li>
+      <li>Dane wspólników: imię, nazwisko, PESEL, adres</li>
+      <li>Kapitał zakładowy — minimum <strong>5 000 zł</strong> (oświadczenie wystarczy przy S24)</li>
+      <li>Skład zarządu (kto jest prezesem)</li>
+      <li>Kody PKD</li>
+    </ul>
+
+    <h3>Kody PKD — pełna lista</h3>
+    <table>
+      <tr><th>Kod</th><th>Opis</th><th>Zastosowanie</th></tr>
+      <tr><td><strong>46.69.Z</strong></td><td>Sprzedaż hurtowa pozostałych maszyn i urządzeń</td><td><span class="tag tag-green">GŁÓWNE PKD</span></td></tr>
+      <tr><td>33.12.Z</td><td>Naprawa i konserwacja maszyn</td><td>Serwis automatów</td></tr>
+      <tr><td>41.20.Z</td><td>Wznoszenie budynków</td><td>Stawianie pawilonów u klienta</td></tr>
+      <tr><td>16.23.Z</td><td>Produkcja prefabrykowanych budynków drewnianych</td><td>Produkcja pawilonów</td></tr>
+      <tr><td>46.90.Z</td><td>Sprzedaż hurtowa niewyspecjalizowana</td><td>Backup handlowy</td></tr>
+      <tr><td>77.39.Z</td><td>Dzierżawa pozostałych maszyn i urządzeń</td><td>Wynajem automatów</td></tr>
+      <tr><td>47.99.Z</td><td>Sprzedaż detaliczna pozostałych produktów</td><td>Ewentualna sprzedaż przez automat</td></tr>
+    </table>
+
+    <h3>Po rejestracji — obowiązkowe kroki</h3>
+    <div class="checklist-item"><div class="ch-box ch-todo">○</div><div>NIP + REGON — nadawane automatycznie przez KRS</div></div>
+    <div class="checklist-item"><div class="ch-box ch-todo">○</div><div>Konto bankowe firmowe (mBank lub PKO) + Revolut Business do płatności CHF/EUR</div></div>
+    <div class="checklist-item"><div class="ch-box ch-todo">○</div><div>Rejestracja VAT (VAT-R) przez podatki.gov.pl — <strong>obowiązkowe</strong> dla importera</div></div>
+    <div class="checklist-item"><div class="ch-box ch-todo">○</div><div><strong>CRBR</strong> — zgłoś beneficjentów w ciągu <strong>14 dni</strong> od KRS! Kara do 1 000 000 zł!</div></div>
+    <div class="checklist-item"><div class="ch-box ch-todo">○</div><div>EORI — rejestracja przez puesc.gov.pl (2–5 dni roboczych) — przed pierwszym importem</div></div>
+  </div>
+</div>
+
+<!-- 2. FINANSOWE -->
+<div class="card" id="finansowe">
+  <div class="card-header"><span class="icon">💰</span><h2>Finansowe — kapitał, konto firmowe, budżet na pierwszą maszynę</h2></div>
+  <div class="card-body">
+    <h3>Kapitał zakładowy</h3>
+    <p>Minimum ustawowe: <strong>5 000 zł</strong>. Nie wpisuj więcej — kapitał zakładowy jest "zamrożony" jako zabezpieczenie wierzycieli, nie służy jako budżet operacyjny.</p>
+
+    <h3>Konta bankowe — rekomendacja: DWA konta</h3>
+    <table>
+      <tr><th>Konto</th><th>Do czego</th><th>Koszt</th></tr>
+      <tr><td><strong>mBank lub PKO BP</strong></td><td>Główne PLN — US, ZUS, kontrahenci polscy</td><td>0–30 zł/mies.</td></tr>
+      <tr><td><strong>Revolut Business</strong></td><td>Płatności w EUR/CHF za maszyny — kurs rynkowy</td><td>0–50 zł/mies.</td></tr>
+    </table>
+
+    <h3>Budżet na pierwszą maszynę Brunimat 650 DUO</h3>
+    <pre>Maszyna + opcje (z cennika):      ~36 930 zł (8 690 EUR × 4,25)
+Transport Szwajcaria → Polska:     ~1 200 zł
+Agencja celna (odprawa):             ~500 zł
+Ubezpieczenie cargo:                 ~120 zł
+──────────────────────────────────────────────
+KOSZT NETTO (bez VAT):            ~38 750 zł
+
+VAT importowy 23% (ZWROTNY!):      ~8 798 zł
+──────────────────────────────────────────────
+Gotówka wychodzi łącznie:         ~47 548 zł
+Wraca po ~30-45 dniach (VAT):      ~8 798 zł
+REALNY KOSZT NETTO:               ~38 750 zł</pre>
+
+    <div class="success">✅ VAT importowy (~8 800 zł) to <strong>nie koszt</strong> — to tymczasowo zamrożona gotówka, która wraca po złożeniu JPK_V7M za dany miesiąc (30–45 dni).</div>
+
+    <h3>Minimalne środki własne na start</h3>
+    <div class="cost-summary">
+      <div class="cost-item"><div class="label">Rejestracja spółki</div><div class="val">5 350 zł</div><div class="sub">KRS + kapitał zakładowy</div></div>
+      <div class="cost-item"><div class="label">Pierwsza maszyna</div><div class="val">~38 750 zł</div><div class="sub">koszt netto bez VAT zwrotnego</div></div>
+      <div class="cost-item"><div class="label">Rezerwa płynnościowa</div><div class="val">~28 500 zł</div><div class="sub">VAT bufor + 3 mies. koszty stałe</div></div>
+      <div class="cost-item"><div class="label">ŁĄCZNIE NA START</div><div class="val">~72 600 zł</div><div class="sub">+ pozycje X (transport do klienta)</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- 3. KSIĘGOWOŚĆ -->
+<div class="card" id="ksiegowosc">
+  <div class="card-header"><span class="icon">📊</span><h2>Księgowość — biuro rachunkowe, pełna księgowość, KSeF</h2></div>
+  <div class="card-body">
+    <h3>Co musi zawierać umowa z biurem rachunkowym</h3>
+    <ul>
+      <li>Pełne księgi rachunkowe (nie KPiR!), JPK_V7M miesięcznie, CIT roczny, sprawozdanie finansowe</li>
+      <li>Obsługa VAT importowego i faktur walutowych (EUR/CHF) — zapytaj wprost czy to robią</li>
+      <li>KSeF — integracja obowiązkowa od 2026</li>
+      <li>Czas reakcji na pytania — zapisz w umowie (np. 24h)</li>
+      <li>OC biura rachunkowego — poproś o polisę</li>
+      <li>Klauzula poufności danych</li>
+    </ul>
+
+    <h3>Pełna księgowość sp. z o.o. — co oznacza w praktyce</h3>
+    <ul>
+      <li>Każda faktura (zakup i sprzedaż) księgowana na kontach księgowych</li>
+      <li>Miesięczne JPK_V7M — deklaracja VAT + ewidencja</li>
+      <li>Miesięczne zaliczki CIT (9% do progu 2 mln EUR) lub kwartalne</li>
+      <li>Roczne sprawozdanie finansowe (bilans + RZiS) — do KRS i US do 30 czerwca</li>
+      <li>Rejestr środków trwałych (maszyny jako ŚT, amortyzacja)</li>
+      <li>Ewidencja rozliczeń walutowych — różnice kursowe CHF/EUR automatycznie</li>
+    </ul>
+
+    <h3>KSeF (Krajowy System e-Faktur)</h3>
+    <div class="info">ℹ️ Od 2026 roku <strong>obowiązkowy</strong> dla aktywnych VATowców. Każda faktura musi przejść przez KSeF i dostać numer systemowy.</div>
+    <ul>
+      <li>Faktury importowe z Brunimat.ch — poza KSeF (zagranica), ale musisz je zaksięgować z dokumentem SAD/PZC</li>
+      <li>Rolnik bez NIP (ryczałtowy) — faktura poza KSeF, normalny wydruk</li>
+      <li>Biuro MUSI mieć oprogramowanie zintegrowane z KSeF — zapytaj przed podpisaniem umowy</li>
+    </ul>
+  </div>
+</div>
+
+<!-- 4. IMPORT -->
+<div class="card" id="import">
+  <div class="card-header"><span class="icon">🚢</span><h2>Import i cło — agencja celna, odprawa Szwajcaria→Polska, certyfikat CE, EORI</h2></div>
+  <div class="card-body">
+    <h3>Co robi agencja celna za Ciebie</h3>
+    <ul>
+      <li>Składa zgłoszenie celne w systemie AIS/IMPORT</li>
+      <li>Oblicza należności celne i VAT importowy</li>
+      <li>Kontaktuje się z urzędem celnym w razie pytań</li>
+      <li>Odbiera towar po odprawie lub organizuje odbiór</li>
+    </ul>
+    <p><strong>Gdzie szukać — Śląsk:</strong> e-clo.gov.pl → Wyszukiwarka agentów celnych. Urzędy IAS Katowice, oddziały: Katowice, Gliwice, Częstochowa.</p>
+    <p><strong>Koszt:</strong> 400–600 zł za jedną odprawę. Przy regularnych zamówieniach negocjuj stałą stawkę.</p>
+
+    <h3>Stawki celne dla Twojej maszyny</h3>
+    <table>
+      <tr><th>Należność</th><th>Stawka</th><th>Uwagi</th></tr>
+      <tr><td>Cło (kod HS 8476)</td><td><strong>0%</strong></td><td>Przy deklaracji pochodzenia EUR.1 od Brunimat</td></tr>
+      <tr><td>Cło bez EUR.1</td><td>1,7–2,5%</td><td>Niepotrzebny koszt — zawsze żądaj EUR.1</td></tr>
+      <tr><td>VAT importowy</td><td><strong>23%</strong> od CIF</td><td>Odliczasz w JPK — to przepływ gotówki, nie koszt</td></tr>
+      <tr><td>Agencja celna</td><td>400–600 zł</td><td>Jednorazowo za przesyłkę</td></tr>
+    </table>
+
+    <h3>Rejestracja EORI</h3>
+    <ul>
+      <li>Format: PL + NIP spółki, np. <code>PL1234567890</code></li>
+      <li>Jak uzyskać: <code>puesc.gov.pl</code> → Rejestracja EORI — bezpłatnie, 2–5 dni</li>
+      <li>Zarejestruj minimum 2 tygodnie przed pierwszym zamówieniem!</li>
+    </ul>
+
+    <h3>Dokumenty wymagane od Brunimat</h3>
+    <table>
+      <tr><th>Dokument</th><th>Kto wystawia</th><th>Po co</th></tr>
+      <tr><td>Faktura handlowa (Commercial Invoice)</td><td>Brunimat</td><td>Podstawa do naliczenia cła i VAT</td></tr>
+      <tr><td>Packing list</td><td>Brunimat</td><td>Wagi, wymiary, liczba paczek</td></tr>
+      <tr><td>List przewozowy CMR</td><td>Spedytor</td><td>Dowód transportu</td></tr>
+      <tr><td>Deklaracja pochodzenia EUR.1</td><td>Brunimat</td><td><strong>Warunkuje 0% cła!</strong></td></tr>
+      <tr><td>Deklaracja Zgodności CE</td><td>Brunimat</td><td>Wymagana przez celnika i dla rynku UE</td></tr>
+      <tr><td>Instrukcja obsługi PL</td><td>Brunimat</td><td>Obowiązkowa przy wprowadzeniu do obrotu w PL</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- 5. TRANSPORT -->
+<div class="card" id="transport">
+  <div class="card-header"><span class="icon">🚛</span><h2>Transport i logistyka — spedytor CH→PL, ubezpieczenie cargo, dostawa do klienta</h2></div>
+  <div class="card-body">
+    <h3>Spedytorzy CH→PL — rekomendowane firmy</h3>
+    <table>
+      <tr><th>Firma</th><th>Specjalizacja</th><th>Kontakt</th></tr>
+      <tr><td><strong>W&amp;W SwissTransport</strong></td><td>99% tylko Szwajcaria↔Polska, obsługa celna w pakiecie</td><td>biuro@swisstransport.pl</td></tr>
+      <tr><td>ICT Spedycja</td><td>Drobnica i maszyny CH→PL</td><td>info@ict-spedycja.pl</td></tr>
+      <tr><td>Tymtrans</td><td>Maszyny rolnicze CH→PL, powiadomienia SMS</td><td>info@tymtrans.eu</td></tr>
+      <tr><td>Jupiter Transport</td><td>Drobnica i maszyny CH→PL, transport specjalistyczny</td><td>jupiter.transport@wp.pl</td></tr>
+    </table>
+
+    <h3>Koszty transportu maszyny (~150 kg)</h3>
+    <pre>Drobnica (doładunek) CH→PL:    800–1 500 zł
+Ubezpieczenie cargo:              ~120 zł (0,3% wartości)
+Agencja celna:                    400–600 zł
+Transport do klienta (Polska):    300–800 zł
+──────────────────────────────────────────────
+RAZEM LOGISTYKA:               1 600–3 000 zł</pre>
+
+    <h3>Dlaczego OC przewoźnika nie wystarczy</h3>
+    <div class="highlight">⚠️ OC przewoźnika (OCP) ogranicza odszkodowanie do ~43 zł/kg = maks. <strong>6 450 zł</strong> dla maszyny 150 kg. Maszyna jest warta ~39 000 zł. Różnica ~32 550 zł — stracona bez polisy cargo!</div>
+  </div>
+</div>
+
+<!-- 6. BRUNIMAT -->
+<div class="card" id="brunimat">
+  <div class="card-header"><span class="icon">🤝</span><h2>Umowa z Brunimat — wyłączność, gwarancja, serwis, części zamienne</h2></div>
+  <div class="card-body">
+    <h3>Kluczowe warunki gwarancji</h3>
+    <ul>
+      <li>Standard dla maszyn przemysłowych: <strong>12–24 miesiące</strong></li>
+      <li>Okres liczy się od <strong>daty instalacji u klienta</strong> (nie wysyłki) — negocjuj to!</li>
+      <li>Sprężarka chłodnicza musi być objęta gwarancją — to najdroższy element</li>
+      <li>Elektronika i sterownik — częste awarie, muszą być w zakresie</li>
+    </ul>
+
+    <h3>Pytania do Brunimat — wysłać na info@brunimat.ch</h3>
+    <ol>
+      <li>Wie lange ist die Garantiezeit? Beginnt sie ab dem Versanddatum oder ab dem Installationsdatum?</li>
+      <li>Bieten Sie autorisierten Servicetechnikern eine Schulung an? Ist diese kostenlos?</li>
+      <li>Wie lange dauert die Lieferung von Ersatzteilen nach Polen?</li>
+      <li>Erhalten Distributoren einen Rabatt auf Ersatzteile?</li>
+      <li>Können Sie eine Liste der am häufigsten ausgetauschten Teile (Fast-Moving Parts) zusenden?</li>
+      <li>Dürfen nach der Garantiezeit Ersatzteile von Drittanbietern verwendet werden?</li>
+      <li>Wer trägt die Rücksendekosten im Garantiefall?</li>
+    </ol>
+
+    <h3>Minimalny magazyn części — zamów razem z maszyną</h3>
+    <table>
+      <tr><th>Część</th><th>Ilość</th><th>Dlaczego</th></tr>
+      <tr><td>Uszczelki do dozownika</td><td>5–10 szt.</td><td>Najczęstsza wymiana, zużycie normalne</td></tr>
+      <tr><td>Czujnik temperatury</td><td>1 szt.</td><td>Awaria = maszyna nie działa</td></tr>
+      <tr><td>Dysza dozująca</td><td>2 szt.</td><td>Zatkanie przy złej higienie</td></tr>
+      <tr><td>Bezpieczniki (komplet)</td><td>1 komplet</td><td>Tanie, ratują sytuację</td></tr>
+      <tr><td>Filtr wody (jeśli model wymaga)</td><td>3–5 szt.</td><td>Wymiana co kilka miesięcy</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- 7. SPRZEDAŻ -->
+<div class="card" id="sprzedaz">
+  <div class="card-header"><span class="icon">🛒</span><h2>Sprzedaż i dystrybucja — cennik, umowa z klientem, fakturowanie</h2></div>
+  <div class="card-body">
+    <h3>Cennik sprzedaży maszyny</h3>
+    <table>
+      <tr><th>Marża</th><th>Cena netto</th><th>Cena brutto</th><th>Po dotacji ARiMR 50%</th></tr>
+      <tr><td>30%</td><td>~50 000 zł</td><td>~61 500 zł</td><td>~25 000 zł</td></tr>
+      <tr><td><strong>40% (rekomendacja)</strong></td><td><strong>~54 000 zł</strong></td><td><strong>~66 400 zł</strong></td><td><strong>~27 000 zł</strong></td></tr>
+      <tr><td>50%</td><td>~58 000 zł</td><td>~71 300 zł</td><td>~29 000 zł</td></tr>
+    </table>
+    <div class="success">💡 Koszt netto maszyny: ~38 750 zł | Rekomendowana marża: 40% | Cena sprzedaży: ~54 000 zł netto</div>
+
+    <h3>Cennik usług dodatkowych</h3>
+    <table>
+      <tr><th>Usługa</th><th>Cena netto</th></tr>
+      <tr><td>Transport i dostawa maszyny do klienta</td><td>400–800 zł</td></tr>
+      <tr><td>Instalacja i uruchomienie</td><td>800–1 500 zł</td></tr>
+      <tr><td>Przegląd roczny (umowa serwisowa)</td><td>500–800 zł</td></tr>
+      <tr><td>Roboczogodzina serwisu</td><td>150–200 zł</td></tr>
+      <tr><td>Dojazd do 50 km</td><td>100 zł (ryczałt)</td></tr>
+      <tr><td>Dojazd > 50 km</td><td>1,50 zł/km</td></tr>
+      <tr><td>Interwencja awaryjna (poza umową)</td><td>300 zł + roboczogodziny</td></tr>
+    </table>
+
+    <h3>Warunki płatności — model zaliczkowy</h3>
+    <pre>PODPISANIE UMOWY
+      ↓
+Zaliczka 50% (~27 000 zł brutto)    ← warunek złożenia zamówienia u Brunimat
+      ↓
+Zamówienie maszyny u Brunimat
+      ↓
+Transport 2–4 tygodnie
+      ↓
+Dopłata 50% przed dostawą lub przy odbiorze
+      ↓
+Instalacja + Protokół odbioru → Faktura końcowa</pre>
+  </div>
+</div>
+
+<!-- 8. SERWIS -->
+<div class="card" id="serwis">
+  <div class="card-header"><span class="icon">🔧</span><h2>Serwis i instalacja — procedura, wymagania sanepidu, szkolenie klienta</h2></div>
+  <div class="card-body">
+    <h3>Wymagania po stronie rolnika — wysyłaj 2 tygodnie przed instalacją</h3>
+    <pre>☐ Gniazdo elektryczne 230V / 16A w odległości max. 2m
+☐ Bezpiecznik dedykowany dla maszyny (nie wspólny)
+☐ Pozioma, twarda powierzchnia (beton, kostka) — tolerancja ±2°
+☐ Dostęp do wody (przy modelach z automatycznym płukaniem)
+☐ Odpływ lub wiadro na wodę z płukania
+☐ Zadaszone miejsce lub gotowy pawilon
+☐ Dostęp dla samochodu dostawczego (wózek paletowy)
+☐ Osoba obecna przy instalacji</pre>
+
+    <h3>Wymagania sanepidu / PIW</h3>
+    <div class="highlight">⚠️ Rolnik sprzedający mleko surowe MUSI zarejestrować się w <strong>Powiatowej Inspekcji Weterynaryjnej</strong> (nie sanepidzie). Rejestracja bezpłatna.</div>
+    <ul>
+      <li>Temperatura mleka: max <strong>+4°C</strong> (Rozporządzenie WE 853/2004)</li>
+      <li>Oznaczenie: „Mleko surowe — przed spożyciem podgrzać do wrzenia"</li>
+      <li>Data udoju na wyświetlaczu — rolnik musi aktualizować przy każdym napełnieniu</li>
+      <li>Certyfikacja CE-MID (150 EUR) — wymagana przy sprzedaży płatnej za objętość</li>
+    </ul>
+
+    <h3>Szkolenie klienta — 4 bloki (60–90 min)</h3>
+    <ol>
+      <li><strong>Codzienna obsługa</strong> — napełnianie, temperatura, licznik sprzedaży, skarbonka</li>
+      <li><strong>Czyszczenie</strong> — codzienne (dysza), tygodniowe (demontaż), miesięczne (filtry)</li>
+      <li><strong>Obsługa awarii</strong> — alarmy, reset, kiedy dzwonić do serwisu</li>
+      <li><strong>Dokumentacja HACCP</strong> — dziennik czyszczenia, dziennik temperatur, dziennik napełnień</li>
+    </ol>
+    <div class="success">✅ Zostaw klientowi: instrukcję PL + kartę czyszczenia (laminat) + dziennik czyszczenia (bloczek A5) + Twoją wizytówkę naklejoną na maszynie</div>
+  </div>
+</div>
+
+<!-- 9. MARKETING -->
+<div class="card" id="marketing">
+  <div class="card-header"><span class="icon">📣</span><h2>Marketing i strona sklepzastodola.pl</h2></div>
+  <div class="card-body">
+    <h3>Kanały sprzedaży — od najskuteczniejszego</h3>
+    <ol>
+      <li><strong>Rekomendacje i marketing szeptany</strong> — jeden zadowolony rolnik = reklama dla 10–20 sąsiadów</li>
+      <li><strong>ODR (Ośrodki Doradztwa Rolniczego)</strong> — jeden doradca ODR = dostęp do dziesiątek rolników w powiecie. ODR Śląski w Częstochowie, ODR Łódź</li>
+      <li><strong>Grupy producenckie mleka</strong> — KOWR.gov.pl → rejestr grup producenckich</li>
+      <li><strong>Spółdzielnie mleczarskie</strong> — OSM Radomsko, SM Gostyń, Mlekpol — kontakt z działem skupu</li>
+      <li><strong>Targi rolnicze</strong> — Agra Poznań (marzec), Agroshow Bednary (wrzesień)</li>
+    </ol>
+
+    <h3>Co dodać do strony sklepzastodola.pl</h3>
+    <ul>
+      <li><strong>Kalkulator ROI</strong> — ile zarobi rolnik z mleKomatem (już gotowy — plik kalkulator.html)</li>
+      <li>Sekcja „Jak to działa" — 5 kroków od udoju do gotówki</li>
+      <li>Realny przykład z liczbami (20 krów → +7 800 zł/mies.)</li>
+      <li>Blog SEO — artykuły o dotacjach ARiMR, sprzedaży mleka, mleKomatach</li>
+      <li>Case study po pierwszej instalacji</li>
+    </ul>
+
+    <h3>Materiał sprzedażowy PDF dla rolnika</h3>
+    <div class="info">ℹ️ Przód: „Mlekomat za połowę ceny dzięki dotacji ARiMR — zwrot inwestycji w 3–6 miesięcy". Tył: jak działa dotacja krok po kroku, warunki kwalifikacji, kontakt.</div>
+
+    <h3>Portale rolnicze do reklamy</h3>
+    <ul>
+      <li>farmer.pl — duży ruch, reklama displayowa i artykuły sponsorowane</li>
+      <li>agrofakt.pl — bardzo duży ruch, rolnicy czytają codziennie</li>
+      <li>agroporady.pl</li>
+      <li>wiescirolnicze.pl</li>
+    </ul>
+  </div>
+</div>
+
+<!-- 10. DOTACJE -->
+<div class="card" id="dotacje">
+  <div class="card-header"><span class="icon">🎯</span><h2>Dotacje i finansowanie — BGK, leasing, FE Śląskie</h2></div>
+  <div class="card-body">
+    <h3>BGK „Wsparcie w Starcie" — status: ZAWIESZONE</h3>
+    <div class="highlight">⚠️ 30 marca 2026 nabór zawieszony — zbyt dużo wniosków. Śledź pfp.com.pl — przy wznowieniu środki kończą się w ciągu godzin. Miej wniosek gotowy TERAZ!</div>
+    <table>
+      <tr><th>Parametr</th><th>Wartość</th></tr>
+      <tr><td>Maksymalna kwota pożyczki</td><td><strong>191 257 zł</strong></td></tr>
+      <tr><td>Oprocentowanie</td><td><strong>0,5%</strong> rocznie — praktycznie zerowe</td></tr>
+      <tr><td>Możliwe umorzenie</td><td>do <strong>57 000 zł</strong> po 12 miesiącach działalności</td></tr>
+      <tr><td>Na co można wydać</td><td>maszyny, towar handlowy, marketing, koszty stałe 6 mies.</td></tr>
+      <tr><td>Operator</td><td>Polska Fundacja Przedsiębiorczości (pfp.com.pl)</td></tr>
+    </table>
+
+    <h3>LGD Brynica — do 150 000 zł bezzwrotnie</h3>
+    <p>Gminy obszaru LGD: Świerklaniec, Ożarowice, Mierzęcice, Bobrowniki, Psary, Siewierz, Woźniki</p>
+    <p><strong>Warunek:</strong> siedziba spółki w jednej z powyższych gmin. Telefon: 32 380 23 28 | lgd@lgd-brynica.pl</p>
+    <div class="highlight">⚠️ Nabór nr 1/2026 zakończył się 20 kwietnia 2026. Pytaj o kolejny nabór!</div>
+
+    <h3>FE Śląskie — po 12 miesiącach działalności</h3>
+    <p>45–50% kosztów kwalifikowalnych dla mikroprzedsiębiorcy. Przykład: 5 mleKomatów za 200 000 zł → <strong>90 000–100 000 zł bezzwrotnie</strong>. Sprawdź: funduszeue.slaskie.pl/nabory</p>
+  </div>
+</div>
+
+<!-- 11. PODATKI -->
+<div class="card" id="podatki">
+  <div class="card-header"><span class="icon">🧾</span><h2>Podatkowe — VAT importowy, CIT 9%, rozliczenie dotacji</h2></div>
+  <div class="card-body">
+    <h3>VAT importowy — przykład dla Twojej maszyny</h3>
+    <pre>Wartość maszyny netto (EUR→PLN):    36 930 zł
+Transport Szwajcaria→Polska:         1 200 zł
+Ubezpieczenie cargo:                   120 zł
+────────────────────────────────────────────
+Podstawa CIF:                        38 250 zł
+VAT 23% od podstawy CIF:             8 798 zł
+────────────────────────────────────────────
+Do zapłaty przy odprawie:             8 798 zł
+Odliczasz w JPK_V7M:                  8 798 zł
+REALNY KOSZT VAT:                        0 zł</pre>
+
+    <h3>CIT 9% — kto płaci stawkę preferencyjną</h3>
+    <ul>
+      <li>Spółka z o.o. jako mały podatnik (przychody &lt; 2 mln EUR) — płacisz <strong>9%</strong></li>
+      <li>CIT liczysz od <strong>dochodu</strong> (przychód minus koszty), nie od przychodu</li>
+      <li>Zaliczki miesięczne do 20. każdego miesiąca, roczne rozliczenie (CIT-8) do 31 marca</li>
+    </ul>
+
+    <h3>Amortyzacja jednorazowa — dla małego podatnika</h3>
+    <p>Możliwość jednorazowego odpisania środka trwałego do <strong>214 000 zł</strong> rocznie (de minimis). Np. maszyna demonstracyjna 39 000 zł — w całości w koszty w roku zakupu zamiast przez 10 lat.</p>
+  </div>
+</div>
+
+<!-- 12. UBEZPIECZENIA -->
+<div class="card" id="ubezpieczenia">
+  <div class="card-header"><span class="icon">🛡️</span><h2>Ubezpieczenia — OC firmy, cargo, OC serwisanta</h2></div>
+  <div class="card-body">
+    <h3>Pakiet ubezpieczeń — co potrzebujesz</h3>
+    <table>
+      <tr><th>Ubezpieczenie</th><th>Suma</th><th>Koszt roczny</th><th>Gdzie kupić</th></tr>
+      <tr><td>OC działalności + OC za produkt + OC serwisanta</td><td>min. 500 000 zł</td><td>1 200–2 000 zł</td><td>swiatpolis.pl</td></tr>
+      <tr><td>Cargo (jednorazowe)</td><td>wartość towaru</td><td>~120 zł/transport</td><td>ubezpieczamy24.com</td></tr>
+      <tr><td>Cargo (generalna polisa roczna)</td><td>obrót roczny</td><td>~400–800 zł/rok</td><td>przez brokera</td></tr>
+    </table>
+    <div class="success">✅ Wszystkie składki ubezpieczeniowe są kosztem podatkowym spółki — obniżają podstawę CIT.</div>
+
+    <h3>Procedura przy szkodzie transportowej</h3>
+    <ol>
+      <li>NIE podpisuj CMR bez zastrzeżeń — wpisz "towar uszkodzony" + opis</li>
+      <li>Zrób zdjęcia przed rozpakowaniem i po</li>
+      <li>Zachowaj oryginalne opakowanie</li>
+      <li>Zgłoś szkodę do ubezpieczyciela w ciągu 3–7 dni (sprawdź termin w polisie!)</li>
+    </ol>
+  </div>
+</div>
+
+</div><!-- /container -->
+
+<footer>
+  Sklep za Stodołą Sp. z o.o. | Notatki operacyjne — czerwiec 2026 | sklepzastodola.pl
+</footer>
+
+</body>
+</html>
