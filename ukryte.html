@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Panel wewnętrzny | Sklep za Stodołą</title>
+<meta name="robots" content="noindex, nofollow"/>
+<style>
+:root{--z:#1a5c2a;--zl:#e8f5e9;--a:#e65100;--al:#fff3e0;--b:#1565c0;--bl:#e3f2fd;--k:#faf8f4;--l:#e5ddd0;--c:#1a1a1a}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:#1a1a2e;color:#e0e0e0;min-height:100vh}
+.header{background:linear-gradient(135deg,#0d1b2a 0%,#1a5c2a 100%);padding:2rem 1.5rem;text-align:center;border-bottom:1px solid #2a2a4a}
+.header h1{font-size:1.4rem;font-weight:800;color:#fff;margin-bottom:.3rem}
+.header p{font-size:.82rem;color:rgba(255,255,255,.5)}
+.badge{display:inline-block;background:#c62828;color:#fff;font-size:.65rem;padding:2px 8px;border-radius:8px;font-weight:700;letter-spacing:.06em;margin-left:8px;vertical-align:middle}
+
+.container{max-width:900px;margin:0 auto;padding:2rem 1.5rem}
+
+.section-title{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.35);margin:2rem 0 .8rem;padding-bottom:.4rem;border-bottom:1px solid #2a2a4a}
+
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:.75rem;margin-bottom:.5rem}
+
+.page-card{background:#1e293b;border:1px solid #2d3a4e;border-radius:.6rem;padding:1rem 1.2rem;text-decoration:none;display:flex;align-items:flex-start;gap:.9rem;transition:all .2s;position:relative}
+.page-card:hover{background:#243447;border-color:#4a6fa5;transform:translateY(-2px)}
+.page-card .icon{font-size:1.6rem;flex-shrink:0;margin-top:1px}
+.page-card .info{}
+.page-card .title{font-size:.9rem;font-weight:700;color:#fff;margin-bottom:.2rem}
+.page-card .url{font-size:.72rem;color:rgba(255,255,255,.35);font-family:monospace;margin-bottom:.3rem}
+.page-card .desc{font-size:.77rem;color:rgba(255,255,255,.55);line-height:1.4}
+.tag{display:inline-block;font-size:.62rem;padding:1px 6px;border-radius:6px;font-weight:700;margin-top:.4rem}
+.tag-pub{background:#1a5c2a;color:#a5d6a7}
+.tag-hidden{background:#b71c1c;color:#ffcdd2}
+.tag-new{background:#e65100;color:#ffe0b2}
+.tag-tool{background:#1565c0;color:#bbdefb}
+
+.status-dot{width:7px;height:7px;border-radius:50%;display:inline-block;margin-right:4px}
+.dot-live{background:#4caf50}
+.dot-new{background:#ff9800}
+.dot-hidden{background:#f44336}
+
+.info-box{background:#1e293b;border:1px solid #2d3a4e;border-radius:.6rem;padding:1.2rem 1.5rem;margin-top:2rem;font-size:.82rem;color:rgba(255,255,255,.55)}
+.info-box strong{color:rgba(255,255,255,.8)}
+
+footer{text-align:center;padding:1.5rem;font-size:.72rem;color:rgba(255,255,255,.25);border-top:1px solid #2a2a4a;margin-top:3rem}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>🔒 Panel wewnętrzny — Sklep za Stodołą <span class="badge">TYLKO DLA WŁAŚCICIELA</span></h1>
+  <p>Strona nieindeksowana przez Google (noindex) | Wszystkie pliki HTML projektu</p>
+</div>
+
+<div class="container">
+
+  <!-- STRONY PUBLICZNE -->
+  <div class="section-title">🌐 Strony publiczne — widoczne w nawigacji</div>
+  <div class="grid">
+
+    <a class="page-card" href="index.html" target="_blank">
+      <span class="icon">🏠</span>
+      <div class="info">
+        <div class="title">Strona główna</div>
+        <div class="url">index.html</div>
+        <div class="desc">Hero, USP, jak to działa, CTA, referencje</div>
+        <span class="tag tag-pub"><span class="status-dot dot-live"></span>PUBLICZNA</span>
+      </div>
+    </a>
+
+    <a class="page-card" href="rolnik.html" target="_blank">
+      <span class="icon">🐄</span>
+      <div class="info">
+        <div class="title">Dla rolników</div>
+        <div class="url">rolnik.html</div>
+        <div class="desc">Dotacje ARiMR, ROI, sprzedaż bezpośrednia, jak to działa</div>
+        <span class="tag tag-pub"><span class="status-dot dot-live"></span>PUBLICZNA</span>
+      </div>
+    </a>
+
+    <a class="page-card" href="oferta.html" target="_blank">
+      <span class="icon">🥛</span>
+      <div class="info">
+        <div class="title">Maszyny i Serwis</div>
+        <div class="url">oferta.html</div>
+        <div class="desc">Automaty do mleka, sprzedaż/leasing, pawilony, serwis</div>
+        <span class="tag tag-pub"><span class="status-dot dot-live"></span>PUBLICZNA</span>
+      </div>
+    </a>
+
+    <a class="page-card" href="kontakt.html" target="_blank">
+      <span class="icon">📞</span>
+      <div class="info">
+        <div class="title">Kontakt</div>
+        <div class="url">kontakt.html</div>
+        <div class="desc">Formularz kontaktowy, telefon, mapa</div>
+        <span class="tag tag-pub"><span class="status-dot dot-live"></span>PUBLICZNA</span>
+      </div>
+    </a>
+
+  </div>
+
+  <!-- STRONY PUBLICZNE — POZA NAV -->
+  <div class="section-title">📄 Strony publiczne — poza nawigacją (linkowane z footer/linki)</div>
+  <div class="grid">
+
+    <a class="page-card" href="polityka.html" target="_blank">
+      <span class="icon">⚖️</span>
+      <div class="info">
+        <div class="title">Polityka prywatności</div>
+        <div class="url">polityka.html</div>
+        <div class="desc">RODO, cookies, przetwarzanie danych — linkowana z footera</div>
+        <span class="tag tag-pub"><span class="status-dot dot-live"></span>PUBLICZNA</span>
+      </div>
+    </a>
+
+    <a class="page-card" href="kalkulator.html" target="_blank">
+      <span class="icon">🧮</span>
+      <div class="info">
+        <div class="title">Kalkulator ROI</div>
+        <div class="url">kalkulator.html</div>
+        <div class="desc">Kalkulator opłacalności mlekomatu dla rolnika — suwaki, ROI, formularz CTA</div>
+        <span class="tag tag-new"><span class="status-dot dot-new"></span>NOWA</span>
+      </div>
+    </a>
+
+  </div>
+
+  <!-- NARZĘDZIA WEWNĘTRZNE -->
+  <div class="section-title">🛠️ Narzędzia wewnętrzne — tylko dla właściciela</div>
+  <div class="grid">
+
+    <a class="page-card" href="notatki_nowe.html" target="_blank">
+      <span class="icon">📋</span>
+      <div class="info">
+        <div class="title">Notatki operacyjne</div>
+        <div class="url">notatki_nowe.html</div>
+        <div class="desc">Rozwinięte notatki z Trello: prawo, finanse, import, serwis, marketing, dotacje</div>
+        <span class="tag tag-hidden"><span class="status-dot dot-hidden"></span>UKRYTA</span>
+        <span class="tag tag-tool">NARZĘDZIE</span>
+      </div>
+    </a>
+
+    <a class="page-card" href="budzet.html" target="_blank">
+      <span class="icon">💰</span>
+      <div class="info">
+        <div class="title">Budżet startowy</div>
+        <div class="url">budzet.html</div>
+        <div class="desc">Szczegółowy budżet uruchomienia: maszyna, transport, koszty stałe, marże, ROI</div>
+        <span class="tag tag-hidden"><span class="status-dot dot-hidden"></span>UKRYTA</span>
+        <span class="tag tag-tool">NARZĘDZIE</span>
+      </div>
+    </a>
+
+    <a class="page-card" href="ukryte.html" target="_blank">
+      <span class="icon">🔒</span>
+      <div class="info">
+        <div class="title">Panel wewnętrzny (ta strona)</div>
+        <div class="url">ukryte.html</div>
+        <div class="desc">Indeks wszystkich plików HTML projektu — noindex</div>
+        <span class="tag tag-hidden"><span class="status-dot dot-hidden"></span>UKRYTA</span>
+        <span class="tag tag-tool">PANEL</span>
+      </div>
+    </a>
+
+  </div>
+
+  <!-- PLIKI ZASOBÓW -->
+  <div class="section-title">📁 Pliki zasobów (nie strony HTML)</div>
+  <div class="grid">
+
+    <div class="page-card" style="cursor:default">
+      <span class="icon">🎨</span>
+      <div class="info">
+        <div class="title">Arkusz stylów</div>
+        <div class="url">style.css</div>
+        <div class="desc">Globalny CSS — kolory, typografia, komponenty używane przez wszystkie strony</div>
+        <span class="tag tag-tool">CSS</span>
+      </div>
+    </div>
+
+    <div class="page-card" style="cursor:default">
+      <span class="icon">🖼️</span>
+      <div class="info">
+        <div class="title">Zdjęcia — główne</div>
+        <div class="url">img/</div>
+        <div class="desc">automat.jpg, serwis.jpg, hero images</div>
+        <span class="tag tag-tool">MEDIA</span>
+      </div>
+    </div>
+
+    <div class="page-card" style="cursor:default">
+      <span class="icon">🏠</span>
+      <div class="info">
+        <div class="title">Zdjęcia pawilonów</div>
+        <div class="url">img/pawilony/</div>
+        <div class="desc">pawilon-1.jpg, pawilon-2.jpg, pawilon-3.jpg, pawilon-4.jpg</div>
+        <span class="tag tag-tool">MEDIA</span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- INFO BOX -->
+  <div class="info-box">
+    <strong>📌 Jak korzystać z tej strony:</strong><br><br>
+    Ta strona (<code>ukryte.html</code>) ma ustawiony meta tag <code>noindex, nofollow</code> — Google jej nie indeksuje i nie wyświetla w wynikach wyszukiwania. Możesz ją udostępnić podwładnemu lub agencji bez ryzyka że klienci ją znajdą.<br><br>
+    <strong>Aby dodać nową ukrytą stronę:</strong> stwórz plik <code>nowapodstrona.html</code> w repo, dodaj nową kartę w sekcji powyżej z odpowiednim tagiem.<br><br>
+    <strong>Formularz z kalkulator.html:</strong> wysyła dane przez Formspree (<code>mqeogyjd</code>) — sprawdzaj w <a href="https://formspree.io/forms/mqeogyjd/submissions" style="color:#4a9eff">formspree.io/forms/mqeogyjd/submissions</a>
+  </div>
+
+</div>
+
+<footer>
+  Sklep za Stodołą Sp. z o.o. | Panel wewnętrzny | noindex | Czerwiec 2026
+</footer>
+
+</body>
+</html>
