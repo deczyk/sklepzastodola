@@ -15,6 +15,214 @@
   <meta property="og:site_name" content="Sklep za Stodołą" />
   <link rel="stylesheet" href="style.css" />
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌾</text></svg>">
+
+  <!-- KALKULATOR ROI — style -->
+  <style>
+  /* ── SEKCJA KALKULATORA ── */
+  .kalk-band {
+    background: var(--zielony);
+    color: #fff;
+    padding: 3.5rem 2rem 2.5rem;
+    text-align: center;
+  }
+  .kalk-band h2 { font-size: clamp(1.4rem, 3.5vw, 2rem); font-weight: 800; margin-bottom: .5rem; }
+  .kalk-band p  { opacity: .8; max-width: 520px; margin: 0 auto; font-size: .95rem; }
+
+  .kalk-wrap {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 2.5rem 1.5rem 3rem;
+  }
+
+  /* SUWAKI */
+  .kalk-sliders {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.4rem 2.5rem;
+    margin-bottom: 2rem;
+  }
+  @media (max-width: 580px) { .kalk-sliders { grid-template-columns: 1fr; } }
+
+  .kalk-slider-group {}
+  .kalk-slider-label {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: .45rem;
+  }
+  .kalk-slider-label span:first-child {
+    font-size: .82rem;
+    font-weight: 600;
+    color: var(--ciemny, #1a1a1a);
+  }
+  .kalk-slider-val {
+    font-size: 1rem;
+    font-weight: 800;
+    color: var(--zielony);
+    min-width: 80px;
+    text-align: right;
+  }
+  input[type=range].kalk-range {
+    width: 100%;
+    height: 5px;
+    -webkit-appearance: none;
+    appearance: none;
+    background: var(--linia, #e5ddd0);
+    border-radius: 3px;
+    outline: none;
+    cursor: pointer;
+  }
+  input[type=range].kalk-range::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 20px; height: 20px;
+    border-radius: 50%;
+    background: var(--zielony);
+    cursor: pointer;
+    border: 3px solid #fff;
+    box-shadow: 0 0 0 2px var(--zielony);
+  }
+  input[type=range].kalk-range::-moz-range-thumb {
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    background: var(--zielony);
+    cursor: pointer;
+    border: 2px solid #fff;
+  }
+  .kalk-range-hint { font-size: .72rem; color: #888; margin-top: 3px; }
+
+  /* WYNIKI */
+  .kalk-results {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: .9rem;
+  }
+  @media (max-width: 480px) { .kalk-results { grid-template-columns: 1fr; } }
+
+  .kalk-box {
+    background: var(--kremowy, #faf8f4);
+    border: 1px solid var(--linia, #e5ddd0);
+    border-radius: .75rem;
+    padding: 1.1rem 1.2rem;
+  }
+  .kalk-box.kalk-box--green { background: #e8f5e9; border-color: #a5d6a7; }
+  .kalk-box.kalk-box--amber { background: #fff3e0; border-color: #ffcc80; }
+  .kalk-box-icon  { font-size: 1.3rem; margin-bottom: .25rem; }
+  .kalk-box-label {
+    font-size: .7rem; font-weight: 700;
+    text-transform: uppercase; letter-spacing: .06em;
+    color: #777; margin-bottom: .2rem;
+  }
+  .kalk-box-value {
+    font-size: 1.55rem; font-weight: 800; line-height: 1.1;
+    color: var(--ciemny, #1a1a1a);
+  }
+  .kalk-box-value.v-green { color: var(--zielony); }
+  .kalk-box-value.v-red   { color: #c62828; }
+  .kalk-box-value.v-amber { color: #e65100; }
+  .kalk-box-sub { font-size: .75rem; color: #888; margin-top: 3px; }
+
+  .kalk-roi {
+    grid-column: 1 / -1;
+    background: var(--zielony);
+    color: #fff;
+    border-radius: .75rem;
+    padding: 1.2rem 1.5rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+  @media (max-width: 480px) { .kalk-roi { grid-template-columns: 1fr; } }
+  .kalk-roi .kalk-box-label { color: rgba(255,255,255,.65); }
+  .kalk-roi .kalk-box-value { color: #fff; }
+  .kalk-roi .kalk-box-sub   { color: rgba(255,255,255,.55); }
+
+  @keyframes kalkPop { from { opacity:.6; transform:scale(.95); } to { opacity:1; transform:scale(1); } }
+  .kalk-animating .kalk-box-value { animation: kalkPop .25s ease; }
+
+  /* CTA FORM */
+  .kalk-cta {
+    margin-top: 2rem;
+    background: var(--kremowy, #faf8f4);
+    border: 1px solid var(--linia, #e5ddd0);
+    border-radius: .75rem;
+    padding: 1.5rem;
+    text-align: center;
+  }
+  .kalk-cta h3 { font-size: 1rem; color: var(--zielony); margin-bottom: .3rem; }
+  .kalk-cta p  { font-size: .83rem; color: #666; margin-bottom: 1rem; }
+  .kalk-form {
+    display: flex;
+    gap: .7rem;
+    flex-wrap: wrap;
+    justify-content: center;
+    max-width: 560px;
+    margin: 0 auto;
+  }
+  .kalk-form input {
+    flex: 1 1 160px;
+    padding: .7rem .9rem;
+    border: 1px solid var(--linia, #e5ddd0);
+    border-radius: .4rem;
+    font-size: .9rem;
+    font-family: inherit;
+    background: #fff;
+  }
+  .kalk-form input:focus { outline: 2px solid var(--zielony); border-color: transparent; }
+  .kalk-form .btn-kalk {
+    flex: 1 1 200px;
+    background: var(--zielony);
+    color: #fff;
+    border: none;
+    padding: .7rem 1.4rem;
+    font-size: .9rem;
+    font-weight: 700;
+    border-radius: .4rem;
+    cursor: pointer;
+    font-family: inherit;
+    transition: .2s;
+  }
+  .kalk-form .btn-kalk:hover { background: #2e7d45; transform: translateY(-1px); }
+  .kalk-form .btn-kalk:disabled { background: #666; cursor: default; transform: none; }
+
+  /* JAK DZIAŁA — kroki mlekomatu */
+  .mlekomat-steps {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: .75rem;
+    margin: 2rem 0;
+  }
+  @media (max-width: 640px) {
+    .mlekomat-steps { grid-template-columns: repeat(2, 1fr); }
+    .mlekomat-steps .ms-card:last-child { grid-column: 1 / -1; max-width: 200px; margin: 0 auto; }
+  }
+  .ms-card {
+    background: #fff;
+    border: 1px solid var(--linia, #e5ddd0);
+    border-radius: .65rem;
+    padding: 1rem .8rem;
+    text-align: center;
+    opacity: 0;
+    transform: translateY(16px);
+    transition: opacity .45s, transform .45s;
+  }
+  .ms-card.ms-visible { opacity: 1; transform: translateY(0); }
+  .ms-num {
+    width: 26px; height: 26px;
+    background: var(--zielony);
+    color: #fff;
+    border-radius: 50%;
+    font-size: .75rem; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto .5rem;
+  }
+  .ms-icon  { font-size: 1.7rem; display: block; margin-bottom: .4rem; }
+  .ms-title { font-size: .78rem; font-weight: 700; color: var(--ciemny, #1a1a1a); margin-bottom: .2rem; }
+  .ms-desc  { font-size: .72rem; color: #888; line-height: 1.4; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .ms-card, .kalk-box-value { animation: none !important; transition: none !important; }
+  }
+  </style>
 </head>
 <body>
 
@@ -37,7 +245,6 @@
       <span class="section-label" style="color:rgba(255,255,255,0.6); margin-bottom:1.2rem; display:block;">Śląskie · Łódzkie · cała Polska</span>
       <h1>Rozwijaj swoje<br>gospodarstwo z głową</h1>
       <p class="podtytul">Maszyny rolnicze w sprzedaży i leasingu. Pomagamy uzyskać dofinansowanie ARiMR do 65%. Instalacja i serwis w całej Polsce.</p>
-
       <div class="karty-wyboru">
         <a href="rolnik.html" class="karta-wyboru">
           <div class="ikona">🌱</div>
@@ -52,7 +259,6 @@
           <div class="strzalka">→</div>
         </a>
       </div>
-
       <p style="color:rgba(255,255,255,0.4); font-size:0.8rem; margin-top:2rem; letter-spacing:0.1em;">↓ lub przewiń niżej</p>
     </div>
   </section>
@@ -63,7 +269,6 @@
     <h2>Jedna firma — kompleksowa obsługa</h2>
     <div class="divider divider-center"></div>
     <p style="max-width:600px; margin:0 auto;">Nie jesteśmy tylko sprzedawcą. Dobieramy maszynę, oferujemy sprzedaż lub leasing, pomagamy z wnioskiem ARiMR, instalujemy i serwisujemy przez lata.</p>
-
     <div class="karty" style="margin-top:3rem;">
       <div class="karta">
         <div class="karta-ikona">💳</div>
@@ -122,7 +327,6 @@
         <a href="kontakt.html" class="btn" style="margin-top:1.5rem;">Zapytaj o leasing</a>
       </div>
     </div>
-
     <div class="highlight" style="margin-top:2.5rem;">
       <strong>💡 Leasing + dofinansowanie ARiMR — czy można łączyć?</strong>
       <p>Tak, w określonych przypadkach. Skontaktuj się z nami — sprawdzimy Twoją sytuację i doradzimy najkorzystniejsze rozwiązanie.</p>
@@ -182,6 +386,163 @@
     <a href="kontakt.html" class="btn">Umów bezpłatną konsultację</a>
   </section>
 
+  <!-- ═══════════════════════════════════════════════════════
+       KALKULATOR ROI — MLEKOMAT
+       ═══════════════════════════════════════════════════════ -->
+
+  <div class="kalk-band">
+    <h2>Czy mlekomat się opłaca?</h2>
+    <p>Przesuń suwaki — zobaczysz ile zarobisz więcej i kiedy zwróci się inwestycja.</p>
+  </div>
+
+  <section style="background:#fff; border-top:1px solid var(--linia);">
+    <div class="kalk-wrap">
+
+      <!-- SUWAKI -->
+      <div class="kalk-sliders">
+
+        <div class="kalk-slider-group">
+          <div class="kalk-slider-label">
+            <span>Dzienna produkcja mleka</span>
+            <span class="kalk-slider-val" id="kv-litry">200 L/dzień</span>
+          </div>
+          <input type="range" class="kalk-range" id="ks-litry" min="10" max="2000" value="200" step="10"/>
+          <div class="kalk-range-hint">Ile litrów mleka produkujesz dziennie?</div>
+        </div>
+
+        <div class="kalk-slider-group">
+          <div class="kalk-slider-label">
+            <span>Cena skupu u pośrednika</span>
+            <span class="kalk-slider-val" id="kv-posrednik">1,20 zł/L</span>
+          </div>
+          <input type="range" class="kalk-range" id="ks-posrednik" min="50" max="200" value="120" step="5"/>
+          <div class="kalk-range-hint">Aktualna cena skupu za litr mleka</div>
+        </div>
+
+        <div class="kalk-slider-group">
+          <div class="kalk-slider-label">
+            <span>Cena sprzedaży przez mlekomat</span>
+            <span class="kalk-slider-val" id="kv-mlekomat">2,50 zł/L</span>
+          </div>
+          <input type="range" class="kalk-range" id="ks-mlekomat" min="150" max="400" value="250" step="10"/>
+          <div class="kalk-range-hint">Typowe ceny w Polsce: 2,00 – 3,50 zł/litr</div>
+        </div>
+
+        <div class="kalk-slider-group">
+          <div class="kalk-slider-label">
+            <span>Wartość inwestycji</span>
+            <span class="kalk-slider-val" id="kv-invest">120 000 zł</span>
+          </div>
+          <input type="range" class="kalk-range" id="ks-invest" min="40000" max="200000" value="120000" step="5000"/>
+          <div class="kalk-range-hint">Koszt mlekomatu + instalacji + pawilonu</div>
+        </div>
+
+      </div><!-- /kalk-sliders -->
+
+      <!-- WYNIKI -->
+      <div class="kalk-results" id="kalk-results">
+
+        <div class="kalk-box">
+          <div class="kalk-box-icon">📉</div>
+          <div class="kalk-box-label">Przez pośrednika — miesięcznie</div>
+          <div class="kalk-box-value v-red" id="kr-posrednik">7 200 zł</div>
+          <div class="kalk-box-sub" id="kr-posrednik-dzien">240 zł/dzień</div>
+        </div>
+
+        <div class="kalk-box kalk-box--green">
+          <div class="kalk-box-icon">💰</div>
+          <div class="kalk-box-label">Przez mlekomat — miesięcznie</div>
+          <div class="kalk-box-value v-green" id="kr-mlekomat">15 000 zł</div>
+          <div class="kalk-box-sub" id="kr-mlekomat-dzien">500 zł/dzień</div>
+        </div>
+
+        <div class="kalk-box kalk-box--green">
+          <div class="kalk-box-icon">🚀</div>
+          <div class="kalk-box-label">Zysk dodatkowy miesięcznie</div>
+          <div class="kalk-box-value v-green" id="kr-diff">+7 800 zł</div>
+          <div class="kalk-box-sub" id="kr-diff-rok">+93 600 zł rocznie</div>
+        </div>
+
+        <div class="kalk-box kalk-box--amber">
+          <div class="kalk-box-icon">📈</div>
+          <div class="kalk-box-label">Wzrost przychodu</div>
+          <div class="kalk-box-value v-amber" id="kr-wzrost">+108%</div>
+          <div class="kalk-box-sub">więcej niż przez pośrednika</div>
+        </div>
+
+        <div class="kalk-roi">
+          <div>
+            <div class="kalk-box-icon">⏳</div>
+            <div class="kalk-box-label">Zwrot bez dotacji</div>
+            <div class="kalk-box-value" id="kr-roi-bez">~15 mies.</div>
+            <div class="kalk-box-sub" id="kr-invest-bez">przy 120 000 zł</div>
+          </div>
+          <div>
+            <div class="kalk-box-icon">✅</div>
+            <div class="kalk-box-label">Zwrot z dotacją ARiMR 50%</div>
+            <div class="kalk-box-value" id="kr-roi-z">~8 mies.</div>
+            <div class="kalk-box-sub" id="kr-invest-z">przy 60 000 zł po dotacji</div>
+          </div>
+        </div>
+
+      </div><!-- /kalk-results -->
+
+      <!-- JAK DZIAŁA MLEKOMAT -->
+      <p style="font-size:.75rem; text-transform:uppercase; letter-spacing:.1em; color:#aaa; margin:2.5rem 0 .8rem; font-weight:700;">Jak działa mlekomat?</p>
+      <div class="mlekomat-steps">
+        <div class="ms-card">
+          <div class="ms-num">1</div>
+          <span class="ms-icon">🪣</span>
+          <div class="ms-title">Napełniasz zbiornik</div>
+          <div class="ms-desc">Wlewasz świeże mleko — zajmuje ~5 minut</div>
+        </div>
+        <div class="ms-card">
+          <div class="ms-num">2</div>
+          <span class="ms-icon">❄️</span>
+          <div class="ms-title">Automat chłodzi</div>
+          <div class="ms-desc">Schładza do +4°C, alarm przy odchyleniu</div>
+        </div>
+        <div class="ms-card">
+          <div class="ms-num">3</div>
+          <span class="ms-icon">💳</span>
+          <div class="ms-title">Klient płaci</div>
+          <div class="ms-desc">Moneta, banknot lub karta — bez Twojej obecności</div>
+        </div>
+        <div class="ms-card">
+          <div class="ms-num">4</div>
+          <span class="ms-icon">🥛</span>
+          <div class="ms-title">Automat nalewa</div>
+          <div class="ms-desc">Dokładnie 1 litr, strefa płucze się automatycznie</div>
+        </div>
+        <div class="ms-card">
+          <div class="ms-num">5</div>
+          <span class="ms-icon">📊</span>
+          <div class="ms-title">Widzisz sprzedaż</div>
+          <div class="ms-desc">SMS + panel online, zawsze wiesz ile zostało</div>
+        </div>
+      </div>
+
+      <!-- CTA FORM -->
+      <div class="kalk-cta">
+        <h3>👉 Policz mój przypadek — chcę bezpłatną wycenę</h3>
+        <p>Podaj numer — oddzwonimy i przygotujemy indywidualną ofertę wraz z pomocą przy wniosku ARiMR.</p>
+        <form class="kalk-form" id="kalk-form" action="https://formspree.io/f/mqeogyjd" method="POST">
+          <input type="text"  name="imie"     placeholder="Imię i nazwisko *" required/>
+          <input type="tel"   name="telefon"  placeholder="Numer telefonu *"  required/>
+          <input type="hidden" name="zrodlo"  value="kalkulator-glowna"/>
+          <input type="hidden" name="dane"    id="kalk-hidden-dane"/>
+          <button type="submit" class="btn-kalk">📞 Oddzwoń do mnie</button>
+        </form>
+        <p style="font-size:.72rem; color:#aaa; margin-top:.7rem;">Bez spamu. Kontakt wyłącznie w sprawie wyceny.</p>
+      </div>
+
+    </div><!-- /kalk-wrap -->
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════
+       KONIEC KALKULATORA
+       ═══════════════════════════════════════════════════════ -->
+
   <!-- CTA -->
   <div class="band">
     <h2>Masz pytania?</h2>
@@ -228,6 +589,92 @@
 
   <script>
     function toggleMenu() { document.getElementById('nav-links').classList.toggle('open'); }
+
+    // ── KALKULATOR ──────────────────────────────────────────
+    const kState = { litry: 200, posrednik: 120, mlekomat: 250, invest: 120000 };
+
+    function kFmt(n)    { return n.toLocaleString('pl-PL') + ' zł'; }
+    function kMies(n)   { if (n >= 99) return '>99 mies.'; return '~' + Math.ceil(n) + ' mies.'; }
+    function kPlDecim(v){ return (v / 100).toFixed(2).replace('.', ','); }
+
+    function kCalc() {
+      const { litry, posrednik, mlekomat, invest } = kState;
+      const p = posrednik / 100, m = mlekomat / 100;
+
+      const posrDzien    = litry * p;
+      const mlekDzien    = litry * m;
+      const posrMies     = posrDzien  * 30;
+      const mlekMies     = mlekDzien  * 30;
+      const diffMies     = mlekMies   - posrMies;
+      const diffRok      = diffMies   * 12;
+      const wzrost       = posrMies > 0 ? (diffMies / posrMies) * 100 : 0;
+      const roiBez       = diffMies > 0 ? invest         / diffMies : 999;
+      const roiZ         = diffMies > 0 ? invest * 0.5   / diffMies : 999;
+
+      document.getElementById('kr-posrednik').textContent      = kFmt(Math.round(posrMies));
+      document.getElementById('kr-posrednik-dzien').textContent= Math.round(posrDzien).toLocaleString('pl-PL') + ' zł/dzień';
+      document.getElementById('kr-mlekomat').textContent       = kFmt(Math.round(mlekMies));
+      document.getElementById('kr-mlekomat-dzien').textContent = Math.round(mlekDzien).toLocaleString('pl-PL') + ' zł/dzień';
+      document.getElementById('kr-diff').textContent           = '+' + kFmt(Math.round(diffMies));
+      document.getElementById('kr-diff-rok').textContent       = '+' + kFmt(Math.round(diffRok)) + ' rocznie';
+      document.getElementById('kr-wzrost').textContent         = '+' + Math.round(wzrost) + '%';
+      document.getElementById('kr-roi-bez').textContent        = kMies(roiBez);
+      document.getElementById('kr-invest-bez').textContent     = 'przy ' + invest.toLocaleString('pl-PL') + ' zł';
+      document.getElementById('kr-roi-z').textContent          = kMies(roiZ);
+      document.getElementById('kr-invest-z').textContent       = 'przy ' + Math.round(invest * 0.5).toLocaleString('pl-PL') + ' zł po dotacji';
+
+      document.getElementById('kalk-hidden-dane').value =
+        `Litry:${litry}/dzień, Pośrednik:${kPlDecim(posrednik)}zł/L, Mlekomat:${kPlDecim(mlekomat)}zł/L, Inwestycja:${invest}zł → diff:+${Math.round(diffMies)}zł/mies, ROI z dotacją:${kMies(roiZ)}`;
+    }
+
+    function kBind(slId, valId, fmtFn, key) {
+      const sl = document.getElementById(slId);
+      if (!sl) return;
+      sl.addEventListener('input', () => {
+        kState[key] = parseInt(sl.value);
+        document.getElementById(valId).textContent = fmtFn(kState[key]);
+        const r = document.getElementById('kalk-results');
+        r.classList.add('kalk-animating');
+        setTimeout(() => r.classList.remove('kalk-animating'), 280);
+        kCalc();
+      });
+    }
+
+    kBind('ks-litry',     'kv-litry',     v => v + ' L/dzień',                     'litry');
+    kBind('ks-posrednik', 'kv-posrednik', v => kPlDecim(v) + ' zł/L',              'posrednik');
+    kBind('ks-mlekomat',  'kv-mlekomat',  v => kPlDecim(v) + ' zł/L',              'mlekomat');
+    kBind('ks-invest',    'kv-invest',    v => v.toLocaleString('pl-PL') + ' zł',   'invest');
+
+    kCalc();
+
+    // ── ANIMACJA KROKÓW ──────────────────────────────────────
+    const msCards = document.querySelectorAll('.ms-card');
+    if ('IntersectionObserver' in window) {
+      const obs = new IntersectionObserver(entries => {
+        entries.forEach((e, i) => {
+          if (e.isIntersecting) setTimeout(() => e.target.classList.add('ms-visible'), i * 110);
+        });
+      }, { threshold: 0.25 });
+      msCards.forEach(c => obs.observe(c));
+    } else {
+      msCards.forEach(c => c.classList.add('ms-visible'));
+    }
+
+    // ── FORMULARZ ───────────────────────────────────────────
+    const kForm = document.getElementById('kalk-form');
+    if (kForm) {
+      kForm.addEventListener('submit', e => {
+        e.preventDefault();
+        const btn = kForm.querySelector('button');
+        btn.textContent = '✅ Wysłano! Oddzwonimy wkrótce.';
+        btn.disabled = true;
+        fetch(kForm.action, {
+          method: 'POST',
+          body: new FormData(kForm),
+          headers: { Accept: 'application/json' }
+        });
+      });
+    }
   </script>
 </body>
 </html>
