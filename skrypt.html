@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Skrypt telefoniczny — Sklep za Stodołą</title>
+<style>
+/* ── TOKENS ── */
+:root {
+  --ink:     #1c1c1c;
+  --mid:     #555;
+  --muted:   #888;
+  --linia:   #e4ddd4;
+  --cream:   #faf7f3;
+  --white:   #ffffff;
+  --green:   #1a5c2a;
+  --green-l: #eaf3ec;
+  --amber:   #b06c00;
+  --amber-l: #fdf5e6;
+  --red:     #9b1c1c;
+  --red-l:   #fdf0f0;
+  --blue:    #14448a;
+  --blue-l:  #eef3fb;
+  --purple:  #4a1a7a;
+  --purple-l:#f4eefb;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 15px; }
+body {
+  font-family: 'Helvetica Neue', Arial, system-ui, sans-serif;
+  background: var(--cream);
+  color: var(--ink);
+  line-height: 1.6;
+}
+
+/* ── HEADER ── */
+.site-header {
+  background: var(--green);
+  padding: 1.4rem 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: .5rem;
+}
+.site-header h1 { font-size: 1rem; color: #fff; font-weight: 700; }
+.site-header .sub { font-size: .75rem; color: rgba(255,255,255,.6); }
+
+/* ── LAYOUT ── */
+.page { max-width: 820px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
+
+/* ── NAV TABS ── */
+.tabs {
+  display: flex; gap: 0; flex-wrap: wrap;
+  border-bottom: 2px solid var(--linia);
+  margin-bottom: 2rem;
+}
+.tab {
+  padding: .55rem 1.1rem;
+  font-size: .8rem; font-weight: 600;
+  color: var(--muted);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  transition: .15s;
+  user-select: none;
+  white-space: nowrap;
+}
+.tab:hover { color: var(--green); }
+.tab.active { color: var(--green); border-bottom-color: var(--green); }
+.panel { display: none; }
+.panel.active { display: block; }
+
+/* ── SECTION TITLES ── */
+.section-title {
+  font-size: .65rem; font-weight: 800;
+  text-transform: uppercase; letter-spacing: .1em;
+  color: var(--muted);
+  margin: 2rem 0 .8rem;
+  padding-bottom: .35rem;
+  border-bottom: 1px solid var(--linia);
+}
+.section-title:first-child { margin-top: 0; }
+
+/* ── BLOCKS ── */
+.block {
+  border-radius: 6px;
+  margin-bottom: .7rem;
+  overflow: hidden;
+}
+.block-head {
+  padding: .65rem 1rem;
+  font-size: .75rem; font-weight: 700;
+  letter-spacing: .04em;
+  display: flex; align-items: center; gap: .5rem;
+}
+.block-body {
+  padding: .8rem 1rem 1rem;
+  font-size: .88rem;
+  line-height: 1.65;
+}
+.block-body p + p { margin-top: .5rem; }
+.block-body ul { margin: .4rem 0 .4rem 1.2rem; }
+.block-body li { margin-bottom: .2rem; }
+
+/* block variants */
+.b-you   { background: var(--green-l); }
+.b-you   .block-head { background: var(--green); color: #fff; }
+.b-them  { background: var(--cream); border: 1px solid var(--linia); }
+.b-them  .block-head { background: #e8e2da; color: var(--ink); }
+.b-tip   { background: var(--blue-l); border: 1px solid #c5d9f5; }
+.b-tip   .block-head { background: var(--blue); color: #fff; }
+.b-warn  { background: var(--amber-l); border: 1px solid #f0d5a0; }
+.b-warn  .block-head { background: var(--amber); color: #fff; }
+.b-obj   { background: var(--red-l);  border: 1px solid #f5c5c5; }
+.b-obj   .block-head { background: var(--red);  color: #fff; }
+.b-note  { background: var(--purple-l); border: 1px solid #d5b8f5; }
+.b-note  .block-head { background: var(--purple); color: #fff; }
+
+/* ── INLINE TAGS ── */
+.tag {
+  display: inline-block; font-size: .65rem; font-weight: 700;
+  padding: 1px 6px; border-radius: 4px; vertical-align: middle;
+  margin-left: 4px;
+}
+.tg { background: var(--green-l); color: var(--green); }
+.ta { background: var(--amber-l); color: var(--amber); }
+.tr { background: var(--red-l); color: var(--red); }
+.tb { background: var(--blue-l); color: var(--blue); }
+
+/* ── QUICK REF TABLE ── */
+.ref-table { width: 100%; border-collapse: collapse; font-size: .83rem; }
+.ref-table th { background: var(--green); color: #fff; padding: .45rem .8rem; text-align: left; }
+.ref-table td { padding: .45rem .8rem; border-bottom: 1px solid var(--linia); vertical-align: top; }
+.ref-table tr:nth-child(even) td { background: rgba(0,0,0,.02); }
+.ref-table tr:last-child td { border-bottom: none; }
+
+/* ── CHECKLIST ── */
+.checklist { list-style: none; }
+.checklist li {
+  display: flex; gap: .7rem; padding: .4rem 0;
+  border-bottom: 1px solid var(--linia); font-size: .87rem;
+}
+.checklist li:last-child { border-bottom: none; }
+.checklist li::before {
+  content: '○'; color: var(--green); font-weight: 700;
+  flex-shrink: 0; margin-top: 1px;
+}
+
+/* ── PRINT ── */
+@media print {
+  .tabs { display: none; }
+  .panel { display: block !important; }
+  .site-header { background: #000; }
+}
+
+/* ── RESPONSIVE ── */
+@media (max-width: 580px) {
+  .page { padding: 1.2rem 1rem 3rem; }
+  .block-head { font-size: .7rem; }
+  .block-body { font-size: .84rem; }
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div>
+    <h1>📞 Skrypt telefoniczny — Sklep za Stodołą</h1>
+    <div class="sub">Sprzedaż mleKomatów · wersja czerwiec 2026</div>
+  </div>
+</header>
+
+<div class="page">
+
+  <!-- TABS -->
+  <div class="tabs">
+    <div class="tab active" onclick="show('cold')">1. Zimny telefon</div>
+    <div class="tab" onclick="show('inbound')">2. Przychodzący</div>
+    <div class="tab" onclick="show('obj')">3. Obiekcje</div>
+    <div class="tab" onclick="show('followup')">4. Follow-up</div>
+    <div class="tab" onclick="show('ref')">5. Ściąga liczb</div>
+  </div>
+
+  <!-- ══ PANEL 1: ZIMNY TELEFON ══ -->
+  <div class="panel active" id="cold">
+
+    <p class="section-title">Przed rozmową — 30 sekund przygotowania</p>
+    <div class="block b-tip">
+      <div class="block-head">💡 Nastawienie</div>
+      <div class="block-body">
+        <p>Nie sprzedajesz maszyny. Dajesz rolnikowi informację, że może zarobić <strong>dwa razy więcej na tym samym mleku</strong> i dostać <strong>połowę kosztu z powrotem od państwa</strong>. Twój telefon to przysługa, nie akwizycja.</p>
+        <p>Rolnik jest zajęty — szanuj jego czas. Masz 60 sekund na wzbudzenie zainteresowania, albo odłoży słuchawkę.</p>
+      </div>
+    </div>
+
+    <p class="section-title">Otwarcie — pierwsze 20 sekund</p>
+
+    <div class="block b-you">
+      <div class="block-head">🗣️ TY mówisz</div>
+      <div class="block-body">
+        <p>„Dzień dobry, nazywam się Jakub Deczyński, dzwonię ze Sklepu za Stodołą ze Śląska. Zajmujemy się automatami do sprzedaży mleka — i mam do Pana jedno konkretne pytanie, zajmie mi to dosłownie minutę. Czy dobrze trafiłem — produkuje Pan mleko?"</p>
+      </div>
+    </div>
+
+    <div class="block b-tip">
+      <div class="block-head">💡 Dlaczego tak, nie inaczej</div>
+      <div class="block-body">
+        <ul>
+          <li>Podajesz imię, firmę i region — budujesz wiarygodność w 5 słowach</li>
+          <li>„Jedno konkretne pytanie" — sygnalizujesz szacunek dla czasu</li>
+          <li>Pytanie zamknięte na start kwalifikuje klienta bez gadania</li>
+        </ul>
+      </div>
+    </div>
+
+    <p class="section-title">Kwalifikacja — jeśli odpowie „tak"</p>
+
+    <div class="block b-you">
+      <div class="block-head">🗣️ TY — pytanie kwalifikujące</div>
+      <div class="block-body">
+        <p>„Świetnie. A sprzedaje Pan mleko do skupu, czy ma Pan już jakiś punkt sprzedaży bezpośredniej?"</p>
+      </div>
+    </div>
+
+    <div class="block b-them">
+      <div class="block-head">👨‍🌾 Odpowiedź: „Do skupu"</div>
+      <div class="block-body">
+        <p>→ Idealna sytuacja. Przejdź do pitch'u.</p>
+      </div>
+    </div>
+
+    <div class="block b-them">
+      <div class="block-head">👨‍🌾 Odpowiedź: „Mam już sklep/mlekomat"</div>
+      <div class="block-body">
+        <p>→ „To świetnie — a z jakiej maszyny Pan korzysta? Pytam bo robimy serwis i mamy części zamienne. Może mogę się przydać?"</p>
+        <p>→ Zostań jako serwisant / część zamienna — nie kończ rozmowy.</p>
+      </div>
+    </div>
+
+    <p class="section-title">Pitch główny — max. 60 sekund</p>
+
+    <div class="block b-you">
+      <div class="block-head">🗣️ TY — argument nr 1: pieniądze</div>
+      <div class="block-body">
+        <p>„To powiem Panu wprost — rolnicy którzy sprzedają mleko przez skup dostają średnio 1,20 złotego za litr. Ci którzy mają automat w gospodarstwie — sprzedają za 4 do 6 złotych. To jest trzy do pięciu razy więcej, z tych samych krów, bez żadnej dodatkowej pracy."</p>
+      </div>
+    </div>
+
+    <div class="block b-you">
+      <div class="block-head">🗣️ TY — argument nr 2: dotacja</div>
+      <div class="block-body">
+        <p>„I teraz najważniejsze — ARiMR ma program w którym rolnik dostaje zwrot do połowy kosztów zakupu takiej maszyny. Więc jeśli automat kosztuje 70 tysięcy złotych, po dotacji płaci Pan 35 tysięcy — a maszyna zwraca się z nadwyżką w ciągu kilku miesięcy."</p>
+      </div>
+    </div>
+
+    <div class="block b-you">
+      <div class="block-head">🗣️ TY — zamknięcie zainteresowania</div>
+      <div class="block-body">
+        <p>„My dostarczamy maszynę ze Szwajcarii, budujemy pawilon, instalujemy i pomagamy z wnioskiem do ARiMR. Wszystko kompleksowo. Czy byłby Pan zainteresowany żebym przesłał konkretne liczby dla Pana gospodarstwa — ile litrów produkuje Pan dziennie?"</p>
+      </div>
+    </div>
+
+    <div class="block b-tip">
+      <div class="block-head">💡 Kluczowe zasady pitch'u</div>
+      <div class="block-body">
+        <ul>
+          <li><strong>Mów do jego kieszeni, nie o maszynie</strong> — rolnik nie chce maszyny, chce zarobić więcej</li>
+          <li>Pytanie na końcu zawsze — nie kończ monologiem, zmuś go do odpowiedzi</li>
+          <li>Jeśli pyta o cenę za wcześnie → „Cena zależy od konfiguracji, ale najpierw powiedz mi ile litrów produkujesz — wyliczę Ci ile byś zarabiał więcej"</li>
+        </ul>
+      </div>
+    </div>
+
+    <p class="section-title">Zamknięcie rozmowy</p>
+
+    <div class="block b-you">
+      <div class="block-head">🗣️ TY — jeśli jest zainteresowany</div>
+      <div class="block-body">
+        <p>„Świetnie. Wyślę Panu w ciągu godziny PDF z kalkulacją dla Pańskiego gospodarstwa i informacją o dotacji ARiMR. Na jaki adres wysłać — email?"</p>
+        <p>→ <em>Zbierz email i imię.</em></p>
+        <p>→ Po chwili: „I żebym mógł dobrze przeliczyć — ile litrów mleka produkuje Pan dziennie i ile ma Pan krów?"</p>
+      </div>
+    </div>
+
+    <div class="block b-you">
+      <div class="block-head">🗣️ TY — jeśli „teraz nie mam czasu"</div>
+      <div class="block-body">
+        <p>„Rozumiem, rolnik nigdy nie ma czasu — sam z doświadczenia wiem. Kiedy mogę oddzwonić, żeby mieć dla Pana 5 minut? Rano czy po południu?"</p>
+        <p>→ <em>Ustal konkretny termin. Nie mów „zadzwonię innym razem" — wtedy nie zadzwonisz.</em></p>
+      </div>
+    </div>
+
+    <div class="block b-warn">
+      <div class="block-head">⚠️ Czego NIE robić</div>
+      <div class="block-body">
+        <ul>
+          <li>Nie mów „oferujemy" ani „posiadamy" — zbyt formalnie, zbyt sprzedażowo</li>
+          <li>Nie wymieniaj nazwy maszyny na początku — rolnik tego nie zna, straci zainteresowanie</li>
+          <li>Nie pytaj „czy ma Pan chwilę?" — prawie zawsze powie nie</li>
+          <li>Nie kończ rozmowy bez konkretnego następnego kroku (email / termin oddzwonienia)</li>
+        </ul>
+      </div>
+    </div>
+
+  </div><!-- /panel cold -->
+
+  <!-- ══ PANEL 2: PRZYCHODZĄCY ══ -->
+  <div class="panel" id="inbound">
+
+    <div class="block b-tip">
+      <div class="block-head">💡 Klient dzwoni po zobaczeniu strony / reklamy / flyer</div>
+      <div class="block-body">
+        <p>Jest już zainteresowany — nie sprzedawaj, kwalifikuj i buduj zaufanie. Twój cel: zebrać dane do spersonalizowanej oferty i umówić się na wysyłkę kalkulacji.</p>
+      </div>
+    </div>
+
+    <p class="section-title">Odebranie i pierwsze pytanie</p>
+
+    <div class="block b-you">
+      <div class="block-head">🗣️ TY — odebranie</div>
+      <div class="block-body">
+        <p>„Sklep za Stodołą, Jakub Deczyński, słucham."</p>
+      </div>
+    </div>
+
+    <div class="block b-them">
+      <div class="block-head">👨‍🌾 Klient: „Dzwonię w sprawie automatu do mleka"</div>
+      <div class="block-body">
+        <p>→ Nie rzucaj się z ceną. Najpierw poznaj sytuację.</p>
+      </div>
+    </div>
+
+    <div class="block b-you">
+      <div class="block-head">🗣️ TY — kwalifikacja</div>
+      <div class="block-body">
+        <p>„Cieszę się, że Pan dzwoni. Żebym mógł Panu dobrze doradzić — czy może mi Pan powiedzieć w skrócie: ile krów ma Pan w stadzie i ile litrów mleka produkuje dziennie?"</p>
+      </div>
+    </div>
+
+    <div class="block b-tip">
+      <div class="block-head">💡 Dlaczego pytasz o liczby na starcie</div>
+      <div class="block-body">
+        <p>Bo zaraz powiesz konkretną kwotę (np. „przy 200 litrach zarobi Pan +16 000 zł miesięcznie więcej"). Liczba dopasowana do jego stada jest dużo bardziej przekonująca niż ogólna.</p>
+      </div>
+    </div>
+
+    <p class="section-title">Prezentacja oferty po zebraniu danych</p>
+
+    <div class="block b-you">
+      <div class="block-head">🗣️ TY — spersonalizowany pitch</div>
+      <div class="block-body">
+        <p>„Przy [X] litrach dziennie — przy cenie skupu 1,20 zł dostaje Pan [KWOTA] miesięcznie. Przez mlekomat przy cenie 4-5 zł byłoby to [KWOTA 2]. Różnica to [RÓŻNICA] złotych miesięcznie, czyli [RÓŻNICA × 12] rocznie."</p>
+        <p>→ <em>Licz w głowie lub miej kalkulator pod ręką. Wzór: litry × 30 × (cena mlekomat − cena skupu)</em></p>
+      </div>
+    </div>
+
+    <div class="block b-you">
+      <div class="block-head">🗣️ TY — dotacja ARiMR</div>
+      <div class="block-body">
+        <p>„Do tego jest program ARiMR — rolnicy dostają zwrot do 50% kosztów inwestycji, a młodzi rolnicy do 65%. Czyli maszyna, pawilon, instalacja razem to ok. 70-120 tysięcy, a po dotacji Pan płaci połowę lub mniej."</p>
+      </div>
+    </div>
+
+    <div class="block b-you">
+      <div class="block-head">🗣️ TY — co oferujemy kompleksowo</div>
+      <div class="block-body">
+        <p>„My zajmujemy się wszystkim — importujemy maszynę ze Szwajcarii, budujemy pawilon drewniany, instalujemy, szkolimy i pomagamy z wnioskiem do ARiMR. Pan nie musi szukać stolarza, elektryka ani spedytora — to wszystko po naszej stronie."</p>
+      </div>
+    </div>
+
+    <div class="block b-you">
+      <div class="block-head">🗣️ TY — zamknięcie</div>
+      <div class="block-body">
+        <p>„Wyślę Panu teraz na email spersonalizowaną kalkulację i informację o dotacji ARiMR. Jaki adres? I jaka jest Pana lokalizacja — powiat lub województwo?"</p>
+        <p>→ <em>Zbierz: email, imię, lokalizacja, litry/dzień, liczba krów.</em></p>
+        <p>→ „Zadzwonię do Pana jeszcze w tym tygodniu żeby omówić szczegóły — który dzień jest dla Pana lepszy, środa czy piątek?"</p>
+      </div>
+    </div>
+
+  </div><!-- /panel inbound -->
+
+  <!-- ══ PANEL 3: OBIEKCJE ══ -->
+  <div class="panel" id="obj">
+
+    <div class="block b-tip">
+      <div class="block-head">💡 Zasada odpowiadania na obiekcje</div>
+      <div class="block-body">
+        <p><strong>Nie zbijaj — dołącz, a potem przekieruj.</strong> Najpierw przyznaj rację lub wykaż zrozumienie, dopiero potem odpowiedz. Rolnik który czuje że go słuchasz, słucha Ciebie.</p>
+      </div>
+    </div>
+
+    <p class="section-title">Obiekcje cenowe</p>
+
+    <div class="block b-obj">
+      <div class="block-head">❌ „To za drogo"</div>
+      <div class="block-body">
+        <p>„Rozumiem — na pierwszy rzut oka to spora kwota. Ale proszę spojrzeć inaczej: przy [X] litrach dziennie zarabia Pan [KWOTA] miesięcznie więcej niż przez skup. Maszyna zwraca się w [MIESIĘCY] miesięcy. A po dotacji ARiMR płaci Pan tylko połowę — czy [POŁOWA KWOTY] to dalej za dużo jak na inwestycję z takim zwrotem?"</p>
+      </div>
+    </div>
+
+    <div class="block b-obj">
+      <div class="block-head">❌ „Nie mam teraz pieniędzy"</div>
+      <div class="block-body">
+        <p>„Rozumiem — dlatego właśnie warto najpierw złożyć wniosek do ARiMR, żeby dostać 50% z powrotem. Możemy też pomóc z leasingiem — wtedy zamiast płacić 70 tysięcy od razu, płaci Pan ratę miesięczną, a maszyna na siebie zarabia od pierwszego dnia. Czy przy takich warunkach to byłoby bardziej realne?"</p>
+      </div>
+    </div>
+
+    <p class="section-title">Obiekcje dotyczące decyzji</p>
+
+    <div class="block b-obj">
+      <div class="block-head">❌ „Muszę to przemyśleć"</div>
+      <div class="block-body">
+        <p>„Oczywiście, decyzja powinna być przemyślana. Co konkretnie budzi Pana wątpliwości? Może mogę od razu odpowiedzieć na te pytania i zaoszczędzi Pan czas?"</p>
+        <p>→ <em>Jeśli nie poda konkretów:</em> „Wyślę Panu kalkulację i informacje o dotacji — żeby miał Pan pełny obraz przed decyzją. Na jaki email?"</p>
+      </div>
+    </div>
+
+    <div class="block b-obj">
+      <div class="block-head">❌ „Muszę porozmawiać z żoną / wspólnikiem"</div>
+      <div class="block-body">
+        <p>„Oczywiście — to ważna decyzja dla całej rodziny. Czy mogę przesłać na Pana email gotową kalkulację z liczbami, żeby miał Pan co pokazać? Wtedy rozmowa będzie łatwiejsza. I kiedy mógłbym zadzwonić po tej rozmowie — może w przyszłym tygodniu?"</p>
+      </div>
+    </div>
+
+    <p class="section-title">Obiekcje techniczne / operacyjne</p>
+
+    <div class="block b-obj">
+      <div class="block-head">❌ „Nie mam czasu tym się zajmować"</div>
+      <div class="block-body">
+        <p>„To właśnie dlatego warto rozważyć naszą ofertę — automat pracuje 24 godziny na dobę bez żadnej obsługi z Pana strony. Napełnia Pan zbiornik raz dziennie, zajmuje to 5 minut, resztę maszyna robi sama. My zajmujemy się instalacją i serwisem — Pan skupia się na krowach."</p>
+      </div>
+    </div>
+
+    <div class="block b-obj">
+      <div class="block-head">❌ „Nie mam gdzie postawić mlekomatu"</div>
+      <div class="block-body">
+        <p>„Dokładnie dlatego mamy w ofercie drewniane pawilony — budujemy go razem z maszyną. Pan wskazuje tylko gdzie ma stanąć na działce, resztą zajmujemy się my. Pawilon jest gotowy razem z mleKomatem — przyjeżdżamy raz i Pan od razu ma gotowy punkt sprzedaży."</p>
+      </div>
+    </div>
+
+    <div class="block b-obj">
+      <div class="block-head">❌ „Czy ktoś w ogóle będzie kupował mleko?"</div>
+      <div class="block-body">
+        <p>„To najczęstsze pytanie i rozumiem je. W Polsce jest już kilkaset takich punktów — i większość rolników mówi, że po postawieniu mlekomatu mają stałe grono klientów w ciągu kilku tygodni. Ludzie szukają świeżego mleka prosto z gospodarstwa — i płacą za to chętnie więcej niż w sklepie. Czy jest w okolicy Pana gospodarstwa jakaś wioska lub osiedle?"</p>
+      </div>
+    </div>
+
+    <div class="block b-obj">
+      <div class="block-head">❌ „A co jeśli maszyna się zepsuje?"</div>
+      <div class="block-body">
+        <p>„Maszyny Brunimat to szwajcarska jakość — działają latami. Ale mamy pełen serwis gwarancyjny i pogwarancyjny, przeglądy roczne i magazyn części zamiennych na miejscu. Reakcja w ciągu 48 godzin. To nie jest tak jak z chińskim sprzętem gdzie czeka się tygodniami na części z zagranicy."</p>
+      </div>
+    </div>
+
+    <div class="block b-obj">
+      <div class="block-head">❌ „Sanepid, papiery — zbyt dużo formalności"</div>
+      <div class="block-body">
+        <p>„Rozumiem tę obawę — ale tu nie ma nic skomplikowanego. Rejestruje Pan działalność w Powiatowej Inspekcji Weterynaryjnej — to jest bezpłatne i zajmuje 10 minut. My przy instalacji dajemy Panu gotową dokumentację i karty czyszczenia. Pomagamy też z wnioskiem do ARiMR. Pan nie robi nic sam — wszystko robimy razem."</p>
+      </div>
+    </div>
+
+    <p class="section-title">Twarde odmowy</p>
+
+    <div class="block b-obj">
+      <div class="block-head">❌ „Nie jestem zainteresowany"</div>
+      <div class="block-body">
+        <p>„Rozumiem. Mogę zapytać tylko — czy to dlatego że już ma Pan rozwiązanie do sprzedaży bezpośredniej, czy po prostu nie jest to dla Pana priorytet w tej chwili?"</p>
+        <p>→ <em>Jeśli „nie jest priorytetem":</em> „To rozumiem. Czy mogę za kilka miesięcy oddzwonić, żeby sprawdzić czy coś się zmieniło? Nabory ARiMR otwierają się raz lub dwa razy w roku — warto być gotowym."</p>
+        <p>→ <em>Jeśli dalej odmowa:</em> „Dziękuję za czas. Mam do Pana ostatnią prośbę — czy zna Pan może kogoś z okolicy kto produkuje mleko i mógłby być zainteresowany? Wdzięczny za polecenie."</p>
+      </div>
+    </div>
+
+  </div><!-- /panel obj -->
+
+  <!-- ══ PANEL 4: FOLLOW-UP ══ -->
+  <div class="panel" id="followup">
+
+    <p class="section-title">Po wysłaniu maila z kalkulacją — oddzwonienie po 24h</p>
+
+    <div class="block b-you">
+      <div class="block-head">🗣️ TY — otwarcie follow-up</div>
+      <div class="block-body">
+        <p>„Dzień dobry, Jakub Deczyński, Sklep za Stodołą — dzwoniłem wczoraj i wysłałem Panu kalkulację na email. Czy miał Pan chwilę żeby rzucić okiem?"</p>
+      </div>
+    </div>
+
+    <div class="block b-them">
+      <div class="block-head">👨‍🌾 „Tak, widziałem"</div>
+      <div class="block-body">
+        <p>→ „Jak wrażenie? Czy liczby są takie jak Pan się spodziewał, czy coś Pana zaskoczyło?"</p>
+        <p>→ <em>Słuchaj. Nie mów. Daj mu mówić — z jego odpowiedzi wyczytasz główną obiekcję lub gotowość do zakupu.</em></p>
+      </div>
+    </div>
+
+    <div class="block b-them">
+      <div class="block-head">👨‍🌾 „Nie czytałem jeszcze"</div>
+      <div class="block-body">
+        <p>→ „Rozumiem — kiedy byłby dobry moment, żeby pan przejrzał? Mogę oddzwonić jutro rano albo pojutrze — który termin jest lepszy?"</p>
+      </div>
+    </div>
+
+    <div class="block b-them">
+      <div class="block-head">👨‍🌾 „Nie dostałem maila"</div>
+      <div class="block-body">
+        <p>→ „Sprawdzi Pan folder spam? Czasem trafia. Jeśli nie ma — podam Panu inny adres lub wyślę SMS z linkiem do strony gdzie wszystko jest rozpisane."</p>
+      </div>
+    </div>
+
+    <p class="section-title">Propozycja spotkania / wyjazdu</p>
+
+    <div class="block b-you">
+      <div class="block-head">🗣️ TY — propozycja spotkania</div>
+      <div class="block-body">
+        <p>„Najlepiej gdybym mógł wpaść do Pana do gospodarstwa — wtedy mogę konkretnie ocenić gdzie najlepiej postawić mlekomat, omówić pawilon i odpowiedzieć na wszystkie pytania na miejscu. Czy byłby Pan wolny w przyszłym tygodniu, w poniedziałek lub wtorek?"</p>
+      </div>
+    </div>
+
+    <div class="block b-tip">
+      <div class="block-head">💡 Spotkanie na miejscu = zamknięcie sprzedaży</div>
+      <div class="block-body">
+        <p>Rolnik kupujący maszynę za 60-70 tysięcy złotych (po dotacji) musi Ci zaufać. Twarz w twarz jest 3× skuteczniejsza niż telefon. Przy wizycie: zrób zdjęcia miejsca, oceń lokalizację pawilonu, zostaw materiały drukowane.</p>
+      </div>
+    </div>
+
+    <p class="section-title">Gdy klient milczy przez 2+ tygodnie</p>
+
+    <div class="block b-you">
+      <div class="block-head">🗣️ TY — reaktywacja</div>
+      <div class="block-body">
+        <p>„Dzień dobry, Jakub Deczyński ze Sklepu za Stodołą — rozmawialiśmy [X] tygodnie temu o mleKomacie. Dzwonię bo otworzyły się właśnie nowe nabory ARiMR i chciałem Pana poinformować, żeby Pan nie stracił okna na dotację. Czy coś się u Pana zmieniło od naszej ostatniej rozmowy?"</p>
+      </div>
+    </div>
+
+    <div class="block b-tip">
+      <div class="block-head">💡 Preteksty do oddzwonienia</div>
+      <div class="block-body">
+        <ul>
+          <li>Nowy nabór ARiMR ogłoszony</li>
+          <li>Zmiana cen skupu mleka (zawsze można to powiązać)</li>
+          <li>Realizacja u sąsiedniego rolnika w tym samym regionie</li>
+          <li>Nowy model maszyny w ofercie</li>
+          <li>Zbliżające się targi rolnicze w regionie</li>
+        </ul>
+      </div>
+    </div>
+
+  </div><!-- /panel followup -->
+
+  <!-- ══ PANEL 5: ŚCIĄGA LICZB ══ -->
+  <div class="panel" id="ref">
+
+    <p class="section-title">Kalkulator w głowie — liczy się na żywo</p>
+
+    <div class="block b-tip">
+      <div class="block-head">🧮 Wzory do zapamiętania</div>
+      <div class="block-body">
+        <p><strong>Miesięczny zysk dodatkowy:</strong><br>
+        litry/dzień × 30 × (cena mlekomat − cena skupu)<br>
+        <em>Przykład: 200 L × 30 × (4,00 − 1,20) = 16 800 zł/mies.</em></p>
+        <p style="margin-top:.7rem"><strong>Zwrot inwestycji z dotacją ARiMR 50%:</strong><br>
+        (koszt całkowity × 0,5) ÷ zysk miesięczny = miesięcy<br>
+        <em>Przykład: (120 000 × 0,5) ÷ 16 800 = 3,6 miesiąca</em></p>
+      </div>
+    </div>
+
+    <p class="section-title">Tabela szybkiej kalkulacji</p>
+
+    <table class="ref-table">
+      <tr><th>Litry/dzień</th><th>Skup (1,20 zł)</th><th>Mlekomat (4,00 zł)</th><th>+Miesięcznie</th><th>+Rocznie</th></tr>
+      <tr><td>100 L</td><td>3 600 zł</td><td>12 000 zł</td><td><strong>+8 400 zł</strong></td><td>+100 800 zł</td></tr>
+      <tr><td>150 L</td><td>5 400 zł</td><td>18 000 zł</td><td><strong>+12 600 zł</strong></td><td>+151 200 zł</td></tr>
+      <tr><td>200 L</td><td>7 200 zł</td><td>24 000 zł</td><td><strong>+16 800 zł</strong></td><td>+201 600 zł</td></tr>
+      <tr><td>300 L</td><td>10 800 zł</td><td>36 000 zł</td><td><strong>+25 200 zł</strong></td><td>+302 400 zł</td></tr>
+      <tr><td>500 L</td><td>18 000 zł</td><td>60 000 zł</td><td><strong>+42 000 zł</strong></td><td>+504 000 zł</td></tr>
+    </table>
+
+    <p class="section-title">Kluczowe liczby do zapamiętania</p>
+
+    <table class="ref-table">
+      <tr><th>Co</th><th>Liczba</th><th>Jak użyć</th></tr>
+      <tr><td>Cena skupu mleka (2026)</td><td>~1,20 zł/L</td><td>Punkt odniesienia — „to co Pan teraz dostaje"</td></tr>
+      <tr><td>Typowa cena w mlekomacie</td><td>4,00–6,00 zł/L</td><td>„Tyle płacą klienci przy automatach w Polsce"</td></tr>
+      <tr><td>Dotacja ARiMR standardowa</td><td>50%</td><td>„Połowę oddaje Panu państwo"</td></tr>
+      <tr><td>Dotacja ARiMR młody rolnik</td><td>65%</td><td>„Jeśli ma Pan mniej niż 40 lat — 65%"</td></tr>
+      <tr><td>Koszt systemu podstawowego</td><td>~70 000 zł brutto</td><td>Maszyna + instalacja + pawilon kompaktowy</td></tr>
+      <tr><td>Koszt systemu ze sklepem</td><td>~120 000 zł brutto</td><td>Maszyna + duży pawilon + instalacja pełna</td></tr>
+      <tr><td>Gwarancja Brunimat</td><td>24 miesiące</td><td>„2 lata gwarancji producenta"</td></tr>
+      <tr><td>Nasz serwis reakcja</td><td>48h</td><td>„Reagujemy w 48 godzin"</td></tr>
+    </table>
+
+    <p class="section-title">Checklist po każdej rozmowie</p>
+
+    <ul class="checklist">
+      <li>Zapisałem imię i nazwisko rozmówcy</li>
+      <li>Mam numer telefonu i email</li>
+      <li>Znam liczbę litrów dziennie i liczbę krów</li>
+      <li>Wiem w jakim województwie/powiecie jest gospodarstwo</li>
+      <li>Wysłałem email z kalkulacją w ciągu 1h od rozmowy</li>
+      <li>Mam umówiony termin następnego kontaktu</li>
+      <li>Wpisałem kontakt do HubSpot CRM</li>
+    </ul>
+
+  </div><!-- /panel ref -->
+
+</div><!-- /page -->
+
+<script>
+function show(id) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  event.target.classList.add('active');
+  window.scrollTo({top: 0, behavior: 'smooth'});
+}
+</script>
+</body>
+</html>
