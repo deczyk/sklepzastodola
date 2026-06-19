@@ -344,8 +344,8 @@
           </div>
           <div class="pawylon-info">
             <div class="pawylon-badge">Sklep gospodarczy</div>
-            <h3>Pawilon z mlekomatem i sklepem — widok frontowy</h3>
-            <p>Drewniany pawilon z otwartym wejściem do sklepu, automatem do produktów rolnych po lewej i mlekomatem po prawej.</p>
+            <h3>Pawilon z mleKomatem i sklepem — widok frontowy</h3>
+            <p>Drewniany pawilon z otwartym wejściem do sklepu, automatem do produktów rolnych po lewej i mleKomatem po prawej.</p>
           </div>
         </div>
 
@@ -402,11 +402,19 @@
             <div class="pawylon-info" style="padding:0.7rem 0.9rem;">
               <div class="pawylon-badge">Sklep + mlekomat</div>
               <h3 style="font-size:0.85rem;">Wejście i mlekomat</h3>
-              <p style="font-size:0.78rem;">Bliskie ujęcie — wejście do sklepu i mlekomat po prawej, dostępny 24/7.</p>
+              <p style="font-size:0.78rem;">Bliskie ujęcie — wejście do sklepu i mleKomat po prawej, dostępny 24/7.</p>
             </div>
           </div>
 
         </div><!-- /3 małe -->
+
+        <div class="realizacje-note" style="margin-top:1rem;">
+          📷 <strong>Nazwy plików w repo:</strong>
+          <code>img/pawilony/pawilon-1.jpg</code> (duże),
+          <code>pawilon-2.jpg</code>, <code>pawilon-3.jpg</code>, <code>pawilon-4.jpg</code> (małe)
+        </div>
+      </div><!-- /prawa kolumna -->
+
     </div><!-- /grid-2 -->
   </section>
   <!-- ========================================= -->
@@ -517,6 +525,25 @@
       document.body.style.overflow = '';
     }
     document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLightbox(); });
+  </script>
+  <!-- COOKIE BANNER -->
+  <div id="cookie-bar" style="position:fixed;bottom:0;left:0;right:0;background:#1a5c2a;color:#fff;padding:1rem 1.5rem;display:flex;justify-content:space-between;align-items:center;gap:1rem;flex-wrap:wrap;z-index:9999;font-size:.85rem;box-shadow:0 -2px 12px rgba(0,0,0,.15)">
+    <span>Ta strona używa plików cookies. <a href="polityka.html" style="color:#a5d6a7;text-decoration:underline">Polityka prywatności</a></span>
+    <div style="display:flex;gap:.6rem;flex-wrap:wrap">
+      <button onclick="setCookies('all')" style="background:#fff;color:#1a5c2a;border:none;padding:.4rem 1.1rem;border-radius:4px;cursor:pointer;font-weight:700;font-size:.82rem">Akceptuję wszystkie</button>
+      <button onclick="setCookies('necessary')" style="background:transparent;color:rgba(255,255,255,.7);border:1px solid rgba(255,255,255,.3);padding:.4rem 1.1rem;border-radius:4px;cursor:pointer;font-size:.82rem">Tylko niezbędne</button>
+    </div>
+  </div>
+  <script>
+  function setCookies(choice){
+    localStorage.setItem('cookie_consent',choice);
+    document.getElementById('cookie-bar').style.display='none';
+  }
+  (function(){
+    if(localStorage.getItem('cookie_consent')){
+      document.getElementById('cookie-bar').style.display='none';
+    }
+  })();
   </script>
 </body>
 </html>
