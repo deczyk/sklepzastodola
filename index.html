@@ -422,10 +422,10 @@
         <div class="kalk-slider-group">
           <div class="kalk-slider-label">
             <span>Cena sprzedaży przez mlekomat</span>
-            <span class="kalk-slider-val" id="kv-mlekomat">2,50 zł/L</span>
+            <span class="kalk-slider-val" id="kv-mlekomat">4,00 zł/L</span>
           </div>
-          <input type="range" class="kalk-range" id="ks-mlekomat" min="150" max="400" value="250" step="10"/>
-          <div class="kalk-range-hint">Typowe ceny w Polsce: 4,00 – 7,00 zł/litr</div>
+          <input type="range" class="kalk-range" id="ks-mlekomat" min="400" max="700" value="400" step="10"/>
+          <div class="kalk-range-hint">Typowe ceny w Polsce: 2,00 – 3,50 zł/litr</div>
         </div>
 
         <div class="kalk-slider-group">
@@ -591,7 +591,7 @@
     function toggleMenu() { document.getElementById('nav-links').classList.toggle('open'); }
 
     // ── KALKULATOR ──────────────────────────────────────────
-    const kState = { litry: 200, posrednik: 120, mlekomat: 250, invest: 120000 };
+    const kState = { litry: 200, posrednik: 120, mlekomat: 400, invest: 120000 };
 
     function kFmt(n)    { return n.toLocaleString('pl-PL') + ' zł'; }
     function kMies(n)   { if (n >= 99) return '>99 mies.'; return '~' + Math.ceil(n) + ' mies.'; }
