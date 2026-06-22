@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Sklep za Stodołą | Maszyny rolnicze, leasing, dofinansowanie ARiMR</title>
   <meta name="description" content="Automaty do mleka i maszyny rolnicze — sprzedaż, leasing, dofinansowanie ARiMR do 65%. Instalacja i serwis w całej Polsce." />
-  <meta name="keywords" content="automat do mleka, maszyny rolnicze, leasing maszyn rolniczych, dofinansowanie ARiMR, sprzedaż bezpośrednia mleka, śląskie, łódzkie, Brunimat" />
+  <meta name="keywords" content="automat do mleka, maszyny rolnicze, leasing maszyn rolniczych, dofinansowanie ARiMR, sprzedaż bezpośrednia mleka, cała Polska, Brunimat" />
   <meta name="robots" content="index, follow" />
   <link rel="canonical" href="https://www.sklepzastodola.pl/" />
   <meta property="og:title" content="Sklep za Stodołą | Maszyny rolnicze, leasing, dofinansowanie ARiMR" />
@@ -184,7 +184,62 @@
   .kalk-form .btn-kalk:hover { background: #2e7d45; transform: translateY(-1px); }
   .kalk-form .btn-kalk:disabled { background: #666; cursor: default; transform: none; }
 
-  /* JAK DZIAŁA — kroki mlekomatu */
+  /* ── CO ZROBISZ Z PIENIĘDZMI ── */
+  .roi-spend {
+    background: var(--kremowy, #faf8f4);
+    border: 1px solid var(--linia, #e5ddd0);
+    border-radius: .75rem;
+    padding: 1.4rem 1.5rem;
+    margin: 1.5rem 0;
+  }
+  .roi-spend-title {
+    font-size: .72rem; font-weight: 700;
+    text-transform: uppercase; letter-spacing: .1em;
+    color: #aaa; margin-bottom: 1rem;
+  }
+  .roi-spend-amount {
+    font-size: 1.8rem; font-weight: 800;
+    color: var(--zielony); margin-bottom: .8rem; line-height: 1;
+  }
+  .roi-spend-items {
+    display: flex; flex-wrap: wrap; gap: .6rem;
+  }
+  .roi-spend-item {
+    background: #fff; border: 1px solid var(--linia, #e5ddd0);
+    border-radius: .4rem; padding: .5rem .9rem;
+    font-size: .83rem; color: #555;
+    display: flex; align-items: center; gap: .4rem;
+  }
+  .roi-spend-item .eq { font-size: .72rem; color: #aaa; font-weight: 600; }
+
+  /* ── SEKCJA LUDZKA ── */
+  .founder-strip {
+    background: var(--kremowy, #faf8f4);
+    border-top: 1px solid var(--linia, #e5ddd0);
+    border-bottom: 1px solid var(--linia, #e5ddd0);
+    padding: 2.5rem 2rem;
+  }
+  .founder-inner {
+    max-width: 700px; margin: 0 auto;
+    display: flex; gap: 2rem; align-items: center;
+    flex-wrap: wrap;
+  }
+  .founder-avatar {
+    width: 80px; height: 80px; border-radius: 50%;
+    background: var(--zielony); color: #fff;
+    font-size: 2rem; display: flex;
+    align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .founder-quote blockquote {
+    font-size: .95rem; color: #444; line-height: 1.65;
+    font-style: italic; margin: 0 0 .5rem;
+    border: none; padding: 0;
+  }
+  .founder-quote cite {
+    font-size: .8rem; color: #888; font-style: normal;
+    font-weight: 600;
+  }
   .mlekomat-steps {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
@@ -242,9 +297,10 @@
   <!-- HERO -->
   <section class="hero-landing">
     <div class="hero-landing-content">
-      <span class="section-label" style="color:rgba(255,255,255,0.6); margin-bottom:1.2rem; display:block;">cała Polska</span>
+      <span class="section-label" style="color:rgba(255,255,255,0.6); margin-bottom:1.2rem; display:block;">Cała Polska</span>
       <h1>Rozwijaj swoje<br>gospodarstwo z głową</h1>
-      <p class="podtytul">Maszyny rolnicze w sprzedaży i leasingu. Pomagamy uzyskać dofinansowanie ARiMR do 65%. Instalacja i serwis w całej Polsce.</p>
+      <p style="font-size:1.05rem; color:rgba(255,255,255,0.55); font-style:italic; margin:-.4rem 0 1.2rem; max-width:560px; line-height:1.5;">Nie sprzedajemy mlekomatów. Tworzymy dochodowe sklepy przy gospodarstwach.</p>
+      <p class="podtytul">Od projektu pawilonu po pierwszą sprzedaż — kompleksowo, z dotacją ARiMR do 65%.</p>
       <div class="karty-wyboru">
         <a href="rolnik.html" class="karta-wyboru">
           <div class="ikona">🌱</div>
@@ -386,11 +442,22 @@
     <a href="kontakt.html" class="btn">Umów bezpłatną konsultację</a>
   </section>
 
+  <!-- LUDZKA TWARZ FIRMY -->
+  <div class="founder-strip">
+    <div class="founder-inner">
+      <div class="founder-avatar">J</div>
+      <div class="founder-quote">
+        <blockquote>„Widziałem jak rolnicy w Szwajcarii zarabiają 4× więcej na tym samym mleku — tylko dlatego że mają automat przy bramie. W Polsce większość nadal oddaje mleko za grosze. Postanowiłem to zmienić."</blockquote>
+        <cite>Jakub Deczyński — założyciel, Sklep za Stodołą</cite>
+      </div>
+    </div>
+  </div>
+
   <!-- ═══════════════════════════════════════════════════════
        KALKULATOR ROI — MLEKOMAT
        ═══════════════════════════════════════════════════════ -->
 
-  <div class="kalk-band">
+  <div class="kalk-band" id="kalkulator">
     <h2>Czy mlekomat się opłaca?</h2>
     <p>Przesuń suwaki — zobaczysz ile zarobisz więcej i kiedy zwróci się inwestycja.</p>
   </div>
@@ -487,6 +554,17 @@
 
       </div><!-- /kalk-results -->
 
+      <!-- CO ZROBISZ Z TYMI PIENIĘDZMI -->
+      <div class="roi-spend" id="roi-spend">
+        <div class="roi-spend-title">Co możesz zrobić z tymi pieniędzmi?</div>
+        <div class="roi-spend-amount" id="spend-amount">+93 600 zł rocznie</div>
+        <div class="roi-spend-items">
+          <div class="roi-spend-item"><span class="eq">=</span> nowy ciągnik po <span id="spend-traktor">—</span> latach</div>
+          <div class="roi-spend-item"><span class="eq">=</span> spłata robota udojowego po <span id="spend-robot">—</span> latach</div>
+          <div class="roi-spend-item"><span class="eq">=</span> modernizacja obory po <span id="spend-obornik">—</span> latach</div>
+        </div>
+      </div>
+
       <!-- JAK DZIAŁA MLEKOMAT -->
       <p style="font-size:.75rem; text-transform:uppercase; letter-spacing:.1em; color:#aaa; margin:2.5rem 0 .8rem; font-weight:700;">Jak działa mlekomat?</p>
       <div class="mlekomat-steps">
@@ -522,7 +600,6 @@
         </div>
       </div>
 
-      <!-- CTA FORM -->
       <div class="kalk-cta">
         <h3>👉 Policz mój przypadek — chcę bezpłatną wycenę</h3>
         <p>Podaj numer — oddzwonimy i przygotujemy indywidualną ofertę wraz z pomocą przy wniosku ARiMR.</p>
@@ -539,11 +616,6 @@
     </div><!-- /kalk-wrap -->
   </section>
 
-  <!-- ═══════════════════════════════════════════════════════
-       KONIEC KALKULATORA
-       ═══════════════════════════════════════════════════════ -->
-
-  <!-- CTA -->
   <div class="band">
     <h2>Masz pytania?</h2>
     <p>Zadzwoń lub napisz — doradzimy bezpłatnie i bez zobowiązań.</p>
@@ -590,7 +662,6 @@
   <script>
     function toggleMenu() { document.getElementById('nav-links').classList.toggle('open'); }
 
-    // ── KALKULATOR ──────────────────────────────────────────
     const kState = { litry: 200, posrednik: 120, mlekomat: 400, invest: 120000 };
 
     function kFmt(n)    { return n.toLocaleString('pl-PL') + ' zł'; }
@@ -623,6 +694,17 @@
       document.getElementById('kr-roi-z').textContent          = kMies(roiZ);
       document.getElementById('kr-invest-z').textContent       = 'przy ' + Math.round(invest * 0.5).toLocaleString('pl-PL') + ' zł po dotacji';
 
+      // ── CO ZROBISZ Z PIENIĘDZMI ──────────────────────────────────────
+      const rokZl = Math.round(diffRok);
+      document.getElementById('spend-amount').textContent = '+' + rokZl.toLocaleString('pl-PL') + ' zł rocznie';
+      // ciągnik ~120 000 zł, robot udojowy ~200 000 zł, modernizacja obory ~80 000 zł
+      const lataTraktor  = rokZl > 0 ? Math.ceil(120000 / rokZl) : '—';
+      const lataRobot    = rokZl > 0 ? Math.ceil(200000 / rokZl) : '—';
+      const lataObornik  = rokZl > 0 ? Math.ceil(80000  / rokZl) : '—';
+      document.getElementById('spend-traktor').textContent  = lataTraktor;
+      document.getElementById('spend-robot').textContent    = lataRobot;
+      document.getElementById('spend-obornik').textContent  = lataObornik;
+
       document.getElementById('kalk-hidden-dane').value =
         `Litry:${litry}/dzień, Pośrednik:${kPlDecim(posrednik)}zł/L, Mlekomat:${kPlDecim(mlekomat)}zł/L, Inwestycja:${invest}zł → diff:+${Math.round(diffMies)}zł/mies, ROI z dotacją:${kMies(roiZ)}`;
     }
@@ -647,7 +729,6 @@
 
     kCalc();
 
-    // ── ANIMACJA KROKÓW ──────────────────────────────────────
     const msCards = document.querySelectorAll('.ms-card');
     if ('IntersectionObserver' in window) {
       const obs = new IntersectionObserver(entries => {
@@ -660,7 +741,6 @@
       msCards.forEach(c => c.classList.add('ms-visible'));
     }
 
-    // ── FORMULARZ ───────────────────────────────────────────
     const kForm = document.getElementById('kalk-form');
     if (kForm) {
       kForm.addEventListener('submit', e => {
