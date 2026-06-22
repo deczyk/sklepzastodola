@@ -9,14 +9,11 @@
   <meta name="robots" content="index, follow" />
   <link rel="canonical" href="https://www.sklepzastodola.pl/" />
   <meta property="og:title" content="Sklep za Stodołą | Maszyny rolnicze, leasing, dofinansowanie ARiMR" />
-  <meta property="og:description" content="Automaty do mleka i maszyny rolnicze — sprzedaż i leasing z dofinansowaniem ARiMR do 65%. Instalacja i serwis w całej Polsce." />
+  <meta property="og:description" content="Automaty do mleka i maszyny rolnicze — sprzedaż i leasing z dofinansowaniem ARiMR do 65%." />
   <meta property="og:url" content="https://www.sklepzastodola.pl/" />
   <meta property="og:type" content="website" />
-  <meta property="og:site_name" content="Sklep za Stodołą" />
   <link rel="stylesheet" href="style.css" />
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌾</text></svg>">
-
-  <!-- KALKULATOR ROI — style -->
   <style>
   /* ── SEKCJA KALKULATORA ── */
   .kalk-band {
@@ -278,6 +275,56 @@
     .ms-card, .kalk-box-value { animation: none !important; transition: none !important; }
   }
   </style>
+
+  /* ── ANIMACJE SCROLL ── */
+  [data-a]{opacity:0;transform:translateY(26px);transition:opacity .55s ease,transform .55s ease}
+  [data-a="fade"]{transform:translateY(0)}
+  [data-a="left"]{transform:translateX(-30px)}
+  [data-a="right"]{transform:translateX(30px)}
+  [data-a="scale"]{transform:scale(.96) translateY(10px)}
+  [data-a].vis{opacity:1;transform:none !important}
+  [data-d="1"]{transition-delay:.08s}[data-d="2"]{transition-delay:.16s}
+  [data-d="3"]{transition-delay:.24s}[data-d="4"]{transition-delay:.32s}
+  [data-d="5"]{transition-delay:.40s}[data-d="6"]{transition-delay:.48s}
+
+  /* hover lift cards */
+  .karta,.karta-wyboru{transition:box-shadow .22s ease,transform .22s ease}
+  .karta:hover,.karta-wyboru:hover{transform:translateY(-5px);box-shadow:0 10px 32px rgba(0,0,0,.11)}
+
+  /* btn hover */
+  .btn{transition:background .18s,transform .18s,box-shadow .18s}
+  .btn:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,.15)}
+
+  /* puls CTA */
+  @keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(26,92,42,.3)}70%{box-shadow:0 0 0 10px rgba(26,92,42,0)}}
+  .btn-pulse{animation:pulse 2.4s infinite}
+
+  /* krok hover */
+  .krok-item{transition:background .18s;border-radius:6px;padding:.8rem .6rem}
+  .krok-item:hover{background:var(--kremowy,#faf8f4)}
+
+  /* kroki linia */
+  .kroki{position:relative}
+
+  /* highlight slide-in */
+  @keyframes hl{from{opacity:0;transform:translateX(-8px)}to{opacity:1;transform:none}}
+  .highlight.vis{animation:hl .45s ease both}
+
+  /* ── FOUNDER STRIP ── */
+  .founder-strip{background:var(--kremowy,#faf8f4);border-top:1px solid var(--linia,#e5ddd0);border-bottom:1px solid var(--linia,#e5ddd0);padding:2.5rem 2rem}
+  .founder-inner{max-width:700px;margin:0 auto;display:flex;gap:2rem;align-items:center;flex-wrap:wrap}
+  .founder-avatar{width:72px;height:72px;border-radius:50%;background:var(--zielony);color:#fff;font-size:1.8rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-weight:700}
+  .founder-quote blockquote{font-size:.95rem;color:#444;line-height:1.65;font-style:italic;margin:0 0 .5rem;border:none;padding:0}
+  .founder-quote cite{font-size:.8rem;color:#888;font-style:normal;font-weight:600}
+
+  /* ── ROI SPEND BLOCK ── */
+  .roi-spend{background:var(--kremowy,#faf8f4);border:1px solid var(--linia,#e5ddd0);border-radius:.75rem;padding:1.4rem 1.5rem;margin:1.5rem 0}
+  .roi-spend-label{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#aaa;margin-bottom:.8rem}
+  .roi-spend-amount{font-size:1.8rem;font-weight:800;color:var(--zielony);margin-bottom:.9rem;line-height:1}
+  .roi-spend-items{display:flex;flex-wrap:wrap;gap:.6rem}
+  .roi-spend-item{background:#fff;border:1px solid var(--linia,#e5ddd0);border-radius:.4rem;padding:.5rem .9rem;font-size:.82rem;color:#555;display:flex;align-items:center;gap:.4rem}
+  .roi-spend-item .eq{font-size:.7rem;color:#bbb;font-weight:700}
+  </style>
 </head>
 <body>
 
@@ -297,15 +344,16 @@
   <!-- HERO -->
   <section class="hero-landing">
     <div class="hero-landing-content">
-      <span class="section-label" style="color:rgba(255,255,255,0.6); margin-bottom:1.2rem; display:block;">Cała Polska</span>
+      <span class="section-label" style="color:rgba(255,255,255,0.6);margin-bottom:1.2rem;display:block;">Cała Polska</span>
       <h1>Rozwijaj swoje<br>gospodarstwo z głową</h1>
-      <p style="font-size:1.05rem; color:rgba(255,255,255,0.55); font-style:italic; margin:-.4rem 0 1.2rem; max-width:560px; line-height:1.5;">Nie sprzedajemy mlekomatów. Tworzymy dochodowe sklepy przy gospodarstwach.</p>
+      <p style="font-size:1rem;color:rgba(255,255,255,0.5);font-style:italic;margin:.3rem auto 1.4rem;max-width:520px;line-height:1.55;text-align:center;">Nie sprzedajemy mlekomatów. Tworzymy dochodowe sklepy przy gospodarstwach.</p>
       <p class="podtytul">Od projektu pawilonu po pierwszą sprzedaż — kompleksowo, z dotacją ARiMR do 65%.</p>
+
       <div class="karty-wyboru">
         <a href="rolnik.html" class="karta-wyboru">
           <div class="ikona">🌱</div>
           <h3>Jestem rolnikiem</h3>
-          <p>Chcę rozwinąć gospodarstwo i dowiedzieć się o dofinansowaniu</p>
+          <p>Chcę zarabiać więcej na swoim mleku</p>
           <div class="strzalka">→</div>
         </a>
         <a href="oferta.html" class="karta-wyboru">
@@ -315,148 +363,41 @@
           <div class="strzalka">→</div>
         </a>
       </div>
-      <p style="color:rgba(255,255,255,0.4); font-size:0.8rem; margin-top:2rem; letter-spacing:0.1em;">↓ lub przewiń niżej</p>
+      <p style="color:rgba(255,255,255,0.35);font-size:.8rem;margin-top:2rem;letter-spacing:.1em;">↓ przewiń niżej</p>
     </div>
   </section>
 
   <!-- DLACZEGO MY -->
   <section class="section section-center">
-    <span class="section-label">Dlaczego my</span>
-    <h2>Jedna firma — kompleksowa obsługa</h2>
+    <span class="section-label" data-a="fade">Czym się zajmujemy</span>
+    <h2 data-a>Jedna firma — kompleksowa obsługa</h2>
     <div class="divider divider-center"></div>
-    <p style="max-width:600px; margin:0 auto;">Nie jesteśmy tylko sprzedawcą. Dobieramy maszynę, oferujemy sprzedaż lub leasing, pomagamy z wnioskiem ARiMR, instalujemy i serwisujemy przez lata.</p>
+    <p style="max-width:580px;margin:0 auto;" data-a data-d="1">Dobieramy maszynę, oferujemy sprzedaż lub leasing, pomagamy z wnioskiem ARiMR, instalujemy i serwisujemy. Jeden kontakt — całość po naszej stronie.</p>
     <div class="karty" style="margin-top:3rem;">
-      <div class="karta">
+      <div class="karta" data-a="scale" data-d="1">
         <div class="karta-ikona">💳</div>
         <h3>Sprzedaż i leasing</h3>
-        <p>Kupujesz od razu lub rozkładasz płatność na wygodne raty leasingowe. Ty wybierasz co pasuje do Twojej sytuacji.</p>
+        <p>Kupujesz od razu lub rozkładasz na raty. Ty wybierasz co pasuje do Twojej sytuacji.</p>
       </div>
-      <div class="karta">
+      <div class="karta" data-a="scale" data-d="2">
         <div class="karta-ikona">💰</div>
-        <h3>Dofinansowanie ARiMR</h3>
-        <p>Pomagamy złożyć wniosek o zwrot do 65% kosztów zakupu. Znamy procedury — Ty skupiasz się na gospodarstwie.</p>
+        <h3>Dotacja ARiMR do 65%</h3>
+        <p>Pomagamy złożyć wniosek o zwrot kosztów zakupu. Znamy procedury — Ty skupiasz się na krowach.</p>
       </div>
-      <div class="karta">
+      <div class="karta" data-a="scale" data-d="3">
         <div class="karta-ikona">🔧</div>
         <h3>Instalacja i serwis</h3>
-        <p>Nasi technicy instalują sprzęt pod klucz. Regularne przeglądy i szybka reakcja serwisowa przez cały rok.</p>
+        <p>Dowozimy, montujemy, uruchamiamy. Serwis mamy na miejscu — nie czekasz tygodniami.</p>
       </div>
-      <div class="karta">
+      <div class="karta" data-a="scale" data-d="4">
         <div class="karta-ikona">🏠</div>
         <h3>Pawilon pod automat</h3>
-        <p>Zapewniamy kompleksową budowę pawilonu dla automatu — od projektu po gotowy obiekt. Załatwiamy producenta i wszystkie formalności za Ciebie.</p>
+        <p>Wskazujesz miejsce — my bierzemy producenta, montaż i wszystkie formalności.</p>
       </div>
     </div>
   </section>
 
-  <!-- MODELE ZAKUPU -->
-  <div class="band">
-    <h2>Dwa sposoby nabycia sprzętu</h2>
-    <div class="divider divider-center" style="margin:1rem auto;"></div>
-    <p>Dopasowujemy formę do Twoich możliwości finansowych</p>
-  </div>
-
-  <section class="section">
-    <div class="grid-2">
-      <div style="background:var(--kremowy); padding:2.5rem; border:1px solid var(--linia);">
-        <div style="font-size:2.5rem; margin-bottom:1rem;">🛒</div>
-        <h3 style="color:var(--zielony); font-size:1.4rem; margin-bottom:1rem;">Sprzedaż bezpośrednia</h3>
-        <p>Kupujesz maszynę od razu — pełna własność od pierwszego dnia. Najlepsza opcja przy dofinansowaniu ARiMR, bo refundacja trafia bezpośrednio do Ciebie.</p>
-        <div class="cechy" style="margin-top:1.5rem;">
-          <span class="cecha">Pełna własność</span>
-          <span class="cecha">Zwrot do 65% z ARiMR</span>
-          <span class="cecha">Faktura VAT</span>
-          <span class="cecha">Gwarancja producenta</span>
-        </div>
-        <a href="kontakt.html" class="btn" style="margin-top:1.5rem;">Zapytaj o cenę</a>
-      </div>
-      <div style="background:var(--kremowy); padding:2.5rem; border:1px solid var(--linia);">
-        <div style="font-size:2.5rem; margin-bottom:1rem;">📋</div>
-        <h3 style="color:var(--zielony); font-size:1.4rem; margin-bottom:1rem;">Leasing</h3>
-        <p>Rozkładasz koszt maszyny na wygodne raty miesięczne. Minimalne zaangażowanie własnego kapitału — sprzęt pracuje i zarabia na siebie od pierwszego dnia.</p>
-        <div class="cechy" style="margin-top:1.5rem;">
-          <span class="cecha">Niski wkład własny</span>
-          <span class="cecha">Raty miesięczne</span>
-          <span class="cecha">Korzyści podatkowe</span>
-          <span class="cecha">Możliwość wykupu</span>
-        </div>
-        <a href="kontakt.html" class="btn" style="margin-top:1.5rem;">Zapytaj o leasing</a>
-      </div>
-    </div>
-    <div class="highlight" style="margin-top:2.5rem;">
-      <strong>💡 Leasing + dofinansowanie ARiMR — czy można łączyć?</strong>
-      <p>Tak, w określonych przypadkach. Skontaktuj się z nami — sprawdzimy Twoją sytuację i doradzimy najkorzystniejsze rozwiązanie.</p>
-    </div>
-  </section>
-
-  <!-- JAK TO DZIAŁA -->
-  <div class="band-kremowy band" style="padding:4rem 2rem;">
-    <h2>Jak wygląda współpraca?</h2>
-    <div class="divider divider-center" style="margin:1rem auto;"></div>
-    <p>Od pierwszego kontaktu do działającego sprzętu</p>
-  </div>
-
-  <section class="section" style="max-width:700px;">
-    <div class="kroki">
-      <div class="krok-item">
-        <div class="krok-num">1</div>
-        <div class="krok-tekst">
-          <h3>Bezpłatna konsultacja</h3>
-          <p>Oceniamy potrzeby Twojego gospodarstwa, dobieramy sprzęt i omawiamy opcje finansowania — sprzedaż lub leasing.</p>
-          <span class="tag">bezpłatnie, bez zobowiązań</span>
-        </div>
-      </div>
-      <div class="krok-item">
-        <div class="krok-num">2</div>
-        <div class="krok-tekst">
-          <h3>Wybór formy finansowania</h3>
-          <p>Decydujesz czy kupujesz od razu czy bierzesz leasing. Jeśli kupujesz — pomagamy złożyć wniosek o dofinansowanie ARiMR.</p>
-          <span class="tag">sprzedaż lub leasing</span>
-        </div>
-      </div>
-      <div class="krok-item">
-        <div class="krok-num">3</div>
-        <div class="krok-tekst">
-          <h3>Dostawa i instalacja</h3>
-          <p>Dostarczamy maszynę i instalujemy ją w Twoim gospodarstwie pod klucz. Szkolenie z obsługi w cenie.</p>
-          <span class="tag">w całej Polsce</span>
-        </div>
-      </div>
-      <div class="krok-item">
-        <div class="krok-num">4</div>
-        <div class="krok-tekst">
-          <h3>Pawilon pod automat — opcjonalnie</h3>
-          <p>Nie masz gdzie postawić automatu? Zajmujemy się budową gotowego pawilonu — od producenta po montaż. Wszystkie formalności po naszej stronie.</p>
-          <span class="tag">kompleksowo</span>
-        </div>
-      </div>
-      <div class="krok-item">
-        <div class="krok-num">5</div>
-        <div class="krok-tekst">
-          <h3>Serwis i opieka</h3>
-          <p>Regularne przeglądy, szybkie naprawy, dostęp do części zamiennych — przez cały okres użytkowania.</p>
-          <span class="tag">umowa serwisowa</span>
-        </div>
-      </div>
-    </div>
-    <a href="kontakt.html" class="btn">Umów bezpłatną konsultację</a>
-  </section>
-
-  <!-- LUDZKA TWARZ FIRMY -->
-  <div class="founder-strip">
-    <div class="founder-inner">
-      <div class="founder-avatar">J</div>
-      <div class="founder-quote">
-        <blockquote>„Widziałem jak rolnicy w Szwajcarii zarabiają 4× więcej na tym samym mleku — tylko dlatego że mają automat przy bramie. W Polsce większość nadal oddaje mleko za grosze. Postanowiłem to zmienić."</blockquote>
-        <cite>Jakub — Sklep za Stodołą</cite>
-      </div>
-    </div>
-  </div>
-
-  <!-- ═══════════════════════════════════════════════════════
-       KALKULATOR ROI — MLEKOMAT
-       ═══════════════════════════════════════════════════════ -->
-
+  <!-- ══ KALKULATOR — tuż pod "Jedna firma" ══ -->
   <div class="kalk-band" id="kalkulator">
     <h2>Czy mlekomat się opłaca?</h2>
     <p>Przesuń suwaki — zobaczysz ile zarobisz więcej i kiedy zwróci się inwestycja.</p>
@@ -600,6 +541,7 @@
         </div>
       </div>
 
+      <!-- CTA FORM -->
       <div class="kalk-cta">
         <h3>👉 Policz mój przypadek — chcę bezpłatną wycenę</h3>
         <p>Podaj numer — oddzwonimy i przygotujemy indywidualną ofertę wraz z pomocą przy wniosku ARiMR.</p>
@@ -615,13 +557,117 @@
 
     </div><!-- /kalk-wrap -->
   </section>
+  <!-- KONIEC KALKULATORA -->
 
+  <!-- MODELE ZAKUPU -->
   <div class="band">
-    <h2>Masz pytania?</h2>
-    <p>Zadzwoń lub napisz — doradzimy bezpłatnie i bez zobowiązań.</p>
-    <div style="display:flex; gap:1rem; justify-content:center; flex-wrap:wrap; margin-top:2rem;">
+    <h2 data-a="fade">Kupujesz czy leasingujesz?</h2>
+    <p data-a="fade" data-d="1">Obydwa warianty — powiedz co Ci pasuje finansowo</p>
+  </div>
+
+  <section class="section">
+    <div class="grid-2">
+      <div style="background:var(--kremowy);padding:2.5rem;border:1px solid var(--linia);" data-a="left">
+        <div style="font-size:2.5rem;margin-bottom:1rem;">🛒</div>
+        <h3 style="color:var(--zielony);font-size:1.4rem;margin-bottom:1rem;">Zakup</h3>
+        <p>Płacisz raz, maszyna jest Twoja. Przy dotacji ARiMR to najlepsza opcja — refundacja trafia bezpośrednio do Ciebie.</p>
+        <div class="cechy" style="margin-top:1.5rem;">
+          <span class="cecha">Pełna własność</span>
+          <span class="cecha">Zwrot do 65% z ARiMR</span>
+          <span class="cecha">Faktura VAT</span>
+          <span class="cecha">Gwarancja producenta</span>
+        </div>
+        <a href="kontakt.html" class="btn" style="margin-top:1.5rem;">Zapytaj o cenę</a>
+      </div>
+      <div style="background:var(--kremowy);padding:2.5rem;border:1px solid var(--linia);" data-a="right">
+        <div style="font-size:2.5rem;margin-bottom:1rem;">📋</div>
+        <h3 style="color:var(--zielony);font-size:1.4rem;margin-bottom:1rem;">Leasing</h3>
+        <p>Mała kasa z góry, stała rata miesięczna. Maszyna zarabia od pierwszego dnia i spłaca się sama.</p>
+        <div class="cechy" style="margin-top:1.5rem;">
+          <span class="cecha">Mały wkład własny</span>
+          <span class="cecha">Stała rata</span>
+          <span class="cecha">Korzyści podatkowe</span>
+          <span class="cecha">Wykup na koniec</span>
+        </div>
+        <a href="kontakt.html" class="btn" style="margin-top:1.5rem;">Zapytaj o leasing</a>
+      </div>
+    </div>
+    <div class="highlight" style="margin-top:2.5rem;" data-a>
+      <strong>Leasing + dotacja ARiMR — czy można łączyć?</strong>
+      <p>Zależy od formy leasingu. Sprawdzimy Twoją sytuację i powiemy wprost co się bardziej opłaca.</p>
+    </div>
+  </section>
+
+  <!-- JAK TO DZIAŁA -->
+  <div class="band-kremowy band" style="padding:4rem 2rem;">
+    <h2 data-a="fade">Jak wygląda współpraca?</h2>
+    <p data-a="fade" data-d="1">Od pierwszego telefonu do działającego mlekomatu</p>
+  </div>
+
+  <section class="section" style="max-width:700px;">
+    <div class="kroki">
+      <div class="krok-item" data-a>
+        <div class="krok-num">1</div>
+        <div class="krok-tekst">
+          <h3>Bezpłatna rozmowa</h3>
+          <p>Gadamy o Twoim gospodarstwie, dobieramy sprzęt, sprawdzamy co z dotacją.</p>
+          <span class="tag">0 zł, bez zobowiązań</span>
+        </div>
+      </div>
+      <div class="krok-item" data-a>
+        <div class="krok-num">2</div>
+        <div class="krok-tekst">
+          <h3>Zakup lub leasing</h3>
+          <p>Decydujesz jak chcesz zapłacić. Jeśli kupujesz — składamy wniosek do ARiMR razem.</p>
+          <span class="tag">zakup lub leasing</span>
+        </div>
+      </div>
+      <div class="krok-item" data-a>
+        <div class="krok-num">3</div>
+        <div class="krok-tekst">
+          <h3>Dostawa i instalacja</h3>
+          <p>Przywożę maszynę, montuję, uruchamiam i pokazuję jak działa. Szkolenie w cenie.</p>
+          <span class="tag">cała Polska</span>
+        </div>
+      </div>
+      <div class="krok-item" data-a>
+        <div class="krok-num">4</div>
+        <div class="krok-tekst">
+          <h3>Pawilon — jeśli potrzebny</h3>
+          <p>Nie masz gdzie postawić? Bierzemy producenta, projekt i montaż. Ty tylko mówisz gdzie.</p>
+          <span class="tag">kompleksowo</span>
+        </div>
+      </div>
+      <div class="krok-item" data-a>
+        <div class="krok-num">5</div>
+        <div class="krok-tekst">
+          <h3>Serwis przez lata</h3>
+          <p>Coś się stało — dzwonisz, przyjeżdżam. Mam części, nie ma tygodniowego czekania.</p>
+          <span class="tag">umowa serwisowa</span>
+        </div>
+      </div>
+    </div>
+    <a href="kontakt.html" class="btn btn-pulse">Umów bezpłatną rozmowę</a>
+  </section>
+
+  <!-- FOUNDER -->
+  <div class="founder-strip" data-a>
+    <div class="founder-inner">
+      <div class="founder-avatar">J</div>
+      <div class="founder-quote">
+        <blockquote>„Widziałem jak rolnicy w Szwajcarii zarabiają 4× więcej na tym samym mleku — tylko dlatego że mają automat przy bramie. W Polsce większość nadal oddaje mleko za grosze. Postanowiłem to zmienić."</blockquote>
+        <cite>Jakub Deczyński — założyciel, Sklep za Stodołą</cite>
+      </div>
+    </div>
+  </div>
+
+  <!-- CTA -->
+  <div class="band">
+    <h2 data-a="fade">Masz pytania?</h2>
+    <p data-a="fade" data-d="1">Zadzwoń lub napisz — odpowiem konkretnie, bez ściemy.</p>
+    <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;margin-top:2rem;" data-a="fade" data-d="2">
       <a href="tel:533200652" class="btn btn-biel">📞 533 200 652</a>
-      <a href="kontakt.html" class="btn" style="border-color:rgba(255,255,255,0.4); background:transparent;">Napisz do nas</a>
+      <a href="kontakt.html" class="btn" style="border-color:rgba(255,255,255,0.4);background:transparent;">Napisz do nas</a>
     </div>
   </div>
 
@@ -660,102 +706,101 @@
   </footer>
 
   <script>
-    function toggleMenu() { document.getElementById('nav-links').classList.toggle('open'); }
+    function toggleMenu(){document.getElementById('nav-links').classList.toggle('open');}
 
+    // ── KALKULATOR ──────────────────────────────────────────
     const kState = { litry: 200, posrednik: 120, mlekomat: 400, invest: 120000 };
+    function kFmt(n){return n.toLocaleString('pl-PL')+' zł';}
+    function kMies(n){if(n>=99)return '>99 mies.';return '~'+Math.ceil(n)+' mies.';}
+    function kPlDecim(v){return(v/100).toFixed(2).replace('.',',');}
 
-    function kFmt(n)    { return n.toLocaleString('pl-PL') + ' zł'; }
-    function kMies(n)   { if (n >= 99) return '>99 mies.'; return '~' + Math.ceil(n) + ' mies.'; }
-    function kPlDecim(v){ return (v / 100).toFixed(2).replace('.', ','); }
+    function kCalc(){
+      const {litry,posrednik,mlekomat,invest}=kState;
+      const p=posrednik/100,m=mlekomat/100;
+      const posrDzien=litry*p, mlekDzien=litry*m;
+      const posrMies=posrDzien*30, mlekMies=mlekDzien*30;
+      const diffMies=mlekMies-posrMies, diffRok=diffMies*12;
+      const wzrost=posrMies>0?(diffMies/posrMies)*100:0;
+      const roiBez=diffMies>0?invest/diffMies:999;
+      const roiZ=diffMies>0?invest*.5/diffMies:999;
 
-    function kCalc() {
-      const { litry, posrednik, mlekomat, invest } = kState;
-      const p = posrednik / 100, m = mlekomat / 100;
+      document.getElementById('kr-posrednik').textContent=kFmt(Math.round(posrMies));
+      document.getElementById('kr-posrednik-dzien').textContent=Math.round(posrDzien).toLocaleString('pl-PL')+' zł/dzień';
+      document.getElementById('kr-mlekomat').textContent=kFmt(Math.round(mlekMies));
+      document.getElementById('kr-mlekomat-dzien').textContent=Math.round(mlekDzien).toLocaleString('pl-PL')+' zł/dzień';
+      document.getElementById('kr-diff').textContent='+'+kFmt(Math.round(diffMies));
+      document.getElementById('kr-diff-rok').textContent='+'+kFmt(Math.round(diffRok))+' rocznie';
+      document.getElementById('kr-wzrost').textContent='+'+Math.round(wzrost)+'%';
+      document.getElementById('kr-roi-bez').textContent=kMies(roiBez);
+      document.getElementById('kr-invest-bez').textContent='przy '+invest.toLocaleString('pl-PL')+' zł';
+      document.getElementById('kr-roi-z').textContent=kMies(roiZ);
+      document.getElementById('kr-invest-z').textContent='przy '+Math.round(invest*.5).toLocaleString('pl-PL')+' zł po dotacji';
 
-      const posrDzien    = litry * p;
-      const mlekDzien    = litry * m;
-      const posrMies     = posrDzien  * 30;
-      const mlekMies     = mlekDzien  * 30;
-      const diffMies     = mlekMies   - posrMies;
-      const diffRok      = diffMies   * 12;
-      const wzrost       = posrMies > 0 ? (diffMies / posrMies) * 100 : 0;
-      const roiBez       = diffMies > 0 ? invest         / diffMies : 999;
-      const roiZ         = diffMies > 0 ? invest * 0.5   / diffMies : 999;
-
-      document.getElementById('kr-posrednik').textContent      = kFmt(Math.round(posrMies));
-      document.getElementById('kr-posrednik-dzien').textContent= Math.round(posrDzien).toLocaleString('pl-PL') + ' zł/dzień';
-      document.getElementById('kr-mlekomat').textContent       = kFmt(Math.round(mlekMies));
-      document.getElementById('kr-mlekomat-dzien').textContent = Math.round(mlekDzien).toLocaleString('pl-PL') + ' zł/dzień';
-      document.getElementById('kr-diff').textContent           = '+' + kFmt(Math.round(diffMies));
-      document.getElementById('kr-diff-rok').textContent       = '+' + kFmt(Math.round(diffRok)) + ' rocznie';
-      document.getElementById('kr-wzrost').textContent         = '+' + Math.round(wzrost) + '%';
-      document.getElementById('kr-roi-bez').textContent        = kMies(roiBez);
-      document.getElementById('kr-invest-bez').textContent     = 'przy ' + invest.toLocaleString('pl-PL') + ' zł';
-      document.getElementById('kr-roi-z').textContent          = kMies(roiZ);
-      document.getElementById('kr-invest-z').textContent       = 'przy ' + Math.round(invest * 0.5).toLocaleString('pl-PL') + ' zł po dotacji';
-
-      // ── CO ZROBISZ Z PIENIĘDZMI ──────────────────────────────────────
-      const rokZl = Math.round(diffRok);
-      document.getElementById('spend-amount').textContent = '+' + rokZl.toLocaleString('pl-PL') + ' zł rocznie';
-      // ciągnik ~120 000 zł, robot udojowy ~200 000 zł, modernizacja obory ~80 000 zł
-      const lataTraktor  = rokZl > 0 ? Math.ceil(120000 / rokZl) : '—';
-      const lataRobot    = rokZl > 0 ? Math.ceil(200000 / rokZl) : '—';
-      const lataObornik  = rokZl > 0 ? Math.ceil(80000  / rokZl) : '—';
-      document.getElementById('spend-traktor').textContent  = lataTraktor;
-      document.getElementById('spend-robot').textContent    = lataRobot;
-      document.getElementById('spend-obornik').textContent  = lataObornik;
-
-      document.getElementById('kalk-hidden-dane').value =
-        `Litry:${litry}/dzień, Pośrednik:${kPlDecim(posrednik)}zł/L, Mlekomat:${kPlDecim(mlekomat)}zł/L, Inwestycja:${invest}zł → diff:+${Math.round(diffMies)}zł/mies, ROI z dotacją:${kMies(roiZ)}`;
+      // co zrobisz z pieniędzmi — dynamiczne z kalkulatora
+      const rokZl=Math.round(diffRok);
+      const amtEl=document.getElementById('spend-amount');
+      if(amtEl){
+        amtEl.textContent='+'+rokZl.toLocaleString('pl-PL')+' zł rocznie';
+        const t=document.getElementById('spend-traktor');
+        const r=document.getElementById('spend-robot');
+        const o=document.getElementById('spend-obornik');
+        if(t) t.textContent=rokZl>0?Math.ceil(120000/rokZl)+'':'—';
+        if(r) r.textContent=rokZl>0?Math.ceil(200000/rokZl)+'':'—';
+        if(o) o.textContent=rokZl>0?Math.ceil(80000/rokZl)+'':'—';
+      }
+      const hid=document.getElementById('kalk-hidden-dane');
+      if(hid) hid.value=`Litry:${litry}/dzień, Pośrednik:${kPlDecim(posrednik)}zł/L, Mlekomat:${kPlDecim(mlekomat)}zł/L → diff:+${Math.round(diffMies)}zł/mies`;
     }
 
-    function kBind(slId, valId, fmtFn, key) {
-      const sl = document.getElementById(slId);
-      if (!sl) return;
-      sl.addEventListener('input', () => {
-        kState[key] = parseInt(sl.value);
-        document.getElementById(valId).textContent = fmtFn(kState[key]);
-        const r = document.getElementById('kalk-results');
+    function kBind(slId,valId,fmtFn,key){
+      const sl=document.getElementById(slId);
+      if(!sl)return;
+      sl.addEventListener('input',()=>{
+        kState[key]=parseInt(sl.value);
+        document.getElementById(valId).textContent=fmtFn(kState[key]);
+        const r=document.getElementById('kalk-results');
         r.classList.add('kalk-animating');
-        setTimeout(() => r.classList.remove('kalk-animating'), 280);
+        setTimeout(()=>r.classList.remove('kalk-animating'),280);
         kCalc();
       });
     }
 
-    kBind('ks-litry',     'kv-litry',     v => v + ' L/dzień',                     'litry');
-    kBind('ks-posrednik', 'kv-posrednik', v => kPlDecim(v) + ' zł/L',              'posrednik');
-    kBind('ks-mlekomat',  'kv-mlekomat',  v => kPlDecim(v) + ' zł/L',              'mlekomat');
-    kBind('ks-invest',    'kv-invest',    v => v.toLocaleString('pl-PL') + ' zł',   'invest');
-
+    kBind('ks-litry','kv-litry',v=>v+' L/dzień','litry');
+    kBind('ks-posrednik','kv-posrednik',v=>kPlDecim(v)+' zł/L','posrednik');
+    kBind('ks-mlekomat','kv-mlekomat',v=>kPlDecim(v)+' zł/L','mlekomat');
+    kBind('ks-invest','kv-invest',v=>v.toLocaleString('pl-PL')+' zł','invest');
     kCalc();
 
-    const msCards = document.querySelectorAll('.ms-card');
-    if ('IntersectionObserver' in window) {
-      const obs = new IntersectionObserver(entries => {
-        entries.forEach((e, i) => {
-          if (e.isIntersecting) setTimeout(() => e.target.classList.add('ms-visible'), i * 110);
-        });
-      }, { threshold: 0.25 });
-      msCards.forEach(c => obs.observe(c));
-    } else {
-      msCards.forEach(c => c.classList.add('ms-visible'));
-    }
+    // ms-card animacje
+    const msCards=document.querySelectorAll('.ms-card');
+    if('IntersectionObserver' in window){
+      const obs=new IntersectionObserver(entries=>{
+        entries.forEach((e,i)=>{if(e.isIntersecting)setTimeout(()=>e.target.classList.add('ms-visible'),i*110);});
+      },{threshold:.25});
+      msCards.forEach(c=>obs.observe(c));
+    } else msCards.forEach(c=>c.classList.add('ms-visible'));
 
-    const kForm = document.getElementById('kalk-form');
-    if (kForm) {
-      kForm.addEventListener('submit', e => {
+    // formularz
+    const kForm=document.getElementById('kalk-form');
+    if(kForm){
+      kForm.addEventListener('submit',e=>{
         e.preventDefault();
-        const btn = kForm.querySelector('button');
-        btn.textContent = '✅ Wysłano! Oddzwonimy wkrótce.';
-        btn.disabled = true;
-        fetch(kForm.action, {
-          method: 'POST',
-          body: new FormData(kForm),
-          headers: { Accept: 'application/json' }
-        });
+        const btn=kForm.querySelector('button');
+        btn.textContent='✅ Wysłano! Oddzwonimy wkrótce.';
+        btn.disabled=true;
+        fetch(kForm.action,{method:'POST',body:new FormData(kForm),headers:{Accept:'application/json'}});
       });
     }
+
+    // IntersectionObserver animacje scroll
+    (function(){
+      const obs=new IntersectionObserver(entries=>{
+        entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('vis');obs.unobserve(e.target);}});
+      },{threshold:.1,rootMargin:'0px 0px -50px 0px'});
+      document.querySelectorAll('[data-a]').forEach(el=>obs.observe(el));
+    })();
   </script>
+
   <!-- COOKIE BANNER -->
   <div id="cookie-bar" style="position:fixed;bottom:0;left:0;right:0;background:#1a5c2a;color:#fff;padding:1rem 1.5rem;display:flex;justify-content:space-between;align-items:center;gap:1rem;flex-wrap:wrap;z-index:9999;font-size:.85rem;box-shadow:0 -2px 12px rgba(0,0,0,.15)">
     <span>Ta strona używa plików cookies. <a href="polityka.html" style="color:#a5d6a7;text-decoration:underline">Polityka prywatności</a></span>
@@ -765,15 +810,8 @@
     </div>
   </div>
   <script>
-  function setCookies(choice){
-    localStorage.setItem('cookie_consent',choice);
-    document.getElementById('cookie-bar').style.display='none';
-  }
-  (function(){
-    if(localStorage.getItem('cookie_consent')){
-      document.getElementById('cookie-bar').style.display='none';
-    }
-  })();
+  function setCookies(c){localStorage.setItem('cookie_consent',c);document.getElementById('cookie-bar').style.display='none';}
+  (function(){if(localStorage.getItem('cookie_consent'))document.getElementById('cookie-bar').style.display='none';})();
   </script>
 </body>
 </html>
