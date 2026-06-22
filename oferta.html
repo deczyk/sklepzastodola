@@ -16,7 +16,6 @@
   <link rel="stylesheet" href="style.css" />
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌾</text></svg>">
   <style>
-    /* ===== GALERIA PAWILONÓW ===== */
     .pawilony-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -76,7 +75,6 @@
       font-weight: 600;
       margin-bottom: 0.5rem;
     }
-    /* ===== LIGHTBOX PROSTY ===== */
     .lightbox-overlay {
       display: none; position: fixed; inset: 0;
       background: rgba(0,0,0,0.88); z-index: 9999;
@@ -99,16 +97,6 @@
       background: rgba(0,0,0,0.4); padding: 6px 14px; border-radius: 20px;
     }
     .pawylon-img-wrap img { cursor: pointer; }
-    /* ===== REALIZACJE BANNER ===== */
-    .realizacje-note {
-      background: #fff8e1;
-      border-left: 4px solid #f9a825;
-      padding: 12px 18px;
-      font-size: 0.83rem;
-      color: #555;
-      border-radius: 0 6px 6px 0;
-      margin-top: 1.5rem;
-    }
   </style>
 </head>
 <body>
@@ -152,8 +140,8 @@
           <span class="cecha">Ekran dotykowy</span>
         </div>
         <div class="highlight" style="margin-top:1.5rem;">
-          <strong>💰 Zwrot inwestycji w 6 miesięcy</strong>
-          <p>Automat sprzedający 50L mleka dziennie przy cenie 1,50 zł/l generuje ~2 250 zł miesięcznie. Przy dofinansowaniu ARiMR 65% — koszt własny zwraca się w ciągu 6 miesięcy.</p>
+          <strong>💰 Zwrot inwestycji w 2 miesiące</strong>
+          <p>Automat sprzedający 50L mleka dziennie przy cenie 4,00 zł/l generuje <strong>6 000 zł miesięcznie</strong>. Przy dofinansowaniu ARiMR 65% — koszt własny zwraca się w ciągu <strong>2 miesięcy</strong>.</p>
         </div>
         <a href="kontakt.html" class="btn">Zapytaj o cenę i dostępność</a>
       </div>
@@ -273,9 +261,6 @@
     </div>
   </section>
 
-  <!-- ========================================= -->
-  <!-- NOWA SEKCJA: REALIZACJE — PAWILONY        -->
-  <!-- ========================================= -->
   <div class="band-kremowy band" id="pawilony">
     <h2>Realizacje — Pawilony handlowe</h2>
     <div class="divider divider-center" style="margin:1rem auto;"></div>
@@ -285,7 +270,6 @@
   <section class="section">
     <div class="grid-2" style="align-items:start; gap:3rem;">
 
-      <!-- LEWA: OPIS -->
       <div class="grid-tekst">
         <span class="section-label">Własna produkcja</span>
         <h2>Pawilon drewniany — kompleksowo</h2>
@@ -328,10 +312,7 @@
         <a href="kontakt.html" class="btn" style="margin-top:2rem;">Zapytaj o pawilon</a>
       </div>
 
-      <!-- PRAWA: GALERIA 4 zdjęcia -->
       <div>
-
-        <!-- DUŻE ZDJĘCIE GŁÓWNE (pawilon-1 / pawilon-1 z bliska) -->
         <div class="pawylon-card" style="margin-bottom:1rem;">
           <div class="pawylon-img-wrap" style="aspect-ratio:16/9;">
             <img
@@ -349,10 +330,8 @@
           </div>
         </div>
 
-        <!-- TRZY MNIEJSZE W RZĘDZIE -->
         <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:0.75rem;">
 
-          <!-- pawilon-2: widok z dystansu -->
           <div class="pawylon-card">
             <div class="pawylon-img-wrap" style="aspect-ratio:4/3;">
               <img
@@ -370,7 +349,6 @@
             </div>
           </div>
 
-          <!-- pawilon-3: wnętrze sklepu -->
           <div class="pawylon-card">
             <div class="pawylon-img-wrap" style="aspect-ratio:4/3;">
               <img
@@ -388,7 +366,6 @@
             </div>
           </div>
 
-          <!-- pawilon-5: bliskie ujęcie frontu -->
           <div class="pawylon-card">
             <div class="pawylon-img-wrap" style="aspect-ratio:4/3;">
               <img
@@ -406,12 +383,11 @@
             </div>
           </div>
 
-        </div><!-- /3 małe -->
-    </div><!-- /grid-2 -->
+        </div>
+      </div>
+
+    </div>
   </section>
-  <!-- ========================================= -->
-  <!-- KONIEC SEKCJI PAWILONY                    -->
-  <!-- ========================================= -->
 
   <!-- SERWIS -->
   <section class="section" style="background:var(--kremowy); max-width:100%; padding:4rem 2rem;">
