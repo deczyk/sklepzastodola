@@ -4,11 +4,45 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Dla Rolników | Sklep za Stodołą</title>
-  <meta name="description" content="Sprzedaj mleko bezpośrednio przez mlekomat — zarabiaj 3x więcej. Dofinansowanie ARiMR do 65%. Instalacja i serwis."/>
+  <meta name="description" content="Sprzedajesz mleko za 1,20 zł? Przez mlekomat dostaniesz 4–6 zł. Te same krowy, 3x więcej pieniędzy."/>
   <meta name="robots" content="index, follow"/>
   <link rel="canonical" href="https://www.sklepzastodola.pl/rolnik.html"/>
   <link rel="stylesheet" href="style.css"/>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌾</text></svg>">
+  <style>
+/* ── ANIMACJE ─────────────────────────────────────────── */
+[data-a]{opacity:0;transform:translateY(28px);transition:opacity .55s ease,transform .55s ease}
+[data-a="fade-in"]{transform:none}
+[data-a="scale"]{transform:scale(.97) translateY(12px)}
+[data-a="left"]{transform:translateX(-28px)}
+[data-a="right"]{transform:translateX(28px)}
+[data-a].visible{opacity:1;transform:none}
+
+[data-a-delay="1"]{transition-delay:.08s}
+[data-a-delay="2"]{transition-delay:.16s}
+[data-a-delay="3"]{transition-delay:.24s}
+[data-a-delay="4"]{transition-delay:.32s}
+[data-a-delay="5"]{transition-delay:.40s}
+[data-a-delay="6"]{transition-delay:.48s}
+
+/* hover lift na kartach */
+.karta,.karta-wyboru,.pawylon-card{transition:box-shadow .22s,transform .22s}
+.karta:hover,.karta-wyboru:hover{transform:translateY(-4px);box-shadow:0 8px 28px rgba(0,0,0,.1)}
+
+/* pulsowanie CTA */
+@keyframes pulse-green{0%,100%{box-shadow:0 0 0 0 rgba(26,92,42,.35)}70%{box-shadow:0 0 0 10px rgba(26,92,42,0)}}
+.btn-pulse{animation:pulse-green 2.2s infinite}
+
+/* licznik */
+.count-num{display:inline-block}
+
+/* kroki – linia łącząca */
+.krok-item{transition:opacity .3s}
+
+/* highlight pulse przy wejściu */
+@keyframes hl-in{from{background:#fff8e8}to{background:#fff8e1}}
+.highlight.visible{animation:hl-in .6s ease}
+</style>
 </head>
 <body>
 
@@ -20,114 +54,113 @@
     <ul class="nav-links" id="nav-links">
       <li><a href="index.html">Start</a></li>
       <li><a href="rolnik.html" class="active">Dla rolników</a></li>
-      <li><a href="oferta.html">Maszyny i serwis</a></li>
-      <li><a href="kontakt.html">Kontakt</a></li>
+      <li><a href="oferta.html" >Maszyny i serwis</a></li>
+      <li><a href="kontakt.html" >Kontakt</a></li>
     </ul>
   </nav>
 
   <div class="page-hero">
     <div class="page-hero-content">
-      <h1>Dla Rolników</h1>
-      <p>Sprzedawaj mleko bezpośrednio — bez pośrednika, za 3–5 razy wyższą cenę</p>
+      <h1>Ile dostaje Pan za litr mleka?</h1>
+      <p>Pośrednik płaci 1,20 zł. Twoi klienci przy mlekomacie — 4 do 6 zł.<br>Te same krowy. Inna kieszeń.</p>
     </div>
   </div>
 
   <!-- GŁÓWNA KORZYŚĆ -->
   <section class="section">
     <div class="grid-2">
-      <img src="img/automat.jpg" alt="Automat do mleka w gospodarstwie" class="pionowe" onerror="this.style.background='#e8e0d0';"/>
-      <div class="grid-tekst">
-        <span class="section-label">Zmień sposób sprzedaży mleka</span>
-        <h2>Skup płaci 1,20 zł za litr.<br>Mlekomat daje 4–6 zł.</h2>
+      <img src="img/automat.jpg" alt="Automat do mleka w gospodarstwie" class="pionowe"
+           data-a="left" onerror="this.style.background='#e8e0d0';"/>
+      <div class="grid-tekst" data-a>
+        <span class="section-label">Liczby mówią same za siebie</span>
+        <h2>Skup: 1,20 zł/L<br>Mlekomat: 4,00 zł/L</h2>
         <div class="divider"></div>
-        <p>Te same krowy, ta sama praca — ale trzy razy więcej pieniędzy. Automat do mleka sprzedaje za Ciebie całą dobę, 7 dni w tygodniu, bez żadnej obsługi.</p>
+        <p>Nie ma żadnej magii. Po prostu sprzedajesz bezpośrednio klientom, którzy chcą świeżego mleka prosto z gospodarstwa — i płacą za to uczciwie.</p>
 
-        <div class="highlight" style="margin-top:1.5rem;">
-          <strong>📊 Przykład: 200 litrów dziennie</strong>
-          <p>Przez pośrednika: 200L × 1,20 zł = <strong>240 zł/dzień = 7 200 zł/mies.</strong></p>
-          <p>Przez mlekomat: 200L × 4,00 zł = <strong>800 zł/dzień = 24 000 zł/mies.</strong></p>
-          <p style="margin-top:.5rem;color:var(--zielony);font-weight:700;">Różnica: +16 800 zł miesięcznie = +201 600 zł rocznie</p>
+        <div class="highlight" style="margin-top:1.5rem;" data-a>
+          <strong>Przykład — 200 litrów dziennie</strong>
+          <p>Skup: 200L × 1,20 zł = <strong>7 200 zł/mies.</strong></p>
+          <p>Mlekomat: 200L × 4,00 zł = <strong>24 000 zł/mies.</strong></p>
+          <p style="margin-top:.6rem;color:var(--zielony);font-weight:700;font-size:1.1rem;">Różnica: +16 800 zł miesięcznie</p>
         </div>
 
-        <a href="kontakt.html" class="btn" style="margin-top:1.5rem;">Oblicz zysk dla mojego gospodarstwa</a>
+        <a href="index.html#kalkulator" class="btn btn-pulse" style="margin-top:1.5rem;">Policz dla swojego gospodarstwa →</a>
       </div>
     </div>
   </section>
 
-  <!-- DOTACJA ARIMR -->
+  <!-- DOTACJA -->
   <div class="band">
-    <h2>Dofinansowanie ARiMR do 65%</h2>
-    <div class="divider divider-center" style="margin:1rem auto;"></div>
-    <p>Rolnicy mogą otrzymać zwrot dużej części kosztów inwestycji z Planu Strategicznego WPR 2021–2027</p>
+    <h2 data-a="fade-in">Połowę zapłaci państwo.</h2>
+    <p data-a="fade-in" data-a-delay="1">Program ARiMR zwraca rolnikom do 65% kosztów — mlekomat, pawilon, instalacja. Wszystko.</p>
   </div>
 
   <section class="section">
     <div class="karty">
-      <div class="karta">
-        <div class="karta-ikona">💰</div>
-        <h3>Do 50% zwrotu</h3>
-        <p>Standardowe dofinansowanie dla producentów mleka. Maszyna kosztuje 70 000 zł — płacisz 35 000 zł.</p>
+      <div class="karta" data-a data-a-delay="1">
+        <div class="karta-ikona">50%</div>
+        <h3>Standardowy zwrot</h3>
+        <p>Maszyna kosztuje 70 000 zł. Po dotacji płacisz 35 000 zł. Resztę oddaje ARiMR.</p>
       </div>
-      <div class="karta">
-        <div class="karta-ikona">🌱</div>
-        <h3>Do 65% dla młodych rolników</h3>
-        <p>Jeśli masz mniej niż 40 lat — kwalifikujesz się do wyższego dofinansowania. Maszyna za 70 000 zł — płacisz 24 500 zł.</p>
+      <div class="karta" data-a data-a-delay="2">
+        <div class="karta-ikona">65%</div>
+        <h3>Młody rolnik (do 40 lat)</h3>
+        <p>Wyższy próg dla młodych. Maszyna 70 000 zł — płacisz 24 500 zł.</p>
       </div>
-      <div class="karta">
-        <div class="karta-ikona">📋</div>
-        <h3>Pomagamy złożyć wniosek</h3>
-        <p>Wystawiamy fakturę z opisem kwalifikującym do dotacji i pomagamy przygotować dokumentację do ARiMR.</p>
+      <div class="karta" data-a data-a-delay="3">
+        <div class="karta-ikona">📄</div>
+        <h3>Wniosek robimy razem</h3>
+        <p>Wystawiamy fakturę z odpowiednim opisem i przechodzimy przez papiery krok po kroku. Nie zostawiamy z tym samego.</p>
       </div>
-      <div class="karta">
-        <div class="karta-ikona">⏱️</div>
-        <h3>Zwrot w 3–8 miesięcy</h3>
-        <p>Po dotacji inwestycja zwraca się z naddatkiem zanim minie rok. Potem to już czysty zysk.</p>
+      <div class="karta" data-a data-a-delay="4">
+        <div class="karta-ikona">~3 mies.</div>
+        <h3>Zwrot inwestycji</h3>
+        <p>Przy 200L dziennie i dotacji — maszyna spłaca się w kilka miesięcy. Potem to już Twój zarobek.</p>
       </div>
     </div>
   </section>
 
-  <!-- JAK DZIAŁA -->
-  <div class="band-kremowy band" style="padding:4rem 2rem;">
-    <h2>Jak to działa — 5 kroków</h2>
-    <div class="divider divider-center" style="margin:1rem auto;"></div>
-    <p>Ty dojesz krowy — automat resztę robi za Ciebie</p>
+  <!-- JAK TO DZIAŁA -->
+  <div class="band-kremowy band" style="padding:3.5rem 2rem;">
+    <h2 data-a="fade-in">Jak to wygląda w praktyce</h2>
+    <p data-a="fade-in" data-a-delay="1">Cały dzień sprzedaży — a Ty rano tylko dolewasz mleko</p>
   </div>
 
   <section class="section" style="max-width:700px;">
     <div class="kroki">
-      <div class="krok-item">
+      <div class="krok-item" data-a>
         <div class="krok-num">1</div>
         <div class="krok-tekst">
-          <h3>Napełniasz zbiornik (5 minut)</h3>
-          <p>Wlewasz świeże mleko po udoju. Automat schładza je automatycznie do +4°C i wysyła SMS jeśli poziom jest niski.</p>
+          <h3>Wlewasz mleko — 5 minut</h3>
+          <p>Kanister do maszyny po porannym udoju. Automat sam schładza do +4°C. SMS jeśli poziom spada.</p>
         </div>
       </div>
-      <div class="krok-item">
+      <div class="krok-item" data-a>
         <div class="krok-num">2</div>
         <div class="krok-tekst">
-          <h3>Klienci kupują sami — całą dobę</h3>
-          <p>Płacą monetą, banknotem lub kartą. Automat nalewa dokładnie 1 litr i automatycznie płucze strefę dozowania.</p>
+          <h3>Klienci przychodzą sami</h3>
+          <p>Płacą kartą, monetą lub blikiem. Automat nalewa litr, płucze, gotowy na kolejnego. Bez Ciebie.</p>
         </div>
       </div>
-      <div class="krok-item">
+      <div class="krok-item" data-a>
         <div class="krok-num">3</div>
         <div class="krok-tekst">
-          <h3>Ty widzisz sprzedaż online</h3>
-          <p>Panel online i SMS — zawsze wiesz ile sprzedałeś i ile zostało mleka. Zero papierkowej roboty.</p>
+          <h3>Widzisz sprzedaż w telefonie</h3>
+          <p>Panel online — ile sprzedano, ile zostało, kiedy przyjść uzupełnić. Nic nie umknie.</p>
         </div>
       </div>
-      <div class="krok-item">
+      <div class="krok-item" data-a>
         <div class="krok-num">4</div>
         <div class="krok-tekst">
-          <h3>My dbamy o serwis</h3>
-          <p>Przegląd roczny, szybka reakcja przy awarii. Masz numer do serwisu — zadzwoń, przyjedziemy.</p>
+          <h3>Serwis jest nasz</h3>
+          <p>Coś się stało? Dzwonisz, przyjeżdżamy. Mamy części, nie czekasz tygodniami.</p>
         </div>
       </div>
-      <div class="krok-item">
+      <div class="krok-item" data-a>
         <div class="krok-num">5</div>
         <div class="krok-tekst">
-          <h3>Stały, przewidywalny przychód</h3>
-          <p>Lojalni klienci wracają co kilka dni. Mleko prosto od rolnika — smakuje lepiej i jest świeższe niż w sklepie.</p>
+          <h3>Stali klienci wracają</h3>
+          <p>Ludzie szukają mleka prosto od rolnika. Jak znajdą Twój punkt — wracają co tydzień, przez lata.</p>
         </div>
       </div>
     </div>
@@ -135,11 +168,11 @@
 
   <!-- CTA -->
   <div class="band">
-    <h2>Sprawdź ile zarobisz</h2>
-    <p>Bezpłatna kalkulacja dla Twojego gospodarstwa — bez zobowiązań.</p>
-    <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;margin-top:2rem;">
-      <a href="tel:533200652" class="btn btn-biel">📞 533 200 652</a>
-      <a href="kontakt.html" class="btn" style="border-color:rgba(255,255,255,0.4);background:transparent;">Formularz kontaktowy</a>
+    <h2 data-a="fade-in">Porozmawiajmy.</h2>
+    <p data-a="fade-in" data-a-delay="1">Bez zobowiązań. Powiedz ile masz krów, powiemy ile możesz zarabiać.</p>
+    <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;margin-top:2rem;" data-a="fade-in" data-a-delay="2">
+      <a href="tel:533200652" class="btn btn-biel">533 200 652</a>
+      <a href="kontakt.html" class="btn" style="border-color:rgba(255,255,255,0.4);background:transparent;">Napisz</a>
     </div>
   </div>
 
@@ -147,7 +180,7 @@
     <div class="footer-inner">
       <div>
         <h4>Sklep za Stodołą</h4>
-        <p>Maszyny rolnicze · Leasing · Dofinansowania ARiMR<br>Instalacja · Serwis</p>
+        <p>Maszyny rolnicze · Leasing · Dofinansowania ARiMR<br>Instalacja · Serwis · Pawilony</p>
         <div class="footer-social">
           <a href="https://www.facebook.com/profile.php?id=61590896125832" title="Facebook">FB</a>
           <a href="https://www.instagram.com/sklepzastodola/" title="Instagram">IG</a>
@@ -176,7 +209,6 @@
       <span><a href="polityka.html">Polityka prywatności</a></span>
     </div>
   </footer>
-
   <!-- COOKIE BANNER -->
   <div id="cookie-bar" style="position:fixed;bottom:0;left:0;right:0;background:#1a5c2a;color:#fff;padding:1rem 1.5rem;display:flex;justify-content:space-between;align-items:center;gap:1rem;flex-wrap:wrap;z-index:9999;font-size:.85rem;box-shadow:0 -2px 12px rgba(0,0,0,.15)">
     <span>Ta strona używa plików cookies. <a href="polityka.html" style="color:#a5d6a7;text-decoration:underline">Polityka prywatności</a></span>
@@ -187,15 +219,45 @@
   </div>
   <script>
     function toggleMenu(){document.getElementById('nav-links').classList.toggle('open');}
-    function setCookies(choice){
-      localStorage.setItem('cookie_consent',choice);
-      document.getElementById('cookie-bar').style.display='none';
-    }
-    (function(){
-      if(localStorage.getItem('cookie_consent')){
-        document.getElementById('cookie-bar').style.display='none';
-      }
-    })();
+    function setCookies(choice){localStorage.setItem('cookie_consent',choice);document.getElementById('cookie-bar').style.display='none';}
+    (function(){if(localStorage.getItem('cookie_consent')){document.getElementById('cookie-bar').style.display='none';}})();
   </script>
+
+<script>
+// ── IntersectionObserver animacje ──────────────────────
+(function(){
+  const els = document.querySelectorAll('[data-a]');
+  if(!els.length) return;
+  const obs = new IntersectionObserver(entries=>{
+    entries.forEach(e=>{
+      if(e.isIntersecting){ e.target.classList.add('visible'); obs.unobserve(e.target); }
+    });
+  },{threshold:.12,rootMargin:'0px 0px -40px 0px'});
+  els.forEach(el=>obs.observe(el));
+})();
+
+// ── Licznik cyfr ───────────────────────────────────────
+function animCount(el, to, dur=1200){
+  const from=0; let start=null;
+  function step(ts){
+    if(!start) start=ts;
+    const p=Math.min((ts-start)/dur,1);
+    const ease=1-Math.pow(1-p,3);
+    el.textContent=Math.round(from+(to-from)*ease).toLocaleString('pl-PL');
+    if(p<1) requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
+document.querySelectorAll('[data-count]').forEach(el=>{
+  const val=parseInt(el.dataset.count);
+  const obs=new IntersectionObserver(entries=>{
+    entries.forEach(e=>{
+      if(e.isIntersecting){ animCount(el,val); obs.unobserve(e.target); }
+    });
+  },{threshold:.5});
+  obs.observe(el);
+});
+</script>
+
 </body>
 </html>
