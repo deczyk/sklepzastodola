@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Konfigurator MleKomatu | Sklep za Stodołą</title>
+<link rel="stylesheet" href="style.css"/>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌾</text></svg>">
+<style>
+:root{--g:#1a5c2a;--gl:#e8f4ec;--ink:#141414;--mid:#4a4a4a;--lt:#888;--line:#e2d9cd;--cr:#faf7f2;--amber:#b07d2a;--al:#fdf5e6;--r:8px}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--cr);color:var(--ink);line-height:1.6}
+
+/* ── PROGRESS BAR ── */
+.progress-bar{position:sticky;top:0;z-index:100;background:#fff;border-bottom:1px solid var(--line);padding:.6rem 1.5rem;display:flex;align-items:center;gap:1rem}
+.progress-steps{display:flex;gap:.5rem;flex:1}
+.ps{flex:1;height:4px;background:var(--line);border-radius:2px;transition:background .3s}
+.ps.done{background:var(--g)}
+.ps.active{background:var(--g);opacity:.5}
+.progress-label{font-size:.75rem;color:var(--lt);white-space:nowrap}
+
+/* ── PRICE BADGE ── */
+.price-badge{position:fixed;bottom:1.5rem;right:1.5rem;background:var(--g);color:#fff;border-radius:12px;padding:.9rem 1.4rem;box-shadow:0 4px 20px rgba(0,0,0,.2);z-index:200;min-width:180px;text-align:center;cursor:pointer;transition:transform .2s}
+.price-badge:hover{transform:scale(1.03)}
+.pb-label{font-size:.68rem;opacity:.7;text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px}
+.pb-netto{font-size:1.4rem;font-weight:800;line-height:1.1}
+.pb-sub{font-size:.72rem;opacity:.65;margin-top:2px}
+
+/* ── LAYOUT ── */
+.brief-wrap{max-width:760px;margin:0 auto;padding:2rem 1.5rem 8rem}
+
+/* ── STEP ── */
+.step{display:none}
+.step.active{display:block}
+.step-head{margin-bottom:2rem}
+.step-num{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--g);margin-bottom:.3rem}
+.step-title{font-size:1.6rem;font-weight:800;color:var(--ink);line-height:1.2}
+.step-sub{font-size:.9rem;color:var(--mid);margin-top:.4rem}
+
+/* ── MODEL CARD ── */
+.model-card{background:#fff;border:2px solid var(--g);border-radius:var(--r);padding:1.4rem 1.5rem;margin-bottom:1.5rem;display:flex;align-items:center;gap:1.2rem}
+.mc-icon{font-size:2.2rem;flex-shrink:0}
+.mc-name{font-size:1.05rem;font-weight:700;color:var(--g)}
+.mc-desc{font-size:.83rem;color:var(--mid);margin-top:.2rem}
+.mc-dims{font-size:.75rem;color:var(--lt);margin-top:.3rem;font-family:monospace}
+
+/* ── WYMAGANE OPCJE ── */
+.required-list{background:#fff;border:1px solid var(--line);border-radius:var(--r);overflow:hidden;margin-bottom:1.5rem}
+.req-header{background:var(--g);color:#fff;padding:.65rem 1.2rem;font-size:.75rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;display:flex;align-items:center;gap:.5rem}
+.req-item{display:flex;align-items:center;gap:.9rem;padding:.75rem 1.2rem;border-bottom:1px solid var(--line)}
+.req-item:last-child{border-bottom:none}
+.req-check{width:20px;height:20px;background:var(--g);border-radius:4px;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:#fff;font-size:.85rem;font-weight:700}
+.req-text{flex:1}
+.req-name{font-size:.9rem;font-weight:600;color:var(--ink)}
+.req-note{font-size:.75rem;color:var(--lt);margin-top:.1rem}
+.req-lock{font-size:.72rem;background:var(--gl);color:var(--g);padding:2px 7px;border-radius:8px;font-weight:600;flex-shrink:0}
+
+/* ── KANNY COUNTER ── */
+.kanny-row{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:1.1rem 1.4rem;margin-bottom:1.5rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem}
+.kanny-info{}
+.kanny-info strong{font-size:.95rem;display:block}
+.kanny-info span{font-size:.8rem;color:var(--mid)}
+.kanny-ctrl{display:flex;align-items:center;gap:.8rem}
+.kanny-btn{width:36px;height:36px;border-radius:50%;border:2px solid var(--g);background:none;font-size:1.2rem;font-weight:700;color:var(--g);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:.15s}
+.kanny-btn:hover{background:var(--g);color:#fff}
+.kanny-num{font-size:1.3rem;font-weight:800;color:var(--g);min-width:30px;text-align:center}
+
+/* ── OPCJE DODATKOWE ── */
+.opt-grid{display:grid;gap:.6rem;margin-bottom:1.5rem}
+.opt-item{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:.95rem 1.2rem;cursor:pointer;transition:border-color .15s,background .15s;display:flex;align-items:center;gap:.9rem;user-select:none}
+.opt-item:hover{border-color:var(--g);background:var(--gl)}
+.opt-item.selected{border-color:var(--g);background:var(--gl)}
+.opt-item.selected .opt-check{background:var(--g);border-color:var(--g)}
+.opt-item.selected .opt-check::after{display:block}
+.opt-check{width:20px;height:20px;border:2px solid var(--line);border-radius:4px;flex-shrink:0;position:relative;transition:.15s}
+.opt-check::after{content:'✓';display:none;position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:700;color:#fff;display:none}
+.opt-item.selected .opt-check::after{display:flex}
+.opt-label{flex:1}
+.opt-name{font-size:.9rem;font-weight:600;color:var(--ink)}
+.opt-desc{font-size:.76rem;color:var(--lt);margin-top:.15rem}
+.opt-badge{font-size:.68rem;background:var(--al);color:var(--amber);padding:2px 7px;border-radius:8px;font-weight:600;flex-shrink:0}
+.opt-badge.popular{background:var(--gl);color:var(--g)}
+
+/* ── SECTION DIVIDER ── */
+.opt-section-label{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--lt);margin:1.4rem 0 .6rem}
+
+/* ── FORMULARZ ── */
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.5rem}
+@media(max-width:520px){.form-grid{grid-template-columns:1fr}}
+.field{display:flex;flex-direction:column;gap:.35rem}
+.field label{font-size:.8rem;font-weight:600;color:var(--mid)}
+.field input,.field select,.field textarea{
+  padding:.7rem .9rem;border:1px solid var(--line);border-radius:var(--r);
+  font-size:.9rem;font-family:inherit;background:#fff;
+  transition:border-color .15s,box-shadow .15s}
+.field input:focus,.field select:focus,.field textarea:focus{
+  outline:none;border-color:var(--g);box-shadow:0 0 0 3px rgba(26,92,42,.1)}
+.field textarea{resize:vertical;min-height:80px}
+.field-full{grid-column:1/-1}
+.field-opt label::after{content:' (opcjonalnie)';font-weight:400;color:var(--lt)}
+
+/* ── SUMMARY ── */
+.summary-card{background:#fff;border:1px solid var(--line);border-radius:var(--r);overflow:hidden;margin-bottom:1.5rem}
+.summary-card .sh{background:var(--g);color:#fff;padding:.8rem 1.2rem;font-size:.8rem;font-weight:700;letter-spacing:.06em}
+.summary-row{display:flex;justify-content:space-between;align-items:baseline;padding:.6rem 1.2rem;font-size:.87rem;border-bottom:1px solid var(--line)}
+.summary-row:last-child{border-bottom:none}
+.summary-row.total{font-weight:700;font-size:1rem;background:var(--cr)}
+.summary-row.highlight{background:var(--gl);color:var(--g);font-weight:700}
+.summary-row .key{color:var(--mid)}
+.summary-row .val{font-weight:600}
+.summary-row .val.green{color:var(--g)}
+
+/* ── BUTTONS ── */
+.btn-row{display:flex;gap:.8rem;flex-wrap:wrap;margin-top:2rem}
+.btn-next{background:var(--g);color:#fff;border:none;padding:.85rem 2rem;border-radius:var(--r);font-size:.95rem;font-weight:700;cursor:pointer;font-family:inherit;transition:.18s;flex:1;max-width:220px}
+.btn-next:hover{background:#2e7d45;transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,.15)}
+.btn-back{background:none;border:1px solid var(--line);color:var(--mid);padding:.85rem 1.5rem;border-radius:var(--r);font-size:.9rem;cursor:pointer;font-family:inherit;transition:.15s}
+.btn-back:hover{border-color:var(--g);color:var(--g)}
+.btn-submit{background:var(--g);color:#fff;border:none;padding:.9rem 2rem;border-radius:var(--r);font-size:.95rem;font-weight:700;cursor:pointer;font-family:inherit;transition:.18s;width:100%}
+.btn-submit:hover{background:#2e7d45;transform:translateY(-2px)}
+.btn-submit:disabled{background:#888;cursor:default;transform:none}
+
+/* ── DISCLAIMER ── */
+.disclaimer{font-size:.75rem;color:var(--lt);line-height:1.5;margin-top:1rem;padding-top:1rem;border-top:1px solid var(--line)}
+
+/* ── AFTER SEND ── */
+.success-msg{text-align:center;padding:3rem 1.5rem;display:none}
+.success-msg.show{display:block}
+.success-icon{font-size:3.5rem;margin-bottom:1rem}
+.success-msg h2{color:var(--g);margin-bottom:.5rem}
+.success-msg p{color:var(--mid);font-size:.95rem}
+
+@media(max-width:480px){
+  .price-badge{bottom:1rem;right:1rem;left:1rem;min-width:0}
+  .model-card{flex-wrap:wrap}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-logo">Sklep za Stodołą</a>
+  <ul class="nav-links" id="nav-links" style="display:none"></ul>
+</nav>
+
+<!-- PROGRESS -->
+<div class="progress-bar">
+  <div class="progress-steps">
+    <div class="ps active" id="ps1"></div>
+    <div class="ps" id="ps2"></div>
+    <div class="ps" id="ps3"></div>
+  </div>
+  <div class="progress-label" id="progress-text">Krok 1 z 3 — Model</div>
+</div>
+
+<!-- LIVE PRICE BADGE -->
+<div class="price-badge" onclick="scrollToSummary()">
+  <div class="pb-label">Szacunkowa cena</div>
+  <div class="pb-netto" id="badge-price">—</div>
+  <div class="pb-sub" id="badge-sub">netto bez VAT</div>
+</div>
+
+<div class="brief-wrap">
+
+  <!-- ═══ KROK 1 — MODEL + WYMAGANE ═══ -->
+  <div class="step active" id="step1">
+    <div class="step-head">
+      <div class="step-num">Krok 1 z 3 — Konfiguracja</div>
+      <div class="step-title">BRUNIMAT 650 Premium DUO</div>
+      <div class="step-sub">Konfigurujesz automat do mleka ze standardowym wyposażeniem. Poniżej możesz wybrać liczbę kannych i opcje dodatkowe.</div>
+    </div>
+
+    <!-- MODEL INFO -->
+    <div class="model-card">
+      <div class="mc-icon">🥛</div>
+      <div>
+        <div class="mc-name">BRUNIMAT 650 Premium DUO</div>
+        <div class="mc-desc">Automatyczne przełączanie między 2 zbiornikami · Schładzanie do +4°C · 24h bez obsługi</div>
+        <div class="mc-dims">Wym. zewn.: 740 × 1020 × 2050 mm · Certyfikat CE-MID · Gwarancja 2 lata</div>
+      </div>
+    </div>
+
+    <!-- WYMAGANE WYPOSAŻENIE -->
+    <div class="required-list">
+      <div class="req-header">
+        <span>✓</span> Wyposażenie standardowe — zawsze w zestawie
+      </div>
+      <div class="req-item">
+        <div class="req-check">✓</div>
+        <div class="req-text">
+          <div class="req-name">Certyfikacja Premium CE-MID</div>
+          <div class="req-note">Zaplombowana dozownia — wymagana prawnie do sprzedaży detalicznej w Polsce</div>
+        </div>
+        <div class="req-lock">wymagane</div>
+      </div>
+      <div class="req-item">
+        <div class="req-check">✓</div>
+        <div class="req-text">
+          <div class="req-name">Reszta + banknoty (combo)</div>
+          <div class="req-note">Automatyczne wydawanie reszty + czytnik banknotów — klient płaci dowolnym nominałem</div>
+        </div>
+        <div class="req-lock">wymagane</div>
+      </div>
+      <div class="req-item">
+        <div class="req-check">✓</div>
+        <div class="req-text">
+          <div class="req-name">Czytnik banknotów</div>
+          <div class="req-note">Zawarty w zestawie Reszta + banknoty</div>
+        </div>
+        <div class="req-lock">w zestawie</div>
+      </div>
+      <div class="req-item">
+        <div class="req-check">✓</div>
+        <div class="req-text">
+          <div class="req-name">Drukarka paragonów</div>
+          <div class="req-note">Wydruk potwierdzenia zakupu po każdej transakcji</div>
+        </div>
+        <div class="req-lock">wymagane</div>
+      </div>
+      <div class="req-item" style="border-bottom:none">
+        <div class="req-check">✓</div>
+        <div class="req-text">
+          <div class="req-name">Ogrzewanie termostatyczne Anti-Frost</div>
+          <div class="req-note">Ochrona przed mrozem — niezbędne przy instalacji zewnętrznej w Polsce</div>
+        </div>
+        <div class="req-lock">wymagane</div>
+      </div>
+    </div>
+
+    <!-- KANNY -->
+    <div class="kanny-row">
+      <div class="kanny-info">
+        <strong>Kanny 50 L — stal nierdzewna</strong>
+        <span>Zbiorniki do mleka ze szczelną pokrywą. DUO wymaga min. 2 szt.</span>
+      </div>
+      <div class="kanny-ctrl">
+        <button class="kanny-btn" onclick="changeKanny(-1)">−</button>
+        <div class="kanny-num" id="kanny-display">2</div>
+        <button class="kanny-btn" onclick="changeKanny(1)">+</button>
+      </div>
+    </div>
+
+    <!-- OPCJE DODATKOWE -->
+    <div class="opt-section-label">Opcje dodatkowe — wybierz co potrzebujesz</div>
+    <div class="opt-grid">
+
+      <div class="opt-item" onclick="toggleOpt(this,'gsm_full')" data-key="gsm_full">
+        <div class="opt-check"></div>
+        <div class="opt-label">
+          <div class="opt-name">GSM — powiadomienia SMS (pełny pakiet)</div>
+          <div class="opt-desc">Alarm SMS przy awarii, włamaniu i różne statusy maszyny</div>
+        </div>
+      </div>
+
+      <div class="opt-item" onclick="toggleOpt(this,'gsm_poziom')" data-key="gsm_poziom">
+        <div class="opt-check"></div>
+        <div class="opt-label">
+          <div class="opt-name">GSM — alarm niskiego poziomu mleka</div>
+          <div class="opt-desc">SMS gdy zbiornik spada poniżej ustawionego progu (np. 50 L)</div>
+        </div>
+        <div class="opt-badge popular">polecane</div>
+      </div>
+
+      <div class="opt-item" onclick="toggleOpt(this,'plukanie')" data-key="plukanie">
+        <div class="opt-check"></div>
+        <div class="opt-label">
+          <div class="opt-name">Automatyczne płukanie strefy dozowania</div>
+          <div class="opt-desc">Czyszczenie po każdej sprzedaży mleka — higiena HACCP bez pracy ręcznej</div>
+        </div>
+        <div class="opt-badge popular">polecane</div>
+      </div>
+
+      <div class="opt-item" onclick="toggleOpt(this,'karta')" data-key="karta">
+        <div class="opt-check"></div>
+        <div class="opt-label">
+          <div class="opt-name">Płatność kartą (terminal Nayax)</div>
+          <div class="opt-desc">Karta, blik, Apple Pay — rosnąca popularność bezgotówkowych płatności</div>
+        </div>
+      </div>
+
+      <div class="opt-item" onclick="toggleOpt(this,'alarm')" data-key="alarm">
+        <div class="opt-check"></div>
+        <div class="opt-label">
+          <div class="opt-name">Alarm + syrena antywłamaniowa</div>
+          <div class="opt-desc">SMS + syrena przy naruszeniu szafy sterowniczej</div>
+        </div>
+      </div>
+
+      <div class="opt-item" onclick="toggleOpt(this,'wozek')" data-key="wozek">
+        <div class="opt-check"></div>
+        <div class="opt-label">
+          <div class="opt-name">Wózek do kannych 50 L</div>
+          <div class="opt-desc">Ułatwia codzienną wymianę zbiornika — mniej wysiłku fizycznego</div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="btn-row">
+      <button class="btn-next" onclick="goStep(2)">Dalej — dane kontaktowe →</button>
+    </div>
+  </div>
+
+  <!-- ═══ KROK 2 — FORMULARZ ═══ -->
+  <div class="step" id="step2">
+    <div class="step-head">
+      <div class="step-num">Krok 2 z 3 — Twoje dane</div>
+      <div class="step-title">Kilka słów o gospodarstwie</div>
+      <div class="step-sub">Żeby przygotować dokładną ofertę — potrzebujemy kilku informacji. Nic skomplikowanego.</div>
+    </div>
+
+    <form id="brief-form" onsubmit="return false">
+    <div class="form-grid">
+      <div class="field">
+        <label>Imię i nazwisko *</label>
+        <input type="text" id="f-name" placeholder="Jan Kowalski" required/>
+      </div>
+      <div class="field">
+        <label>Numer telefonu *</label>
+        <input type="tel" id="f-tel" placeholder="600 000 000" required/>
+      </div>
+      <div class="field">
+        <label>Email</label>
+        <input type="email" id="f-email" placeholder="jan@kowalski.pl"/>
+      </div>
+      <div class="field">
+        <label>Województwo *</label>
+        <select id="f-woj" required>
+          <option value="">— wybierz —</option>
+          <option>Dolnośląskie</option><option>Kujawsko-pomorskie</option>
+          <option>Lubelskie</option><option>Lubuskie</option>
+          <option>Łódzkie</option><option>Małopolskie</option>
+          <option>Mazowieckie</option><option>Opolskie</option>
+          <option>Podkarpackie</option><option>Podlaskie</option>
+          <option>Pomorskie</option><option>Śląskie</option>
+          <option>Świętokrzyskie</option><option>Warmińsko-mazurskie</option>
+          <option>Wielkopolskie</option><option>Zachodniopomorskie</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Liczba krów mlecznych *</label>
+        <select id="f-krowy" required>
+          <option value="">— wybierz —</option>
+          <option>do 10 krów</option><option>10–20 krów</option>
+          <option>20–50 krów</option><option>50–100 krów</option>
+          <option>powyżej 100 krów</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Dzienna produkcja mleka *</label>
+        <select id="f-litry" required>
+          <option value="">— wybierz —</option>
+          <option>do 50 L/dzień</option><option>50–100 L/dzień</option>
+          <option>100–200 L/dzień</option><option>200–500 L/dzień</option>
+          <option>powyżej 500 L/dzień</option>
+        </select>
+      </div>
+      <div class="field field-full">
+        <label>Czy masz miejsce/pawilon pod automat?</label>
+        <select id="f-pawilon">
+          <option value="">— wybierz —</option>
+          <option>Tak — mam gotowe miejsce</option>
+          <option>Nie — potrzebuję pawilonu drewnianego</option>
+          <option>Nie wiem jeszcze</option>
+        </select>
+      </div>
+      <div class="field field-full field-opt">
+        <label>Uwagi lub pytania</label>
+        <textarea id="f-uwagi" placeholder="Np. termin realizacji, specjalne wymagania lokalizacyjne..."></textarea>
+      </div>
+    </div>
+    </form>
+
+    <div class="btn-row">
+      <button class="btn-back" onclick="goStep(1)">← Wróć</button>
+      <button class="btn-next" onclick="goStep(3)">Dalej — podsumowanie →</button>
+    </div>
+  </div>
+
+  <!-- ═══ KROK 3 — PODSUMOWANIE ═══ -->
+  <div class="step" id="step3">
+    <div class="step-head">
+      <div class="step-num">Krok 3 z 3 — Podsumowanie</div>
+      <div class="step-title">Twoja konfiguracja</div>
+      <div class="step-sub">Sprawdź czy wszystko się zgadza, a potem wyślij — oddzwonimy w ciągu jednego dnia roboczego.</div>
+    </div>
+
+    <!-- SUMMARY CARD -->
+    <div class="summary-card" id="summary-card">
+      <div class="sh">BRUNIMAT 650 Premium DUO — Konfiguracja</div>
+      <div id="summary-rows"></div>
+    </div>
+
+    <!-- PRICE SUMMARY -->
+    <div class="summary-card">
+      <div class="sh">Szacunkowa wycena</div>
+      <div class="summary-row">
+        <span class="key">Cena netto</span>
+        <span class="val" id="sum-netto">—</span>
+      </div>
+      <div class="summary-row">
+        <span class="key">VAT 23%</span>
+        <span class="val" id="sum-vat">—</span>
+      </div>
+      <div class="summary-row total">
+        <span class="key">Cena brutto</span>
+        <span class="val green" id="sum-brutto">—</span>
+      </div>
+      <div class="summary-row highlight">
+        <span class="key">Po dotacji ARiMR 50% — brutto</span>
+        <span class="val" id="sum-arimr">—</span>
+      </div>
+    </div>
+
+    <div class="disclaimer">
+      * Cena szacunkowa. Kurs EUR/PLN wg NBP w dniu zamówienia: przeliczono po kursie 4,25 PLN/EUR.<br>
+      * Uwzględniono transport CH→PL, odprawę celną i ubezpieczenie cargo (~2 250 PLN).<br>
+      * VAT importowy (~9 500 PLN) jest <strong>zwrotny</strong> po złożeniu JPK_V7M.<br>
+      * Dotacja ARiMR — kwota i procent zależą od wniosku i programu. Pomagamy z dokumentacją.
+    </div>
+
+    <!-- ACTIONS -->
+    <div class="btn-row" style="margin-top:1.5rem;">
+      <button class="btn-back" onclick="goStep(2)">← Wróć</button>
+    </div>
+    <button class="btn-submit" id="send-btn" onclick="sendBrief()" style="margin-top:.8rem">
+      Wyślij zapytanie — oddzwonimy w 24h
+    </button>
+
+    <!-- SUCCESS -->
+    <div class="success-msg" id="success-msg">
+      <div class="success-icon">✅</div>
+      <h2>Wysłano!</h2>
+      <p>Oddzwonimy do <span id="suc-name">Ciebie</span> w ciągu jednego dnia roboczego.<br>
+      W razie pytań: <a href="tel:533200652" style="color:var(--g);font-weight:600">533 200 652</a></p>
+    </div>
+  </div>
+
+</div><!-- /brief-wrap -->
+
+<script>
+// ── CENNIK ────────────────────────────────────────────────────────────────────
+const KURS = 4.25;
+const TRANSPORT_PLN = 2250;
+const MARKUP = 1.55; // 55% narzut
+
+const BASE_EUR = {
+  duo:       6400,
+  cemid:      150,
+  combo:     1250,
+  drukarka:   530,
+  ogrzewanie: 100,
+};
+const KANNA_EUR = 230;
+
+const OPT_EUR = {
+  gsm_full:   500,
+  gsm_poziom: 160,
+  plukanie:   200,
+  karta:      650,
+  alarm:      200,
+  wozek:      280,
+};
+
+const OPT_LABELS = {
+  gsm_full:   'GSM — powiadomienia SMS (pełny pakiet)',
+  gsm_poziom: 'GSM — alarm niskiego poziomu',
+  plukanie:   'Automatyczne płukanie',
+  karta:      'Płatność kartą (Nayax)',
+  alarm:      'Alarm + syrena',
+  wozek:      'Wózek do kannych',
+};
+
+// ── STATE ─────────────────────────────────────────────────────────────────────
+let kanny = 2;
+let selected = new Set();
+let currentStep = 1;
+
+// ── PRICE CALC ────────────────────────────────────────────────────────────────
+function calcPrice() {
+  let totalEUR = Object.values(BASE_EUR).reduce((a,b)=>a+b,0);
+  totalEUR += kanny * KANNA_EUR;
+  selected.forEach(k => { totalEUR += OPT_EUR[k] || 0; });
+  const costPLN = totalEUR * KURS + TRANSPORT_PLN;
+  const netto   = Math.round(costPLN * MARKUP / 100) * 100;
+  const brutto  = Math.round(netto * 1.23 / 100) * 100;
+  const arimr   = Math.round(brutto * 0.5 / 100) * 100;
+  return { netto, brutto, arimr };
+}
+
+function fmt(n) { return n.toLocaleString('pl-PL') + ' zł'; }
+
+function updateBadge() {
+  const { netto, brutto, arimr } = calcPrice();
+  document.getElementById('badge-price').textContent = fmt(netto);
+  document.getElementById('badge-sub').textContent = `brutto ${fmt(brutto)} · po dotacji ${fmt(arimr)}`;
+}
+
+// ── KANNY ─────────────────────────────────────────────────────────────────────
+function changeKanny(d) {
+  kanny = Math.max(2, Math.min(4, kanny + d));
+  document.getElementById('kanny-display').textContent = kanny;
+  updateBadge();
+}
+
+// ── OPTIONS ───────────────────────────────────────────────────────────────────
+function toggleOpt(el, key) {
+  // gsm — only one can be selected
+  if (key === 'gsm_full' && selected.has('gsm_poziom')) selected.delete('gsm_poziom');
+  if (key === 'gsm_poziom' && selected.has('gsm_full')) selected.delete('gsm_full');
+  document.querySelectorAll('[data-key]').forEach(e => {
+    if ((e.dataset.key === 'gsm_full' || e.dataset.key === 'gsm_poziom') && e !== el) {
+      e.classList.remove('selected');
+    }
+  });
+
+  if (selected.has(key)) {
+    selected.delete(key);
+    el.classList.remove('selected');
+  } else {
+    selected.add(key);
+    el.classList.add('selected');
+  }
+  updateBadge();
+}
+
+// ── STEPS ─────────────────────────────────────────────────────────────────────
+function goStep(n) {
+  if (n === 2) {
+    // validate step 1 — nothing required here
+  }
+  if (n === 3) {
+    const name = document.getElementById('f-name').value.trim();
+    const tel  = document.getElementById('f-tel').value.trim();
+    const woj  = document.getElementById('f-woj').value;
+    const krowy= document.getElementById('f-krowy').value;
+    const litry= document.getElementById('f-litry').value;
+    if (!name || !tel || !woj || !krowy || !litry) {
+      alert('Wypełnij wymagane pola (imię, telefon, województwo, krowy, litry).');
+      return;
+    }
+    buildSummary();
+  }
+  currentStep = n;
+  document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+  document.getElementById('step' + n).classList.add('active');
+  // update progress
+  for (let i = 1; i <= 3; i++) {
+    const ps = document.getElementById('ps' + i);
+    ps.className = 'ps' + (i < n ? ' done' : i === n ? ' active' : '');
+  }
+  const labels = ['', 'Krok 1 z 3 — Model', 'Krok 2 z 3 — Dane', 'Krok 3 z 3 — Podsumowanie'];
+  document.getElementById('progress-text').textContent = labels[n];
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+// ── SUMMARY ───────────────────────────────────────────────────────────────────
+function buildSummary() {
+  const rows = [
+    ['Model', 'BRUNIMAT 650 Premium DUO'],
+    ['Certyfikat CE-MID', '✓ w zestawie'],
+    ['Reszta + banknoty + czytnik', '✓ w zestawie'],
+    ['Drukarka paragonów', '✓ w zestawie'],
+    ['Ogrzewanie Anti-Frost', '✓ w zestawie'],
+    ['Kanny 50 L', kanny + ' szt.'],
+  ];
+  selected.forEach(k => rows.push([OPT_LABELS[k], '✓ wybrano']));
+
+  const name = document.getElementById('f-name').value;
+  const woj  = document.getElementById('f-woj').value;
+  const krowy= document.getElementById('f-krowy').value;
+  const litry= document.getElementById('f-litry').value;
+  const paw  = document.getElementById('f-pawilon').value;
+  rows.push(['—', '']);
+  rows.push(['Rolnik', name]);
+  rows.push(['Województwo', woj]);
+  rows.push(['Stado', krowy]);
+  rows.push(['Produkcja', litry]);
+  if (paw) rows.push(['Pawilon', paw]);
+
+  const container = document.getElementById('summary-rows');
+  container.innerHTML = rows.map(([k,v]) => v
+    ? `<div class="summary-row"><span class="key">${k}</span><span class="val">${v}</span></div>`
+    : '<div style="height:4px;background:var(--line)"></div>'
+  ).join('');
+
+  const { netto, brutto, arimr } = calcPrice();
+  const vat = brutto - netto;
+  document.getElementById('sum-netto').textContent  = fmt(netto);
+  document.getElementById('sum-vat').textContent    = fmt(vat);
+  document.getElementById('sum-brutto').textContent = fmt(brutto);
+  document.getElementById('sum-arimr').textContent  = fmt(arimr);
+}
+
+// ── SEND ──────────────────────────────────────────────────────────────────────
+async function sendBrief() {
+  const btn = document.getElementById('send-btn');
+  btn.disabled = true;
+  btn.textContent = 'Wysyłam...';
+
+  const { netto, brutto, arimr } = calcPrice();
+  const opts = [...selected].map(k => OPT_LABELS[k]).join(', ') || 'brak';
+
+  const data = {
+    imie:       document.getElementById('f-name').value,
+    telefon:    document.getElementById('f-tel').value,
+    email:      document.getElementById('f-email').value,
+    wojewodztwo:document.getElementById('f-woj').value,
+    krowy:      document.getElementById('f-krowy').value,
+    litry:      document.getElementById('f-litry').value,
+    pawilon:    document.getElementById('f-pawilon').value,
+    uwagi:      document.getElementById('f-uwagi').value,
+    konfiguracja: `BRUNIMAT 650 Premium DUO | kanny: ${kanny} | opcje: ${opts}`,
+    cena_netto:  fmt(netto),
+    cena_brutto: fmt(brutto),
+    po_dotacji:  fmt(arimr),
+    zrodlo: 'brief-konfiguracja',
+  };
+
+  const fd = new FormData();
+  Object.entries(data).forEach(([k,v]) => fd.append(k,v));
+
+  try {
+    await fetch('https://formspree.io/f/mqeogyjd', {
+      method: 'POST', body: fd, headers: {Accept: 'application/json'}
+    });
+  } catch(e) {}
+
+  document.getElementById('brief-form') && (document.getElementById('brief-form').style.display='none');
+  document.getElementById('send-btn').style.display='none';
+  document.getElementById('success-msg').classList.add('show');
+  document.getElementById('suc-name').textContent = document.getElementById('f-name').value.split(' ')[0] || 'Ciebie';
+}
+
+function scrollToSummary() {
+  if (currentStep === 3) window.scrollTo({top:0,behavior:'smooth'});
+}
+
+// init
+updateBadge();
+</script>
+</body>
+</html>
