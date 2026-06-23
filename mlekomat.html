@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mlekomat Premium — Sklep za Stodołą</title>
+<meta name="description" content="Automat do mleka Premium z certyfikatem CE-MID — chłodzenie, płatność kartą, auto-płukanie, monitoring SMS. Wyłączny dystrybutor w Polsce.">
+<link rel="stylesheet" href="style.css">
+<style>
+.ml-split { display: grid; grid-template-columns: 1fr 1fr; gap: 4.5rem; align-items: start; max-width: 1000px; margin-top: 3.5rem; }
+.machine-visual { position: sticky; top: 6rem; }
+.machine-photo { border-radius: var(--r-lg); overflow: hidden; }
+.machine-photo img { width: 100%; height: 520px; object-fit: cover; object-position: center top; }
+.machine-badge-strip { display: flex; gap: .5rem; flex-wrap: wrap; margin-top: 1rem; }
+.badge { font-size: .7rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; padding: .28rem .75rem; border-radius: 100px; }
+.badge-green { background: rgba(45,90,39,.2); border: 1px solid rgba(45,90,39,.4); color: var(--moss); }
+.badge-gold  { background: rgba(200,169,110,.12); border: 1px solid rgba(200,169,110,.3); color: var(--wheat); }
+.how-steps { margin-top: 2.5rem; display: flex; flex-direction: column; gap: 1.2rem; }
+.how-step { display: flex; gap: 1rem; align-items: flex-start; }
+.how-step-n { width: 32px; height: 32px; border-radius: 50%; background: rgba(45,90,39,.15); border: 1px solid rgba(45,90,39,.3); display: flex; align-items: center; justify-content: center; font-size: .72rem; font-weight: 700; color: var(--forest); flex-shrink: 0; margin-top: .1rem; }
+.how-step-body h4 { font-size: .9rem; font-weight: 700; margin-bottom: .2rem; }
+.how-step-body p { font-size: .83rem; color: var(--dim); line-height: 1.6; }
+.cta-box { background: rgba(45,90,39,.07); border: 1px solid rgba(45,90,39,.3); border-radius: var(--r-lg); padding: 1.8rem; margin-top: 2rem; }
+.cta-box h3 { font-family: var(--serif); font-size: 1.15rem; font-weight: 700; margin-bottom: .5rem; }
+.cta-box p { font-size: .86rem; color: var(--dim); line-height: 1.65; margin-bottom: 1.2rem; }
+@media(max-width:860px){
+  .ml-split { grid-template-columns: 1fr; gap: 2.5rem; }
+  .machine-visual { position: static; }
+  .machine-photo img { height: 320px; }
+}
+</style>
+</head>
+<body>
+
+<div class="ticker">
+  <div class="ticker-inner">
+    <span>Kompleksowa obsługa farmera</span><span>Drewniany pawilon pod klucz</span><span>Mlekomat Premium CE-MID</span><span>Dotacja ARiMR do 65%</span><span>Leasing rolniczy</span><span>Instalacja i serwis — cała Polska</span><span>Kompleksowa obsługa farmera</span><span>Drewniany pawilon pod klucz</span><span>Mlekomat Premium CE-MID</span><span>Dotacja ARiMR do 65%</span><span>Leasing rolniczy</span><span>Instalacja i serwis — cała Polska</span>
+  </div>
+</div>
+
+<nav class="nav" id="nav">
+  <a href="index.html" class="nav-logo"><span class="nav-logo-dot"></span>Sklep za Stodołą</a>
+  <ul class="nav-links">
+    <li><a href="index.html">Start</a></li>
+    <li><a href="jak-dzialamy.html">Jak działamy</a></li>
+    <li><a href="mlekomat.html" class="active">Mlekomat</a></li>
+    <li><a href="kalkulator.html">Kalkulator</a></li>
+    <li><a href="kontakt.html">Kontakt</a></li>
+  </ul>
+  <a href="kontakt.html" class="nav-cta">Porozmawiajmy</a>
+  <button class="burger" id="burger" aria-label="Menu" aria-expanded="false"><span></span><span></span><span></span></button>
+</nav>
+<nav class="mob-nav" id="mob-nav"><button class="mob-close" id="mob-close">✕</button>
+  <a href="index.html">Start</a><a href="jak-dzialamy.html">Jak działamy</a><a href="mlekomat.html">Mlekomat</a><a href="kalkulator.html">Kalkulator</a><a href="kontakt.html">Kontakt</a>
+</nav>
+
+<header class="page-hero">
+  <p class="page-hero-eyebrow" data-r="fade">Wyłączny dystrybutor w Polsce</p>
+  <h1 data-r>Mlekomat Premium —<br><em>serce Twojego sklepu.</em></h1>
+  <p class="page-hero-sub" data-r data-d="1">Szwajcarski automat do mleka z certyfikatem CE-MID. Legalny handel, automatyczne chłodzenie, płatność kartą — działa bez Twojego udziału 24/7.</p>
+</header>
+
+<section class="sec">
+  <div class="ml-split">
+
+    <!-- LEWA: specs -->
+    <div>
+      <div data-r>
+        <p class="sec-label">Parametry i możliwości</p>
+        <h2 class="sec-title">Co potrafi<br><em>ten automat.</em></h2>
+      </div>
+      <div class="specs" data-r data-d="1">
+        <div class="spec-row"><span class="lbl">Chłodzenie</span><span class="val g">+4°C z alarmem odchylenia</span></div>
+        <div class="spec-row"><span class="lbl">Certyfikat</span><span class="val g">CE-MID — legalny handel odmierzanym mlekiem</span></div>
+        <div class="spec-row"><span class="lbl">Płatności</span><span class="val">moneta · banknot · karta bezstykowa</span></div>
+        <div class="spec-row"><span class="lbl">Auto-płukanie strefy dozowania</span><span class="val g">po każdej sprzedaży</span></div>
+        <div class="spec-row"><span class="lbl">Monitoring SMS</span><span class="val">alarm niskiego poziomu mleka</span></div>
+        <div class="spec-row"><span class="lbl">Panel online</span><span class="val">podgląd sprzedaży 24/7</span></div>
+        <div class="spec-row"><span class="lbl">Alarm antywłamaniowy</span><span class="val">SMS przy naruszeniu szafy</span></div>
+        <div class="spec-row"><span class="lbl">Ogrzewanie Anti-Frost</span><span class="val">termostatyczne — działa zimą</span></div>
+        <div class="spec-row"><span class="lbl">Drukarka paragonów</span><span class="val">opcja dostępna</span></div>
+      </div>
+
+      <div style="margin-top:2.5rem" data-r data-d="2">
+        <p class="sec-label">Jak to działa</p>
+        <div class="how-steps">
+          <div class="how-step"><div class="how-step-n">1</div><div class="how-step-body"><h4>Napełniasz zbiornik</h4><p>Wlewasz świeże mleko — zajmuje kilka minut. Automat schładza do +4°C.</p></div></div>
+          <div class="how-step"><div class="how-step-n">2</div><div class="how-step-body"><h4>Klient płaci i wybiera ilość</h4><p>Monetą, banknotem lub kartą — bez Twojej obecności, o każdej porze dnia.</p></div></div>
+          <div class="how-step"><div class="how-step-n">3</div><div class="how-step-body"><h4>Automat nalewa i płucze</h4><p>Dokładna porcja, strefa dozowania automatycznie oczyszczona po każdej sprzedaży.</p></div></div>
+          <div class="how-step"><div class="how-step-n">4</div><div class="how-step-body"><h4>Ty widzisz wyniki online</h4><p>SMS gdy poziom spada, panel online ze sprzedażą — wszystko pod kontrolą z pola.</p></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PRAWA: zdjęcie + CTA -->
+    <div class="machine-visual" data-r="right">
+      <div class="machine-photo">
+        <img src="automat.jpg" alt="Automat do mleka Premium zainstalowany w drewnianym pawilonie">
+      </div>
+      <div class="machine-badge-strip">
+        <span class="badge badge-green">CE-MID</span>
+        <span class="badge badge-green">Auto-płukanie</span>
+        <span class="badge badge-gold">Wyłączny dystrybutor PL</span>
+        <span class="badge badge-green">Karta · Banknot · Moneta</span>
+      </div>
+      <div class="cta-box">
+        <h3>Zapytaj o cenę i dostępność</h3>
+        <p>Wyceniamy każdy projekt indywidualnie — zależy od modelu, wyposażenia dodatkowego i opcji finansowania. Możliwa dotacja ARiMR do 65%.</p>
+        <a href="kontakt.html" class="btn btn-green" style="width:100%;justify-content:center">Zapytaj o wycenę →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- DLACZEGO LEGALNOŚĆ WAŻNA -->
+<section class="sec sec-alt">
+  <div data-r>
+    <p class="sec-label">Certyfikat CE-MID</p>
+    <h2 class="sec-title">Legalny handel<br><em>od pierwszego dnia.</em></h2>
+    <p class="sec-body">Nie każdy automat do mleka na rynku posiada certyfikat CE-MID uprawniający do legalnej, odpłatnej sprzedaży odmierzanego mleka. Nasz mlekomat Premium go ma — co oznacza, że Twoja sprzedaż jest w pełni zgodna z przepisami.</p>
+  </div>
+  <div class="cards" style="margin-top:2.5rem">
+    <div class="card" data-r data-d="1">
+      <div class="card-icon">✅</div>
+      <h3>Legalny handel odmierzanym mlekiem</h3>
+      <p>Certyfikat CE-MID to wymóg prawny dla sprzedaży mleka na wagę lub objętość. Bez niego sprzedaż jest nielegalna.</p>
+    </div>
+    <div class="card" data-r data-d="2">
+      <div class="card-icon">🏥</div>
+      <h3>Standardy sanitarne</h3>
+      <p>Automatyczne chłodzenie do +4°C i auto-płukanie po każdej sprzedaży — zgodność z wymogami sanepidu.</p>
+    </div>
+    <div class="card" data-r data-d="3">
+      <div class="card-icon">🔒</div>
+      <h3>Bezpieczeństwo inwestycji</h3>
+      <p>Kupujesz maszynę od wyłącznego dystrybutora w Polsce — gwarancja producenta, serwis, oryginalne części.</p>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ MLEKOMAT -->
+<section class="sec">
+  <div data-r>
+    <p class="sec-label">Pytania o mlekomat</p>
+    <h2 class="sec-title">Najczęstsze<br><em>pytania.</em></h2>
+  </div>
+  <div class="faq">
+    <div class="fq"><button class="fq-q" aria-expanded="false">Czy mlekomat jest legalny? Co z sanepid?<span class="fq-icon">+</span></button>
+      <div class="fq-a"><p>Nasz mlekomat Premium posiada certyfikat CE-MID, który uprawnia do legalnej, odpłatnej sprzedaży odmierzanego mleka. W kwestiach sanitarnych doradzamy i pomagamy spełnić wymogi sanepidu dla sprzedaży bezpośredniej.</p></div></div>
+    <div class="fq"><button class="fq-q" aria-expanded="false">Co jeśli mlekomat się zepsuje?<span class="fq-icon">+</span></button>
+      <div class="fq-a"><p>Jeden telefon — przyjeżdżamy. Jako wyłączny dystrybutor mamy części na stanie. Nie czekasz tygodniami na import. Oferujemy umowy serwisowe dla pewności ciągłości działania.</p></div></div>
+    <div class="fq"><button class="fq-q" aria-expanded="false">Ile mleka można przechowywać w automacie?<span class="fq-icon">+</span></button>
+      <div class="fq-a"><p>Zależy od modelu — od 2 × 50 L (kanny) do zbiorników 200 L. Model 650 Premium DUO obsługuje 2 × 50 L kanny, co sprawdza się dla większości gospodarstw. Dobieramy pojemność do Twojej dziennej produkcji.</p></div></div>
+    <div class="fq"><button class="fq-q" aria-expanded="false">Czy automat działa zimą?<span class="fq-icon">+</span></button>
+      <div class="fq-a"><p>Tak. Dostępny jest system ogrzewania termostatycznego Anti-Frost, który zapewnia pracę automatu przy ujemnych temperaturach zewnętrznych. Polecamy go szczególnie przy instalacji w nieogrzewanym pawilonie.</p></div></div>
+    <div class="fq"><button class="fq-q" aria-expanded="false">Czy można sprzedawać też inne napoje poza mlekiem?<span class="fq-icon">+</span></button>
+      <div class="fq-a"><p>Tak — dostępny jest wariant Bi-fluid, który obsługuje 2 różne płyny (np. mleko pełne i mleko chude, albo mleko i sok). Idealnie jeśli chcesz poszerzyć ofertę bez osobnego automatu.</p></div></div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="sec sec-alt">
+  <div data-r>
+    <h2 class="sec-title">Gotowy na<br><em>automat przy swoim gospodarstwie?</em></h2>
+    <p class="sec-body" style="margin-bottom:2rem">Zapytaj o cenę, dostępność i możliwość dotacji ARiMR. Bezpłatna konsultacja, odpiszemy w 24h.</p>
+    <div style="display:flex;flex-wrap:wrap;gap:.9rem;align-items:center">
+      <a href="kontakt.html" class="btn btn-green">Zapytaj o mlekomat →</a>
+      <a href="kalkulator.html" class="btn btn-outline">Policz swój zysk</a>
+    </div>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="footer-inner">
+    <div><p class="footer-brand">Sklep za Stodołą</p><p class="footer-sub">Tworzymy dochodowe sklepy przy gospodarstwach. Wyłączny dystrybutor mlekomatu Premium w Polsce.</p>
+      <div class="footer-soc"><a href="https://www.facebook.com/profile.php?id=61590896125832" class="soc-btn" target="_blank" rel="noopener">f</a><a href="https://www.instagram.com/sklepzastodola/" class="soc-btn" target="_blank" rel="noopener">ig</a></div>
+    </div>
+    <div class="footer-col"><h4>Strony</h4><ul><li><a href="index.html">Start</a></li><li><a href="jak-dzialamy.html">Jak działamy</a></li><li><a href="mlekomat.html">Mlekomat</a></li><li><a href="kalkulator.html">Kalkulator</a></li><li><a href="kontakt.html">Kontakt</a></li></ul></div>
+    <div class="footer-col"><h4>Kontakt</h4><ul><li><a href="tel:533200652">533 200 652</a></li><li><a href="tel:690000923">690 000 923</a></li><li><a href="mailto:kontakt@sklepzastodola.pl">kontakt@sklepzastodola.pl</a></li></ul></div>
+  </div>
+  <div class="footer-bottom"><p class="footer-copy">© 2026 Sklep za Stodołą Sp. z o.o.</p><div class="footer-links"><a href="polityka.html">Polityka prywatności</a></div></div>
+</footer>
+<div class="cookie" id="cookie"><p>Ta strona używa plików cookies. <a href="polityka.html">Polityka prywatności</a></p><div class="cookie-btns"><button class="ck-yes" onclick="setCk('yes')">Akceptuję</button><button class="ck-no" onclick="setCk('no')">Tylko niezbędne</button></div></div>
+<script src="nav.js"></script>
+</body>
+</html>
