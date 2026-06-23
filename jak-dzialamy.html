@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Jak działamy — Sklep za Stodołą</title>
-<meta name="description" content="Od rozmowy do działającego sklepu — pawilon, mlekomat, Twoje produkty, leasing i ARiMR. Jeden kontakt, całość po naszej stronie.">
+<title>Jak działamy i ile zarobisz — Sklep za Stodołą</title>
+<meta name="description" content="Od rozmowy do działającego sklepu — pawilon, mlekomat, Twoje produkty, leasing i ARiMR. Kalkulator ROI. Jeden kontakt, całość po naszej stronie.">
 <link rel="stylesheet" href="style.css">
 <style>
 .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 4.5rem; align-items: start; max-width: 1000px; }
@@ -28,14 +28,16 @@
     <li><a href="index.html">Start</a></li>
     <li><a href="jak-dzialamy.html" class="active">Jak działamy</a></li>
     <li><a href="mlekomat.html">Mlekomat</a></li>
-    <li><a href="kalkulator.html">Kalkulator</a></li>
     <li><a href="kontakt.html">Kontakt</a></li>
   </ul>
   <a href="kontakt.html" class="nav-cta">Porozmawiajmy</a>
   <button class="burger" id="burger" aria-label="Menu" aria-expanded="false"><span></span><span></span><span></span></button>
 </nav>
 <nav class="mob-nav" id="mob-nav"><button class="mob-close" id="mob-close">✕</button>
-  <a href="index.html">Start</a><a href="jak-dzialamy.html">Jak działamy</a><a href="mlekomat.html">Mlekomat</a><a href="kalkulator.html">Kalkulator</a><a href="kontakt.html">Kontakt</a>
+  <a href="index.html">Start</a>
+  <a href="jak-dzialamy.html">Jak działamy</a>
+  <a href="mlekomat.html">Mlekomat</a>
+  <a href="kontakt.html">Kontakt</a>
 </nav>
 
 <header class="page-hero">
@@ -71,14 +73,14 @@
       <p class="card-num">02</p>
       <div class="card-icon">🥛</div>
       <h3>Mlekomat Premium</h3>
-      <p>Dostarczamy i instalujemy automat do mleka z certyfikatem CE-MID — legalny handel, automatyczne chłodzenie, płatność kartą lub gotówką. Wyłączna dystrybucja w Polsce.</p>
+      <p>Dostarczamy i instalujemy automat do mleka z certyfikatem CE-MID — legalny handel, automatyczne chłodzenie, płatność kartą lub gotówką.</p>
       <span class="card-tag">certyfikat CE-MID</span>
     </div>
     <div class="card" data-r data-d="3">
       <p class="card-num">03</p>
       <div class="card-icon">🧀</div>
       <h3>Twoje produkty, pięknie podane</h3>
-      <p>Jajka, ser, masło, przetwory — co masz, to sprzedajemy. Pomagamy ułożyć asortyment i zaaranżować ekspozycję tak, żeby klient wracał po więcej.</p>
+      <p>Jajka, ser, masło, przetwory — co masz, to sprzedajemy. Pomagamy ułożyć asortyment i ekspozycję tak, żeby klient wracał po więcej.</p>
       <span class="card-tag">dostosowane do Ciebie</span>
     </div>
     <div class="card" data-r data-d="4">
@@ -173,10 +175,127 @@
       </div>
     </div>
     <div data-r="right">
-      <img src="pawilon-4.jpg" alt="Wnętrze sklepu przy gospodarstwie z produktami" style="border-radius: var(--r-lg); width:100%; object-fit:cover; height:380px;">
+      <img src="pawilon-4.jpg" alt="Wnętrze sklepu przy gospodarstwie z produktami" style="border-radius:var(--r-lg);width:100%;object-fit:cover;height:380px">
       <div class="info-box">
         Każde gospodarstwo jest inne — dlatego nie mamy jednego szablonu sklepu. <strong>Dopasowujemy asortyment, ekspozycję i układ pawilonu do Twoich produktów i klientów.</strong> Cel jest prosty: żeby klient, który przyszedł po mleko, wyszedł też z jajkami i serem.
       </div>
+    </div>
+  </div>
+</section>
+
+<!-- KALKULATOR ROI -->
+<section class="sec sec-alt" id="kalkulator">
+  <div data-r>
+    <p class="sec-label">Kalkulator ROI</p>
+    <h2 class="sec-title">Ile zarobisz<br><em>więcej niż w skupie?</em></h2>
+    <p class="sec-body">Przesuń suwaki i sprawdź na żywo różnicę między ceną skupu a sprzedażą bezpośrednią przez mlekomat.</p>
+  </div>
+  <div class="roi-grid" style="margin-top:3rem">
+    <div class="slider-wrap" data-r data-d="1">
+      <div class="sl-group">
+        <label for="s1">Dzienna produkcja mleka<span class="v" id="v1">200 L</span></label>
+        <input type="range" id="s1" min="20" max="1000" step="10" value="200" aria-label="Dzienna produkcja mleka">
+      </div>
+      <div class="sl-group">
+        <label for="s2">Aktualna cena skupu<span class="v" id="v2">1,20 zł/L</span></label>
+        <input type="range" id="s2" min="0.50" max="2.50" step="0.05" value="1.20" aria-label="Cena skupu">
+      </div>
+      <div class="sl-group">
+        <label for="s3">Cena przez mlekomat<span class="v" id="v3">4,00 zł/L</span></label>
+        <input type="range" id="s3" min="1.50" max="6.00" step="0.10" value="4.00" aria-label="Cena mlekomat">
+      </div>
+      <div class="sl-group">
+        <label for="s4">Wartość inwestycji<span class="v" id="v4">120 000 zł</span></label>
+        <input type="range" id="s4" min="30000" max="300000" step="5000" value="120000" aria-label="Wartość inwestycji">
+      </div>
+      <button class="toggle-row" id="tog" type="button" aria-pressed="false">
+        <span class="tog"></span>
+        <div>
+          <div class="tog-lbl">Dotacja ARiMR 50%</div>
+          <div class="tog-sub">Włącz jeśli kwalifikujesz się na zwrot kosztów</div>
+        </div>
+      </button>
+    </div>
+    <div class="roi-results" data-r="right" data-d="2" aria-live="polite">
+      <div class="roi-card">
+        <p class="roi-card-lbl">Przez skup — miesięcznie</p>
+        <p class="roi-card-val neu" id="r1">7 200 zł</p>
+        <p class="roi-card-sub" id="r1s">240 zł/dzień</p>
+      </div>
+      <div class="roi-card">
+        <p class="roi-card-lbl">Przez mlekomat — miesięcznie</p>
+        <p class="roi-card-val neu" id="r2">15 000 zł</p>
+        <p class="roi-card-sub" id="r2s">500 zł/dzień</p>
+      </div>
+      <div class="roi-card hi">
+        <p class="roi-card-lbl">Dodatkowy zysk</p>
+        <p class="roi-card-val pos" id="r3">+7 800 zł/mies.</p>
+        <p class="roi-card-sub" id="r3s">+93 600 zł rocznie · +108%</p>
+      </div>
+      <div class="roi-card">
+        <p class="roi-card-lbl" id="r4l">Zwrot inwestycji</p>
+        <p class="roi-card-val dim" id="r4">~15 mies.</p>
+        <p class="roi-card-sub" id="r4s">przy 120 000 zł</p>
+      </div>
+    </div>
+  </div>
+  <p style="font-size:.75rem;color:var(--muted);margin-top:1.8rem;font-style:italic;max-width:600px" data-r>
+    Szacunek orientacyjny. Rzeczywiste wyniki zależą od lokalizacji, asortymentu i organizacji sprzedaży.
+    <a href="kontakt.html" style="color:var(--wheat)">Skontaktuj się</a> po bezpłatną indywidualną wycenę.
+  </p>
+</section>
+
+<!-- FINANSOWANIE -->
+<section class="sec">
+  <div data-r>
+    <p class="sec-label">Finansowanie</p>
+    <h2 class="sec-title">Sklep się opłaca<br><em>od pierwszego dnia.</em></h2>
+    <p class="sec-body">Trzy drogi do inwestycji — dobieramy to co ma sens w Twojej sytuacji finansowej.</p>
+  </div>
+  <div class="fin-grid">
+    <div class="fin-card hi" data-r data-d="1">
+      <div class="fin-card-icon">💰</div>
+      <h3>Dotacja ARiMR</h3>
+      <p>Program wsparcia modernizacji gospodarstw. Możliwy zwrot kosztów zakupu mlekomatu i wyposażenia pawilonu. Pomagamy sprawdzić czy kwalifikujesz się i przeprowadzamy przez cały proces składania wniosku.</p>
+      <ul class="fin-list">
+        <li>Do 65% wartości inwestycji</li>
+        <li>Refundacja trafia bezpośrednio do Ciebie</li>
+        <li>Pomagamy od A do Z ze wnioskiem</li>
+        <li>Znamy procedury — Ty skupiasz się na krowach</li>
+      </ul>
+    </div>
+    <div class="fin-card" data-r data-d="2">
+      <div class="fin-card-icon">📋</div>
+      <h3>Leasing rolniczy</h3>
+      <p>Mały wkład własny, stała rata miesięczna. Mlekomat zarabia od pierwszego dnia — spłaca się zanim go w pełni wykupisz.</p>
+      <ul class="fin-list">
+        <li>Niski wkład własny</li>
+        <li>Stała, przewidywalna rata miesięczna</li>
+        <li>Korzyści podatkowe dla działalności rolniczej</li>
+        <li>Wykup po zakończeniu okresu leasingu</li>
+      </ul>
+    </div>
+    <div class="fin-card" data-r data-d="3">
+      <div class="fin-card-icon">🛒</div>
+      <h3>Zakup bezpośredni</h3>
+      <p>Płacisz raz — maszyna i pawilon są Twoje od pierwszego dnia. Przy dotacji ARiMR to najlepsza opcja finansowo.</p>
+      <ul class="fin-list">
+        <li>Pełna własność od razu</li>
+        <li>Najlepsze warunki przy dotacji ARiMR</li>
+        <li>Faktura VAT — odliczenie podatku</li>
+        <li>Pełna gwarancja producenta</li>
+      </ul>
+    </div>
+    <div class="fin-card" data-r data-d="4">
+      <div class="fin-card-icon">🤝</div>
+      <h3>Leasing + ARiMR razem?</h3>
+      <p>Zależy od formy leasingu i konkretnego programu ARiMR. Oceniamy indywidualnie i mówimy wprost co się bardziej opłaca.</p>
+      <ul class="fin-list">
+        <li>Analizujemy Twoją sytuację</li>
+        <li>Znamy aktualne programy ARiMR</li>
+        <li>Bezpłatna konsultacja</li>
+        <li>Konkretna odpowiedź, nie marketingowy bełkot</li>
+      </ul>
     </div>
   </div>
 </section>
@@ -185,13 +304,17 @@
 <section class="sec sec-alt">
   <div data-r>
     <p class="sec-label">Pytania</p>
-    <h2 class="sec-title">Często zadawane<br><em>pytania.</em></h2>
+    <h2 class="sec-title">Najczęstsze<br><em>pytania.</em></h2>
   </div>
   <div class="faq">
     <div class="fq"><button class="fq-q" aria-expanded="false">Czy muszę mieć duże gospodarstwo?<span class="fq-icon">+</span></button>
       <div class="fq-a"><p>Nie ma minimalnego progu. Rozmawiamy o każdej skali — od małej farmy rodzinnej po dużą fermę. Jeśli masz mleko i chcesz zarabiać na nim więcej niż w skupie — jesteś naszym klientem.</p></div></div>
     <div class="fq"><button class="fq-q" aria-expanded="false">Jak wygląda pawilon? Czy potrzebuję pozwolenia?<span class="fq-icon">+</span></button>
       <div class="fq-a"><p>Drewniana konstrukcja — solidna, estetyczna, stworzona z myślą o sprzedaży bezpośredniej. Kwestie formalne omawiamy na etapie rozmowy i doradzamy w zależności od wielkości obiektu i lokalizacji na Twojej działce.</p></div></div>
+    <div class="fq"><button class="fq-q" aria-expanded="false">Ile kosztuje cały projekt?<span class="fq-icon">+</span></button>
+      <div class="fq-a"><p>Każdy projekt wyceniamy indywidualnie — zależy od rozmiaru pawilonu, modelu mlekomatu i wyposażenia dodatkowego. Mlekomat Premium zaczyna się od 6 000 EUR (loco fabryka Szwajcaria). Do tego koszt pawilonu i montażu. Z dotacją ARiMR rzeczywisty koszt może być znacząco niższy. Zadzwoń — damy Ci konkretne liczby.</p></div></div>
+    <div class="fq"><button class="fq-q" aria-expanded="false">Czy dotacja ARiMR pokrywa też pawilon?<span class="fq-icon">+</span></button>
+      <div class="fq-a"><p>Zależy od konkretnego działania ARiMR. Sprawdzamy Twoją sytuację indywidualnie i doradzamy co i w jakim zakresie kwalifikuje się do dofinansowania.</p></div></div>
     <div class="fq"><button class="fq-q" aria-expanded="false">Jak szybko sklep może zacząć działać?<span class="fq-icon">+</span></button>
       <div class="fq-a"><p>Od decyzji do pierwszej sprzedaży — zależy od dostępności terminów i ewentualnych formalności budowlanych. Naszym celem jest sprawny montaż. Dokładny harmonogram ustalamy po pierwszej rozmowie.</p></div></div>
     <div class="fq"><button class="fq-q" aria-expanded="false">Czy muszę sprzedawać tylko mleko?<span class="fq-icon">+</span></button>
@@ -217,16 +340,19 @@
       <p class="footer-brand">Sklep za Stodołą</p>
       <p class="footer-sub">Tworzymy dochodowe sklepy przy gospodarstwach. Wyłączny dystrybutor mlekomatu Premium w Polsce.</p>
       <div class="footer-soc">
-        <a href="https://www.facebook.com/profile.php?id=61590896125832" class="soc-btn" aria-label="Facebook" target="_blank" rel="noopener">f</a>
-        <a href="https://www.instagram.com/sklepzastodola/" class="soc-btn" aria-label="Instagram" target="_blank" rel="noopener">ig</a>
+        <a href="https://www.facebook.com/profile.php?id=61590896125832" class="soc-btn" target="_blank" rel="noopener">f</a>
+        <a href="https://www.instagram.com/sklepzastodola/" class="soc-btn" target="_blank" rel="noopener">ig</a>
       </div>
     </div>
     <div class="footer-col"><h4>Strony</h4><ul>
-      <li><a href="index.html">Start</a></li><li><a href="jak-dzialamy.html">Jak działamy</a></li>
-      <li><a href="mlekomat.html">Mlekomat</a></li><li><a href="kalkulator.html">Kalkulator</a></li><li><a href="kontakt.html">Kontakt</a></li>
+      <li><a href="index.html">Start</a></li>
+      <li><a href="jak-dzialamy.html">Jak działamy</a></li>
+      <li><a href="mlekomat.html">Mlekomat</a></li>
+      <li><a href="kontakt.html">Kontakt</a></li>
     </ul></div>
     <div class="footer-col"><h4>Kontakt</h4><ul>
-      <li><a href="tel:533200652">533 200 652</a></li><li><a href="tel:690000923">690 000 923</a></li>
+      <li><a href="tel:533200652">533 200 652</a></li>
+      <li><a href="tel:690000923">690 000 923</a></li>
       <li><a href="mailto:kontakt@sklepzastodola.pl">kontakt@sklepzastodola.pl</a></li>
     </ul></div>
   </div>
@@ -235,7 +361,38 @@
     <div class="footer-links"><a href="polityka.html">Polityka prywatności</a></div>
   </div>
 </footer>
+
 <div class="cookie" id="cookie"><p>Ta strona używa plików cookies. <a href="polityka.html">Polityka prywatności</a></p><div class="cookie-btns"><button class="ck-yes" onclick="setCk('yes')">Akceptuję</button><button class="ck-no" onclick="setCk('no')">Tylko niezbędne</button></div></div>
+
 <script src="nav.js"></script>
+<script>
+(function(){
+  var arimr = false;
+  var tog = document.getElementById('tog');
+  tog.addEventListener('click', function(){ arimr=!arimr; tog.classList.toggle('on',arimr); tog.setAttribute('aria-pressed',arimr); calc(); });
+  function fmt(n){ return n.toLocaleString('pl-PL',{maximumFractionDigits:0})+' zł'; }
+  function calc(){
+    var prod=+document.getElementById('s1').value, skup=+document.getElementById('s2').value,
+        ml=+document.getElementById('s3').value, inv=+document.getElementById('s4').value;
+    var sm=prod*30*skup, mm=prod*30*ml, zysk=mm-sm, zyskR=zysk*12;
+    var w=sm>0?Math.round((mm/sm-1)*100):0, effInv=arimr?inv*.5:inv, zwrot=zysk>0?Math.ceil(effInv/zysk):999;
+    document.getElementById('v1').textContent=prod+' L';
+    document.getElementById('v2').textContent=skup.toFixed(2).replace('.',',')+' zł/L';
+    document.getElementById('v3').textContent=ml.toFixed(2).replace('.',',')+' zł/L';
+    document.getElementById('v4').textContent=inv.toLocaleString('pl-PL')+' zł';
+    document.getElementById('r1').textContent=fmt(sm);
+    document.getElementById('r1s').textContent=fmt(Math.round(sm/30))+'/dzień';
+    document.getElementById('r2').textContent=fmt(mm);
+    document.getElementById('r2s').textContent=fmt(Math.round(mm/30))+'/dzień';
+    document.getElementById('r3').textContent=(zysk>=0?'+':'')+fmt(zysk)+'/mies.';
+    document.getElementById('r3s').textContent=(zyskR>=0?'+':'')+fmt(zyskR)+' rocznie · +'+w+'%';
+    document.getElementById('r4').textContent=zwrot<200?'~'+zwrot+' mies.':'powyżej 16 lat';
+    document.getElementById('r4s').textContent='przy '+effInv.toLocaleString('pl-PL')+' zł'+(arimr?' (po dotacji ARiMR)':'');
+    document.getElementById('r4l').textContent=arimr?'Zwrot z dotacją ARiMR':'Zwrot inwestycji';
+  }
+  ['s1','s2','s3','s4'].forEach(function(id){ document.getElementById(id).addEventListener('input',calc); });
+  calc();
+})();
+</script>
 </body>
 </html>
