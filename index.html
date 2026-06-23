@@ -15,7 +15,7 @@
 .hero-content { position: relative; z-index: 1; }
 .hero-eyebrow { font-size: .75rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--wheat); margin-bottom: 1.3rem; display: flex; align-items: center; gap: .7rem; }
 .hero-eyebrow::before { content: ''; display: block; width: 2rem; height: 1px; background: var(--wheat); }
-.hero-h1 { font-family: var(--serif); font-size: clamp(3rem, 8vw, 6.5rem); font-weight: 900; line-height: 1.0; letter-spacing: -.03em; max-width: 14ch; margin-bottom: 1.6rem; color: var(--ink); }
+.hero-h1 { font-family: var(--sans); font-size: clamp(2.6rem, 7vw, 5.5rem); font-weight: 700; line-height: 1.05; letter-spacing: -.03em; max-width: 14ch; margin-bottom: 1.6rem; color: var(--ink); }
 .hero-h1 em { font-style: normal; color: var(--forest); display: block; }
 .hero-sub { font-size: clamp(.95rem, 1.4vw, 1.1rem); color: var(--muted); max-width: 52ch; line-height: 1.75; margin-bottom: 2.2rem; }
 .hero-sub strong { color: var(--ink); font-weight: 700; }
@@ -27,13 +27,13 @@
 /* STATEMENT */
 .stmt { padding: 5.5rem 5vw; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); background: var(--bg2); }
 .stmt-inner { max-width: 900px; display: grid; grid-template-columns: 1fr 1fr; gap: 4.5rem; align-items: center; }
-.stmt-quote { font-family: var(--serif); font-size: clamp(1.4rem, 2.8vw, 2.2rem); font-weight: 700; line-height: 1.25; letter-spacing: -.02em; }
+.stmt-quote { font-family: var(--sans); font-size: clamp(1.3rem, 2.5vw, 2rem); font-weight: 700; line-height: 1.25; letter-spacing: -.02em; }
 .stmt-quote .accent { color: var(--forest); }
 .stmt-meta { border-left: 2px solid var(--forest); padding-left: 1.5rem; background: transparent; }
 .stmt-meta p { font-size: .93rem; color: var(--dim); line-height: 1.72; margin-bottom: 1.1rem; }
 .stmt-meta p strong { color: var(--paper); }
 .founder { display: flex; align-items: center; gap: .85rem; margin-top: 1.4rem; padding-top: 1.4rem; border-top: 1px solid var(--line); }
-.founder-av { width: 42px; height: 42px; border-radius: 50%; background: var(--forest); color: #fff; display: flex; align-items: center; justify-content: center; font-family: var(--serif); font-weight: 800; font-size: .95rem; flex-shrink: 0; }
+.founder-av { width: 42px; height: 42px; border-radius: 50%; background: var(--forest); color: #fff; display: flex; align-items: center; justify-content: center; font-family: var(--sans); font-weight: 800; font-size: .95rem; flex-shrink: 0; }
 .founder-info { font-size: .78rem; color: var(--muted); line-height: 1.4; }
 .founder-info strong { display: block; color: var(--ink); font-size: .83rem; font-weight: 700; }
 
@@ -49,7 +49,7 @@
 .pcard { background: var(--paper); border: 1px solid var(--line); border-radius: var(--r-lg); padding: 2rem; transition: border-color .25s, transform .22s; display: flex; flex-direction: column; }
 .pcard:hover { border-color: var(--forest); transform: translateY(-3px); }
 .pcard-icon { width: 44px; height: 44px; border-radius: var(--r); background: var(--sage); border: 1px solid rgba(45,90,39,.2); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; margin-bottom: 1.1rem; }
-.pcard h3 { font-family: var(--serif); font-size: 1.1rem; font-weight: 700; margin-bottom: .5rem; line-height: 1.25; color: var(--ink); }
+.pcard h3 { font-family: var(--sans); font-size: 1.1rem; font-weight: 700; margin-bottom: .5rem; line-height: 1.25; color: var(--ink); }
 .pcard p { font-size: .86rem; color: var(--muted); line-height: 1.65; flex: 1; }
 .pcard-link { display: inline-flex; align-items: center; gap: .35rem; margin-top: 1.2rem; font-size: .8rem; font-weight: 700; color: var(--wheat); transition: color .2s; }
 .pcard-link:hover { color: var(--gold); }
@@ -57,7 +57,7 @@
 /* CTA BAND */
 .cta-band { padding: 5.5rem 5vw; border-top: 1px solid var(--line); }
 .cta-band-inner { max-width: 680px; }
-.cta-band h2 { font-family: var(--serif); font-size: clamp(2rem, 3.5vw, 3rem); font-weight: 800; line-height: 1.1; letter-spacing: -.02em; margin-bottom: 1rem; color: var(--ink); }
+.cta-band h2 { font-family: var(--sans); font-size: clamp(2rem, 3.5vw, 3rem); font-weight: 800; line-height: 1.1; letter-spacing: -.02em; margin-bottom: 1rem; color: var(--ink); }
 .cta-band h2 em { font-style: italic; color: var(--wheat); }
 .cta-band p { font-size: 1rem; color: var(--muted); line-height: 1.72; margin-bottom: 2rem; max-width: 50ch; }
 .cta-actions { display: flex; flex-wrap: wrap; gap: .9rem; align-items: center; }
@@ -90,6 +90,7 @@
   <ul class="nav-links">
     <li><a href="index.html" class="active">Start</a></li>
     <li><a href="jak-dzialamy.html">Jak działamy</a></li>
+    <li><a href="pawilony.html">Pawilony</a></li>
     <li><a href="mlekomat.html">Mlekomat</a></li>
     <li><a href="kontakt.html">Kontakt</a></li>
   </ul>
@@ -103,6 +104,7 @@
   <button class="mob-close" id="mob-close" aria-label="Zamknij">✕</button>
   <a href="index.html">Start</a>
   <a href="jak-dzialamy.html">Jak działamy</a>
+  <a href="pawilony.html">Pawilony</a>
   <a href="mlekomat.html">Mlekomat</a>
   
   <a href="kontakt.html">Kontakt</a>
@@ -121,7 +123,7 @@
       <em>Przy Twoim gospodarstwie.</em>
     </h1>
     <p class="hero-sub" data-r data-d="1">
-      <strong>Tworzymy dochodowe sklepy przy gospodarstwach.</strong>
+      Nie sprzedajemy mlekomatów. <strong>Tworzymy dochodowe sklepy przy gospodarstwach.</strong>
       Drewniany pawilon, mlekomat Premium, Twoje produkty — gotowa sprzedaż bezpośrednia zamiast groszy w skupie.
     </p>
     <div class="hero-actions" data-r data-d="2">
@@ -146,7 +148,7 @@
       <div class="founder">
         <div class="founder-av">JD</div>
         <div class="founder-info">
-          <strong>Jakub</strong>
+          <strong>Jakub Deczyński</strong>
           Założyciel, Sklep za Stodołą
         </div>
       </div>
