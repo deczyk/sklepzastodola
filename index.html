@@ -247,6 +247,14 @@
   </div>
 </div>
 
+<script>
+  // Jednorazowe czyszczenie starego klucza 'ck' z poprzedniej wersji
+  if(localStorage.getItem('ck') && !localStorage.getItem('cookie_consent')){
+    var v = localStorage.getItem('ck');
+    localStorage.setItem('cookie_consent', v === 'yes' ? 'accept' : 'reject');
+    localStorage.removeItem('ck');
+  }
+</script>
 <script src="nav.js"></script>
 </body>
 </html>
