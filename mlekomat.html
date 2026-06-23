@@ -189,6 +189,14 @@
   <div class="footer-bottom"><p class="footer-copy">© 2026 Sklep za Stodołą Sp. z o.o.</p><div class="footer-links"><a href="polityka.html">Polityka prywatności</a></div></div>
 </footer>
 <div class="cookie" id="cookie"><p>Ta strona używa plików cookies. <a href="polityka.html">Polityka prywatności</a></p><div class="cookie-btns"><button class="ck-yes" onclick="setCk('yes')">Akceptuję</button><button class="ck-no" onclick="setCk('no')">Tylko niezbędne</button></div></div>
+<script>
+  // Jednorazowe czyszczenie starego klucza 'ck' z poprzedniej wersji
+  if(localStorage.getItem('ck') && !localStorage.getItem('cookie_consent')){
+    var v = localStorage.getItem('ck');
+    localStorage.setItem('cookie_consent', v === 'yes' ? 'accept' : 'reject');
+    localStorage.removeItem('ck');
+  }
+</script>
 <script src="nav.js"></script>
 </body>
 </html>
