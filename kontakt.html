@@ -141,7 +141,13 @@ document.getElementById('cform').addEventListener('submit', async function(e){
   e.preventDefault();
   var btn=document.getElementById('sbtn'), txt=document.getElementById('stxt'), msg=document.getElementById('smsg');
   btn.disabled=true; txt.textContent='Wysyłam…';
-  await new Promise(function(r){ setTimeout(r,900); }); // podłącz do Formspree / własnego backendu
+  const formData = new FormData(e.target);
+  const res = await fetch('https://formspree.io/f/xaqzvywz', {
+    method: 'POST',
+    body: formData,
+    headers: { 'Accept': 'application/json' }
+  });
+  if(!res.ok){ txt.textContent='Wyślij wiadomość →'; msg.textContent='Coś poszło nie tak. Zadzwoń: 533 200 652.'; msg.style.color='#c0392b'; msg.style.display='block'; btn.disabled=false; return; }
   txt.textContent='✓ Wiadomość wysłana!';
   msg.textContent='Odezwiemy się w ciągu 24h. Dziękujemy!';
   msg.style.display='block'; msg.style.color='var(--moss)';
