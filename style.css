@@ -29,6 +29,10 @@
   --shadow-lg:0 8px 32px rgba(30,30,26,.12);
 }
 
+
+/* ── CONTAINER ── */
+.wrap { max-width: 1100px; margin-left: auto; margin-right: auto; width: 100%; }
+
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
 body { font-family: var(--sans); background: var(--bg); color: var(--ink); line-height: 1.65; overflow-x: hidden; }
@@ -58,8 +62,8 @@ button { cursor: pointer; font-family: inherit; }
 @keyframes tick { from { transform: translateX(0); } to { transform: translateX(-50%); } }
 
 /* ── NAV ── */
-.nav { position: fixed; top: 0; left: 0; right: 0; z-index: 999; padding: 1rem 2.5rem; display: flex; align-items: center; justify-content: space-between; transition: background .3s, padding .3s, box-shadow .3s; }
-.nav.scrolled { background: rgba(247,244,238,.96); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); padding: .7rem 2.5rem; border-bottom: 1px solid var(--line); box-shadow: var(--shadow); }
+.nav { position: fixed; top: 0; left: 0; right: 0; z-index: 999; padding: 1rem 2.5rem; display: flex; align-items: center; justify-content: space-between; background: rgba(247,244,238,.97); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-bottom: 1px solid var(--line); box-shadow: var(--shadow); transition: padding .3s; }
+.nav.scrolled { padding: .7rem 2.5rem; }
 .nav-logo { font-family: var(--serif); font-size: 1.05rem; font-weight: 700; color: var(--ink); display: flex; align-items: center; gap: .45rem; }
 .nav-logo-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--forest); flex-shrink: 0; }
 .nav-links { display: flex; gap: 2rem; list-style: none; }
@@ -78,6 +82,7 @@ button { cursor: pointer; font-family: inherit; }
 
 /* ── PAGE HERO ── */
 .page-hero { padding: 9rem 5vw 5rem; position: relative; overflow: hidden; border-bottom: 1px solid var(--line); background: var(--bg); }
+
 .page-hero::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 60% 70% at 80% 50%, rgba(90,158,80,.08) 0%, transparent 65%); pointer-events: none; }
 .page-hero-eyebrow { font-size: .73rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--wheat); margin-bottom: 1.1rem; display: flex; align-items: center; gap: .65rem; }
 .page-hero-eyebrow::before { content: ''; display: block; width: 2rem; height: 1px; background: var(--wheat); }
@@ -87,6 +92,7 @@ button { cursor: pointer; font-family: inherit; }
 
 /* ── SECTION BASE ── */
 .sec { padding: 6rem 5vw; }
+
 .sec-alt { background: var(--bg2); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
 .sec-label { font-size: .72rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--wheat); margin-bottom: 1rem; display: flex; align-items: center; gap: .65rem; }
 .sec-label::before { content: ''; display: block; width: 1.6rem; height: 1px; background: var(--wheat); }
