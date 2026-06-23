@@ -1,817 +1,259 @@
 <!DOCTYPE html>
 <html lang="pl">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Sklep za Stodołą | Maszyny rolnicze, leasing, dofinansowanie ARiMR</title>
-  <meta name="description" content="Automaty do mleka i maszyny rolnicze — sprzedaż, leasing, dofinansowanie ARiMR do 65%. Instalacja i serwis w całej Polsce." />
-  <meta name="keywords" content="automat do mleka, maszyny rolnicze, leasing maszyn rolniczych, dofinansowanie ARiMR, sprzedaż bezpośrednia mleka, cała Polska, Brunimat" />
-  <meta name="robots" content="index, follow" />
-  <link rel="canonical" href="https://www.sklepzastodola.pl/" />
-  <meta property="og:title" content="Sklep za Stodołą | Maszyny rolnicze, leasing, dofinansowanie ARiMR" />
-  <meta property="og:description" content="Automaty do mleka i maszyny rolnicze — sprzedaż i leasing z dofinansowaniem ARiMR do 65%." />
-  <meta property="og:url" content="https://www.sklepzastodola.pl/" />
-  <meta property="og:type" content="website" />
-  <link rel="stylesheet" href="style.css" />
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌾</text></svg>">
-  <style>
-  /* ── SEKCJA KALKULATORA ── */
-  .kalk-band {
-    background: var(--zielony);
-    color: #fff;
-    padding: 3.5rem 2rem 2.5rem;
-    text-align: center;
-  }
-  .kalk-band h2 { font-size: clamp(1.4rem, 3.5vw, 2rem); font-weight: 800; margin-bottom: .5rem; }
-  .kalk-band p  { opacity: .8; max-width: 520px; margin: 0 auto; font-size: .95rem; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sklep za Stodołą — Dochodowe sklepy przy gospodarstwach</title>
+<meta name="description" content="Nie sprzedajemy mlekomatów. Tworzymy dochodowe sklepy przy gospodarstwach. Drewniany pawilon, mlekomat, Twoje produkty — gotowa sprzedaż bezpośrednia.">
+<link rel="stylesheet" href="style.css">
+<style>
+/* HOME-ONLY */
+.hero { min-height: 100vh; display: flex; flex-direction: column; justify-content: flex-end; padding: 0 5vw 8vh; position: relative; overflow: hidden; }
+.hero-bg { position: absolute; inset: 0; z-index: 0; }
+.hero-bg::before { content: ''; position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse 80% 60% at 65% 40%, rgba(45,90,39,.22) 0%, transparent 70%),
+    radial-gradient(ellipse 50% 80% at 15% 90%, rgba(200,169,110,.06) 0%, transparent 60%),
+    linear-gradient(160deg, #131210 0%, #0f0e0c 55%, #141310 100%); }
+.hero-photo { position: absolute; inset: 0; z-index: 0; }
+.hero-photo img { width: 100%; height: 100%; object-fit: cover; opacity: .18; }
+.hero-photo::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to top, rgba(15,14,12,1) 20%, rgba(15,14,12,.5) 60%, rgba(15,14,12,.3) 100%); }
+.hero-content { position: relative; z-index: 1; }
+.hero-eyebrow { font-size: .75rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--wheat); margin-bottom: 1.3rem; display: flex; align-items: center; gap: .7rem; }
+.hero-eyebrow::before { content: ''; display: block; width: 2rem; height: 1px; background: var(--wheat); }
+.hero-h1 { font-family: var(--serif); font-size: clamp(3rem, 8vw, 7rem); font-weight: 900; line-height: 1.0; letter-spacing: -.03em; max-width: 14ch; margin-bottom: 1.6rem; }
+.hero-h1 em { font-style: normal; color: var(--wheat); display: block; }
+.hero-sub { font-size: clamp(.95rem, 1.4vw, 1.1rem); color: var(--dim); max-width: 52ch; line-height: 1.75; margin-bottom: 2.2rem; }
+.hero-sub strong { color: var(--paper); font-weight: 700; }
+.hero-actions { display: flex; flex-wrap: wrap; gap: .9rem; align-items: center; }
+.hero-scroll { position: absolute; bottom: 2.5rem; right: 5vw; z-index: 1; writing-mode: vertical-rl; font-size: .65rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); display: flex; align-items: center; gap: .55rem; }
+.hero-scroll::after { content: ''; display: block; width: 1px; height: 2.8rem; background: linear-gradient(to bottom, var(--muted), transparent); animation: sc 2s ease-in-out infinite; }
+@keyframes sc { 0%,100%{opacity:.4} 50%{opacity:1} }
 
-  .kalk-wrap {
-    max-width: 860px;
-    margin: 0 auto;
-    padding: 2.5rem 1.5rem 3rem;
-  }
+/* STATEMENT */
+.stmt { padding: 5.5rem 5vw; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.stmt-inner { max-width: 900px; display: grid; grid-template-columns: 1fr 1fr; gap: 4.5rem; align-items: center; }
+.stmt-quote { font-family: var(--serif); font-size: clamp(1.4rem, 2.8vw, 2.2rem); font-weight: 700; line-height: 1.25; letter-spacing: -.02em; }
+.stmt-quote .accent { color: var(--wheat); }
+.stmt-meta { border-left: 2px solid var(--forest); padding-left: 1.5rem; }
+.stmt-meta p { font-size: .93rem; color: var(--dim); line-height: 1.72; margin-bottom: 1.1rem; }
+.stmt-meta p strong { color: var(--paper); }
+.founder { display: flex; align-items: center; gap: .85rem; margin-top: 1.4rem; padding-top: 1.4rem; border-top: 1px solid var(--line); }
+.founder-av { width: 42px; height: 42px; border-radius: 50%; background: var(--forest); color: #fff; display: flex; align-items: center; justify-content: center; font-family: var(--serif); font-weight: 800; font-size: .95rem; flex-shrink: 0; }
+.founder-info { font-size: .78rem; color: var(--muted); line-height: 1.4; }
+.founder-info strong { display: block; color: var(--paper); font-size: .83rem; font-weight: 700; }
 
-  /* SUWAKI */
-  .kalk-sliders {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1.4rem 2.5rem;
-    margin-bottom: 2rem;
-  }
-  @media (max-width: 580px) { .kalk-sliders { grid-template-columns: 1fr; } }
+/* PHOTO STRIP */
+.strip { padding: 0 5vw 5rem; }
+.strip-grid { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: .8rem; height: 420px; }
+.strip-grid img { width: 100%; height: 100%; object-fit: cover; border-radius: var(--r-lg); }
 
-  .kalk-slider-group {}
-  .kalk-slider-label {
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    margin-bottom: .45rem;
-  }
-  .kalk-slider-label span:first-child {
-    font-size: .82rem;
-    font-weight: 600;
-    color: var(--ciemny, #1a1a1a);
-  }
-  .kalk-slider-val {
-    font-size: 1rem;
-    font-weight: 800;
-    color: var(--zielony);
-    min-width: 80px;
-    text-align: right;
-  }
-  input[type=range].kalk-range {
-    width: 100%;
-    height: 5px;
-    -webkit-appearance: none;
-    appearance: none;
-    background: var(--linia, #e5ddd0);
-    border-radius: 3px;
-    outline: none;
-    cursor: pointer;
-  }
-  input[type=range].kalk-range::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    width: 20px; height: 20px;
-    border-radius: 50%;
-    background: var(--zielony);
-    cursor: pointer;
-    border: 3px solid #fff;
-    box-shadow: 0 0 0 2px var(--zielony);
-  }
-  input[type=range].kalk-range::-moz-range-thumb {
-    width: 18px; height: 18px;
-    border-radius: 50%;
-    background: var(--zielony);
-    cursor: pointer;
-    border: 2px solid #fff;
-  }
-  .kalk-range-hint { font-size: .72rem; color: #888; margin-top: 3px; }
+/* PREVIEW CARDS */
+.preview { padding: 5.5rem 5vw; border-top: 1px solid var(--line); background: var(--ink2); }
+.preview-inner { max-width: 1100px; }
+.preview-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.2rem; margin-top: 3rem; }
+.pcard { background: var(--ink); border: 1px solid var(--line); border-radius: var(--r-lg); padding: 2rem; transition: border-color .25s, transform .22s; display: flex; flex-direction: column; }
+.pcard:hover { border-color: var(--forest); transform: translateY(-3px); }
+.pcard-icon { width: 44px; height: 44px; border-radius: var(--r); background: rgba(45,90,39,.14); border: 1px solid rgba(45,90,39,.28); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; margin-bottom: 1.1rem; }
+.pcard h3 { font-family: var(--serif); font-size: 1.1rem; font-weight: 700; margin-bottom: .5rem; line-height: 1.25; }
+.pcard p { font-size: .86rem; color: var(--dim); line-height: 1.65; flex: 1; }
+.pcard-link { display: inline-flex; align-items: center; gap: .35rem; margin-top: 1.2rem; font-size: .8rem; font-weight: 700; color: var(--wheat); transition: color .2s; }
+.pcard-link:hover { color: var(--gold); }
 
-  /* WYNIKI */
-  .kalk-results {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: .9rem;
-  }
-  @media (max-width: 480px) { .kalk-results { grid-template-columns: 1fr; } }
+/* CTA BAND */
+.cta-band { padding: 5.5rem 5vw; border-top: 1px solid var(--line); }
+.cta-band-inner { max-width: 680px; }
+.cta-band h2 { font-family: var(--serif); font-size: clamp(2rem, 3.5vw, 3rem); font-weight: 800; line-height: 1.1; letter-spacing: -.02em; margin-bottom: 1rem; }
+.cta-band h2 em { font-style: italic; color: var(--wheat); }
+.cta-band p { font-size: 1rem; color: var(--dim); line-height: 1.72; margin-bottom: 2rem; max-width: 50ch; }
+.cta-actions { display: flex; flex-wrap: wrap; gap: .9rem; align-items: center; }
+.tel-link { font-size: 1.1rem; font-weight: 700; color: var(--paper); display: flex; align-items: center; gap: .4rem; transition: color .2s; }
+.tel-link:hover { color: var(--wheat); }
 
-  .kalk-box {
-    background: var(--kremowy, #faf8f4);
-    border: 1px solid var(--linia, #e5ddd0);
-    border-radius: .75rem;
-    padding: 1.1rem 1.2rem;
-  }
-  .kalk-box.kalk-box--green { background: #e8f5e9; border-color: #a5d6a7; }
-  .kalk-box.kalk-box--amber { background: #fff3e0; border-color: #ffcc80; }
-  .kalk-box-icon  { font-size: 1.3rem; margin-bottom: .25rem; }
-  .kalk-box-label {
-    font-size: .7rem; font-weight: 700;
-    text-transform: uppercase; letter-spacing: .06em;
-    color: #777; margin-bottom: .2rem;
-  }
-  .kalk-box-value {
-    font-size: 1.55rem; font-weight: 800; line-height: 1.1;
-    color: var(--ciemny, #1a1a1a);
-  }
-  .kalk-box-value.v-green { color: var(--zielony); }
-  .kalk-box-value.v-red   { color: #c62828; }
-  .kalk-box-value.v-amber { color: #e65100; }
-  .kalk-box-sub { font-size: .75rem; color: #888; margin-top: 3px; }
-
-  .kalk-roi {
-    grid-column: 1 / -1;
-    background: var(--zielony);
-    color: #fff;
-    border-radius: .75rem;
-    padding: 1.2rem 1.5rem;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1rem;
-  }
-  @media (max-width: 480px) { .kalk-roi { grid-template-columns: 1fr; } }
-  .kalk-roi .kalk-box-label { color: rgba(255,255,255,.65); }
-  .kalk-roi .kalk-box-value { color: #fff; }
-  .kalk-roi .kalk-box-sub   { color: rgba(255,255,255,.55); }
-
-  @keyframes kalkPop { from { opacity:.6; transform:scale(.95); } to { opacity:1; transform:scale(1); } }
-  .kalk-animating .kalk-box-value { animation: kalkPop .25s ease; }
-
-  /* CTA FORM */
-  .kalk-cta {
-    margin-top: 2rem;
-    background: var(--kremowy, #faf8f4);
-    border: 1px solid var(--linia, #e5ddd0);
-    border-radius: .75rem;
-    padding: 1.5rem;
-    text-align: center;
-  }
-  .kalk-cta h3 { font-size: 1rem; color: var(--zielony); margin-bottom: .3rem; }
-  .kalk-cta p  { font-size: .83rem; color: #666; margin-bottom: 1rem; }
-  .kalk-form {
-    display: flex;
-    gap: .7rem;
-    flex-wrap: wrap;
-    justify-content: center;
-    max-width: 560px;
-    margin: 0 auto;
-  }
-  .kalk-form input {
-    flex: 1 1 160px;
-    padding: .7rem .9rem;
-    border: 1px solid var(--linia, #e5ddd0);
-    border-radius: .4rem;
-    font-size: .9rem;
-    font-family: inherit;
-    background: #fff;
-  }
-  .kalk-form input:focus { outline: 2px solid var(--zielony); border-color: transparent; }
-  .kalk-form .btn-kalk {
-    flex: 1 1 200px;
-    background: var(--zielony);
-    color: #fff;
-    border: none;
-    padding: .7rem 1.4rem;
-    font-size: .9rem;
-    font-weight: 700;
-    border-radius: .4rem;
-    cursor: pointer;
-    font-family: inherit;
-    transition: .2s;
-  }
-  .kalk-form .btn-kalk:hover { background: #2e7d45; transform: translateY(-1px); }
-  .kalk-form .btn-kalk:disabled { background: #666; cursor: default; transform: none; }
-
-  /* ── CO ZROBISZ Z PIENIĘDZMI ── */
-  .roi-spend {
-    background: var(--kremowy, #faf8f4);
-    border: 1px solid var(--linia, #e5ddd0);
-    border-radius: .75rem;
-    padding: 1.4rem 1.5rem;
-    margin: 1.5rem 0;
-  }
-  .roi-spend-title {
-    font-size: .72rem; font-weight: 700;
-    text-transform: uppercase; letter-spacing: .1em;
-    color: #aaa; margin-bottom: 1rem;
-  }
-  .roi-spend-amount {
-    font-size: 1.8rem; font-weight: 800;
-    color: var(--zielony); margin-bottom: .8rem; line-height: 1;
-  }
-  .roi-spend-items {
-    display: flex; flex-wrap: wrap; gap: .6rem;
-  }
-  .roi-spend-item {
-    background: #fff; border: 1px solid var(--linia, #e5ddd0);
-    border-radius: .4rem; padding: .5rem .9rem;
-    font-size: .83rem; color: #555;
-    display: flex; align-items: center; gap: .4rem;
-  }
-  .roi-spend-item .eq { font-size: .72rem; color: #aaa; font-weight: 600; }
-
-  /* ── SEKCJA LUDZKA ── */
-  .founder-strip {
-    background: var(--kremowy, #faf8f4);
-    border-top: 1px solid var(--linia, #e5ddd0);
-    border-bottom: 1px solid var(--linia, #e5ddd0);
-    padding: 2.5rem 2rem;
-  }
-  .founder-inner {
-    max-width: 700px; margin: 0 auto;
-    display: flex; gap: 2rem; align-items: center;
-    flex-wrap: wrap;
-  }
-  .founder-avatar {
-    width: 80px; height: 80px; border-radius: 50%;
-    background: var(--zielony); color: #fff;
-    font-size: 2rem; display: flex;
-    align-items: center; justify-content: center;
-    flex-shrink: 0;
-  }
-  .founder-quote blockquote {
-    font-size: .95rem; color: #444; line-height: 1.65;
-    font-style: italic; margin: 0 0 .5rem;
-    border: none; padding: 0;
-  }
-  .founder-quote cite {
-    font-size: .8rem; color: #888; font-style: normal;
-    font-weight: 600;
-  }
-  .mlekomat-steps {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap: .75rem;
-    margin: 2rem 0;
-  }
-  @media (max-width: 640px) {
-    .mlekomat-steps { grid-template-columns: repeat(2, 1fr); }
-    .mlekomat-steps .ms-card:last-child { grid-column: 1 / -1; max-width: 200px; margin: 0 auto; }
-  }
-  .ms-card {
-    background: #fff;
-    border: 1px solid var(--linia, #e5ddd0);
-    border-radius: .65rem;
-    padding: 1rem .8rem;
-    text-align: center;
-    opacity: 0;
-    transform: translateY(16px);
-    transition: opacity .45s, transform .45s;
-  }
-  .ms-card.ms-visible { opacity: 1; transform: translateY(0); }
-  .ms-num {
-    width: 26px; height: 26px;
-    background: var(--zielony);
-    color: #fff;
-    border-radius: 50%;
-    font-size: .75rem; font-weight: 700;
-    display: flex; align-items: center; justify-content: center;
-    margin: 0 auto .5rem;
-  }
-  .ms-icon  { font-size: 1.7rem; display: block; margin-bottom: .4rem; }
-  .ms-title { font-size: .78rem; font-weight: 700; color: var(--ciemny, #1a1a1a); margin-bottom: .2rem; }
-  .ms-desc  { font-size: .72rem; color: #888; line-height: 1.4; }
-
-  @media (prefers-reduced-motion: reduce) {
-    .ms-card, .kalk-box-value { animation: none !important; transition: none !important; }
-  }
-  </style>
-
-  /* ── ANIMACJE SCROLL ── */
-  [data-a]{opacity:0;transform:translateY(26px);transition:opacity .55s ease,transform .55s ease}
-  [data-a="fade"]{transform:translateY(0)}
-  [data-a="left"]{transform:translateX(-30px)}
-  [data-a="right"]{transform:translateX(30px)}
-  [data-a="scale"]{transform:scale(.96) translateY(10px)}
-  [data-a].vis{opacity:1;transform:none !important}
-  [data-d="1"]{transition-delay:.08s}[data-d="2"]{transition-delay:.16s}
-  [data-d="3"]{transition-delay:.24s}[data-d="4"]{transition-delay:.32s}
-  [data-d="5"]{transition-delay:.40s}[data-d="6"]{transition-delay:.48s}
-
-  /* hover lift cards */
-  .karta,.karta-wyboru{transition:box-shadow .22s ease,transform .22s ease}
-  .karta:hover,.karta-wyboru:hover{transform:translateY(-5px);box-shadow:0 10px 32px rgba(0,0,0,.11)}
-
-  /* btn hover */
-  .btn{transition:background .18s,transform .18s,box-shadow .18s}
-  .btn:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,.15)}
-
-  /* puls CTA */
-  @keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(26,92,42,.3)}70%{box-shadow:0 0 0 10px rgba(26,92,42,0)}}
-  .btn-pulse{animation:pulse 2.4s infinite}
-
-  /* krok hover */
-  .krok-item{transition:background .18s;border-radius:6px;padding:.8rem .6rem}
-  .krok-item:hover{background:var(--kremowy,#faf8f4)}
-
-  /* kroki linia */
-  .kroki{position:relative}
-
-  /* highlight slide-in */
-  @keyframes hl{from{opacity:0;transform:translateX(-8px)}to{opacity:1;transform:none}}
-  .highlight.vis{animation:hl .45s ease both}
-
-  /* ── FOUNDER STRIP ── */
-  .founder-strip{background:var(--kremowy,#faf8f4);border-top:1px solid var(--linia,#e5ddd0);border-bottom:1px solid var(--linia,#e5ddd0);padding:2.5rem 2rem}
-  .founder-inner{max-width:700px;margin:0 auto;display:flex;gap:2rem;align-items:center;flex-wrap:wrap}
-  .founder-avatar{width:72px;height:72px;border-radius:50%;background:var(--zielony);color:#fff;font-size:1.8rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-weight:700}
-  .founder-quote blockquote{font-size:.95rem;color:#444;line-height:1.65;font-style:italic;margin:0 0 .5rem;border:none;padding:0}
-  .founder-quote cite{font-size:.8rem;color:#888;font-style:normal;font-weight:600}
-
-  /* ── ROI SPEND BLOCK ── */
-  .roi-spend{background:var(--kremowy,#faf8f4);border:1px solid var(--linia,#e5ddd0);border-radius:.75rem;padding:1.4rem 1.5rem;margin:1.5rem 0}
-  .roi-spend-label{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#aaa;margin-bottom:.8rem}
-  .roi-spend-amount{font-size:1.8rem;font-weight:800;color:var(--zielony);margin-bottom:.9rem;line-height:1}
-  .roi-spend-items{display:flex;flex-wrap:wrap;gap:.6rem}
-  .roi-spend-item{background:#fff;border:1px solid var(--linia,#e5ddd0);border-radius:.4rem;padding:.5rem .9rem;font-size:.82rem;color:#555;display:flex;align-items:center;gap:.4rem}
-  .roi-spend-item .eq{font-size:.7rem;color:#bbb;font-weight:700}
-  </style>
+@media(max-width:860px){
+  .stmt-inner { grid-template-columns: 1fr; gap: 2.5rem; }
+  .strip-grid { grid-template-columns: 1fr 1fr; grid-template-rows: 200px 200px; height: auto; }
+  .strip-grid img:first-child { grid-column: 1/3; }
+  .preview-grid { grid-template-columns: 1fr; }
+  .hero-scroll { display: none; }
+}
+@media(max-width:600px){
+  .strip-grid { grid-template-columns: 1fr; height: auto; }
+  .strip-grid img:first-child { grid-column: auto; }
+}
+</style>
 </head>
 <body>
 
-  <nav>
-    <a href="index.html" class="nav-logo">Sklep za Stodołą</a>
-    <button class="hamburger" onclick="toggleMenu()" aria-label="Menu">
-      <span></span><span></span><span></span>
-    </button>
-    <ul class="nav-links" id="nav-links">
-      <li><a href="index.html" class="active">Start</a></li>
-      <li><a href="rolnik.html">Dla rolników</a></li>
-      <li><a href="oferta.html">Maszyny i serwis</a></li>
-      <li><a href="kontakt.html">Kontakt</a></li>
-    </ul>
-  </nav>
-
-  <!-- HERO -->
-  <section class="hero-landing">
-    <div class="hero-landing-content">
-      <span class="section-label" style="color:rgba(255,255,255,0.6);margin-bottom:1.2rem;display:block;">Cała Polska</span>
-      <h1>Rozwijaj swoje<br>gospodarstwo z głową</h1>
-      <p style="font-size:1rem;color:rgba(255,255,255,0.5);font-style:italic;margin:.3rem auto 1.4rem;max-width:520px;line-height:1.55;text-align:center;">Nie sprzedajemy mlekomatów. Tworzymy dochodowe sklepy przy gospodarstwach.</p>
-      <p class="podtytul">Od projektu pawilonu po pierwszą sprzedaż — kompleksowo, z dotacją ARiMR do 65%.</p>
-
-      <div class="karty-wyboru">
-        <a href="rolnik.html" class="karta-wyboru">
-          <div class="ikona">🌱</div>
-          <h3>Jestem rolnikiem</h3>
-          <p>Chcę zarabiać więcej na swoim mleku</p>
-          <div class="strzalka">→</div>
-        </a>
-        <a href="oferta.html" class="karta-wyboru">
-          <div class="ikona">⚙️</div>
-          <h3>Szukam maszyny</h3>
-          <p>Sprzedaż, leasing, instalacja i serwis</p>
-          <div class="strzalka">→</div>
-        </a>
-      </div>
-      <p style="color:rgba(255,255,255,0.35);font-size:.8rem;margin-top:2rem;letter-spacing:.1em;">↓ przewiń niżej</p>
-    </div>
-  </section>
-
-  <!-- DLACZEGO MY -->
-  <section class="section section-center">
-    <span class="section-label" data-a="fade">Czym się zajmujemy</span>
-    <h2 data-a>Jedna firma — kompleksowa obsługa</h2>
-    <div class="divider divider-center"></div>
-    <p style="max-width:580px;margin:0 auto;" data-a data-d="1">Dobieramy maszynę, oferujemy sprzedaż lub leasing, pomagamy z wnioskiem ARiMR, instalujemy i serwisujemy. Jeden kontakt — całość po naszej stronie.</p>
-    <div class="karty" style="margin-top:3rem;">
-      <div class="karta" data-a="scale" data-d="1">
-        <div class="karta-ikona">💳</div>
-        <h3>Sprzedaż i leasing</h3>
-        <p>Kupujesz od razu lub rozkładasz na raty. Ty wybierasz co pasuje do Twojej sytuacji.</p>
-      </div>
-      <div class="karta" data-a="scale" data-d="2">
-        <div class="karta-ikona">💰</div>
-        <h3>Dotacja ARiMR do 65%</h3>
-        <p>Pomagamy złożyć wniosek o zwrot kosztów zakupu. Znamy procedury — Ty skupiasz się na krowach.</p>
-      </div>
-      <div class="karta" data-a="scale" data-d="3">
-        <div class="karta-ikona">🔧</div>
-        <h3>Instalacja i serwis</h3>
-        <p>Dowozimy, montujemy, uruchamiamy. Serwis mamy na miejscu — nie czekasz tygodniami.</p>
-      </div>
-      <div class="karta" data-a="scale" data-d="4">
-        <div class="karta-ikona">🏠</div>
-        <h3>Pawilon pod automat</h3>
-        <p>Wskazujesz miejsce — my bierzemy producenta, montaż i wszystkie formalności.</p>
-      </div>
-    </div>
-  </section>
-
-  <!-- ══ KALKULATOR — tuż pod "Jedna firma" ══ -->
-  <div class="kalk-band" id="kalkulator">
-    <h2>Czy mlekomat się opłaca?</h2>
-    <p>Przesuń suwaki — zobaczysz ile zarobisz więcej i kiedy zwróci się inwestycja.</p>
+<div class="ticker">
+  <div class="ticker-inner">
+    <span>Kompleksowa obsługa farmera</span><span>Drewniany pawilon pod klucz</span><span>Mlekomat Premium CE-MID</span><span>Dotacja ARiMR do 65%</span><span>Leasing rolniczy</span><span>Instalacja i serwis — cała Polska</span><span>Kompleksowa obsługa farmera</span><span>Drewniany pawilon pod klucz</span><span>Mlekomat Premium CE-MID</span><span>Dotacja ARiMR do 65%</span><span>Leasing rolniczy</span><span>Instalacja i serwis — cała Polska</span>
   </div>
+</div>
 
-  <section style="background:#fff; border-top:1px solid var(--linia);">
-    <div class="kalk-wrap">
+<nav class="nav" id="nav">
+  <a href="index.html" class="nav-logo"><span class="nav-logo-dot"></span>Sklep za Stodołą</a>
+  <ul class="nav-links">
+    <li><a href="index.html" class="active">Start</a></li>
+    <li><a href="jak-dzialamy.html">Jak działamy</a></li>
+    <li><a href="mlekomat.html">Mlekomat</a></li>
+    <li><a href="kalkulator.html">Kalkulator</a></li>
+    <li><a href="kontakt.html">Kontakt</a></li>
+  </ul>
+  <a href="kontakt.html" class="nav-cta">Porozmawiajmy</a>
+  <button class="burger" id="burger" aria-label="Menu" aria-expanded="false">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
 
-      <!-- SUWAKI -->
-      <div class="kalk-sliders">
+<nav class="mob-nav" id="mob-nav" aria-label="Menu mobilne">
+  <button class="mob-close" id="mob-close" aria-label="Zamknij">✕</button>
+  <a href="index.html">Start</a>
+  <a href="jak-dzialamy.html">Jak działamy</a>
+  <a href="mlekomat.html">Mlekomat</a>
+  <a href="kalkulator.html">Kalkulator</a>
+  <a href="kontakt.html">Kontakt</a>
+</nav>
 
-        <div class="kalk-slider-group">
-          <div class="kalk-slider-label">
-            <span>Dzienna produkcja mleka</span>
-            <span class="kalk-slider-val" id="kv-litry">200 L/dzień</span>
-          </div>
-          <input type="range" class="kalk-range" id="ks-litry" min="10" max="2000" value="200" step="10"/>
-          <div class="kalk-range-hint">Ile litrów mleka produkujesz dziennie?</div>
-        </div>
-
-        <div class="kalk-slider-group">
-          <div class="kalk-slider-label">
-            <span>Cena skupu u pośrednika</span>
-            <span class="kalk-slider-val" id="kv-posrednik">1,20 zł/L</span>
-          </div>
-          <input type="range" class="kalk-range" id="ks-posrednik" min="50" max="200" value="120" step="5"/>
-          <div class="kalk-range-hint">Aktualna cena skupu za litr mleka</div>
-        </div>
-
-        <div class="kalk-slider-group">
-          <div class="kalk-slider-label">
-            <span>Cena sprzedaży przez mlekomat</span>
-            <span class="kalk-slider-val" id="kv-mlekomat">4,00 zł/L</span>
-          </div>
-          <input type="range" class="kalk-range" id="ks-mlekomat" min="400" max="700" value="400" step="10"/>
-          <div class="kalk-range-hint">Typowe ceny w Polsce: 2,00 – 3,50 zł/litr</div>
-        </div>
-
-        <div class="kalk-slider-group">
-          <div class="kalk-slider-label">
-            <span>Wartość inwestycji</span>
-            <span class="kalk-slider-val" id="kv-invest">120 000 zł</span>
-          </div>
-          <input type="range" class="kalk-range" id="ks-invest" min="40000" max="200000" value="120000" step="5000"/>
-          <div class="kalk-range-hint">Koszt mlekomatu + instalacji + pawilonu</div>
-        </div>
-
-      </div><!-- /kalk-sliders -->
-
-      <!-- WYNIKI -->
-      <div class="kalk-results" id="kalk-results">
-
-        <div class="kalk-box">
-          <div class="kalk-box-icon">📉</div>
-          <div class="kalk-box-label">Przez pośrednika — miesięcznie</div>
-          <div class="kalk-box-value v-red" id="kr-posrednik">7 200 zł</div>
-          <div class="kalk-box-sub" id="kr-posrednik-dzien">240 zł/dzień</div>
-        </div>
-
-        <div class="kalk-box kalk-box--green">
-          <div class="kalk-box-icon">💰</div>
-          <div class="kalk-box-label">Przez mlekomat — miesięcznie</div>
-          <div class="kalk-box-value v-green" id="kr-mlekomat">15 000 zł</div>
-          <div class="kalk-box-sub" id="kr-mlekomat-dzien">500 zł/dzień</div>
-        </div>
-
-        <div class="kalk-box kalk-box--green">
-          <div class="kalk-box-icon">🚀</div>
-          <div class="kalk-box-label">Zysk dodatkowy miesięcznie</div>
-          <div class="kalk-box-value v-green" id="kr-diff">+7 800 zł</div>
-          <div class="kalk-box-sub" id="kr-diff-rok">+93 600 zł rocznie</div>
-        </div>
-
-        <div class="kalk-box kalk-box--amber">
-          <div class="kalk-box-icon">📈</div>
-          <div class="kalk-box-label">Wzrost przychodu</div>
-          <div class="kalk-box-value v-amber" id="kr-wzrost">+108%</div>
-          <div class="kalk-box-sub">więcej niż przez pośrednika</div>
-        </div>
-
-        <div class="kalk-roi">
-          <div>
-            <div class="kalk-box-icon">⏳</div>
-            <div class="kalk-box-label">Zwrot bez dotacji</div>
-            <div class="kalk-box-value" id="kr-roi-bez">~15 mies.</div>
-            <div class="kalk-box-sub" id="kr-invest-bez">przy 120 000 zł</div>
-          </div>
-          <div>
-            <div class="kalk-box-icon">✅</div>
-            <div class="kalk-box-label">Zwrot z dotacją ARiMR 50%</div>
-            <div class="kalk-box-value" id="kr-roi-z">~8 mies.</div>
-            <div class="kalk-box-sub" id="kr-invest-z">przy 60 000 zł po dotacji</div>
-          </div>
-        </div>
-
-      </div><!-- /kalk-results -->
-
-      <!-- CO ZROBISZ Z TYMI PIENIĘDZMI -->
-      <div class="roi-spend" id="roi-spend">
-        <div class="roi-spend-title">Co możesz zrobić z tymi pieniędzmi?</div>
-        <div class="roi-spend-amount" id="spend-amount">+93 600 zł rocznie</div>
-        <div class="roi-spend-items">
-          <div class="roi-spend-item"><span class="eq">=</span> nowy ciągnik po <span id="spend-traktor">—</span> latach</div>
-          <div class="roi-spend-item"><span class="eq">=</span> spłata robota udojowego po <span id="spend-robot">—</span> latach</div>
-          <div class="roi-spend-item"><span class="eq">=</span> modernizacja obory po <span id="spend-obornik">—</span> latach</div>
-        </div>
-      </div>
-
-      <!-- JAK DZIAŁA MLEKOMAT -->
-      <p style="font-size:.75rem; text-transform:uppercase; letter-spacing:.1em; color:#aaa; margin:2.5rem 0 .8rem; font-weight:700;">Jak działa mlekomat?</p>
-      <div class="mlekomat-steps">
-        <div class="ms-card">
-          <div class="ms-num">1</div>
-          <span class="ms-icon">🪣</span>
-          <div class="ms-title">Napełniasz zbiornik</div>
-          <div class="ms-desc">Wlewasz świeże mleko — zajmuje ~5 minut</div>
-        </div>
-        <div class="ms-card">
-          <div class="ms-num">2</div>
-          <span class="ms-icon">❄️</span>
-          <div class="ms-title">Automat chłodzi</div>
-          <div class="ms-desc">Schładza do +4°C, alarm przy odchyleniu</div>
-        </div>
-        <div class="ms-card">
-          <div class="ms-num">3</div>
-          <span class="ms-icon">💳</span>
-          <div class="ms-title">Klient płaci</div>
-          <div class="ms-desc">Moneta, banknot lub karta — bez Twojej obecności</div>
-        </div>
-        <div class="ms-card">
-          <div class="ms-num">4</div>
-          <span class="ms-icon">🥛</span>
-          <div class="ms-title">Automat nalewa</div>
-          <div class="ms-desc">Dokładnie 1 litr, strefa płucze się automatycznie</div>
-        </div>
-        <div class="ms-card">
-          <div class="ms-num">5</div>
-          <span class="ms-icon">📊</span>
-          <div class="ms-title">Widzisz sprzedaż</div>
-          <div class="ms-desc">SMS + panel online, zawsze wiesz ile zostało</div>
-        </div>
-      </div>
-
-      <!-- CTA FORM -->
-      <div class="kalk-cta">
-        <h3>👉 Policz mój przypadek — chcę bezpłatną wycenę</h3>
-        <p>Podaj numer — oddzwonimy i przygotujemy indywidualną ofertę wraz z pomocą przy wniosku ARiMR.</p>
-        <form class="kalk-form" id="kalk-form" action="https://formspree.io/f/mqeogyjd" method="POST">
-          <input type="text"  name="imie"     placeholder="Imię i nazwisko *" required/>
-          <input type="tel"   name="telefon"  placeholder="Numer telefonu *"  required/>
-          <input type="hidden" name="zrodlo"  value="kalkulator-glowna"/>
-          <input type="hidden" name="dane"    id="kalk-hidden-dane"/>
-          <button type="submit" class="btn-kalk">📞 Oddzwoń do mnie</button>
-        </form>
-        <p style="font-size:.72rem; color:#aaa; margin-top:.7rem;">Bez spamu. Kontakt wyłącznie w sprawie wyceny.</p>
-      </div>
-
-    </div><!-- /kalk-wrap -->
-  </section>
-  <!-- KONIEC KALKULATORA -->
-
-  <!-- MODELE ZAKUPU -->
-  <div class="band">
-    <h2 data-a="fade">Kupujesz czy leasingujesz?</h2>
-    <p data-a="fade" data-d="1">Obydwa warianty — powiedz co Ci pasuje finansowo</p>
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-photo">
+    <img src="pawilon-1.jpg" alt="Drewniany pawilon handlowy przy gospodarstwie">
   </div>
-
-  <section class="section">
-    <div class="grid-2">
-      <div style="background:var(--kremowy);padding:2.5rem;border:1px solid var(--linia);" data-a="left">
-        <div style="font-size:2.5rem;margin-bottom:1rem;">🛒</div>
-        <h3 style="color:var(--zielony);font-size:1.4rem;margin-bottom:1rem;">Zakup</h3>
-        <p>Płacisz raz, maszyna jest Twoja. Przy dotacji ARiMR to najlepsza opcja — refundacja trafia bezpośrednio do Ciebie.</p>
-        <div class="cechy" style="margin-top:1.5rem;">
-          <span class="cecha">Pełna własność</span>
-          <span class="cecha">Zwrot do 65% z ARiMR</span>
-          <span class="cecha">Faktura VAT</span>
-          <span class="cecha">Gwarancja producenta</span>
-        </div>
-        <a href="kontakt.html" class="btn" style="margin-top:1.5rem;">Zapytaj o cenę</a>
-      </div>
-      <div style="background:var(--kremowy);padding:2.5rem;border:1px solid var(--linia);" data-a="right">
-        <div style="font-size:2.5rem;margin-bottom:1rem;">📋</div>
-        <h3 style="color:var(--zielony);font-size:1.4rem;margin-bottom:1rem;">Leasing</h3>
-        <p>Mała kasa z góry, stała rata miesięczna. Maszyna zarabia od pierwszego dnia i spłaca się sama.</p>
-        <div class="cechy" style="margin-top:1.5rem;">
-          <span class="cecha">Mały wkład własny</span>
-          <span class="cecha">Stała rata</span>
-          <span class="cecha">Korzyści podatkowe</span>
-          <span class="cecha">Wykup na koniec</span>
-        </div>
-        <a href="kontakt.html" class="btn" style="margin-top:1.5rem;">Zapytaj o leasing</a>
-      </div>
+  <div class="hero-content">
+    <p class="hero-eyebrow" data-r="fade">Kompleksowa obsługa farmera</p>
+    <h1 class="hero-h1" data-r>
+      Twój sklep.<br>
+      <em>Przy Twoim gospodarstwie.</em>
+    </h1>
+    <p class="hero-sub" data-r data-d="1">
+      Nie sprzedajemy mlekomatów. <strong>Tworzymy dochodowe sklepy przy gospodarstwach.</strong>
+      Drewniany pawilon, mlekomat Premium, Twoje produkty — gotowa sprzedaż bezpośrednia zamiast groszy w skupie.
+    </p>
+    <div class="hero-actions" data-r data-d="2">
+      <a href="kontakt.html" class="btn btn-green">Chcę sklep przy swoim gospodarstwie →</a>
+      <a href="kalkulator.html" class="btn btn-outline">Sprawdź ile zarobię</a>
     </div>
-    <div class="highlight" style="margin-top:2.5rem;" data-a>
-      <strong>Leasing + dotacja ARiMR — czy można łączyć?</strong>
-      <p>Zależy od formy leasingu. Sprawdzimy Twoją sytuację i powiemy wprost co się bardziej opłaca.</p>
-    </div>
-  </section>
-
-  <!-- JAK TO DZIAŁA -->
-  <div class="band-kremowy band" style="padding:4rem 2rem;">
-    <h2 data-a="fade">Jak wygląda współpraca?</h2>
-    <p data-a="fade" data-d="1">Od pierwszego telefonu do działającego mlekomatu</p>
   </div>
+  <div class="hero-scroll" aria-hidden="true">przewiń</div>
+</section>
 
-  <section class="section" style="max-width:700px;">
-    <div class="kroki">
-      <div class="krok-item" data-a>
-        <div class="krok-num">1</div>
-        <div class="krok-tekst">
-          <h3>Bezpłatna rozmowa</h3>
-          <p>Gadamy o Twoim gospodarstwie, dobieramy sprzęt, sprawdzamy co z dotacją.</p>
-          <span class="tag">0 zł, bez zobowiązań</span>
-        </div>
-      </div>
-      <div class="krok-item" data-a>
-        <div class="krok-num">2</div>
-        <div class="krok-tekst">
-          <h3>Zakup lub leasing</h3>
-          <p>Decydujesz jak chcesz zapłacić. Jeśli kupujesz — składamy wniosek do ARiMR razem.</p>
-          <span class="tag">zakup lub leasing</span>
-        </div>
-      </div>
-      <div class="krok-item" data-a>
-        <div class="krok-num">3</div>
-        <div class="krok-tekst">
-          <h3>Dostawa i instalacja</h3>
-          <p>Przywożę maszynę, montuję, uruchamiam i pokazuję jak działa. Szkolenie w cenie.</p>
-          <span class="tag">cała Polska</span>
-        </div>
-      </div>
-      <div class="krok-item" data-a>
-        <div class="krok-num">4</div>
-        <div class="krok-tekst">
-          <h3>Pawilon — jeśli potrzebny</h3>
-          <p>Nie masz gdzie postawić? Bierzemy producenta, projekt i montaż. Ty tylko mówisz gdzie.</p>
-          <span class="tag">kompleksowo</span>
-        </div>
-      </div>
-      <div class="krok-item" data-a>
-        <div class="krok-num">5</div>
-        <div class="krok-tekst">
-          <h3>Serwis przez lata</h3>
-          <p>Coś się stało — dzwonisz, przyjeżdżam. Mam części, nie ma tygodniowego czekania.</p>
-          <span class="tag">umowa serwisowa</span>
-        </div>
-      </div>
+<!-- STATEMENT -->
+<section class="stmt">
+  <div class="stmt-inner">
+    <div class="stmt-quote" data-r="left">
+      <span class="accent">„Rolnicy w Szwajcarii zarabiają 4× więcej na tym samym mleku."</span><br><br>
+      W Polsce większość nadal oddaje za grosze. Postanowiłem to zmienić.
     </div>
-    <a href="kontakt.html" class="btn btn-pulse">Umów bezpłatną rozmowę</a>
-  </section>
-
-  <!-- FOUNDER -->
-  <div class="founder-strip" data-a>
-    <div class="founder-inner">
-      <div class="founder-avatar">J</div>
-      <div class="founder-quote">
-        <blockquote>„Widziałem jak rolnicy w Szwajcarii zarabiają 4× więcej na tym samym mleku — tylko dlatego że mają automat przy bramie. W Polsce większość nadal oddaje mleko za grosze. Postanowiłem to zmienić."</blockquote>
-        <cite>Jakub Deczyński — założyciel, Sklep za Stodołą</cite>
+    <div class="stmt-meta" data-r="right">
+      <p>Widziałem jak działa sprzedaż bezpośrednia za granicą — automat do mleka przy bramie, drewniany pawilon z lokalnymi produktami, stali klienci. <strong>Prosta sprawa, która po prostu działa.</strong></p>
+      <p>Dlatego zamiast sprzedawać samą maszynę, bierzemy cały projekt: pawilon, mlekomat, ustawienie produktów, leasing, wniosek ARiMR. Ty zajmujesz się gospodarstwem — my resztą.</p>
+      <div class="founder">
+        <div class="founder-av">JD</div>
+        <div class="founder-info">
+          <strong>Jakub Deczyński</strong>
+          Założyciel, Sklep za Stodołą
+        </div>
       </div>
     </div>
   </div>
+</section>
 
-  <!-- CTA -->
-  <div class="band">
-    <h2 data-a="fade">Masz pytania?</h2>
-    <p data-a="fade" data-d="1">Zadzwoń lub napisz — odpowiem konkretnie, bez ściemy.</p>
-    <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;margin-top:2rem;" data-a="fade" data-d="2">
-      <a href="tel:533200652" class="btn btn-biel">📞 533 200 652</a>
-      <a href="kontakt.html" class="btn" style="border-color:rgba(255,255,255,0.4);background:transparent;">Napisz do nas</a>
+<!-- PHOTO STRIP -->
+<div class="strip">
+  <div class="strip-grid" data-r>
+    <img src="pawilon-1.jpg" alt="Pawilon handlowy przy gospodarstwie — widok z zewnątrz">
+    <img src="pawilon-4.jpg" alt="Wnętrze sklepu przy gospodarstwie">
+    <img src="automat.jpg" alt="Automat do mleka Premium">
+  </div>
+</div>
+
+<!-- PREVIEW SECTIONS -->
+<section class="preview">
+  <div class="preview-inner">
+    <div data-r>
+      <p class="sec-label">Wszystko czego potrzebujesz</p>
+      <h2 class="sec-title">Jeden projekt —<br><em>gotowy sklep.</em></h2>
+    </div>
+    <div class="preview-grid">
+      <div class="pcard" data-r data-d="1">
+        <div class="pcard-icon">🏡</div>
+        <h3>Jak działamy</h3>
+        <p>Drewniany pawilon na Twojej działce, mlekomat, Twoje produkty pięknie podane — od projektu do pierwszej sprzedaży. Jeden kontakt, całość po naszej stronie.</p>
+        <a href="jak-dzialamy.html" class="pcard-link">Zobacz cały proces →</a>
+      </div>
+      <div class="pcard" data-r data-d="2">
+        <div class="pcard-icon">🥛</div>
+        <h3>Mlekomat Premium</h3>
+        <p>Szwajcarski automat do mleka z certyfikatem CE-MID — serce sklepu. Chłodzi, liczy, płucze się automatycznie. Płatność kartą, banknotem lub monetą.</p>
+        <a href="mlekomat.html" class="pcard-link">Poznaj mlekomat →</a>
+      </div>
+      <div class="pcard" data-r data-d="3">
+        <div class="pcard-icon">📊</div>
+        <h3>Kalkulator i finansowanie</h3>
+        <p>Sprawdź ile zarobisz więcej niż w skupie. Leasing, zakup lub dotacja ARiMR do 65% — dobieramy finansowanie do Twojej sytuacji.</p>
+        <a href="kalkulator.html" class="pcard-link">Policz swój zysk →</a>
+      </div>
     </div>
   </div>
+</section>
 
-  <footer>
-    <div class="footer-inner">
-      <div>
-        <h4>Sklep za Stodołą</h4>
-        <p>Maszyny rolnicze · Leasing · Dofinansowania ARiMR<br>Instalacja · Serwis</p>
-        <div class="footer-social">
-          <a href="https://www.facebook.com/profile.php?id=61590896125832" title="Facebook">FB</a>
-          <a href="https://www.instagram.com/sklepzastodola/" title="Instagram">IG</a>
-        </div>
-      </div>
-      <div>
-        <h4>Nawigacja</h4>
-        <p>
-          <a href="index.html">Strona główna</a><br>
-          <a href="rolnik.html">Dla rolników</a><br>
-          <a href="oferta.html">Maszyny i serwis</a><br>
-          <a href="kontakt.html">Kontakt</a>
-        </p>
-      </div>
-      <div>
-        <h4>Kontakt</h4>
-        <p>
-          <a href="tel:533200652">533 200 652</a><br>
-          <a href="tel:690000923">690 000 923</a><br>
-          <a href="mailto:kontakt@sklepzastodola.pl">kontakt@sklepzastodola.pl</a>
-        </p>
-      </div>
-    </div>
-    <div class="footer-bottom">
-      <span>© 2026 Sklep za Stodołą</span>
-      <span><a href="polityka.html">Polityka prywatności</a></span>
-    </div>
-  </footer>
-
-  <script>
-    function toggleMenu(){document.getElementById('nav-links').classList.toggle('open');}
-
-    // ── KALKULATOR ──────────────────────────────────────────
-    const kState = { litry: 200, posrednik: 120, mlekomat: 400, invest: 120000 };
-    function kFmt(n){return n.toLocaleString('pl-PL')+' zł';}
-    function kMies(n){if(n>=99)return '>99 mies.';return '~'+Math.ceil(n)+' mies.';}
-    function kPlDecim(v){return(v/100).toFixed(2).replace('.',',');}
-
-    function kCalc(){
-      const {litry,posrednik,mlekomat,invest}=kState;
-      const p=posrednik/100,m=mlekomat/100;
-      const posrDzien=litry*p, mlekDzien=litry*m;
-      const posrMies=posrDzien*30, mlekMies=mlekDzien*30;
-      const diffMies=mlekMies-posrMies, diffRok=diffMies*12;
-      const wzrost=posrMies>0?(diffMies/posrMies)*100:0;
-      const roiBez=diffMies>0?invest/diffMies:999;
-      const roiZ=diffMies>0?invest*.5/diffMies:999;
-
-      document.getElementById('kr-posrednik').textContent=kFmt(Math.round(posrMies));
-      document.getElementById('kr-posrednik-dzien').textContent=Math.round(posrDzien).toLocaleString('pl-PL')+' zł/dzień';
-      document.getElementById('kr-mlekomat').textContent=kFmt(Math.round(mlekMies));
-      document.getElementById('kr-mlekomat-dzien').textContent=Math.round(mlekDzien).toLocaleString('pl-PL')+' zł/dzień';
-      document.getElementById('kr-diff').textContent='+'+kFmt(Math.round(diffMies));
-      document.getElementById('kr-diff-rok').textContent='+'+kFmt(Math.round(diffRok))+' rocznie';
-      document.getElementById('kr-wzrost').textContent='+'+Math.round(wzrost)+'%';
-      document.getElementById('kr-roi-bez').textContent=kMies(roiBez);
-      document.getElementById('kr-invest-bez').textContent='przy '+invest.toLocaleString('pl-PL')+' zł';
-      document.getElementById('kr-roi-z').textContent=kMies(roiZ);
-      document.getElementById('kr-invest-z').textContent='przy '+Math.round(invest*.5).toLocaleString('pl-PL')+' zł po dotacji';
-
-      // co zrobisz z pieniędzmi — dynamiczne z kalkulatora
-      const rokZl=Math.round(diffRok);
-      const amtEl=document.getElementById('spend-amount');
-      if(amtEl){
-        amtEl.textContent='+'+rokZl.toLocaleString('pl-PL')+' zł rocznie';
-        const t=document.getElementById('spend-traktor');
-        const r=document.getElementById('spend-robot');
-        const o=document.getElementById('spend-obornik');
-        if(t) t.textContent=rokZl>0?Math.ceil(120000/rokZl)+'':'—';
-        if(r) r.textContent=rokZl>0?Math.ceil(200000/rokZl)+'':'—';
-        if(o) o.textContent=rokZl>0?Math.ceil(80000/rokZl)+'':'—';
-      }
-      const hid=document.getElementById('kalk-hidden-dane');
-      if(hid) hid.value=`Litry:${litry}/dzień, Pośrednik:${kPlDecim(posrednik)}zł/L, Mlekomat:${kPlDecim(mlekomat)}zł/L → diff:+${Math.round(diffMies)}zł/mies`;
-    }
-
-    function kBind(slId,valId,fmtFn,key){
-      const sl=document.getElementById(slId);
-      if(!sl)return;
-      sl.addEventListener('input',()=>{
-        kState[key]=parseInt(sl.value);
-        document.getElementById(valId).textContent=fmtFn(kState[key]);
-        const r=document.getElementById('kalk-results');
-        r.classList.add('kalk-animating');
-        setTimeout(()=>r.classList.remove('kalk-animating'),280);
-        kCalc();
-      });
-    }
-
-    kBind('ks-litry','kv-litry',v=>v+' L/dzień','litry');
-    kBind('ks-posrednik','kv-posrednik',v=>kPlDecim(v)+' zł/L','posrednik');
-    kBind('ks-mlekomat','kv-mlekomat',v=>kPlDecim(v)+' zł/L','mlekomat');
-    kBind('ks-invest','kv-invest',v=>v.toLocaleString('pl-PL')+' zł','invest');
-    kCalc();
-
-    // ms-card animacje
-    const msCards=document.querySelectorAll('.ms-card');
-    if('IntersectionObserver' in window){
-      const obs=new IntersectionObserver(entries=>{
-        entries.forEach((e,i)=>{if(e.isIntersecting)setTimeout(()=>e.target.classList.add('ms-visible'),i*110);});
-      },{threshold:.25});
-      msCards.forEach(c=>obs.observe(c));
-    } else msCards.forEach(c=>c.classList.add('ms-visible'));
-
-    // formularz
-    const kForm=document.getElementById('kalk-form');
-    if(kForm){
-      kForm.addEventListener('submit',e=>{
-        e.preventDefault();
-        const btn=kForm.querySelector('button');
-        btn.textContent='✅ Wysłano! Oddzwonimy wkrótce.';
-        btn.disabled=true;
-        fetch(kForm.action,{method:'POST',body:new FormData(kForm),headers:{Accept:'application/json'}});
-      });
-    }
-
-    // IntersectionObserver animacje scroll
-    (function(){
-      const obs=new IntersectionObserver(entries=>{
-        entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('vis');obs.unobserve(e.target);}});
-      },{threshold:.1,rootMargin:'0px 0px -50px 0px'});
-      document.querySelectorAll('[data-a]').forEach(el=>obs.observe(el));
-    })();
-  </script>
-
-  <!-- COOKIE BANNER -->
-  <div id="cookie-bar" style="position:fixed;bottom:0;left:0;right:0;background:#1a5c2a;color:#fff;padding:1rem 1.5rem;display:flex;justify-content:space-between;align-items:center;gap:1rem;flex-wrap:wrap;z-index:9999;font-size:.85rem;box-shadow:0 -2px 12px rgba(0,0,0,.15)">
-    <span>Ta strona używa plików cookies. <a href="polityka.html" style="color:#a5d6a7;text-decoration:underline">Polityka prywatności</a></span>
-    <div style="display:flex;gap:.6rem;flex-wrap:wrap">
-      <button onclick="setCookies('all')" style="background:#fff;color:#1a5c2a;border:none;padding:.4rem 1.1rem;border-radius:4px;cursor:pointer;font-weight:700;font-size:.82rem">Akceptuję wszystkie</button>
-      <button onclick="setCookies('necessary')" style="background:transparent;color:rgba(255,255,255,.7);border:1px solid rgba(255,255,255,.3);padding:.4rem 1.1rem;border-radius:4px;cursor:pointer;font-size:.82rem">Tylko niezbędne</button>
+<!-- CTA BAND -->
+<section class="cta-band">
+  <div class="cta-band-inner" data-r>
+    <h2>Gotowy żeby<br><em>przestać oddawać mleko za grosze?</em></h2>
+    <p>Bezpłatna rozmowa — ocenimy Twój przypadek, powiemy co ma sens i co możesz zyskać. Bez presji, bez ściemy.</p>
+    <div class="cta-actions">
+      <a href="kontakt.html" class="btn btn-green">Umów bezpłatną rozmowę →</a>
+      <a href="tel:533200652" class="tel-link">📞 533 200 652</a>
     </div>
   </div>
-  <script>
-  function setCookies(c){localStorage.setItem('cookie_consent',c);document.getElementById('cookie-bar').style.display='none';}
-  (function(){if(localStorage.getItem('cookie_consent'))document.getElementById('cookie-bar').style.display='none';})();
-  </script>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="footer-inner">
+    <div>
+      <p class="footer-brand">Sklep za Stodołą</p>
+      <p class="footer-sub">Tworzymy dochodowe sklepy przy gospodarstwach. Wyłączny dystrybutor mlekomatu Premium w Polsce.</p>
+      <div class="footer-soc">
+        <a href="https://www.facebook.com/profile.php?id=61590896125832" class="soc-btn" aria-label="Facebook" target="_blank" rel="noopener">f</a>
+        <a href="https://www.instagram.com/sklepzastodola/" class="soc-btn" aria-label="Instagram" target="_blank" rel="noopener">ig</a>
+      </div>
+    </div>
+    <div class="footer-col">
+      <h4>Strony</h4>
+      <ul>
+        <li><a href="index.html">Start</a></li>
+        <li><a href="jak-dzialamy.html">Jak działamy</a></li>
+        <li><a href="mlekomat.html">Mlekomat</a></li>
+        <li><a href="kalkulator.html">Kalkulator</a></li>
+        <li><a href="kontakt.html">Kontakt</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Kontakt</h4>
+      <ul>
+        <li><a href="tel:533200652">533 200 652</a></li>
+        <li><a href="tel:690000923">690 000 923</a></li>
+        <li><a href="mailto:kontakt@sklepzastodola.pl">kontakt@sklepzastodola.pl</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p class="footer-copy">© 2026 Sklep za Stodołą Sp. z o.o.</p>
+    <div class="footer-links"><a href="polityka.html">Polityka prywatności</a></div>
+  </div>
+</footer>
+
+<div class="cookie" id="cookie">
+  <p>Ta strona używa plików cookies. <a href="polityka.html">Polityka prywatności</a></p>
+  <div class="cookie-btns">
+    <button class="ck-yes" onclick="setCk('yes')">Akceptuję</button>
+    <button class="ck-no" onclick="setCk('no')">Tylko niezbędne</button>
+  </div>
+</div>
+
+<script src="nav.js"></script>
 </body>
 </html>
