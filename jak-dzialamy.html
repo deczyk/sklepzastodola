@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jak działamy — Sklep za Stodołą</title>
+<meta name="description" content="Od rozmowy do działającego sklepu — pawilon, mlekomat, Twoje produkty, leasing i ARiMR. Jeden kontakt, całość po naszej stronie.">
+<link rel="stylesheet" href="style.css">
+<style>
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 4.5rem; align-items: start; max-width: 1000px; }
+.prod-tags { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: 1.3rem; }
+.info-box { background: rgba(200,169,110,.06); border: 1px solid rgba(200,169,110,.18); border-radius: var(--r-lg); padding: 1.8rem; margin-top: 2rem; font-size: .9rem; color: var(--dim); line-height: 1.72; }
+.info-box strong { color: var(--paper); }
+@media(max-width:860px){ .two-col { grid-template-columns: 1fr; gap: 2.5rem; } }
+</style>
+</head>
+<body>
+
+<div class="ticker">
+  <div class="ticker-inner">
+    <span>Kompleksowa obsługa farmera</span><span>Drewniany pawilon pod klucz</span><span>Mlekomat Premium CE-MID</span><span>Dotacja ARiMR do 65%</span><span>Leasing rolniczy</span><span>Instalacja i serwis — cała Polska</span><span>Kompleksowa obsługa farmera</span><span>Drewniany pawilon pod klucz</span><span>Mlekomat Premium CE-MID</span><span>Dotacja ARiMR do 65%</span><span>Leasing rolniczy</span><span>Instalacja i serwis — cała Polska</span>
+  </div>
+</div>
+
+<nav class="nav" id="nav">
+  <a href="index.html" class="nav-logo"><span class="nav-logo-dot"></span>Sklep za Stodołą</a>
+  <ul class="nav-links">
+    <li><a href="index.html">Start</a></li>
+    <li><a href="jak-dzialamy.html" class="active">Jak działamy</a></li>
+    <li><a href="mlekomat.html">Mlekomat</a></li>
+    <li><a href="kalkulator.html">Kalkulator</a></li>
+    <li><a href="kontakt.html">Kontakt</a></li>
+  </ul>
+  <a href="kontakt.html" class="nav-cta">Porozmawiajmy</a>
+  <button class="burger" id="burger" aria-label="Menu" aria-expanded="false"><span></span><span></span><span></span></button>
+</nav>
+<nav class="mob-nav" id="mob-nav"><button class="mob-close" id="mob-close">✕</button>
+  <a href="index.html">Start</a><a href="jak-dzialamy.html">Jak działamy</a><a href="mlekomat.html">Mlekomat</a><a href="kalkulator.html">Kalkulator</a><a href="kontakt.html">Kontakt</a>
+</nav>
+
+<header class="page-hero">
+  <p class="page-hero-eyebrow" data-r="fade">Kompleksowa obsługa farmera</p>
+  <h1 data-r>Od rozmowy<br><em>do działającego sklepu.</em></h1>
+  <p class="page-hero-sub" data-r data-d="1">Jeden punkt kontaktu. Całość — pawilon, mlekomat, produkty, finansowanie — po naszej stronie.</p>
+</header>
+
+<!-- ZDJĘCIA -->
+<section class="sec" style="padding-bottom:0">
+  <div class="photo-grid three" data-r>
+    <img class="photo-main" src="pawilon-1.jpg" alt="Pawilon handlowy przy gospodarstwie">
+    <img src="pawilon-3.jpg" alt="Widok na sklep przy zagrodzie">
+    <img src="pawilon-4.jpg" alt="Wnętrze drewnianego sklepu">
+  </div>
+</section>
+
+<!-- CO ROBIMY — KARTY -->
+<section class="sec">
+  <div data-r>
+    <p class="sec-label">Co wchodzi w skład</p>
+    <h2 class="sec-title">Wszystko, czego potrzebuje<br><em>Twój sklep.</em></h2>
+  </div>
+  <div class="cards">
+    <div class="card" data-r data-d="1">
+      <p class="card-num">01</p>
+      <div class="card-icon">🏡</div>
+      <h3>Drewniany pawilon</h3>
+      <p>Drewniana konstrukcja na Twojej działce, zaprojektowana jako punkt sprzedaży bezpośredniej. Miejsca na mlekomat, lada chłodnicza, ekspozycja produktów.</p>
+      <span class="card-tag">na Twojej ziemi</span>
+    </div>
+    <div class="card" data-r data-d="2">
+      <p class="card-num">02</p>
+      <div class="card-icon">🥛</div>
+      <h3>Mlekomat Premium</h3>
+      <p>Dostarczamy i instalujemy automat do mleka z certyfikatem CE-MID — legalny handel, automatyczne chłodzenie, płatność kartą lub gotówką. Wyłączna dystrybucja w Polsce.</p>
+      <span class="card-tag">certyfikat CE-MID</span>
+    </div>
+    <div class="card" data-r data-d="3">
+      <p class="card-num">03</p>
+      <div class="card-icon">🧀</div>
+      <h3>Twoje produkty, pięknie podane</h3>
+      <p>Jajka, ser, masło, przetwory — co masz, to sprzedajemy. Pomagamy ułożyć asortyment i zaaranżować ekspozycję tak, żeby klient wracał po więcej.</p>
+      <span class="card-tag">dostosowane do Ciebie</span>
+    </div>
+    <div class="card" data-r data-d="4">
+      <p class="card-num">04</p>
+      <div class="card-icon">💰</div>
+      <h3>Leasing i dotacja ARiMR</h3>
+      <p>Sprawdzamy czy kwalifikujesz się na zwrot kosztów z ARiMR do 65%. Oferujemy leasing rolniczy — sklep zarabia zanim skończy się spłata.</p>
+      <span class="card-tag">do 65% dofinansowania</span>
+    </div>
+    <div class="card" data-r data-d="5">
+      <p class="card-num">05</p>
+      <div class="card-icon">🔧</div>
+      <h3>Instalacja i serwis</h3>
+      <p>Dowozimy, montujemy, uruchamiamy. Szkolenie w cenie. Jeden telefon jeśli coś się stanie — przyjeżdżamy z częściami na stanie.</p>
+      <span class="card-tag">cała Polska</span>
+    </div>
+    <div class="card" data-r data-d="6">
+      <p class="card-num">06</p>
+      <div class="card-icon">📱</div>
+      <h3>Monitoring i panel online</h3>
+      <p>SMS przy niskim poziomie mleka, podgląd sprzedaży online, alarm antywłamaniowy. Wiesz co się dzieje w sklepie, będąc w polu.</p>
+      <span class="card-tag">24/7</span>
+    </div>
+  </div>
+</section>
+
+<!-- KROKI -->
+<section class="sec sec-alt">
+  <div data-r>
+    <p class="sec-label">Krok po kroku</p>
+    <h2 class="sec-title">Jak wygląda<br><em>nasza współpraca.</em></h2>
+  </div>
+  <div class="steps">
+    <div class="step" data-r>
+      <div class="step-n">01</div>
+      <div class="step-body">
+        <h3>Bezpłatna rozmowa</h3>
+        <p>Gadamy o Twoim gospodarstwie, produktach i miejscu na pawilon. Sprawdzamy szanse na dotację ARiMR. Zero zobowiązań.</p>
+        <span class="step-tag">0 zł · bez zobowiązań</span>
+      </div>
+    </div>
+    <div class="step" data-r data-d="1">
+      <div class="step-n">02</div>
+      <div class="step-body">
+        <h3>Indywidualny projekt i wycena</h3>
+        <p>Przygotowujemy ofertę skrojoną pod Ciebie — pawilon, mlekomat, wyposażenie dodatkowe, warianty finansowania. Konkretne liczby, bez owijania w bawełnę.</p>
+        <span class="step-tag">indywidualna oferta</span>
+      </div>
+    </div>
+    <div class="step" data-r data-d="2">
+      <div class="step-n">03</div>
+      <div class="step-body">
+        <h3>Zakup lub leasing</h3>
+        <p>Decydujesz jak chcesz finansować. Kupujesz — składamy razem wniosek ARiMR. Leasingujesz — sklep zarabia zanim skończy się spłata.</p>
+        <span class="step-tag">zakup · leasing · ARiMR</span>
+      </div>
+    </div>
+    <div class="step" data-r data-d="3">
+      <div class="step-n">04</div>
+      <div class="step-body">
+        <h3>Montaż pawilonu i mlekomatu</h3>
+        <p>Przyjeżdżamy, stawiamy pawilon, montujemy mlekomat, ustawiamy ekspozycję produktów. Szkolenie z obsługi w cenie. Przekazanie kluczy.</p>
+        <span class="step-tag">kompleksowy montaż</span>
+      </div>
+    </div>
+    <div class="step" data-r data-d="4">
+      <div class="step-n">05</div>
+      <div class="step-body">
+        <h3>Sklep działa. Ty zarabiasz.</h3>
+        <p>Klienci kupują, mlekomat liczy, panel online pokazuje wyniki. Serwis masz zagwarantowany. Jesteśmy pod telefonem kiedy czegokolwiek potrzebujesz.</p>
+        <span class="step-tag">od pierwszego dnia</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRODUKTY W SKLEPIE -->
+<section class="sec">
+  <div class="two-col">
+    <div data-r>
+      <p class="sec-label">Asortyment</p>
+      <h2 class="sec-title">Mlekomat to tylko<br><em>jeden z elementów.</em></h2>
+      <p class="sec-body">Razem decydujemy co będzie w sklepie — dopasowujemy do tego co masz na gospodarstwie i czego potrzebuje lokalna społeczność.</p>
+      <div class="prod-tags">
+        <span class="pill">🥛 Świeże mleko z mlekomatu</span>
+        <span class="pill">🥚 Jajka od swoich kur</span>
+        <span class="pill">🧀 Sery i twarogi</span>
+        <span class="pill">🧈 Masło i śmietana</span>
+        <span class="pill">🫙 Przetwory i dżemy</span>
+        <span class="pill">🍯 Miód</span>
+        <span class="pill hi">➕ Co tylko masz — dobierzemy</span>
+      </div>
+    </div>
+    <div data-r="right">
+      <img src="pawilon-4.jpg" alt="Wnętrze sklepu przy gospodarstwie z produktami" style="border-radius: var(--r-lg); width:100%; object-fit:cover; height:380px;">
+      <div class="info-box">
+        Każde gospodarstwo jest inne — dlatego nie mamy jednego szablonu sklepu. <strong>Dopasowujemy asortyment, ekspozycję i układ pawilonu do Twoich produktów i klientów.</strong> Cel jest prosty: żeby klient, który przyszedł po mleko, wyszedł też z jajkami i serem.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="sec sec-alt">
+  <div data-r>
+    <p class="sec-label">Pytania</p>
+    <h2 class="sec-title">Często zadawane<br><em>pytania.</em></h2>
+  </div>
+  <div class="faq">
+    <div class="fq"><button class="fq-q" aria-expanded="false">Czy muszę mieć duże gospodarstwo?<span class="fq-icon">+</span></button>
+      <div class="fq-a"><p>Nie ma minimalnego progu. Rozmawiamy o każdej skali — od małej farmy rodzinnej po dużą fermę. Jeśli masz mleko i chcesz zarabiać na nim więcej niż w skupie — jesteś naszym klientem.</p></div></div>
+    <div class="fq"><button class="fq-q" aria-expanded="false">Jak wygląda pawilon? Czy potrzebuję pozwolenia?<span class="fq-icon">+</span></button>
+      <div class="fq-a"><p>Drewniana konstrukcja — solidna, estetyczna, stworzona z myślą o sprzedaży bezpośredniej. Kwestie formalne omawiamy na etapie rozmowy i doradzamy w zależności od wielkości obiektu i lokalizacji na Twojej działce.</p></div></div>
+    <div class="fq"><button class="fq-q" aria-expanded="false">Jak szybko sklep może zacząć działać?<span class="fq-icon">+</span></button>
+      <div class="fq-a"><p>Od decyzji do pierwszej sprzedaży — zależy od dostępności terminów i ewentualnych formalności budowlanych. Naszym celem jest sprawny montaż. Dokładny harmonogram ustalamy po pierwszej rozmowie.</p></div></div>
+    <div class="fq"><button class="fq-q" aria-expanded="false">Czy muszę sprzedawać tylko mleko?<span class="fq-icon">+</span></button>
+      <div class="fq-a"><p>Absolutnie nie. Mlekomat generuje stały ruch klientów — ale sklep sprzedaje wszystko co masz: jajka, sery, masło, przetwory, miód. Razem dobieramy asortyment pod Twoje gospodarstwo.</p></div></div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="sec" style="border-top:1px solid var(--line)">
+  <div data-r>
+    <h2 class="sec-title">Brzmi jak coś<br><em>dla Twojego gospodarstwa?</em></h2>
+    <p class="sec-body" style="margin-bottom:2rem">Bezpłatna rozmowa — bez zobowiązań. Powiemy wprost czy i co ma sens w Twoim przypadku.</p>
+    <div style="display:flex;flex-wrap:wrap;gap:.9rem;align-items:center">
+      <a href="kontakt.html" class="btn btn-green">Umów bezpłatną rozmowę →</a>
+      <a href="tel:533200652" style="font-size:1rem;font-weight:700;color:var(--paper);display:flex;align-items:center;gap:.4rem">📞 533 200 652</a>
+    </div>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="footer-inner">
+    <div>
+      <p class="footer-brand">Sklep za Stodołą</p>
+      <p class="footer-sub">Tworzymy dochodowe sklepy przy gospodarstwach. Wyłączny dystrybutor mlekomatu Premium w Polsce.</p>
+      <div class="footer-soc">
+        <a href="https://www.facebook.com/profile.php?id=61590896125832" class="soc-btn" aria-label="Facebook" target="_blank" rel="noopener">f</a>
+        <a href="https://www.instagram.com/sklepzastodola/" class="soc-btn" aria-label="Instagram" target="_blank" rel="noopener">ig</a>
+      </div>
+    </div>
+    <div class="footer-col"><h4>Strony</h4><ul>
+      <li><a href="index.html">Start</a></li><li><a href="jak-dzialamy.html">Jak działamy</a></li>
+      <li><a href="mlekomat.html">Mlekomat</a></li><li><a href="kalkulator.html">Kalkulator</a></li><li><a href="kontakt.html">Kontakt</a></li>
+    </ul></div>
+    <div class="footer-col"><h4>Kontakt</h4><ul>
+      <li><a href="tel:533200652">533 200 652</a></li><li><a href="tel:690000923">690 000 923</a></li>
+      <li><a href="mailto:kontakt@sklepzastodola.pl">kontakt@sklepzastodola.pl</a></li>
+    </ul></div>
+  </div>
+  <div class="footer-bottom">
+    <p class="footer-copy">© 2026 Sklep za Stodołą Sp. z o.o.</p>
+    <div class="footer-links"><a href="polityka.html">Polityka prywatności</a></div>
+  </div>
+</footer>
+<div class="cookie" id="cookie"><p>Ta strona używa plików cookies. <a href="polityka.html">Polityka prywatności</a></p><div class="cookie-btns"><button class="ck-yes" onclick="setCk('yes')">Akceptuję</button><button class="ck-no" onclick="setCk('no')">Tylko niezbędne</button></div></div>
+<script src="nav.js"></script>
+</body>
+</html>
