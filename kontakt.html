@@ -1,164 +1,140 @@
 <!DOCTYPE html>
 <html lang="pl">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Kontakt | Sklep za Stodołą</title>
-  <meta name="description" content="Skontaktuj się z nami — automaty do mleka, leasing, dofinansowanie ARiMR. Zadzwoń lub napisz."/>
-  <meta name="robots" content="index, follow"/>
-  <link rel="canonical" href="https://www.sklepzastodola.pl/kontakt.html"/>
-  <link rel="stylesheet" href="style.css"/>
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌾</text></svg>">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kontakt — Sklep za Stodołą</title>
+<meta name="description" content="Porozmawiaj z nami o sklepie przy Twoim gospodarstwie. Bezpłatna konsultacja. Tel: 533 200 652. Odpiszemy w 24h.">
+<link rel="stylesheet" href="style.css">
+<style>
+.contact-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 5rem; align-items: start; max-width: 900px; }
+.contact-links { display: flex; flex-direction: column; gap: .6rem; margin-top: 1.8rem; }
+.clink { display: flex; align-items: center; gap: .85rem; font-size: .93rem; color: var(--dim); padding: .75rem 0; border-bottom: 1px solid var(--line); transition: color .2s; }
+.clink:hover { color: var(--paper); }
+.clink-icon { width: 36px; height: 36px; border-radius: var(--r); background: rgba(45,90,39,.14); border: 1px solid rgba(45,90,39,.26); display: flex; align-items: center; justify-content: center; font-size: .9rem; flex-shrink: 0; }
+.contact-note { font-size: .8rem; color: var(--muted); margin-top: 1.5rem; line-height: 1.65; }
+@media(max-width:860px){ .contact-layout { grid-template-columns: 1fr; gap: 3rem; } }
+</style>
 </head>
 <body>
 
-  <nav>
-    <a href="index.html" class="nav-logo">Sklep za Stodołą</a>
-    <button class="hamburger" onclick="toggleMenu()" aria-label="Menu">
-      <span></span><span></span><span></span>
-    </button>
-    <ul class="nav-links" id="nav-links">
-      <li><a href="index.html">Start</a></li>
-      <li><a href="rolnik.html">Dla rolników</a></li>
-      <li><a href="oferta.html">Maszyny i serwis</a></li>
-      <li><a href="kontakt.html" class="active">Kontakt</a></li>
-    </ul>
-  </nav>
+<div class="ticker">
+  <div class="ticker-inner">
+    <span>Kompleksowa obsługa farmera</span><span>Drewniany pawilon pod klucz</span><span>Mlekomat Premium CE-MID</span><span>Dotacja ARiMR do 65%</span><span>Leasing rolniczy</span><span>Instalacja i serwis — cała Polska</span><span>Kompleksowa obsługa farmera</span><span>Drewniany pawilon pod klucz</span><span>Mlekomat Premium CE-MID</span><span>Dotacja ARiMR do 65%</span><span>Leasing rolniczy</span><span>Instalacja i serwis — cała Polska</span>
+  </div>
+</div>
 
-  <div class="page-hero">
-    <div class="page-hero-content">
-      <h1>Kontakt</h1>
-      <p>Zadzwoń lub napisz — odpowiemy bezpłatnie i bez zobowiązań</p>
+<nav class="nav" id="nav">
+  <a href="index.html" class="nav-logo"><span class="nav-logo-dot"></span>Sklep za Stodołą</a>
+  <ul class="nav-links">
+    <li><a href="index.html">Start</a></li>
+    <li><a href="jak-dzialamy.html">Jak działamy</a></li>
+    <li><a href="mlekomat.html">Mlekomat</a></li>
+    <li><a href="kalkulator.html">Kalkulator</a></li>
+    <li><a href="kontakt.html" class="active">Kontakt</a></li>
+  </ul>
+  <a href="kontakt.html" class="nav-cta">Porozmawiajmy</a>
+  <button class="burger" id="burger" aria-label="Menu" aria-expanded="false"><span></span><span></span><span></span></button>
+</nav>
+<nav class="mob-nav" id="mob-nav"><button class="mob-close" id="mob-close">✕</button>
+  <a href="index.html">Start</a><a href="jak-dzialamy.html">Jak działamy</a><a href="mlekomat.html">Mlekomat</a><a href="kalkulator.html">Kalkulator</a><a href="kontakt.html">Kontakt</a>
+</nav>
+
+<header class="page-hero">
+  <p class="page-hero-eyebrow" data-r="fade">Bezpłatna konsultacja</p>
+  <h1 data-r>Porozmawiajmy<br><em>o Twoim sklepie.</em></h1>
+  <p class="page-hero-sub" data-r data-d="1">Bez presji, bez ściemy. Ocenimy Twój przypadek i powiemy wprost co ma sens — i ile możesz na tym zarobić.</p>
+</header>
+
+<section class="sec">
+  <div class="contact-layout">
+    <!-- FORMULARZ -->
+    <div data-r>
+      <p class="sec-label">Napisz do nas</p>
+      <h2 class="sec-title" style="font-size:clamp(1.6rem,2.5vw,2.2rem)">Formularz<br><em>kontaktowy.</em></h2>
+      <form class="cform" id="cform" novalidate style="margin-top:1.5rem">
+        <div class="ff">
+          <label for="fi">Imię i nazwisko *</label>
+          <input type="text" id="fi" name="imie" placeholder="Jan Kowalski" required autocomplete="name">
+        </div>
+        <div class="ff">
+          <label for="ft">Numer telefonu *</label>
+          <input type="tel" id="ft" name="telefon" placeholder="500 000 000" required autocomplete="tel">
+        </div>
+        <div class="ff">
+          <label for="fm">Adres e-mail</label>
+          <input type="email" id="fm" name="email" placeholder="jan@kowalski.pl" autocomplete="email">
+        </div>
+        <div class="ff">
+          <label for="ftem">Co Cię interesuje?</label>
+          <select id="ftem" name="temat">
+            <option value="">Wybierz temat</option>
+            <option value="sklep">Sklep przy gospodarstwie pod klucz</option>
+            <option value="mlekomat">Tylko mlekomat</option>
+            <option value="arimr">Dotacja ARiMR</option>
+            <option value="leasing">Leasing</option>
+            <option value="serwis">Serwis automatu</option>
+            <option value="inne">Inne pytanie</option>
+          </select>
+        </div>
+        <div class="ff">
+          <label for="fw">Wiadomość</label>
+          <textarea id="fw" name="wiadomosc" placeholder="Napisz kilka słów o swoim gospodarstwie — ile litrów mleka dziennie, co chciałbyś sprzedawać, gdzie jesteś..."></textarea>
+        </div>
+        <button type="submit" class="btn btn-green" id="sbtn" style="width:100%;justify-content:center">
+          <span id="stxt">Wyślij wiadomość →</span>
+        </button>
+        <p id="smsg" style="font-size:.82rem;margin-top:.5rem;display:none"></p>
+        <p style="font-size:.73rem;color:var(--muted);margin-top:.4rem">Bez spamu. Kontakt wyłącznie w sprawie Twojego zapytania.</p>
+      </form>
+    </div>
+
+    <!-- INFO -->
+    <div data-r="right" data-d="1">
+      <p class="sec-label">Dane kontaktowe</p>
+      <h2 class="sec-title" style="font-size:clamp(1.6rem,2.5vw,2.2rem)">Zadzwoń lub<br><em>napisz bezpośrednio.</em></h2>
+      <p style="font-size:.9rem;color:var(--dim);line-height:1.7;margin-top:.8rem">Działamy w całej Polsce. Odpiszemy lub oddzwonimy w ciągu 24h w dni robocze.</p>
+      <div class="contact-links">
+        <a class="clink" href="tel:533200652"><span class="clink-icon">📞</span>533 200 652</a>
+        <a class="clink" href="tel:690000923"><span class="clink-icon">📞</span>690 000 923</a>
+        <a class="clink" href="mailto:kontakt@sklepzastodola.pl"><span class="clink-icon">✉️</span>kontakt@sklepzastodola.pl</a>
+        <a class="clink" href="https://www.facebook.com/profile.php?id=61590896125832" target="_blank" rel="noopener"><span class="clink-icon">📘</span>Facebook</a>
+        <a class="clink" href="https://www.instagram.com/sklepzastodola/" target="_blank" rel="noopener"><span class="clink-icon">📷</span>Instagram</a>
+      </div>
+      <p class="contact-note">Sklep za Stodołą Sp. z o.o.<br>Cała Polska — dojeżdżamy do klienta.</p>
+
+      <div style="margin-top:2.5rem;padding:1.6rem;background:rgba(45,90,39,.07);border:1px solid rgba(45,90,39,.28);border-radius:var(--r-lg)">
+        <p style="font-size:.88rem;color:var(--dim);line-height:1.7"><strong style="color:var(--paper);display:block;margin-bottom:.4rem">Jak wygląda pierwsza rozmowa?</strong>
+        Gadamy o Twoim gospodarstwie — ile mleka, co jeszcze chciałbyś sprzedawać, gdzie stoi działka. Sprawdzamy szanse na dotację ARiMR. Nic nie podpisujesz. Zero zobowiązań.</p>
+      </div>
     </div>
   </div>
+</section>
 
-  <section class="section" style="max-width:700px;">
-    <div class="grid-2">
-
-      <!-- DANE KONTAKTOWE -->
-      <div class="grid-tekst">
-        <span class="section-label">Bezpośredni kontakt</span>
-        <h2>Zadzwoń do nas</h2>
-        <div class="divider"></div>
-        <p>Doradzamy bezpłatnie — dobierzemy maszynę, wyliczymy ROI dla Twojego gospodarstwa i sprawdzimy możliwości dotacji ARiMR.</p>
-
-        <div class="kroki" style="margin-top:1.5rem;">
-          <div class="krok-item" style="padding:.8rem 0;">
-            <div class="krok-num" style="min-width:36px;height:36px;font-size:.9rem;">📞</div>
-            <div class="krok-tekst">
-              <h3>Telefon</h3>
-              <p><a href="tel:533200652" style="font-size:1.1rem;font-weight:700;color:var(--zielony)">533 200 652</a></p>
-              <p><a href="tel:690000923" style="color:var(--zielony)">690 000 923</a></p>
-            </div>
-          </div>
-          <div class="krok-item" style="padding:.8rem 0;">
-            <div class="krok-num" style="min-width:36px;height:36px;font-size:.9rem;">✉️</div>
-            <div class="krok-tekst">
-              <h3>Email</h3>
-              <p><a href="mailto:kontakt@sklepzastodola.pl" style="color:var(--zielony)">kontakt@sklepzastodola.pl</a></p>
-            </div>
-          </div>
-          <div class="krok-item" style="padding:.8rem 0;border-bottom:none;">
-            <div class="krok-num" style="min-width:36px;height:36px;font-size:.9rem;">🌐</div>
-            <div class="krok-tekst">
-              <h3>Social media</h3>
-              <p>
-                <a href="https://www.facebook.com/profile.php?id=61590896125832" style="color:var(--zielony)">Facebook</a> ·
-                <a href="https://www.instagram.com/sklepzastodola/" style="color:var(--zielony)">Instagram</a>
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- FORMULARZ -->
-      <div>
-        <span class="section-label">Formularz kontaktowy</span>
-        <h2>Napisz do nas</h2>
-        <div class="divider"></div>
-        <form action="https://formspree.io/f/mqeogyjd" method="POST" style="margin-top:1.5rem;">
-          <div style="margin-bottom:1rem;">
-            <label style="display:block;font-size:.82rem;font-weight:600;margin-bottom:.3rem;">Imię i nazwisko *</label>
-            <input type="text" name="imie" required
-              style="width:100%;padding:.7rem .9rem;border:1px solid var(--linia);border-radius:4px;font-size:.9rem;font-family:inherit;"/>
-          </div>
-          <div style="margin-bottom:1rem;">
-            <label style="display:block;font-size:.82rem;font-weight:600;margin-bottom:.3rem;">Telefon *</label>
-            <input type="tel" name="telefon" required
-              style="width:100%;padding:.7rem .9rem;border:1px solid var(--linia);border-radius:4px;font-size:.9rem;font-family:inherit;"/>
-          </div>
-          <div style="margin-bottom:1rem;">
-            <label style="display:block;font-size:.82rem;font-weight:600;margin-bottom:.3rem;">Email</label>
-            <input type="email" name="email"
-              style="width:100%;padding:.7rem .9rem;border:1px solid var(--linia);border-radius:4px;font-size:.9rem;font-family:inherit;"/>
-          </div>
-          <div style="margin-bottom:1.5rem;">
-            <label style="display:block;font-size:.82rem;font-weight:600;margin-bottom:.3rem;">Wiadomość</label>
-            <textarea name="wiadomosc" rows="4"
-              style="width:100%;padding:.7rem .9rem;border:1px solid var(--linia);border-radius:4px;font-size:.9rem;font-family:inherit;resize:vertical;"></textarea>
-          </div>
-          <input type="hidden" name="zrodlo" value="formularz-kontakt"/>
-          <button type="submit" class="btn" style="width:100%;text-align:center;">Wyślij wiadomość</button>
-          <p style="font-size:.75rem;color:#888;margin-top:.6rem;text-align:center;">Odpowiadamy zwykle w ciągu kilku godzin w dni robocze.</p>
-        </form>
-      </div>
-
+<footer class="footer">
+  <div class="footer-inner">
+    <div><p class="footer-brand">Sklep za Stodołą</p><p class="footer-sub">Tworzymy dochodowe sklepy przy gospodarstwach. Wyłączny dystrybutor mlekomatu Premium w Polsce.</p>
+      <div class="footer-soc"><a href="https://www.facebook.com/profile.php?id=61590896125832" class="soc-btn" target="_blank" rel="noopener">f</a><a href="https://www.instagram.com/sklepzastodola/" class="soc-btn" target="_blank" rel="noopener">ig</a></div>
     </div>
-  </section>
-
-  <footer>
-    <div class="footer-inner">
-      <div>
-        <h4>Sklep za Stodołą</h4>
-        <p>Maszyny rolnicze · Leasing · Dofinansowania ARiMR<br>Instalacja · Serwis</p>
-        <div class="footer-social">
-          <a href="https://www.facebook.com/profile.php?id=61590896125832" title="Facebook">FB</a>
-          <a href="https://www.instagram.com/sklepzastodola/" title="Instagram">IG</a>
-        </div>
-      </div>
-      <div>
-        <h4>Nawigacja</h4>
-        <p>
-          <a href="index.html">Strona główna</a><br>
-          <a href="rolnik.html">Dla rolników</a><br>
-          <a href="oferta.html">Maszyny i serwis</a><br>
-          <a href="kontakt.html">Kontakt</a>
-        </p>
-      </div>
-      <div>
-        <h4>Kontakt</h4>
-        <p>
-          <a href="tel:533200652">533 200 652</a><br>
-          <a href="tel:690000923">690 000 923</a><br>
-          <a href="mailto:kontakt@sklepzastodola.pl">kontakt@sklepzastodola.pl</a>
-        </p>
-      </div>
-    </div>
-    <div class="footer-bottom">
-      <span>© 2026 Sklep za Stodołą</span>
-      <span><a href="polityka.html">Polityka prywatności</a></span>
-    </div>
-  </footer>
-
-  <!-- COOKIE BANNER -->
-  <div id="cookie-bar" style="position:fixed;bottom:0;left:0;right:0;background:#1a5c2a;color:#fff;padding:1rem 1.5rem;display:flex;justify-content:space-between;align-items:center;gap:1rem;flex-wrap:wrap;z-index:9999;font-size:.85rem;box-shadow:0 -2px 12px rgba(0,0,0,.15)">
-    <span>Ta strona używa plików cookies. <a href="polityka.html" style="color:#a5d6a7;text-decoration:underline">Polityka prywatności</a></span>
-    <div style="display:flex;gap:.6rem;flex-wrap:wrap">
-      <button onclick="setCookies('all')" style="background:#fff;color:#1a5c2a;border:none;padding:.4rem 1.1rem;border-radius:4px;cursor:pointer;font-weight:700;font-size:.82rem">Akceptuję wszystkie</button>
-      <button onclick="setCookies('necessary')" style="background:transparent;color:rgba(255,255,255,.7);border:1px solid rgba(255,255,255,.3);padding:.4rem 1.1rem;border-radius:4px;cursor:pointer;font-size:.82rem">Tylko niezbędne</button>
-    </div>
+    <div class="footer-col"><h4>Strony</h4><ul><li><a href="index.html">Start</a></li><li><a href="jak-dzialamy.html">Jak działamy</a></li><li><a href="mlekomat.html">Mlekomat</a></li><li><a href="kalkulator.html">Kalkulator</a></li><li><a href="kontakt.html">Kontakt</a></li></ul></div>
+    <div class="footer-col"><h4>Kontakt</h4><ul><li><a href="tel:533200652">533 200 652</a></li><li><a href="tel:690000923">690 000 923</a></li><li><a href="mailto:kontakt@sklepzastodola.pl">kontakt@sklepzastodola.pl</a></li></ul></div>
   </div>
-  <script>
-    function toggleMenu(){document.getElementById('nav-links').classList.toggle('open');}
-    function setCookies(choice){
-      localStorage.setItem('cookie_consent',choice);
-      document.getElementById('cookie-bar').style.display='none';
-    }
-    (function(){
-      if(localStorage.getItem('cookie_consent')){
-        document.getElementById('cookie-bar').style.display='none';
-      }
-    })();
-  </script>
+  <div class="footer-bottom"><p class="footer-copy">© 2026 Sklep za Stodołą Sp. z o.o.</p><div class="footer-links"><a href="polityka.html">Polityka prywatności</a></div></div>
+</footer>
+<div class="cookie" id="cookie"><p>Ta strona używa plików cookies. <a href="polityka.html">Polityka prywatności</a></p><div class="cookie-btns"><button class="ck-yes" onclick="setCk('yes')">Akceptuję</button><button class="ck-no" onclick="setCk('no')">Tylko niezbędne</button></div></div>
+<script src="nav.js"></script>
+<script>
+document.getElementById('cform').addEventListener('submit', async function(e){
+  e.preventDefault();
+  var btn=document.getElementById('sbtn'), txt=document.getElementById('stxt'), msg=document.getElementById('smsg');
+  btn.disabled=true; txt.textContent='Wysyłam…';
+  await new Promise(function(r){ setTimeout(r,900); }); // podłącz do Formspree / własnego backendu
+  txt.textContent='✓ Wiadomość wysłana!';
+  msg.textContent='Odezwiemy się w ciągu 24h. Dziękujemy!';
+  msg.style.display='block'; msg.style.color='var(--moss)';
+  e.target.reset();
+  setTimeout(function(){ btn.disabled=false; txt.textContent='Wyślij wiadomość →'; msg.style.display='none'; },5000);
+});
+</script>
 </body>
 </html>
