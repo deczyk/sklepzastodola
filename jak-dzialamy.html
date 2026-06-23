@@ -322,7 +322,7 @@
     <div class="fq"><button class="fq-q" aria-expanded="false">Jak wygląda pawilon? Czy potrzebuję pozwolenia?<span class="fq-icon">+</span></button>
       <div class="fq-a"><p>Drewniana konstrukcja — solidna, estetyczna, stworzona z myślą o sprzedaży bezpośredniej. Kwestie formalne omawiamy na etapie rozmowy i doradzamy w zależności od wielkości obiektu i lokalizacji na Twojej działce.</p></div></div>
     <div class="fq"><button class="fq-q" aria-expanded="false">Ile kosztuje cały projekt?<span class="fq-icon">+</span></button>
-      <div class="fq-a"><p>Każdy projekt wyceniamy indywidualnie — zależy od rozmiaru pawilonu, modelu mlekomatu i wyposażenia dodatkowego. Mlekomat Premium zaczyna się od 9 000 EUR (loco fabryka Szwajcaria). Do tego koszt pawilonu i montażu. Z dotacją ARiMR rzeczywisty koszt może być znacząco niższy. Zadzwoń — damy Ci konkretne liczby.</p></div></div>
+      <div class="fq-a"><p>Każdy projekt wyceniamy indywidualnie — zależy od rozmiaru pawilonu, modelu mlekomatu i wyposażenia dodatkowego. Mlekomat Premium zaczyna się od 6 000 EUR (loco fabryka Szwajcaria). Do tego koszt pawilonu i montażu. Z dotacją ARiMR rzeczywisty koszt może być znacząco niższy. Zadzwoń — damy Ci konkretne liczby.</p></div></div>
     <div class="fq"><button class="fq-q" aria-expanded="false">Czy dotacja ARiMR pokrywa też pawilon?<span class="fq-icon">+</span></button>
       <div class="fq-a"><p>Zależy od konkretnego działania ARiMR. Sprawdzamy Twoją sytuację indywidualnie i doradzamy co i w jakim zakresie kwalifikuje się do dofinansowania.</p></div></div>
     <div class="fq"><button class="fq-q" aria-expanded="false">Jak szybko sklep może zacząć działać?<span class="fq-icon">+</span></button>
@@ -375,6 +375,14 @@
 
 <div class="cookie" id="cookie"><p>Ta strona używa plików cookies. <a href="polityka.html">Polityka prywatności</a></p><div class="cookie-btns"><button class="ck-yes" onclick="setCk('yes')">Akceptuję</button><button class="ck-no" onclick="setCk('no')">Tylko niezbędne</button></div></div>
 
+<script>
+  // Jednorazowe czyszczenie starego klucza 'ck' z poprzedniej wersji
+  if(localStorage.getItem('ck') && !localStorage.getItem('cookie_consent')){
+    var v = localStorage.getItem('ck');
+    localStorage.setItem('cookie_consent', v === 'yes' ? 'accept' : 'reject');
+    localStorage.removeItem('ck');
+  }
+</script>
 <script src="nav.js"></script>
 <script>
 (function(){
