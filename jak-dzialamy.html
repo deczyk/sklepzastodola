@@ -12,13 +12,32 @@
 .info-box { background: var(--wheat-bg); border: 1px solid rgba(155,122,58,.18); border-radius: var(--r-lg); padding: 1.8rem; margin-top: 2rem; font-size: .9rem; color: var(--dim); line-height: 1.72; }
 .info-box strong { color: var(--paper); }
 @media(max-width:860px){ .two-col { grid-template-columns: 1fr; gap: 2.5rem; } }
+
+/* ── CALCULATOR TABS ── */
+.calc-tab {
+  font-family: var(--sans);
+  font-size: .82rem;
+  font-weight: 700;
+  padding: .6rem 1.3rem;
+  border-radius: var(--r);
+  border: 1.5px solid var(--line);
+  background: var(--paper);
+  color: var(--muted);
+  cursor: pointer;
+  transition: background .2s, border-color .2s, color .2s;
+  display: inline-flex;
+  align-items: center;
+  gap: .4rem;
+}
+.calc-tab:hover { border-color: var(--forest); color: var(--forest); }
+.calc-tab.active { background: var(--forest); border-color: var(--forest); color: #fff; }
 </style>
 </head>
 <body>
 
 <div class="ticker">
   <div class="ticker-inner">
-    <span>Kompleksowa obsługa farmera</span><span>Drewniany pawilon pod klucz</span><span>Mlekomat Premium CE-MID</span><span>Dotacja ARiMR do 65%</span><span>Leasing rolniczy</span><span>Instalacja i serwis — cała Polska</span><span>Kompleksowa obsługa farmera</span><span>Drewniany pawilon pod klucz</span><span>Mlekomat Premium CE-MID</span><span>Dotacja ARiMR do 65%</span><span>Leasing rolniczy</span><span>Instalacja i serwis — cała Polska</span>
+    <span>Kompleksowa obsługa farmera</span><span>Drewniany pawilon pod klucz</span><span>Mlekomat Premium CE-MID</span><span>Pomoc przy finansowaniu inwestycji</span><span>Leasing rolniczy</span><span>Instalacja i serwis — cała Polska</span><span>Kompleksowa obsługa farmera</span><span>Drewniany pawilon pod klucz</span><span>Mlekomat Premium CE-MID</span><span>Pomoc przy finansowaniu inwestycji</span><span>Leasing rolniczy</span><span>Instalacja i serwis — cała Polska</span>
   </div>
 </div>
 
@@ -91,9 +110,9 @@
     <div class="card" data-r data-d="4">
       <p class="card-num">04</p>
       <div class="card-icon">💰</div>
-      <h3>Leasing i dotacja ARiMR</h3>
-      <p>Sprawdzamy czy kwalifikujesz się na zwrot kosztów z ARiMR do 65%. Oferujemy leasing rolniczy — sklep zarabia zanim skończy się spłata.</p>
-      <span class="card-tag">do 65% dofinansowania</span>
+      <h3>Leasing i finansowanie</h3>
+      <p>Sprawdzamy możliwości finansowania inwestycji: leasing, kredyt, środki własne oraz aktualne programy wsparcia rolniczego. Sklep zarabia zanim skończy się spłata.</p>
+      <span class="card-tag">indywidualna analiza</span>
     </div>
     <div class="card" data-r data-d="5">
       <p class="card-num">05</p>
@@ -124,7 +143,7 @@
       <div class="step-n">01</div>
       <div class="step-body">
         <h3>Bezpłatna rozmowa</h3>
-        <p>Gadamy o Twoim gospodarstwie, produktach i miejscu na pawilon. Sprawdzamy szanse na dotację ARiMR. Zero zobowiązań.</p>
+        <p>Gadamy o Twoim gospodarstwie, produktach i miejscu na pawilon. Sprawdzamy możliwości finansowania inwestycji. Zero zobowiązań.</p>
         <span class="step-tag">0 zł · bez zobowiązań</span>
       </div>
     </div>
@@ -140,8 +159,8 @@
       <div class="step-n">03</div>
       <div class="step-body">
         <h3>Zakup lub leasing</h3>
-        <p>Decydujesz jak chcesz finansować. Kupujesz — składamy razem wniosek ARiMR. Leasingujesz — sklep zarabia zanim skończy się spłata.</p>
-        <span class="step-tag">zakup · leasing · ARiMR</span>
+        <p>Decydujesz jak chcesz finansować. Analizujemy opcje: leasing, zakup bezpośredni, programy wsparcia rolniczego — każdą inwestycję oceniamy indywidualnie.</p>
+        <span class="step-tag">zakup · leasing · dofinansowanie</span>
       </div>
     </div>
     <div class="step" data-r data-d="3">
@@ -194,11 +213,20 @@
 <section class="sec sec-alt" id="kalkulator">
 <div class="wrap">
   <div data-r>
-    <p class="sec-label">Kalkulator ROI</p>
-    <h2 class="sec-title">Ile zarobisz<br><em>więcej niż w skupie?</em></h2>
-    <p class="sec-body">Przesuń suwaki i sprawdź na żywo różnicę między ceną skupu a sprzedażą bezpośrednią przez mlekomat.</p>
+    <p class="sec-label">Kalkulator zysku</p>
+    <h2 class="sec-title">Ile może zarobić<br><em>sklep przy Twoim gospodarstwie?</em></h2>
+    <p class="sec-body">Mlekomat przyciąga klientów — ale prawdziwy zysk pochodzi z całego sklepu. Przesuń suwaki i sprawdź pełny obraz.</p>
   </div>
-  <div class="roi-grid" style="margin-top:3rem">
+
+  <!-- ZAKŁADKI -->
+  <div style="display:flex;gap:.5rem;margin-top:2rem;margin-bottom:1.5rem;flex-wrap:wrap">
+    <button class="calc-tab active" id="tab-mleko" onclick="switchTab('mleko')" type="button">🥛 Zysk z mlekomatu</button>
+    <button class="calc-tab" id="tab-sklep" onclick="switchTab('sklep')" type="button">🛒 Zysk z całego sklepu</button>
+  </div>
+
+  <!-- PANEL: MLEKOMAT -->
+  <div id="panel-mleko">
+  <div class="roi-grid" style="margin-top:0">
     <div class="slider-wrap" data-r data-d="1">
       <div class="sl-group">
         <label for="s1">Dzienna produkcja mleka<span class="v" id="v1">200 L</span></label>
@@ -219,8 +247,8 @@
       <button class="toggle-row" id="tog" type="button" aria-pressed="false">
         <span class="tog"></span>
         <div>
-          <div class="tog-lbl">Dotacja ARiMR 50%</div>
-          <div class="tog-sub">Włącz jeśli kwalifikujesz się na zwrot kosztów</div>
+          <div class="tog-lbl">Dofinansowanie inwestycji</div>
+          <div class="tog-sub">Włącz jeśli kwalifikujesz się na wsparcie (szacunkowo 50%)</div>
         </div>
       </button>
     </div>
@@ -236,7 +264,7 @@
         <p class="roi-card-sub" id="r2s">500 zł/dzień</p>
       </div>
       <div class="roi-card hi">
-        <p class="roi-card-lbl">Dodatkowy zysk</p>
+        <p class="roi-card-lbl">Dodatkowy zysk z mleka</p>
         <p class="roi-card-val pos" id="r3">+7 800 zł/mies.</p>
         <p class="roi-card-sub" id="r3s">+93 600 zł rocznie · +108%</p>
       </div>
@@ -247,9 +275,60 @@
       </div>
     </div>
   </div>
+  </div>
+
+  <!-- PANEL: CAŁY SKLEP -->
+  <div id="panel-sklep" style="display:none">
+  <div class="roi-grid" style="margin-top:0">
+    <div class="slider-wrap" data-r data-d="1">
+      <div class="sl-group">
+        <label for="s5">Klientów dziennie<span class="v" id="v5">30</span></label>
+        <input type="range" id="s5" min="5" max="120" step="5" value="30" aria-label="Klientów dziennie">
+      </div>
+      <div class="sl-group">
+        <label for="s6">Średni zakup mleka<span class="v" id="v6">8,00 zł</span></label>
+        <input type="range" id="s6" min="2" max="30" step="1" value="8" aria-label="Średni zakup mleka">
+      </div>
+      <div class="sl-group">
+        <label for="s7">Dodatkowy koszyk (jajka, sery, itd.)<span class="v" id="v7">15 zł</span></label>
+        <input type="range" id="s7" min="0" max="60" step="5" value="15" aria-label="Dodatkowy koszyk">
+      </div>
+      <div class="sl-group">
+        <label for="s8">% klientów kupujących coś więcej<span class="v" id="v8">40%</span></label>
+        <input type="range" id="s8" min="0" max="100" step="10" value="40" aria-label="Procent klientów z koszykiem">
+      </div>
+      <div style="padding:.9rem 1.1rem;background:var(--sage);border:1px solid rgba(45,90,39,.2);border-radius:var(--r);font-size:.8rem;color:var(--muted);line-height:1.6">
+        💡 <strong style="color:var(--ink)">Jak to działa?</strong><br>Klient przychodzi po mleko i przy okazji bierze jajka, ser czy masło. Mlekomat jest magnesem — sklep robi zysk.
+      </div>
+    </div>
+    <div class="roi-results" aria-live="polite">
+      <div class="roi-card">
+        <p class="roi-card-lbl">Przychód z mleka — miesięcznie</p>
+        <p class="roi-card-val neu" id="rs1">7 200 zł</p>
+        <p class="roi-card-sub" id="rs1s">240 zł/dzień</p>
+      </div>
+      <div class="roi-card">
+        <p class="roi-card-lbl">Przychód z koszyka — miesięcznie</p>
+        <p class="roi-card-val neu" id="rs2">2 700 zł</p>
+        <p class="roi-card-sub" id="rs2s">90 zł/dzień</p>
+      </div>
+      <div class="roi-card hi">
+        <p class="roi-card-lbl">Łączny przychód sklepu</p>
+        <p class="roi-card-val pos" id="rs3">9 900 zł/mies.</p>
+        <p class="roi-card-sub" id="rs3s">118 800 zł rocznie</p>
+      </div>
+      <div class="roi-card" style="border-color:rgba(155,122,58,.35);background:var(--wheat-bg)">
+        <p class="roi-card-lbl">Koszyk dodaje rocznie</p>
+        <p class="roi-card-val" id="rs4" style="color:var(--wheat)">+32 400 zł</p>
+        <p class="roi-card-sub" id="rs4s">przy 40% klientów kupujących więcej</p>
+      </div>
+    </div>
+  </div>
+  </div>
+
   <p style="font-size:.75rem;color:var(--muted);margin-top:1.8rem;font-style:italic;max-width:600px" data-r>
-    Szacunek orientacyjny. Rzeczywiste wyniki zależą od lokalizacji, asortymentu i organizacji sprzedaży.
-    <a href="kontakt.html" style="color:var(--wheat)">Skontaktuj się</a> po bezpłatną indywidualną wycenę.
+    Szacunek orientacyjny — przychód, nie zysk netto. Rzeczywiste wyniki zależą od lokalizacji, asortymentu i organizacji sprzedaży.
+    <a href="kontakt.html" style="color:var(--forest)">Skontaktuj się</a> po bezpłatną indywidualną analizę.
   </p>
 </div>
 </section>
@@ -265,13 +344,13 @@
   <div class="fin-grid">
     <div class="fin-card hi" data-r data-d="1">
       <div class="fin-card-icon">💰</div>
-      <h3>Dotacja ARiMR</h3>
-      <p>Program wsparcia modernizacji gospodarstw. Możliwy zwrot kosztów zakupu mlekomatu i wyposażenia pawilonu. Pomagamy sprawdzić czy kwalifikujesz się i przeprowadzamy przez cały proces składania wniosku.</p>
+      <h3>Programy wsparcia rolniczego</h3>
+      <p>Sprawdzamy dostępne programy wsparcia modernizacji gospodarstw. W wybranych naborach część kosztów może kwalifikować się do dofinansowania — każdą inwestycję analizujemy indywidualnie.</p>
       <ul class="fin-list">
-        <li>Do 65% wartości inwestycji</li>
-        <li>Refundacja trafia bezpośrednio do Ciebie</li>
-        <li>Pomagamy od A do Z ze wnioskiem</li>
-        <li>Znamy procedury — Ty skupiasz się na krowach</li>
+        <li>Analiza kwalifikowalności Twojej inwestycji</li>
+        <li>Pomoc przy wniosku, jeśli nabór jest aktywny</li>
+        <li>Znamy aktualne programy i procedury</li>
+        <li>Ty skupiasz się na krowach — my na papierach</li>
       </ul>
     </div>
     <div class="fin-card" data-r data-d="2">
@@ -298,8 +377,8 @@
     </div>
     <div class="fin-card" data-r data-d="4">
       <div class="fin-card-icon">🤝</div>
-      <h3>Leasing + ARiMR razem?</h3>
-      <p>Zależy od formy leasingu i konkretnego programu ARiMR. Oceniamy indywidualnie i mówimy wprost co się bardziej opłaca.</p>
+      <h3>Łączenie finansowania</h3>
+      <p>Leasing + programy wsparcia? Zależy od formy leasingu i aktywnych naborów. Oceniamy indywidualnie i mówimy wprost co się bardziej opłaca.</p>
       <ul class="fin-list">
         <li>Analizujemy Twoją sytuację</li>
         <li>Znamy aktualne programy ARiMR</li>
@@ -323,7 +402,7 @@
     <div class="fq"><button class="fq-q" aria-expanded="false">Jak wygląda pawilon? Czy potrzebuję pozwolenia?<span class="fq-icon">+</span></button>
       <div class="fq-a"><p>Drewniana konstrukcja — solidna, estetyczna, stworzona z myślą o sprzedaży bezpośredniej. Kwestie formalne omawiamy na etapie rozmowy i doradzamy w zależności od wielkości obiektu i lokalizacji na Twojej działce.</p></div></div>
     <div class="fq"><button class="fq-q" aria-expanded="false">Ile kosztuje cały projekt?<span class="fq-icon">+</span></button>
-      <div class="fq-a"><p>Każdy projekt wyceniamy indywidualnie — zależy od rozmiaru pawilonu, modelu mlekomatu i wyposażenia dodatkowego. Mlekomat Premium zaczyna się od 6 000 EUR (loco fabryka Szwajcaria). Do tego koszt pawilonu i montażu. Z dotacją ARiMR rzeczywisty koszt może być znacząco niższy. Zadzwoń — damy Ci konkretne liczby.</p></div></div>
+      <div class="fq-a"><p>Każdy projekt wyceniamy indywidualnie — zależy od rozmiaru pawilonu, modelu mlekomatu i wyposażenia dodatkowego. Mlekomat Premium zaczyna się od 6 000 EUR (loco fabryka Szwajcaria). Do tego koszt pawilonu i montażu. Przy wsparciu z programów rolniczych rzeczywisty koszt może być niższy — każdą sytuację analizujemy osobno. Zadzwoń — damy Ci konkretne liczby.</p></div></div>
     <div class="fq"><button class="fq-q" aria-expanded="false">Czy dotacja ARiMR pokrywa też pawilon?<span class="fq-icon">+</span></button>
       <div class="fq-a"><p>Zależy od konkretnego działania ARiMR. Sprawdzamy Twoją sytuację indywidualnie i doradzamy co i w jakim zakresie kwalifikuje się do dofinansowania.</p></div></div>
     <div class="fq"><button class="fq-q" aria-expanded="false">Jak szybko sklep może zacząć działać?<span class="fq-icon">+</span></button>
