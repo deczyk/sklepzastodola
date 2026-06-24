@@ -259,6 +259,11 @@ input[type=range]::-moz-range-thumb { width: 18px; height: 18px; border-radius: 
   .photo-col .photo-side { height: 144px; }
   section, .sec { padding: 4.5rem 5vw; }
   .page-hero { padding: 7.5rem 5vw 4rem; }
+  /* Wyniki kalkulatora na mobile: brak animacji bocznej, pokazuj od razu */
+  .roi-results[data-r="right"] { transform: translateY(28px); }
+  .roi-results[data-r="right"].on { transform: none; }
+  /* Calc tab buttons na mobile */
+  .calc-tab { font-size: .78rem; padding: .55rem 1rem; }
 }
 @media (max-width: 600px) {
   .cards { grid-template-columns: 1fr; }
@@ -268,4 +273,7 @@ input[type=range]::-moz-range-thumb { width: 18px; height: 18px; border-radius: 
   .photo-col .photo-side { height: 140px; flex: 1; }
   .footer-inner { grid-template-columns: 1fr; }
   .steps::before { display: none; }
+  /* Na małych ekranach wyłącz animacje right/left które mogą być obcięte */
+  [data-r="right"], [data-r="left"] { transform: translateY(28px); }
+  [data-r="right"].on, [data-r="left"].on { transform: none; }
 }
