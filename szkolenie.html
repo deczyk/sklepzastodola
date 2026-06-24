@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Szkolenie Brunimat — Przewodnik po polsku z angielską terminologią</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink:#1e1e1a; --bg:#f7f4ee; --bg2:#eee9df; --paper:#fff;
+  --forest:#2d5a27; --sage:#e8f0e6; --wheat:#9b7a3a; --wheat-bg:#f5eddb;
+  --line:#d6cfc3; --muted:#6b6454; --red:#c0392b; --blue:#1a3c8a;
+  --sans:'DM Sans',system-ui,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--sans);background:var(--bg);color:var(--ink);line-height:1.65;font-size:15px}
+.header{background:var(--forest);color:#fff;padding:2rem 2.5rem;border-bottom:3px solid #1a3c1a}
+.header h1{font-size:1.6rem;font-weight:700;margin-bottom:.3rem}
+.header p{font-size:.9rem;opacity:.8}
+.badge{display:inline-block;background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.3);border-radius:100px;padding:.15rem .7rem;font-size:.75rem;font-weight:700;margin-left:.5rem;vertical-align:middle}
+
+.toc{background:var(--paper);border:1px solid var(--line);border-radius:.75rem;padding:1.5rem;margin:1.5rem 2.5rem;max-width:700px}
+.toc h2{font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:.8rem}
+.toc ol{padding-left:1.3rem;display:grid;grid-template-columns:1fr 1fr;gap:.25rem .5rem}
+.toc li a{font-size:.9rem;color:var(--forest);text-decoration:none;font-weight:500}
+.toc li a:hover{text-decoration:underline}
+
+main{max-width:860px;margin:0 auto;padding:1rem 2.5rem 3rem}
+
+section{margin-bottom:3rem}
+h2.sec{font-size:1.4rem;font-weight:700;color:var(--forest);border-bottom:2px solid var(--sage);padding-bottom:.5rem;margin-bottom:1.2rem;display:flex;align-items:center;gap:.6rem}
+h2.sec .num{background:var(--forest);color:#fff;width:32px;height:32px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:.85rem;flex-shrink:0}
+h3{font-size:1.05rem;font-weight:700;color:var(--ink);margin:1.2rem 0 .4rem}
+
+/* TERM BLOCK: polskie + angielskie */
+.term-block{background:var(--paper);border:1px solid var(--line);border-radius:.6rem;overflow:hidden;margin:.6rem 0}
+.term-row{display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid var(--line)}
+.term-row:last-child{border-bottom:none}
+.term-pl{padding:.6rem .9rem;font-size:.88rem;color:var(--muted)}
+.term-en{padding:.6rem .9rem;font-size:.88rem;font-weight:700;color:var(--blue);background:rgba(26,60,138,.04);border-left:1px solid var(--line)}
+.term-row.header-row .term-pl,.term-row.header-row .term-en{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);background:var(--bg2);padding:.4rem .9rem}
+
+/* STEP BLOCK */
+.steps-block{display:flex;flex-direction:column;gap:.5rem;margin:.8rem 0}
+.step-item{display:grid;grid-template-columns:auto 1fr;gap:.8rem;align-items:start}
+.step-num{width:28px;height:28px;border-radius:50%;background:var(--forest);color:#fff;display:flex;align-items:center;justify-content:center;font-size:.78rem;font-weight:700;flex-shrink:0;margin-top:.1rem}
+.step-body{font-size:.9rem;color:var(--ink);line-height:1.6}
+.step-body .en{font-weight:700;color:var(--blue);font-style:italic}
+.step-body .pl{color:var(--muted);font-size:.85rem}
+
+/* ALERT */
+.alert{border-left:3px solid;border-radius:0 .5rem .5rem 0;padding:.8rem 1rem;margin:.8rem 0;font-size:.88rem;line-height:1.6}
+.alert.warn{border-color:#e67e22;background:#fff8f0;color:#7a4a10}
+.alert.danger{border-color:var(--red);background:#fff5f5;color:#7a1515}
+.alert.tip{border-color:var(--forest);background:var(--sage);color:#1a3c1a}
+.alert strong{display:block;font-weight:700;margin-bottom:.2rem}
+
+/* PHRASE TABLE */
+.phrase-table{width:100%;border-collapse:collapse;margin:.8rem 0;font-size:.88rem}
+.phrase-table th{background:var(--forest);color:#fff;padding:.5rem .8rem;text-align:left;font-weight:700;font-size:.78rem;text-transform:uppercase;letter-spacing:.05em}
+.phrase-table td{padding:.55rem .8rem;border-bottom:1px solid var(--line);vertical-align:top}
+.phrase-table tr:nth-child(even) td{background:var(--bg2)}
+.phrase-table .en-col{font-weight:700;color:var(--blue)}
+.phrase-table .pl-col{color:var(--muted)}
+
+/* CODE */
+.code{font-family:monospace;background:var(--bg2);border:1px solid var(--line);padding:.1rem .4rem;border-radius:.25rem;font-size:.9em;color:var(--forest);font-weight:700}
+
+/* EXAM */
+.exam{background:var(--wheat-bg);border:1px solid rgba(155,122,58,.3);border-radius:.6rem;padding:1.2rem;margin:.8rem 0}
+.exam-title{font-weight:700;color:var(--wheat);font-size:.8rem;text-transform:uppercase;letter-spacing:.08em;margin-bottom:.6rem}
+.exam-q{font-size:.9rem;margin:.3rem 0;padding-left:1.2rem;position:relative;color:var(--ink)}
+.exam-q::before{content:'\2713';position:absolute;left:0;color:var(--forest);font-weight:700}
+
+@media(max-width:600px){
+  main,header.header,.toc{padding-left:1rem;padding-right:1rem}
+  .toc ol{grid-template-columns:1fr}
+  .term-row{grid-template-columns:1fr}
+  .term-en{border-left:none;border-top:1px solid var(--line)}
+}
+@media print{
+  body{font-size:12px}
+  .header{padding:1rem}
+  main{padding:0}
+  section{page-break-inside:avoid}
+}
+</style>
+</head>
+<body>
+
+<header class="header">
+  <h1>Szkolenie Brunimat Premium <span class="badge">środa</span></h1>
+  <p>Przewodnik po polsku z angielską terminologią — żebyś wiedział co mówią i mógł rozmawiać z Brunimatem</p>
+</header>
+
+<div class="toc">
+  <h2>Spis treści</h2>
+  <ol>
+    <li><a href="#slownik">Słownik — kluczowe terminy</a></li>
+    <li><a href="#budowa">Budowa maszyny</a></li>
+    <li><a href="#uruchomienie">Uruchomienie (start-up)</a></li>
+    <li><a href="#programowanie">Programowanie — menu</a></li>
+    <li><a href="#gsm">GSM / SMS alerts</a></li>
+    <li><a href="#czyszczenie">Czyszczenie i wymiana mleka</a></li>
+    <li><a href="#serwis">Serwis i troubleshooting</a></li>
+    <li><a href="#bezpieczenstwo">Bezpieczeństwo</a></li>
+    <li><a href="#frazy">Przydatne frazy na szkoleniu</a></li>
+  </ol>
+</div>
+
+<main>
+
+<!-- ══ 1. SŁOWNIK ══════════════════════════════════════════════════════════ -->
+<section id="slownik">
+  <h2 class="sec"><span class="num">1</span>Słownik — kluczowe terminy techniczne</h2>
+  <p style="color:var(--muted);font-size:.88rem;margin-bottom:.8rem">Te słowa usłyszysz najczęściej. Lewa kolumna — co to znaczy po polsku. Prawa — jak to mówią po angielsku.</p>
+
+  <div class="term-block">
+    <div class="term-row header-row"><div class="term-pl">Po polsku</div><div class="term-en">Po angielsku (usłyszysz)</div></div>
+    <div class="term-row"><div class="term-pl">Automat do mleka / mlekomat</div><div class="term-en">milk vending machine</div></div>
+    <div class="term-row"><div class="term-pl">Strefa dozowania (gdzie leje mleko)</div><div class="term-en">dispensing area</div></div>
+    <div class="term-row"><div class="term-pl">Wrzutnik monet</div><div class="term-en">coin slot / coin acceptor</div></div>
+    <div class="term-row"><div class="term-pl">Czytnik banknotów</div><div class="term-en">banknote reader / bill acceptor</div></div>
+    <div class="term-row"><div class="term-pl">Zasobnik reszty / wydawanie reszty</div><div class="term-en">change dispenser</div></div>
+    <div class="term-row"><div class="term-pl">Rurki na monety</div><div class="term-en">coin tubes</div></div>
+    <div class="term-row"><div class="term-pl">Pomiar ilości (litrów)</div><div class="term-en">flow meter</div></div>
+    <div class="term-row"><div class="term-pl">Mieszadło (miesza mleko w kance)</div><div class="term-en">stirrer / agitator</div></div>
+    <div class="term-row"><div class="term-pl">Łopatki mieszadła</div><div class="term-en">stirrer blades</div></div>
+    <div class="term-row"><div class="term-pl">Pompa mleka</div><div class="term-en">milk pump</div></div>
+    <div class="term-row"><div class="term-pl">Przewód ssący</div><div class="term-en">suction tube</div></div>
+    <div class="term-row"><div class="term-pl">Zawór zaciskowy przewodu</div><div class="term-en">hose pinch valve</div></div>
+    <div class="term-row"><div class="term-pl">Kanka mleczna</div><div class="term-en">milk can</div></div>
+    <div class="term-row"><div class="term-pl">Zbiornik przelewowy (mały pojemnik na resztki)</div><div class="term-en">overflow container</div></div>
+    <div class="term-row"><div class="term-pl">Czujnik poziomu (mierzy ile mleka zostało)</div><div class="term-en">level sensor</div></div>
+    <div class="term-row"><div class="term-pl">Spłukiwanie / płukanie</div><div class="term-en">rinsing / flushing</div></div>
+    <div class="term-row"><div class="term-pl">Dysza spłukująca</div><div class="term-en">rinsing nozzle</div></div>
+    <div class="term-row"><div class="term-pl">Skrzynka sterująca</div><div class="term-en">control box</div></div>
+    <div class="term-row"><div class="term-pl">Płytka sterująca / sterownik</div><div class="term-en">control board / controller</div></div>
+    <div class="term-row"><div class="term-pl">Przycisk menu</div><div class="term-en">menu button</div></div>
+    <div class="term-row"><div class="term-pl">Klawiatura foliowa</div><div class="term-en">membrane keypad</div></div>
+    <div class="term-row"><div class="term-pl">Wyświetlacz</div><div class="term-en">display screen</div></div>
+    <div class="term-row"><div class="term-pl">Sprężarka</div><div class="term-en">compressor</div></div>
+    <div class="term-row"><div class="term-pl">Skraplacz</div><div class="term-en">condenser</div></div>
+    <div class="term-row"><div class="term-pl">Filtr przeciwpyłkowy</div><div class="term-en">dust filter</div></div>
+    <div class="term-row"><div class="term-pl">Zabezpieczenie transportowe</div><div class="term-en">transport lock</div></div>
+    <div class="term-row"><div class="term-pl">Bezpiecznik</div><div class="term-en">fuse</div></div>
+    <div class="term-row"><div class="term-pl">Drukarka (paragonów)</div><div class="term-en">receipt printer</div></div>
+    <div class="term-row"><div class="term-pl">Głowica drukująca</div><div class="term-en">print head</div></div>
+    <div class="term-row"><div class="term-pl">Papier termiczny</div><div class="term-en">thermal paper</div></div>
+    <div class="term-row"><div class="term-pl">Alarm antywłamaniowy</div><div class="term-en">anti-theft alarm</div></div>
+    <div class="term-row"><div class="term-pl">Wyłącznik krańcowy</div><div class="term-en">limit switch</div></div>
+    <div class="term-row"><div class="term-pl">Moduł GSM (wysyła SMS)</div><div class="term-en">GSM module</div></div>
+    <div class="term-row"><div class="term-pl">Silnik zwrotu (wraca resztę)</div><div class="term-en">return motor</div></div>
+    <div class="term-row"><div class="term-pl">Reset systemu</div><div class="term-en">system reset</div></div>
+    <div class="term-row"><div class="term-pl">Awaria / usterka</div><div class="term-en">fault / malfunction</div></div>
+    <div class="term-row"><div class="term-pl">Zacięcie banknotu</div><div class="term-en">banknote jam</div></div>
+    <div class="term-row"><div class="term-pl">Osad mleczny / kamień mleczny</div><div class="term-en">milk stone / milk scale</div></div>
+    <div class="term-row"><div class="term-pl">Alkohol izopropylowy</div><div class="term-en">isopropyl alcohol (IPA)</div></div>
+    <div class="term-row"><div class="term-pl">Środek do usuwania kamienia</div><div class="term-en">descaler</div></div>
+  </div>
+</section>
+
+<!-- ══ 2. BUDOWA ═══════════════════════════════════════════════════════════ -->
+<section id="budowa">
+  <h2 class="sec"><span class="num">2</span>Budowa maszyny — co gdzie jest</h2>
+
+  <div class="alert tip">
+    <strong>Jak to powiedzieć na szkoleniu:</strong>
+    "Can you show me where the <strong>flow meter</strong> is?" — Czy możesz mi pokazać gdzie jest pomiar ilości?<br>
+    "What is this part called?" — Jak ta część się nazywa?
+  </div>
+
+  <h3>Zewnętrzna część maszyny (outside / front panel)</h3>
+  <div class="term-block">
+    <div class="term-row header-row"><div class="term-pl">Element</div><div class="term-en">Po angielsku</div></div>
+    <div class="term-row"><div class="term-pl">A — Wskaźnik temperatury</div><div class="term-en">A — Temperature display</div></div>
+    <div class="term-row"><div class="term-pl">B — Wyświetlacz</div><div class="term-en">B — Display screen</div></div>
+    <div class="term-row"><div class="term-pl">C — Wrzutnik monet</div><div class="term-en">C — Coin slot</div></div>
+    <div class="term-row"><div class="term-pl">D — Przycisk Start/Stop</div><div class="term-en">D — Start/Stop button & change</div></div>
+    <div class="term-row"><div class="term-pl">E — Drukarka</div><div class="term-en">E — Printer</div></div>
+    <div class="term-row"><div class="term-pl">F — Wydawanie reszty</div><div class="term-en">F — Change output</div></div>
+    <div class="term-row"><div class="term-pl">G — Czytnik banknotów</div><div class="term-en">G — Banknote reader</div></div>
+    <div class="term-row"><div class="term-pl">H — Strefa dozowania</div><div class="term-en">H — Dispensing area</div></div>
+  </div>
+
+  <h3>Wnętrze maszyny (inside)</h3>
+  <div class="term-block">
+    <div class="term-row header-row"><div class="term-pl">Element</div><div class="term-en">Po angielsku</div></div>
+    <div class="term-row"><div class="term-pl">A — Mieszadło</div><div class="term-en">A — Stirrer / agitator</div></div>
+    <div class="term-row"><div class="term-pl">E — Pomiar ilości</div><div class="term-en">E — Flow meter</div></div>
+    <div class="term-row"><div class="term-pl">G — Zbiornik przelewowy</div><div class="term-en">G — Overflow container</div></div>
+    <div class="term-row"><div class="term-pl">H — Kanka mleczna</div><div class="term-en">H — Milk can</div></div>
+    <div class="term-row"><div class="term-pl">K — Pompa mleka</div><div class="term-en">K — Milk pump</div></div>
+    <div class="term-row"><div class="term-pl">L — Zawór zaciskowy przewodu</div><div class="term-en">L — Hose pinch valve</div></div>
+    <div class="term-row"><div class="term-pl">N — Przewód ssący</div><div class="term-en">N — Suction tube</div></div>
+  </div>
+</section>
+
+<!-- ══ 3. URUCHOMIENIE ════════════════════════════════════════════════════ -->
+<section id="uruchomienie">
+  <h2 class="sec"><span class="num">3</span>Uruchomienie maszyny (start-up / commissioning)</h2>
+
+  <p style="margin-bottom:.8rem;color:var(--muted);font-size:.88rem">Na szkoleniu pewnie będziesz robić to krok po kroku. Oto co i jak.</p>
+
+  <div class="steps-block">
+    <div class="step-item">
+      <div class="step-num">1</div>
+      <div class="step-body">
+        Rozpakuj i sprawdź maszynę pod kątem uszkodzeń<br>
+        <span class="en">"Inspect the machine for transport damage"</span><br>
+        <span class="pl">transport damage = uszkodzenia transportowe</span>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">2</div>
+      <div class="step-body">
+        Usuń zabezpieczenie transportowe sprężarki (śruba lub taśma metalowa)<br>
+        <span class="en">"Remove the compressor transport lock"</span><br>
+        <span class="pl">transport lock = zabezpieczenie transportowe</span>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">3</div>
+      <div class="step-body">
+        Wypoziomuj maszynę poziomicą<br>
+        <span class="en">"Level the machine using a spirit level"</span><br>
+        <span class="pl">spirit level = poziomica; adjustable feet = regulowane nóżki</span>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">4</div>
+      <div class="step-body">
+        Podłącz wtyczkę 230V<br>
+        <span class="en">"Plug in the power cable (230V)"</span>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">5</div>
+      <div class="step-body">
+        Zaprogramuj cenę w menu C6<br>
+        <span class="en">"Programme the price in menu C6"</span><br>
+        <span class="pl">Jak to zrobić — patrz sekcja 4 poniżej</span>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">6</div>
+      <div class="step-body">
+        Przepłucz maszynę (patrz sekcja 6)<br>
+        <span class="en">"Flush / rinse the machine"</span>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">7</div>
+      <div class="step-body">
+        Sprawdź czy maszyna chłodzi poniżej 5°C po 15–20 minutach<br>
+        <span class="en">"Check that the machine has cooled below 5°C"</span><br>
+        <span class="pl">cooled down = schłodziło się</span>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">8</div>
+      <div class="step-body">
+        Próbne napełnienie — sprawdź ilość (1030 g = 1 litr)<br>
+        <span class="en">"Perform a test dispense and verify the quantity"</span><br>
+        <span class="pl">test dispense = próbne napełnienie</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="alert tip">
+    <strong>Ważne:</strong> Nad maszyną musi być minimum 30 cm wolnej przestrzeni — inaczej układ chłodzenia się przegrzeje.<br>
+    Po angielsku: <strong>"Maintain at least 30 cm of clearance above the machine"</strong>
+  </div>
+</section>
+
+<!-- ══ 4. PROGRAMOWANIE ═══════════════════════════════════════════════════ -->
+<section id="programowanie">
+  <h2 class="sec"><span class="num">4</span>Programowanie — menu i klawisze</h2>
+
+  <h3>Klawisze na klawiaturze foliowej (membrane keypad)</h3>
+  <div class="term-block">
+    <div class="term-row header-row"><div class="term-pl">Klawisz i funkcja po polsku</div><div class="term-en">Po angielsku</div></div>
+    <div class="term-row"><div class="term-pl">Home (1) — wyjście z podmenu / powrót do menu głównego</div><div class="term-en">Home — exit submenu / back to main menu</div></div>
+    <div class="term-row"><div class="term-pl">▲ góra (2) — do przodu / zwiększ wartość</div><div class="term-en">Up — forward / increase value</div></div>
+    <div class="term-row"><div class="term-pl">▼ dół (3) — do tyłu / zmniejsz wartość</div><div class="term-en">Down — backward / decrease value</div></div>
+    <div class="term-row"><div class="term-pl">Enter (4) — wejdź / potwierdź wartość</div><div class="term-en">Enter — view / confirm value</div></div>
+    <div class="term-row"><div class="term-pl">Clear (5) — usuń wartość / przesuń o cyfrę</div><div class="term-en">Clear — delete value / move one digit</div></div>
+    <div class="term-row"><div class="term-pl">10er (6) — skoki o 10</div><div class="term-en">10er — jumps of 10</div></div>
+    <div class="term-row"><div class="term-pl">100er (7) — skoki o 100</div><div class="term-en">100er — jumps of 100</div></div>
+  </div>
+
+  <div class="alert warn">
+    <strong>⚠ Zapamiętaj:</strong> Parametrów C1, C4, C5, C7, C8 NIE RUSZAJ — tylko firma może je zmieniać.<br>
+    Po angielsku: <strong>"Do not change parameters C1, C4, C5, C7 and C8 — factory settings only!"</strong>
+  </div>
+
+  <h3>Jak wejść do menu serwisowego</h3>
+  <div class="steps-block">
+    <div class="step-item">
+      <div class="step-num">1</div>
+      <div class="step-body">
+        Naciśnij i przytrzymaj czerwony przycisk menu aż pojawi się <span class="code">"Service-Menu!"</span><br>
+        <span class="en">"Press and hold the menu button until the display shows Service-Menu!"</span>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">2</div>
+      <div class="step-body">
+        Naciśnij Enter (4) — jesteś w C0.1<br>
+        <span class="en">"Press Enter (4) to enter submenu C0.1"</span>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">3</div>
+      <div class="step-body">
+        Żeby wejść do C1–C9 wpisz hasło: <span class="code">4-2-3-1</span><br>
+        <span class="en">"Enter password 4-2-3-1 to access menus C1 through C9"</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="alert danger">
+    <strong>Uwaga!</strong> Krótkie naciśnięcie (zamiast przytrzymania) powoduje <strong>reset systemu</strong>. Odczekaj aż maszyna się uruchomi.<br>
+    <strong>"A brief press causes a system reset — wait until the machine is ready again"</strong>
+  </div>
+
+  <h3>Jak ustawić cenę (set the price)</h3>
+  <p style="font-size:.9rem;color:var(--muted);margin:.4rem 0 .8rem">Menu C6 → C6.2 → C6.2.01 → klawisz 2 = zwiększ / klawisz 3 = zmniejsz</p>
+  <div class="alert tip">
+    Po angielsku: <strong>"Go to C6, then C6.2, then C6.2.01. Press 2 to increase the price, press 3 to decrease."</strong>
+  </div>
+
+  <h3>Najważniejsze pozycje menu — szybki przegląd</h3>
+  <div class="term-block">
+    <div class="term-row header-row"><div class="term-pl">Menu — co to robi po polsku</div><div class="term-en">Po angielsku</div></div>
+    <div class="term-row"><div class="term-pl"><span class="code">C0.3</span> — wkładasz monety żeby wypełnić rurki na resztę</div><div class="term-en">Fill coin tubes</div></div>
+    <div class="term-row"><div class="term-pl"><span class="code">C0.4</span> — opróżniasz rurki na monety (hasło 1234)</div><div class="term-en">Empty coin tubes (password 1-2-3-4)</div></div>
+    <div class="term-row"><div class="term-pl"><span class="code">C1.7</span> — tryb bezpłatny (mleko bez płatności — do testów)</div><div class="term-en">Free vend mode</div></div>
+    <div class="term-row"><div class="term-pl"><span class="code">C1.C</span> — czas spłukiwania (0 = wyłączone)</div><div class="term-en">Water rinsing time (0 = off)</div></div>
+    <div class="term-row"><div class="term-pl"><span class="code">C4.6</span> — test SMS (sprawdzasz czy GSM działa)</div><div class="term-en">Modem test — sends test SMS</div></div>
+    <div class="term-row"><div class="term-pl"><span class="code">C4.7</span> — poziom sygnału GSM (powinien być min. 10–15)</div><div class="term-en">GSM signal level (min. 10–15)</div></div>
+    <div class="term-row"><div class="term-pl"><span class="code">C6</span> — ustawianie ceny za litr</div><div class="term-en">Price setting</div></div>
+    <div class="term-row"><div class="term-pl"><span class="code">C9.1</span> — włącz/wyłącz moduł GSM (0/1)</div><div class="term-en">Modem profile (0=off, 1=on)</div></div>
+  </div>
+</section>
+
+<!-- ══ 5. GSM ══════════════════════════════════════════════════════════════ -->
+<section id="gsm">
+  <h2 class="sec"><span class="num">5</span>GSM module — powiadomienia SMS</h2>
+
+  <p style="color:var(--muted);font-size:.88rem;margin-bottom:.8rem">Maszyna wysyła SMS-y do Ciebie gdy coś się dzieje. Cztery typy wiadomości:</p>
+
+  <div class="term-block">
+    <div class="term-row header-row"><div class="term-pl">Typ SMS</div><div class="term-en">Co wysyła</div></div>
+    <div class="term-row"><div class="term-pl">Type 1 — awarie (faults)</div><div class="term-en">All faults → to operator (Twój numer)</div></div>
+    <div class="term-row"><div class="term-pl">Type 2 — zużycie litrów dziennie</div><div class="term-en">Litres consumed since last fill → daily</div></div>
+    <div class="term-row"><div class="term-pl">Type 3 — rozliczenie (przy napełnieniu lub 1. dnia miesiąca)</div><div class="term-en">Billing summary → to office number</div></div>
+    <div class="term-row"><div class="term-pl">Type 4 — alarm antywłamaniowy</div><div class="term-en">Anti-theft alarm triggered</div></div>
+  </div>
+
+  <h3>Kody błędów w SMS (SMS error codes)</h3>
+  <div class="term-block">
+    <div class="term-row header-row"><div class="term-pl">Kod — co to znaczy po polsku</div><div class="term-en">Po angielsku</div></div>
+    <div class="term-row"><div class="term-pl">5 — błąd chłodzenia (za wysoka temperatura za długo)</div><div class="term-en">Cooling fault — temperature too high</div></div>
+    <div class="term-row"><div class="term-pl">6 — błąd systemu płatności</div><div class="term-en">Payment system fault</div></div>
+    <div class="term-row"><div class="term-pl">7 — wszystkie zbiorniki mleka puste</div><div class="term-en">Milk bag empty — all containers empty</div></div>
+    <div class="term-row"><div class="term-pl">8 — błąd drukarki</div><div class="term-en">Printer fault</div></div>
+    <div class="term-row"><div class="term-pl">9 — flowmeter nie daje impulsów (zatkany)</div><div class="term-en">Flowmeter! — no pulses from flow meter</div></div>
+    <div class="term-row"><div class="term-pl">10 — zbiornik pusty</div><div class="term-en">Tank empty</div></div>
+    <div class="term-row"><div class="term-pl">11 — resztka mleka (czujnik poziomu)</div><div class="term-en">Milk residue — minimum level reached</div></div>
+    <div class="term-row"><div class="term-pl">F4 — przerwa w zasilaniu, maszyna zablokowana</div><div class="term-en">Power interruption — machine locked</div></div>
+  </div>
+
+  <h3>Jak skonfigurować GSM (krok po kroku)</h3>
+  <div class="steps-block">
+    <div class="step-item"><div class="step-num">1</div><div class="step-body">Odłącz kabel modemu <span class="en">"Disconnect the modem cable first"</span></div></div>
+    <div class="step-item"><div class="step-num">2</div><div class="step-body"><span class="code">C9.1</span> ustaw na 1 — aktywacja GSM <span class="en">"Set C9.1 to 1 to activate GSM"</span></div></div>
+    <div class="step-item"><div class="step-num">3</div><div class="step-body"><span class="code">C9.2.1</span> — Twój numer telefonu (bez +48) <span class="en">"Enter your service phone number without country code"</span></div></div>
+    <div class="step-item"><div class="step-num">4</div><div class="step-body"><span class="code">C9.2.2</span> — numer centrali SMS Twojego operatora <span class="en">"SMS centre number of your SIM card operator"</span></div></div>
+    <div class="step-item"><div class="step-num">5</div><div class="step-body"><span class="code">C9.2.3</span> — PIN: zostaw puste <span class="en">"Leave PIN empty"</span></div></div>
+    <div class="step-item"><div class="step-num">6</div><div class="step-body">Dezaktywuj PIN karty SIM wcześniej w smartfonie, wstaw kartę do modułu GSM <span class="en">"Deactivate SIM PIN on your phone first, then insert SIM card"</span></div></div>
+    <div class="step-item"><div class="step-num">7</div><div class="step-body">Odłącz zasilanie na 2 minuty, podłącz kabel modemu i włącz <span class="en">"Power off for 2 minutes, connect modem, power on"</span></div></div>
+    <div class="step-item"><div class="step-num">8</div><div class="step-body">Sprawdź zielone LED na module GSM: szybkie miganie = łączy; wolne = połączono <span class="en">"Fast green flash = connecting; slow flash = connected"</span></div></div>
+    <div class="step-item"><div class="step-num">9</div><div class="step-body"><span class="code">C4.6</span> — wyślij testowy SMS <span class="en">"Send a test SMS via C4.6"</span></div></div>
+  </div>
+</section>
+
+<!-- ══ 6. CZYSZCZENIE ══════════════════════════════════════════════════════ -->
+<section id="czyszczenie">
+  <h2 class="sec"><span class="num">6</span>Czyszczenie i wymiana mleka (cleaning & milk change)</h2>
+
+  <div class="alert warn">
+    <strong>Kluczowe zasady:</strong><br>
+    • Woda do czyszczenia minimum 60°C — <strong>"at least 60°C"</strong><br>
+    • Stosuj kwas i ług na przemian — <strong>"use acid and alkali alternately"</strong><br>
+    • Nigdy nie mów "myję wodą" — mówisz <strong>"I'm rinsing / flushing the machine"</strong>
+  </div>
+
+  <h3>Procedura czyszczenia (cleaning procedure)</h3>
+  <div class="steps-block">
+    <div class="step-item"><div class="step-num">1</div><div class="step-body">Przygotuj 6L gorącej wody z detergentem i 3L wody do płukania <span class="en">"Prepare 6L of hot cleaning solution and 3L of rinse water"</span></div></div>
+    <div class="step-item"><div class="step-num">2</div><div class="step-body">Przekręć przełącznik spłukiwania do góry — na wyświetlaczu pojawi się "Rinsing programme" <span class="en">"Flip the rinsing switch up — display shows Rinsing programme"</span></div></div>
+    <div class="step-item"><div class="step-num">3</div><div class="step-body">Włóż przewód ssący do wiadra z detergentem <span class="en">"Place the suction tube into the cleaning solution bucket"</span></div></div>
+    <div class="step-item"><div class="step-num">4</div><div class="step-body">Na klawiaturze naciśnij klawisz odpowiadający numerowi zaworu (1, 2...) <span class="en">"Activate the pump and pinch valve using keypad — key 1 = valve 1"</span></div></div>
+    <div class="step-item"><div class="step-num">5</div><div class="step-body">Przepłucz też wodą czystą <span class="en">"Rinse again with clean tap water"</span></div></div>
+    <div class="step-item"><div class="step-num">6</div><div class="step-body">Włóż kanki z mlekiem, wstaw przewód ssący, zasysaj mleko klawiaturą <span class="en">"Insert milk cans, insert suction tube, draw up milk using keypad"</span></div></div>
+    <div class="step-item"><div class="step-num">7</div><div class="step-body">Przekręć przełącznik spłukiwania w dół — koniec <span class="en">"Flip the rinsing switch down — rinsing complete"</span></div></div>
+  </div>
+
+  <h3>Czyszczenie systemu spłukiwania (rinsing system)</h3>
+  <div class="term-block">
+    <div class="term-row"><div class="term-pl">Zbiornik wody spłukującej (6L) — czyść co tydzień</div><div class="term-en">Water rinsing tank — clean weekly</div></div>
+    <div class="term-row"><div class="term-pl">Środek do usuwania kamienia — stosuj co miesiąc</div><div class="term-en">Descaler — use monthly</div></div>
+    <div class="term-row"><div class="term-pl">Klawisz 8 na klawiaturze — ręczne spłukiwanie (3 sek.)</div><div class="term-en">Press key 8 for manual 3-second rinse cycle</div></div>
+  </div>
+</section>
+
+<!-- ══ 7. SERWIS I AWARIE ══════════════════════════════════════════════════ -->
+<section id="serwis">
+  <h2 class="sec"><span class="num">7</span>Serwis i rozwiązywanie problemów (troubleshooting)</h2>
+
+  <div class="alert tip">
+    Na szkoleniu będziesz mówić o awariach. Podstawowa fraza:<br>
+    <strong>"The machine is showing a fault / error"</strong> — Maszyna pokazuje błąd<br>
+    <strong>"How do I fix this?"</strong> — Jak to naprawić?<br>
+    <strong>"Can you show me step by step?"</strong> — Możesz pokazać krok po kroku?
+  </div>
+
+  <h3>Flowmeter — najczęstsza awaria</h3>
+  <p style="font-size:.9rem;color:var(--muted);margin:.3rem 0 .6rem">Flowmeter = pomiar ilości. Kiedy jest zatkany, maszyna wyświetla "Flowmeter!" i wysyła SMS z kodem 9.</p>
+  <div class="steps-block">
+    <div class="step-item"><div class="step-num">1</div><div class="step-body">Usuń węże pompy <span class="en">"Remove the pump hoses"</span></div></div>
+    <div class="step-item"><div class="step-num">2</div><div class="step-body">Obróć górną część flowmetera w prawo i zdejmij <span class="en">"Rotate the upper part of the flow meter clockwise and remove"</span></div></div>
+    <div class="step-item"><div class="step-num">3</div><div class="step-body">Wyczyść kółko łopatkowe i dyszę <span class="en">"Clean the impeller and inlet nozzle"</span></div></div>
+    <div class="step-item"><div class="step-num">4</div><div class="step-body">Złóż z powrotem ostrożnie <span class="en">"Reassemble carefully"</span></div></div>
+  </div>
+  <div class="alert danger">
+    <strong>NIE MOCZ flowmetera w wodzie ani kwasie!</strong><br>
+    "Do NOT immerse the flow meter in water or any liquid!"
+  </div>
+
+  <h3>Tabela problemów i rozwiązań (troubleshooting table)</h3>
+  <table class="phrase-table">
+    <thead><tr><th>Problem (po polsku)</th><th class="en-col">Problem (po angielsku)</th><th>Rozwiązanie</th></tr></thead>
+    <tbody>
+      <tr><td>Słaba akceptacja monet</td><td class="en-col">Poor coin acceptance</td><td>Wyczyść coin validator wilgotną ściereczką. Wysusz suszarką.</td></tr>
+      <tr><td>Brak reszty</td><td class="en-col">No change dispensed</td><td>Naciśnij każdy klawisz na change dispenser 1×. Uzupełnij coin tubes.</td></tr>
+      <tr><td>Mleko cofa się do kanistra</td><td class="en-col">Milk flows back into can</td><td>Sprawdź uszczelki pompy (pump seals) i pinch valve.</td></tr>
+      <tr><td>Maszyna nie chłodzi</td><td class="en-col">Machine not cooling</td><td>Sprawdź door switch. Heat exchanger może być zamarznięty — odłącz zasilanie.</td></tr>
+      <tr><td>Wyświetlacz "TEST" przy starcie</td><td class="en-col">Display shows TEST</td><td>Rinsing switch jest w górę. Przekręć w dół i zrób reset.</td></tr>
+      <tr><td>Maszyna zablokowana po braku prądu</td><td class="en-col">Machine locked after power failure</td><td>Użyj rinsing switch lub system reset. Czas blokady w C1.F.</td></tr>
+      <tr><td>Zacięcie banknotu</td><td class="en-col">Banknote jam</td><td>LED czytnika miga 1×. Wyciągnij kasetę i usuń zacięty banknot.</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Czyszczenie drukarki (printer cleaning)</h3>
+  <div class="steps-block">
+    <div class="step-item"><div class="step-num">1</div><div class="step-body">Połóż drukarkę na boku (strona podajnika papieru) <span class="en">"Lay the printer on its side, paper feed side down"</span></div></div>
+    <div class="step-item"><div class="step-num">2</div><div class="step-body">Naciśnij metalowy zatrzask do góry — mechanizm się otwiera <span class="en">"Press the metal latch upward — mechanism opens"</span></div></div>
+    <div class="step-item"><div class="step-num">3</div><div class="step-body">Pędzelkiem usuń brud, wydmuchaj kurz <span class="en">"Use a brush to remove dirt, blow out dust"</span></div></div>
+    <div class="step-item"><div class="step-num">4</div><div class="step-body">Wacik z IPA (alkohol izopropylowy) do czyszczenia głowicy i wałka <span class="en">"Use IPA-soaked swab to clean print head and drive roller"</span></div></div>
+  </div>
+  <div class="alert danger">
+    Nie dotykaj głowicy drukarki palcami!<br>
+    <strong>"Never touch the print head — electrostatic damage!"</strong>
+  </div>
+
+  <h3>Poziom sygnału GSM (signal level)</h3>
+  <p style="font-size:.9rem;color:var(--muted);margin:.3rem 0 .6rem">Menu C4.7 pokazuje poziom sygnału. Powinien wynosić minimum 10–15.</p>
+  <div class="alert tip">
+    <strong>"Check the GSM signal level in C4.7 — it should be at least 10 to 15"</strong>
+  </div>
+</section>
+
+<!-- ══ 8. BEZPIECZEŃSTWO ═══════════════════════════════════════════════════ -->
+<section id="bezpieczenstwo">
+  <h2 class="sec"><span class="num">8</span>Bezpieczeństwo (safety)</h2>
+
+  <div class="alert danger">
+    <strong>230V — zagrożenie życia!</strong> "Risk to life — 230V mains voltage!"<br>
+    Przed pracą serwisową zawsze odłącz zasilanie: <strong>"Always disconnect power before servicing!"</strong>
+  </div>
+
+  <h3>Co robić tylko przy wyłączonym zasilaniu (power disconnected):</h3>
+  <div class="term-block">
+    <div class="term-row"><div class="term-pl">Wymiana bezpieczników</div><div class="term-en">Fuse replacement</div></div>
+    <div class="term-row"><div class="term-pl">Czyszczenie jednostki chłodzącej</div><div class="term-en">Cleaning the cooling unit</div></div>
+    <div class="term-row"><div class="term-pl">Wymiana lampki wewnętrznej</div><div class="term-en">Replacing the interior light</div></div>
+  </div>
+
+  <h3>System alarmowy (alarm system)</h3>
+  <p style="font-size:.9rem;color:var(--muted);margin:.3rem 0 .6rem">Dwa wyłączniki krańcowe (limit switches) chronią przed włamaniem. Alarm = SMS typ 4 + opcjonalnie syrena.</p>
+  <div class="alert warn">
+    Zawsze najpierw otwieraj <strong>dolny zamek</strong>, potem górny — żeby nie odpalić alarmu!<br>
+    <strong>"Always open the lower lock first, then the upper lock"</strong><br>
+    Po uruchomieniu alarmu: 2 minuty syreny, wyłączyć można tylko odłączając zasilanie.<br>
+    <strong>"Unplug the power cable to stop the siren"</strong>
+  </div>
+</section>
+
+<!-- ══ 9. FRAZY ═══════════════════════════════════════════════════════════ -->
+<section id="frazy">
+  <h2 class="sec"><span class="num">9</span>Przydatne frazy na szkoleniu</h2>
+  <p style="color:var(--muted);font-size:.88rem;margin-bottom:.8rem">Masz prawo nie rozumieć — używaj tych zdań bez wstydu.</p>
+
+  <table class="phrase-table">
+    <thead><tr><th>Sytuacja</th><th class="en-col">Co powiedzieć po angielsku</th><th class="pl-col">Co to znaczy</th></tr></thead>
+    <tbody>
+      <tr><td>Nie rozumiem</td><td class="en-col">Could you repeat that, please?</td><td>Czy możesz powtórzyć?</td></tr>
+      <tr><td>Proszę mów wolniej</td><td class="en-col">Could you speak more slowly?</td><td>Możesz mówić wolniej?</td></tr>
+      <tr><td>Nie wiem jak to przetłumaczyć</td><td class="en-col">I'm not sure about the translation for this in Polish.</td><td>Nie jestem pewien tłumaczenia</td></tr>
+      <tr><td>Chcę to zapisać</td><td class="en-col">Can I write this down / take a photo?</td><td>Mogę to zapisać / sfotografować?</td></tr>
+      <tr><td>Pokaż mi jeszcze raz</td><td class="en-col">Can you show me again, step by step?</td><td>Możesz pokazać krok po kroku?</td></tr>
+      <tr><td>Co to część?</td><td class="en-col">What is this part called?</td><td>Jak ta część się nazywa?</td></tr>
+      <tr><td>Gdzie to jest?</td><td class="en-col">Where exactly is the [flow meter]?</td><td>Gdzie dokładnie jest [element]?</td></tr>
+      <tr><td>Co robić gdy..?</td><td class="en-col">What should I do when the machine shows this error?</td><td>Co robić gdy maszyna pokazuje błąd?</td></tr>
+      <tr><td>Serwis u klienta</td><td class="en-col">I need to service a machine at a customer's farm.</td><td>Serwis maszyny u klienta</td></tr>
+      <tr><td>Zamówienie części</td><td class="en-col">I need to order a spare part for the flow meter.</td><td>Zamówienie części zamiennej</td></tr>
+      <tr><td>Maszyna nie chłodzi</td><td class="en-col">The machine is not cooling properly.</td><td>Maszyna nie chłodzi</td></tr>
+      <tr><td>Klient dzwoni z problemem</td><td class="en-col">My customer is reporting a fault — the display shows code 9.</td><td>Klient zgłasza błąd — kod 9</td></tr>
+      <tr><td>Proszę o dokumentację</td><td class="en-col">Could you send me the technical documentation?</td><td>Prześlij dokumentację techniczną</td></tr>
+      <tr><td>Dziękuję za szkolenie</td><td class="en-col">Thank you for the training — it was very helpful.</td><td>Dziękuję za szkolenie</td></tr>
+    </tbody>
+  </table>
+
+  <div class="alert tip" style="margin-top:1.5rem">
+    <strong>Tip na szkolenie:</strong> Miej ten przewodnik na telefonie. Gdy nie znasz angielskiego słowa — pokaż polską wersję i zapytaj "What is this called in English?" Alfred Bruni jest przyzwyczajony do klientów z różnych krajów. Ważne żebyś rozumiał maszynę — nie musisz mieć perfekcyjnego angielskiego.
+  </div>
+</section>
+
+</main>
+</body>
+</html>
