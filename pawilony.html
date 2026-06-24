@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pawilony — Sklep za Stodołą</title>
+<meta name="description" content="Dwa rodzaje drewnianych pawilonów: pawilon pod mlekomat oraz pawilon sklepu gospodarczego. Montaż na Twojej działce, projekt pod klucz.">
+<link rel="stylesheet" href="style.css">
+<style>
+/* ── PAWILON PAGE SPECIFIC ── */
+.paw-hero-strip {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: .8rem;
+  margin-top: 2.5rem;
+}
+.paw-hero-strip .ph-img {
+  width: 100%;
+  height: 320px;
+  object-fit: cover;
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow);
+  background: var(--bg3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.ph-placeholder {
+  width: 100%;
+  height: 320px;
+  border-radius: var(--r-lg);
+  background: var(--bg3);
+  border: 2px dashed var(--line);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: .5rem;
+  color: var(--dim);
+}
+.ph-placeholder .ph-icon { font-size: 2.5rem; }
+.ph-placeholder .ph-label { font-size: .82rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
+.ph-placeholder .ph-fname { font-size: .75rem; color: var(--leaf); font-family: monospace; margin-top: .2rem; }
+
+/* ── TYPE SECTIONS ── */
+.paw-type { max-width: 1100px; margin: 0 auto; }
+.paw-type-header {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4rem;
+  align-items: start;
+  margin-bottom: 3rem;
+}
+.paw-type-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: .5rem;
+  font-size: .72rem;
+  font-weight: 700;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--forest);
+  background: var(--sage);
+  border: 1px solid rgba(45,90,39,.25);
+  border-radius: 100px;
+  padding: .28rem .85rem;
+  margin-bottom: 1rem;
+}
+.paw-type-desc { font-size: .95rem; color: var(--muted); line-height: 1.75; }
+.paw-specs-box {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  padding: 1.8rem;
+  box-shadow: var(--shadow);
+}
+.paw-specs-box h4 {
+  font-family: var(--sans);
+  font-size: 1rem;
+  font-weight: 700;
+  margin-bottom: 1.1rem;
+  color: var(--ink);
+}
+
+/* ── PHOTO GALLERY ── */
+.paw-gallery {
+  display: grid;
+  gap: .8rem;
+  margin-bottom: 3rem;
+}
+.paw-gallery.one   { grid-template-columns: 1fr; }
+.paw-gallery.two   { grid-template-columns: 1fr 1fr; }
+.paw-gallery.three { grid-template-columns: 2fr 1fr 1fr; }
+.paw-gallery img, .paw-gallery .ph-placeholder {
+  width: 100%;
+  height: 300px;
+  object-fit: cover;
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow);
+}
+.paw-gallery.one img, .paw-gallery.one .ph-placeholder { height: 420px; }
+
+/* ── INCLUDED LIST ── */
+.included {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: .6rem;
+  margin-top: 1rem;
+}
+.inc-item {
+  display: flex;
+  align-items: flex-start;
+  gap: .65rem;
+  font-size: .87rem;
+  color: var(--ink2);
+  line-height: 1.5;
+  padding: .6rem .8rem;
+  background: var(--bg);
+  border-radius: var(--r);
+  border: 1px solid var(--line);
+}
+.inc-item::before {
+  content: '✓';
+  color: var(--forest);
+  font-weight: 900;
+  font-size: .8rem;
+  margin-top: .1rem;
+  flex-shrink: 0;
+}
+
+/* ── DIVIDER ── */
+.paw-divider {
+  border: none;
+  border-top: 2px dashed var(--line);
+  margin: 0;
+}
+
+/* ── CTA BOX ── */
+.paw-cta-box {
+  background: var(--sage);
+  border: 1.5px solid rgba(45,90,39,.3);
+  border-radius: var(--r-lg);
+  padding: 2.5rem;
+  margin-top: 3rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+.paw-cta-box h3 {
+  font-family: var(--sans);
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--ink);
+  margin-bottom: .4rem;
+}
+.paw-cta-box p { font-size: .9rem; color: var(--muted); max-width: 42ch; line-height: 1.65; }
+.paw-cta-actions { display: flex; gap: .8rem; flex-wrap: wrap; align-items: center; flex-shrink: 0; }
+
+@media(max-width:860px){
+  .paw-hero-strip { grid-template-columns: 1fr; }
+  .paw-type-header { grid-template-columns: 1fr; gap: 2rem; }
+  .paw-gallery.two, .paw-gallery.three { grid-template-columns: 1fr 1fr; }
+  .included { grid-template-columns: 1fr; }
+  .paw-cta-box { flex-direction: column; align-items: flex-start; }
+}
+@media(max-width:600px){
+  .paw-gallery.two, .paw-gallery.three { grid-template-columns: 1fr; }
+  .paw-gallery img, .paw-gallery .ph-placeholder { height: 220px; }
+  .paw-gallery.one img, .paw-gallery.one .ph-placeholder { height: 260px; }
+  .ph-placeholder { height: 220px !important; }
+  .paw-hero-strip .ph-placeholder { height: 220px; }
+}
+</style>
+</head>
+<body>
+
+<div class="ticker">
+  <div class="ticker-inner">
+    <span>Kompleksowa obsługa farmera</span><span>Drewniany pawilon pod klucz</span><span>Mlekomat Premium CE-MID</span><span>Pomoc przy finansowaniu inwestycji</span><span>Leasing rolniczy</span><span>Instalacja i serwis — cała Polska</span><span>Kompleksowa obsługa farmera</span><span>Drewniany pawilon pod klucz</span><span>Mlekomat Premium CE-MID</span><span>Pomoc przy finansowaniu inwestycji</span><span>Leasing rolniczy</span><span>Instalacja i serwis — cała Polska</span>
+  </div>
+</div>
+
+<nav class="nav" id="nav">
+  <a href="index.html" class="nav-logo"><span class="nav-logo-dot"></span>Sklep za Stodołą</a>
+  <ul class="nav-links">
+    <li><a href="index.html">Start</a></li>
+    <li><a href="jak-dzialamy.html">Jak działamy</a></li>
+    <li><a href="pawilony.html" class="active">Pawilony</a></li>
+    <li><a href="mlekomat.html">Mlekomat</a></li>
+    <li><a href="kontakt.html">Kontakt</a></li>
+  </ul>
+  <a href="kontakt.html" class="nav-cta">Porozmawiajmy</a>
+  <button class="burger" id="burger" aria-label="Menu" aria-expanded="false"><span></span><span></span><span></span></button>
+</nav>
+<nav class="mob-nav" id="mob-nav">
+  <button class="mob-close" id="mob-close">✕</button>
+  <a href="index.html">Start</a>
+  <a href="jak-dzialamy.html">Jak działamy</a>
+  <a href="pawilony.html">Pawilony</a>
+  <a href="mlekomat.html">Mlekomat</a>
+  <a href="kontakt.html">Kontakt</a>
+</nav>
+
+<!-- PAGE HERO -->
+<header class="page-hero">
+  <div class="wrap">
+    <p class="page-hero-eyebrow" data-r="fade">Drewniane pawilony handlowe</p>
+    <h1 data-r>Pawilon dopasowany<br><em>do Twojego celu.</em></h1>
+    <p class="page-hero-sub" data-r data-d="1">Dwa rodzaje pawilonów — jeden skupiony na sprzedaży mleka, drugi to pełnowymiarowy sklep przy gospodarstwie. Oba stawiane na Twojej działce, pod klucz.</p>
+    <div class="paw-hero-strip" data-r data-d="2">
+      <!-- ZAMIEŃ src na prawdziwe zdjęcia gdy będą gotowe -->
+      <div class="ph-placeholder">
+        <span class="ph-icon">🏠</span>
+        <span class="ph-label">Pawilon pod mlekomat</span>
+        <span class="ph-fname">paw-mlekomat-hero.jpg</span>
+      </div>
+      <div class="ph-placeholder">
+        <span class="ph-icon">🏪</span>
+        <span class="ph-label">Pawilon sklepu gospodarczego</span>
+        <span class="ph-fname">paw-sklep-hero.jpg</span>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ═══════════════════════════════════════════
+     TYP 1 — PAWILON POD MLEKOMAT
+═══════════════════════════════════════════ -->
+<section class="sec" id="pawilon-mlekomat">
+  <div class="wrap">
+    <div class="paw-type">
+
+      <div data-r>
+        <span class="paw-type-badge">Typ 01</span>
+        <h2 class="sec-title">Pawilon<br><em>pod mlekomat.</em></h2>
+      </div>
+
+      <div class="paw-type-header">
+        <div data-r>
+          <p class="paw-type-desc">
+            Kompaktowy drewniany pawilon zaprojektowany z myślą o jednym głównym celu — bezobsługowej sprzedaży świeżego mleka. Mlekomat jest osią całego projektu, a pawilon chroni maszynę, daje klientowi wygodę i nadaje całości profesjonalny wygląd.
+          </p>
+          <p class="paw-type-desc" style="margin-top:.9rem">
+            Idealny dla rolników, którzy chcą zacząć od sprzedaży mleka i stopniowo rozwijać ofertę.
+          </p>
+          <div style="margin-top:1.5rem;display:flex;flex-wrap:wrap;gap:.5rem">
+            <span class="pill">🥛 Mlekomat w centrum</span>
+            <span class="pill">📐 Kompaktowa forma</span>
+            <span class="pill">⚡ Szybki montaż</span>
+            <span class="pill">🔒 Ochrona maszyny</span>
+          </div>
+        </div>
+
+        <div class="paw-specs-box" data-r="right">
+          <h4>Parametry orientacyjne</h4>
+          <div class="specs">
+            <div class="spec-row"><span class="lbl">Powierzchnia</span><span class="val">[X] m²</span></div>
+            <div class="spec-row"><span class="lbl">Szerokość</span><span class="val">[X] m</span></div>
+            <div class="spec-row"><span class="lbl">Głębokość</span><span class="val">[X] m</span></div>
+            <div class="spec-row"><span class="lbl">Wysokość w kalenicy</span><span class="val">[X] m</span></div>
+            <div class="spec-row"><span class="lbl">Konstrukcja</span><span class="val g">Drewno klejone / bale</span></div>
+            <div class="spec-row"><span class="lbl">Dach</span><span class="val">[blachodachówka / gont]</span></div>
+            <div class="spec-row"><span class="lbl">Czas montażu</span><span class="val">[X] dni roboczych</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- GALERIA — typ 1 -->
+      <div class="paw-gallery two" data-r>
+        <div class="ph-placeholder">
+          <span class="ph-icon">📷</span>
+          <span class="ph-label">Widok z zewnątrz</span>
+          <span class="ph-fname">paw-mlekomat-1.jpg</span>
+        </div>
+        <div class="ph-placeholder">
+          <span class="ph-icon">📷</span>
+          <span class="ph-label">Wnętrze / mlekomat</span>
+          <span class="ph-fname">paw-mlekomat-2.jpg</span>
+        </div>
+      </div>
+
+      <!-- CO WCHODZI W SKŁAD -->
+      <div data-r>
+        <p class="sec-label">Co wchodzi w skład</p>
+        <div class="included">
+          <div class="inc-item">Drewniana konstrukcja pawilonu</div>
+          <div class="inc-item">Montaż mlekomatu Premium</div>
+          <div class="inc-item">Przyłącze elektryczne do mlekomatu</div>
+          <div class="inc-item">Oświetlenie strefy klienta</div>
+          <div class="inc-item">Podłoga (beton / płyta)</div>
+          <div class="inc-item">Drzwi serwisowe do mlekomatu</div>
+          <div class="inc-item">Monitoring SMS i panel online</div>
+          <div class="inc-item">Szkolenie z obsługi</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<hr class="paw-divider">
+
+<!-- ═══════════════════════════════════════════
+     TYP 2 — PAWILON SKLEPU GOSPODARCZEGO
+═══════════════════════════════════════════ -->
+<section class="sec sec-alt" id="pawilon-sklep">
+  <div class="wrap">
+    <div class="paw-type">
+
+      <div data-r>
+        <span class="paw-type-badge">Typ 02</span>
+        <h2 class="sec-title">Pawilon sklepu<br><em>gospodarczego.</em></h2>
+      </div>
+
+      <div class="paw-type-header">
+        <div data-r>
+          <p class="paw-type-desc">
+            Pełnowymiarowy drewniany sklep przy Twoim gospodarstwie. Miejsce na mlekomat, ladę chłodniczą, ekspozycję produktów, a nawet kącik dla klientów. Zaprojektowany tak, żeby każdy, kto wejdzie po mleko, wyszedł z koszykiem pełnym Twoich produktów.
+          </p>
+          <p class="paw-type-desc" style="margin-top:.9rem">
+            Dla rolników, którzy myślą o kompleksowej sprzedaży bezpośredniej i chcą zbudować coś trwałego.
+          </p>
+          <div style="margin-top:1.5rem;display:flex;flex-wrap:wrap;gap:.5rem">
+            <span class="pill">🛒 Pełna ekspozycja produktów</span>
+            <span class="pill">🥛 Mlekomat jako element</span>
+            <span class="pill">❄️ Miejsce na chłodnie</span>
+            <span class="pill">🪵 Drewno — ciepły klimat</span>
+            <span class="pill">📦 Magazyn / zaplecze</span>
+          </div>
+        </div>
+
+        <div class="paw-specs-box" data-r="right">
+          <h4>Parametry orientacyjne</h4>
+          <div class="specs">
+            <div class="spec-row"><span class="lbl">Powierzchnia</span><span class="val">[X] m²</span></div>
+            <div class="spec-row"><span class="lbl">Szerokość</span><span class="val">[X] m</span></div>
+            <div class="spec-row"><span class="lbl">Głębokość</span><span class="val">[X] m</span></div>
+            <div class="spec-row"><span class="lbl">Wysokość w kalenicy</span><span class="val">[X] m</span></div>
+            <div class="spec-row"><span class="lbl">Konstrukcja</span><span class="val g">Drewno klejone / bale</span></div>
+            <div class="spec-row"><span class="lbl">Dach</span><span class="val">[blachodachówka / gont]</span></div>
+            <div class="spec-row"><span class="lbl">Czas montażu</span><span class="val">[X] dni roboczych</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- GALERIA — typ 2 -->
+      <div class="paw-gallery three" data-r>
+        <div class="ph-placeholder">
+          <span class="ph-icon">📷</span>
+          <span class="ph-label">Widok z zewnątrz</span>
+          <span class="ph-fname">paw-sklep-1.jpg</span>
+        </div>
+        <div class="ph-placeholder">
+          <span class="ph-icon">📷</span>
+          <span class="ph-label">Wnętrze — ekspozycja</span>
+          <span class="ph-fname">paw-sklep-2.jpg</span>
+        </div>
+        <div class="ph-placeholder">
+          <span class="ph-icon">📷</span>
+          <span class="ph-label">Detal / strefa mleka</span>
+          <span class="ph-fname">paw-sklep-3.jpg</span>
+        </div>
+      </div>
+
+      <!-- CO WCHODZI W SKŁAD -->
+      <div data-r>
+        <p class="sec-label">Co wchodzi w skład</p>
+        <div class="included">
+          <div class="inc-item">Drewniana konstrukcja pawilonu</div>
+          <div class="inc-item">Montaż mlekomatu Premium</div>
+          <div class="inc-item">Lada chłodnicza / witryna</div>
+          <div class="inc-item">Regały i ekspozytory na produkty</div>
+          <div class="inc-item">Przyłącze elektryczne i oświetlenie</div>
+          <div class="inc-item">Podłoga (beton / płyta / drewno)</div>
+          <div class="inc-item">Zaplecze / magazyn (opcja)</div>
+          <div class="inc-item">Monitoring i alarm antywłamaniowy</div>
+          <div class="inc-item">Ogrzewanie (opcja — zima)</div>
+          <div class="inc-item">Szyld / oznakowanie sklepu</div>
+          <div class="inc-item">Panel online ze sprzedażą</div>
+          <div class="inc-item">Szkolenie z obsługi</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="sec" style="border-top:1px solid var(--line)">
+  <div class="wrap">
+    <div class="paw-cta-box" data-r>
+      <div>
+        <h3>Nie wiesz który pawilon wybrać?</h3>
+        <p>Porozmawiajmy — dobierzemy typ i rozmiar do Twojego miejsca, produktów i budżetu. Bezpłatna konsultacja, bez zobowiązań.</p>
+      </div>
+      <div class="paw-cta-actions">
+        <a href="kontakt.html" class="btn btn-green">Zapytaj o pawilon →</a>
+        <a href="tel:533200652" style="font-size:1rem;font-weight:700;color:var(--forest);display:flex;align-items:center;gap:.4rem">📞 533 200 652</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="footer-inner">
+    <div>
+      <p class="footer-brand">Sklep za Stodołą</p>
+      <p class="footer-sub">Tworzymy dochodowe sklepy przy gospodarstwach. Wyłączny dystrybutor mlekomatu Premium w Polsce.</p>
+      <div class="footer-soc">
+        <a href="https://www.facebook.com/profile.php?id=61590896125832" class="soc-btn" target="_blank" rel="noopener">f</a>
+        <a href="https://www.instagram.com/sklepzastodola/" class="soc-btn" target="_blank" rel="noopener">ig</a>
+      </div>
+    </div>
+    <div class="footer-col"><h4>Strony</h4><ul>
+      <li><a href="index.html">Start</a></li>
+      <li><a href="jak-dzialamy.html">Jak działamy</a></li>
+      <li><a href="pawilony.html">Pawilony</a></li>
+      <li><a href="mlekomat.html">Mlekomat</a></li>
+      <li><a href="kontakt.html">Kontakt</a></li>
+    </ul></div>
+    <div class="footer-col"><h4>Kontakt</h4><ul>
+      <li><a href="tel:533200652">533 200 652</a></li>
+      <li><a href="tel:690000923">690 000 923</a></li>
+      <li><a href="mailto:kontakt@sklepzastodola.pl">kontakt@sklepzastodola.pl</a></li>
+    </ul></div>
+  </div>
+  <div class="footer-bottom">
+    <p class="footer-copy">© 2026 Sklep za Stodołą Sp. z o.o.</p>
+    <div class="footer-links"><a href="polityka.html">Polityka prywatności</a></div>
+  </div>
+</footer>
+
+<div class="cookie" id="cookie">
+  <p>Ta strona używa plików cookies. <a href="polityka.html">Polityka prywatności</a></p>
+  <div class="cookie-btns">
+    <button class="ck-yes" onclick="setCk('accept')">Akceptuję</button>
+    <button class="ck-no" onclick="setCk('reject')">Tylko niezbędne</button>
+  </div>
+</div>
+
+<script>
+  if(localStorage.getItem('ck') && !localStorage.getItem('cookie_consent')){
+    var v = localStorage.getItem('ck');
+    localStorage.setItem('cookie_consent', v === 'yes' ? 'accept' : 'reject');
+    localStorage.removeItem('ck');
+  }
+</script>
+<script src="nav.js"></script>
+</body>
+</html>
