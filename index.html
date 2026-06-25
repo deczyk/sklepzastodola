@@ -38,60 +38,55 @@
 .founder-info strong { display: block; color: var(--ink); font-size: .83rem; font-weight: 700; }
 
 /* PHOTO STRIP */
-.strip { 
-  padding: 0 5vw 3.5rem; 
+.strip {
+  padding: 0 5vw 3.5rem;
 }
 
-.strip-grid { 
-  display: grid; 
-  grid-template-columns: 2fr 1fr 1fr; 
-  gap: .8rem; 
+.strip-grid {
+  max-width: 1120px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(180px, .65fr) minmax(0, 1.1fr);
+  gap: .9rem;
   align-items: stretch;
 }
 
-.strip-img,
-.strip-stack {
-  width: 100%;
-  min-width: 0;
+.strip-photo {
+  position: relative;
   overflow: hidden;
   border-radius: var(--r-lg);
+  background: var(--paper);
+  box-shadow: 0 18px 45px rgba(43, 35, 25, .08);
 }
 
-.strip-img {
-  aspect-ratio: 4 / 3;
-}
-
-.strip-stack {
-  display: grid;
-  grid-template-rows: 1fr 1fr;
-  gap: .8rem;
-}
-
-.strip-stack .strip-img {
-  aspect-ratio: auto;
-  min-height: 0;
-}
-
-.strip-img img {
+.strip-photo img {
   width: 100%;
   height: 100%;
   display: block;
   object-fit: cover;
-  object-position: center;
   border-radius: inherit;
-  transition: transform .45s cubic-bezier(.22,1,.36,1), filter .35s;
+  transition: transform .55s cubic-bezier(.22,1,.36,1), filter .35s;
 }
 
-.strip-img:hover img {
+.strip-photo:hover img {
   transform: scale(1.035);
+  filter: saturate(1.04);
 }
 
-.strip-img.main img {
+.strip-photo.wide {
+  aspect-ratio: 4 / 3;
+}
+
+.strip-photo.tall {
+  aspect-ratio: 3 / 4;
+}
+
+.strip-photo.left img,
+.strip-photo.right img {
   object-position: center center;
 }
 
-.strip-img.top img,
-.strip-img.bottom img {
+.strip-photo.middle img {
   object-position: center top;
 }
 
@@ -118,107 +113,56 @@
 .tel-link:hover { color: var(--moss); }
 
 @media(max-width:860px){
-  .stmt-inner { grid-template-columns: 1fr; gap: 2.5rem; }
-@media(max-width:860px){
-  .stmt-inner { grid-template-columns: 1fr; gap: 2.5rem; }
-
-  .strip-grid { 
-    grid-template-columns: 1fr 1fr; 
+  .stmt-inner {
+    grid-template-columns: 1fr;
+    gap: 2.5rem;
   }
 
-  .strip-img.main { 
-    grid-column: 1 / -1; 
+  .strip-grid {
+    max-width: 760px;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .strip-photo.left {
+    grid-column: 1 / -1;
     aspect-ratio: 16 / 9;
   }
 
-  .strip-stack {
-    grid-column: 1 / 2;
-    aspect-ratio: 1 / 1;
+  .strip-photo.middle,
+  .strip-photo.right {
+    aspect-ratio: 4 / 3;
   }
 
-  .strip-grid > .strip-img:last-child {
-    grid-column: 2 / 3;
-    aspect-ratio: 1 / 1;
+  .preview-grid {
+    grid-template-columns: 1fr;
   }
 
-  .preview-grid { grid-template-columns: 1fr; }
-  .hero-scroll { display: none; }
+  .hero-scroll {
+    display: none;
+  }
 }
 
 @media(max-width:600px){
-  .strip-grid { 
-    grid-template-columns: 1fr; 
+  .strip {
+    padding: 0 4vw 3rem;
   }
 
-  .strip-img.main,
-  .strip-grid > .strip-img:last-child,
-  .strip-stack {
+  .strip-grid {
+    max-width: 430px;
+    grid-template-columns: 1fr;
+    gap: .75rem;
+  }
+
+  .strip-photo.left,
+  .strip-photo.middle,
+  .strip-photo.right {
     grid-column: auto;
     aspect-ratio: 4 / 3;
   }
 
-  .strip-stack {
-    display: grid;
-    grid-template-rows: 1fr 1fr;
-    aspect-ratio: auto;
+  .strip-photo.middle img {
+    object-position: center top;
   }
-
-  .strip-stack .strip-img {
-    aspect-ratio: 4 / 3;
-  }
-}
-  .preview-grid { grid-template-columns: 1fr; }
-  .hero-scroll { display: none; }
-}
-@media(max-width:600px){
-@media(max-width:860px){
-  .stmt-inner { grid-template-columns: 1fr; gap: 2.5rem; }
-
-  .strip-grid { 
-    grid-template-columns: 1fr 1fr; 
-  }
-
-  .strip-img.main { 
-    grid-column: 1 / -1; 
-    aspect-ratio: 16 / 9;
-  }
-
-  .strip-stack {
-    grid-column: 1 / 2;
-    aspect-ratio: 1 / 1;
-  }
-
-  .strip-grid > .strip-img:last-child {
-    grid-column: 2 / 3;
-    aspect-ratio: 1 / 1;
-  }
-
-  .preview-grid { grid-template-columns: 1fr; }
-  .hero-scroll { display: none; }
-}
-
-@media(max-width:600px){
-  .strip-grid { 
-    grid-template-columns: 1fr; 
-  }
-
-  .strip-img.main,
-  .strip-grid > .strip-img:last-child,
-  .strip-stack {
-    grid-column: auto;
-    aspect-ratio: 4 / 3;
-  }
-
-  .strip-stack {
-    display: grid;
-    grid-template-rows: 1fr 1fr;
-    aspect-ratio: auto;
-  }
-
-  .strip-stack .strip-img {
-    aspect-ratio: 4 / 3;
-  }
-}
 }
 </style>
 </head>
@@ -277,6 +221,7 @@
     </div>
   </div>
   <div class="hero-scroll" aria-hidden="true">przewiń</div>
+</div>
 </section>
 
 <!-- STATEMENT -->
@@ -298,28 +243,24 @@
         </div>
       </div>
     </div>
+  </div>
+</div>
 </section>
 
 <!-- PHOTO STRIP -->
 <div class="strip">
   <div class="strip-grid" data-r>
-    <div class="strip-img main">
-      <img src="npawilony2.jpg" alt="Pawilon pod mlekomat przy gospodarstwie — widok zewnętrzny">
-    </div>
+    <figure class="strip-photo wide left">
+      <img src="npawilony2.jpg" alt="Pawilon z dystrybutorem mleka przy gospodarstwie">
+    </figure>
 
-    <div class="strip-stack">
-      <div class="strip-img top">
-        <img src="automat2.jpg" alt="Mlekomat Brunimat Premium — front">
-      </div>
+    <figure class="strip-photo tall middle">
+      <img src="automat3.jpg" alt="Dystrybutor mleka wewnątrz pawilonu">
+    </figure>
 
-      <div class="strip-img bottom">
-        <img src="automat3.jpg" alt="Mlekomat Brunimat Premium — wnętrze">
-      </div>
-    </div>
-
-    <div class="strip-img">
-      <img src="npawilon3.jpg" alt="Pawilon sklepu gospodarczego — drewniany sklep przy zagrodzie">
-    </div>
+    <figure class="strip-photo wide right">
+      <img src="npawilony3.jpg" alt="Drewniany sklep przy gospodarstwie">
+    </figure>
   </div>
 </div>
 
@@ -393,6 +334,8 @@
         <a href="jak-dzialamy.html#kalkulator" class="pcard-link">Policz swój zysk →</a>
       </div>
     </div>
+  </div>
+</div>
 </section>
 
 <!-- CTA BAND -->
@@ -405,6 +348,8 @@
       <a href="kontakt.html" class="btn btn-green">Umów bezpłatną rozmowę →</a>
       <a href="tel:533200652" class="tel-link">📞 533 200 652</a>
     </div>
+  </div>
+</div>
 </section>
 
 <!-- FOOTER -->
