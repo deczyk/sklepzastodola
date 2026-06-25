@@ -49,8 +49,8 @@
 <nav class="nav" id="nav">
   <a href="index.html" class="nav-logo"><span class="nav-logo-dot"></span>Sklep za Stodołą</a>
   <ul class="nav-links">
-    <li><a href="index.html" class="active">Start</a></li>
-    <li><a href="jak-dzialamy.html">Jak działamy</a></li>
+    <li><a href="index.html">Start</a></li>
+    <li><a href="jak-dzialamy.html" class="active">Jak działamy</a></li>
     <li><a href="dlaczego.html">Dlaczego to działa?</a></li>
     <li><a href="pawilony.html">Pawilony</a></li>
     <li><a href="mlekomat.html">Mlekomat</a></li>
@@ -535,6 +535,20 @@ document.addEventListener('DOMContentLoaded', function(){
     var el = document.getElementById(id);
     if(el) el.addEventListener('input', calcSklep);
   });
+  /* FAQ — rozwijanie pytań */
+  document.querySelectorAll('.faq-clean-q').forEach(function(button){
+    button.addEventListener('click', function(){
+      var currentItem = button.closest('.faq-clean-item');
+      if(!currentItem) return;
+
+      document.querySelectorAll('.faq-clean-item').forEach(function(item){
+        if(item !== currentItem) item.classList.remove('open');
+      });
+
+      currentItem.classList.toggle('open');
+    });
+  });
+
   /* pierwsze uruchomienie */
   calc();
   calcSklep();
