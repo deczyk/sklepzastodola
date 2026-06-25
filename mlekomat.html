@@ -27,6 +27,8 @@
   .ml-split { grid-template-columns: 1fr; gap: 2.5rem; }
   .machine-visual { position: static; }
   .machine-photo img { height: 320px; }
+  .machine-photo[style] img { height: 260px; }
+  .machine-photo[style] { gap: 6px !important; }
 }
 </style>
 </head>
@@ -101,8 +103,9 @@
 
     <!-- PRAWA: zdjęcie + CTA -->
     <div class="machine-visual" data-r="right">
-      <div class="machine-photo">
-        <img src="automat.jpg" alt="Automat do mleka Premium zainstalowany w drewnianym pawilonie">
+      <div class="machine-photo" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;overflow:visible;background:none;border-radius:0">
+        <img src="automat2.jpg" alt="Mlekomat Brunimat Premium — widok frontu" style="width:100%;height:480px;object-fit:cover;object-position:center top;border-radius:var(--r-lg)">
+        <img src="automat3.jpg" alt="Mlekomat Brunimat zainstalowany w drewnianym pawilonie" style="width:100%;height:480px;object-fit:cover;object-position:center top;border-radius:var(--r-lg)">
       </div>
       <div class="machine-badge-strip">
         <span class="badge badge-green">CE-MID</span>
