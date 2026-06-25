@@ -1,669 +1,154 @@
 <!DOCTYPE html>
 <html lang="pl">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="icon" type="image/x-icon" href="favicon.ico">
-  <link rel="icon" type="image/png" sizes="192x192" href="favicon-192.png">
-  <link rel="apple-touch-icon" href="apple-touch-icon.png">
-  <link rel="icon" type="image/svg+xml" href="favicon.svg">
-
-<title>Sklep za Stodołą — Dochodowe sklepy przy gospodarstwach</title>
-<meta name="description" content="Nie sprzedajemy mlekomatów. Tworzymy dochodowe sklepy przy gospodarstwach. Drewniany pawilon, mlekomat, Twoje produkty — gotowa sprzedaż bezpośrednia.">
-<link rel="stylesheet" href="style.css">
-<style>
-/* HOME-ONLY */
-.hero { min-height: 90vh; display: flex; flex-direction: column; justify-content: flex-end; padding: 0 5vw 8vh; position: relative; overflow: hidden; background: var(--bg); }
-.hero-photo { position: absolute; inset: 0; z-index: 0; }
-.hero-photo img { width: 100%; height: 100%; object-fit: cover; opacity: .45; }
-.hero-photo::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to top, rgba(247,244,238,1) 12%, rgba(247,244,238,.6) 45%, rgba(247,244,238,.15) 100%); }
-.hero-content { position: relative; z-index: 1; }
-.hero-eyebrow { font-size: .75rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--wheat); margin-bottom: 1.3rem; display: flex; align-items: center; gap: .7rem; }
-.hero-eyebrow::before { content: ''; display: block; width: 2rem; height: 1px; background: var(--wheat); }
-.hero-h1 { font-family: var(--sans); font-size: clamp(2.6rem, 7vw, 5.5rem); font-weight: 700; line-height: 1.05; letter-spacing: -.03em; max-width: 14ch; margin-bottom: 1.6rem; color: var(--ink); }
-.hero-h1 em { font-style: normal; color: var(--forest); display: block; }
-.hero-sub { font-size: clamp(.95rem, 1.4vw, 1.1rem); color: var(--muted); max-width: 52ch; line-height: 1.75; margin-bottom: 2.2rem; }
-.hero-sub strong { color: var(--ink); font-weight: 700; }
-.hero-actions { display: flex; flex-wrap: wrap; gap: .9rem; align-items: center; }
-.hero-scroll { position: absolute; bottom: 2.5rem; right: 5vw; z-index: 1; writing-mode: vertical-rl; font-size: .65rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); display: flex; align-items: center; gap: .55rem; }
-.hero-scroll::after { content: ''; display: block; width: 1px; height: 2.8rem; background: linear-gradient(to bottom, var(--forest), transparent); animation: sc 2s ease-in-out infinite; }
-@keyframes sc { 0%,100%{opacity:.4} 50%{opacity:1} }
-
-/* STATEMENT */
-.stmt { padding: 5.5rem 5vw; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); background: var(--bg2); }
-.stmt-inner { max-width: 900px; display: grid; grid-template-columns: 1fr 1fr; gap: 4.5rem; align-items: center; }
-.stmt-quote { font-family: var(--sans); font-size: clamp(1.3rem, 2.5vw, 2rem); font-weight: 700; line-height: 1.25; letter-spacing: -.02em; }
-.stmt-quote .accent { color: var(--forest); }
-.stmt-meta { border-left: 2px solid var(--forest); padding-left: 1.5rem; background: transparent; }
-.stmt-meta p { font-size: .93rem; color: var(--dim); line-height: 1.72; margin-bottom: 1.1rem; }
-.stmt-meta p strong { color: var(--paper); }
-.founder { display: flex; align-items: center; gap: .85rem; margin-top: 1.4rem; padding-top: 1.4rem; border-top: 1px solid var(--line); }
-.founder-av { width: 42px; height: 42px; border-radius: 50%; background: var(--forest); color: #fff; display: flex; align-items: center; justify-content: center; font-family: var(--sans); font-weight: 800; font-size: .95rem; flex-shrink: 0; }
-.founder-info { font-size: .78rem; color: var(--muted); line-height: 1.4; }
-.founder-info strong { display: block; color: var(--ink); font-size: .83rem; font-weight: 700; }
-
-/* PHOTO STRIP */
-.strip { padding: 0 5vw 4.5rem; }
-.strip-grid { display: flex; flex-direction: column; gap: 1rem; }
-.strip-row-top { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
-.strip-row-top img { width: 100%; height: 300px; object-fit: cover; object-position: center; border-radius: var(--r-lg); display: block; }
-.strip-row-bottom { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
-.strip-row-bottom img { width: 100%; height: 300px; object-fit: cover; object-position: center top; border-radius: var(--r-lg); display: block; }
-
-/* PREVIEW CARDS */
-.preview { padding: 5.5rem 5vw; border-top: 1px solid var(--line); background: var(--bg); }
-.preview-inner { max-width: 1100px; }
-.preview-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.2rem; margin-top: 3rem; }
-.pcard { background: var(--paper); border: 1px solid var(--line); border-radius: var(--r-lg); padding: 2rem; transition: border-color .25s, transform .22s; display: flex; flex-direction: column; }
-.pcard:hover { border-color: var(--forest); transform: translateY(-3px); }
-.pcard-icon { width: 44px; height: 44px; border-radius: var(--r); background: var(--sage); border: 1px solid rgba(45,90,39,.2); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; margin-bottom: 1.1rem; }
-.pcard h3 { font-family: var(--sans); font-size: 1.1rem; font-weight: 700; margin-bottom: .5rem; line-height: 1.25; color: var(--ink); }
-.pcard p { font-size: .86rem; color: var(--muted); line-height: 1.65; flex: 1; }
-.pcard-link { display: inline-flex; align-items: center; gap: .35rem; margin-top: 1.2rem; font-size: .8rem; font-weight: 700; color: var(--wheat); transition: color .2s; }
-.pcard-link:hover { color: var(--gold); }
-
-/* SCENARIO ANIMATED SECTION */
-.scenario-sec { padding: 5.5rem 5vw; border-top: 1px solid var(--line); background: var(--bg2); }
-.scenario-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; margin-top: 3rem; align-items: center; }
-.scenario-ingredients { display: flex; flex-direction: column; gap: 0; }
-.sc-item { background: var(--paper); border: 1px solid var(--line); border-radius: var(--r-lg); padding: 1.2rem 1.5rem; display: flex; align-items: center; gap: 1rem; transition: border-color .3s, box-shadow .3s; }
-.sc-item.lit { border-color: var(--forest); box-shadow: 0 0 0 3px rgba(45,90,39,.08); }
-.sc-icon { font-size: 1.6rem; flex-shrink: 0; width: 2.4rem; text-align: center; }
-.sc-label { font-size: .82rem; font-weight: 700; color: var(--ink); flex: 1; line-height: 1.3; }
-.sc-val { font-size: 1.05rem; font-weight: 800; color: var(--forest); font-family: var(--sans); min-width: 80px; text-align: right; transition: color .3s; }
-.sc-sub { font-size: .68rem; color: var(--muted); min-width: 64px; text-align: right; }
-.sc-plus { text-align: center; font-size: 1.3rem; font-weight: 700; color: var(--muted); padding: .3rem 0; line-height: 1; }
-.scenario-result { background: var(--forest); border-radius: var(--r-lg); padding: 2.5rem 2rem; color: #fff; }
-.sc-result-inner { display: flex; flex-direction: column; gap: .5rem; }
-.sc-result-label { font-size: .72rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: rgba(255,255,255,.6); }
-.sc-result-val { font-size: clamp(2rem,4vw,3rem); font-weight: 800; color: #fff; font-family: var(--sans); line-height: 1.1; transition: all .4s; }
-.sc-result-sub { font-size: .88rem; color: rgba(255,255,255,.65); margin-bottom: .5rem; }
-.sc-divider { height: 1px; background: rgba(255,255,255,.15); margin: .8rem 0; }
-.sc-vs-label { font-size: .7rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: rgba(255,255,255,.5); }
-.sc-vs-skup { font-size: 1.1rem; font-weight: 700; color: rgba(255,255,255,.5); text-decoration: line-through; margin-bottom: .6rem; }
-.sc-result-diff { display: flex; align-items: center; gap: .8rem; flex-wrap: wrap; }
-.sc-diff-badge { background: rgba(255,255,255,.15); border: 1px solid rgba(255,255,255,.25); border-radius: 2rem; padding: .35rem .9rem; font-size: .95rem; font-weight: 800; color: #fff; }
-.sc-diff-pct { font-size: 1.5rem; font-weight: 800; color: #a8d4a4; }
-.sc-disclaimer { font-size: .72rem; color: rgba(255,255,255,.4); margin-top: 1rem; line-height: 1.5; }
-@keyframes countUp { from { opacity:.3; transform: translateY(6px); } to { opacity:1; transform: translateY(0); } }
-.sc-val.counting { animation: countUp .35s ease-out; }
-.sc-result-val.counting { animation: countUp .45s ease-out; }
-
-/* CALC TABS (copied from jak-dzialamy) */
-.calc-tab { padding: .6rem 1.4rem; border: 1.5px solid var(--line); border-radius: 2rem; font-family: var(--sans); font-size: .85rem; font-weight: 700; cursor: pointer; background: var(--paper); color: var(--muted); transition: all .2s; }
-.calc-tab:hover { border-color: var(--forest); color: var(--forest); }
-.calc-tab.active { background: var(--forest); border-color: var(--forest); color: #fff; }
-
-@media(max-width:860px){
-  .scenario-grid { grid-template-columns: 1fr; gap: 2rem; }
-}
-@media(max-width:600px){
-  .sc-val { min-width: 60px; font-size: .9rem; }
-}
-
-.cta-band { padding: 5.5rem 5vw; border-top: 1px solid var(--line); }
-.cta-band-inner { max-width: 680px; }
-.cta-band h2 { font-family: var(--sans); font-size: clamp(2rem, 3.5vw, 3rem); font-weight: 800; line-height: 1.1; letter-spacing: -.02em; margin-bottom: 1rem; color: var(--ink); }
-.cta-band h2 em { font-style: italic; color: var(--wheat); }
-.cta-band p { font-size: 1rem; color: var(--muted); line-height: 1.72; margin-bottom: 2rem; max-width: 50ch; }
-.cta-actions { display: flex; flex-wrap: wrap; gap: .9rem; align-items: center; }
-.tel-link { font-size: 1.1rem; font-weight: 700; color: var(--forest); display: flex; align-items: center; gap: .4rem; transition: color .2s; }
-.tel-link:hover { color: var(--moss); }
-
-@media(max-width:860px){
-  .stmt-inner { grid-template-columns: 1fr; gap: 2.5rem; }
-  .strip-row-top img { height: 220px; }
-  .strip-row-bottom img { height: 280px; }
-  .preview-grid { grid-template-columns: 1fr; }
-  .hero-scroll { display: none; }
-}
-@media(max-width:600px){
-  .strip-row-top { grid-template-columns: 1fr; }
-  .strip-row-top img { height: 220px; }
-  .strip-row-bottom { grid-template-columns: 1fr; }
-  .strip-row-bottom img { height: 260px; }
-}
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sklep za Stodołą — Dochodowe sklepy przy gospodarstwach</title>
+  <meta name="description" content="Tworzymy dochodowe sklepy przy gospodarstwach: drewniany pawilon, mlekomat Premium, finansowanie, montaż i serwis." />
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-
-<div class="ticker">
-  <div class="ticker-inner">
-    <span>Kompleksowa obsługa farmera</span><span>Drewniany pawilon pod klucz</span><span>Mlekomat Premium CE-MID</span><span>Pomoc przy finansowaniu inwestycji</span><span>Leasing rolniczy</span><span>Instalacja i serwis — cała Polska</span><span>Kompleksowa obsługa farmera</span><span>Drewniany pawilon pod klucz</span><span>Mlekomat Premium CE-MID</span><span>Pomoc przy finansowaniu inwestycji</span><span>Leasing rolniczy</span><span>Instalacja i serwis — cała Polska</span>
-  </div>
-</div>
-
-<nav class="nav" id="nav">
-  <a href="index.html" class="nav-logo"><span class="nav-logo-dot"></span>Sklep za Stodołą</a>
-  <ul class="nav-links">
-    <li><a href="index.html" class="active">Start</a></li>
-    <li><a href="jak-dzialamy.html">Jak działamy</a></li>
-    <li><a href="pawilony.html">Pawilony</a></li>
-    <li><a href="mlekomat.html">Mlekomat</a></li>
-    <li><a href="kontakt.html">Kontakt</a></li>
-  </ul>
-  <a href="kontakt.html" class="nav-cta">Porozmawiajmy</a>
-  <button class="burger" id="burger" aria-label="Menu" aria-expanded="false">
-    <span></span><span></span><span></span>
-  </button>
-</nav>
-
-<nav class="mob-nav" id="mob-nav" aria-label="Menu mobilne">
-  <button class="mob-close" id="mob-close" aria-label="Zamknij">✕</button>
-  <a href="index.html">Start</a>
-  <a href="jak-dzialamy.html">Jak działamy</a>
-  <a href="pawilony.html">Pawilony</a>
-  <a href="mlekomat.html">Mlekomat</a>
-  
-  <a href="kontakt.html">Kontakt</a>
-</nav>
-
-<!-- HERO -->
-<section class="hero">
-<div class="wrap">
-  <div class="hero-photo">
-    <img src="pawilon-1.jpg" alt="Drewniany pawilon handlowy przy gospodarstwie">
-  </div>
-  <div class="hero-content">
-    <p class="hero-eyebrow" data-r="fade">Kompleksowa obsługa farmera</p>
-    <h1 class="hero-h1" data-r>
-      Twój sklep.<br>
-      <em>Przy Twoim gospodarstwie.</em>
-    </h1>
-    <p class="hero-sub" data-r data-d="1">
-      Nie sprzedajemy mlekomatów. <strong>Tworzymy dochodowe sklepy przy gospodarstwach.</strong>
-      Drewniany pawilon, mlekomat Premium, Twoje produkty — gotowa sprzedaż bezpośrednia zamiast groszy w skupie.
-    </p>
-    <div class="hero-actions" data-r data-d="2">
-      <a href="kontakt.html" class="btn btn-green">Chcę sklep przy swoim gospodarstwie →</a>
-      <a href="#kalkulator" class="btn btn-outline">Sprawdź ile zarobię</a>
+  <div class="ticker" aria-hidden="true">
+    <div class="ticker-inner">
+      <span>Kompleksowa obsługa farmera</span><span>Drewniany pawilon pod klucz</span><span>Mlekomat Premium CE-MID</span><span>Pomoc przy finansowaniu inwestycji</span><span>Instalacja i serwis — cała Polska</span>
+      <span>Kompleksowa obsługa farmera</span><span>Drewniany pawilon pod klucz</span><span>Mlekomat Premium CE-MID</span><span>Pomoc przy finansowaniu inwestycji</span><span>Instalacja i serwis — cała Polska</span>
     </div>
   </div>
-  <div class="hero-scroll" aria-hidden="true">przewiń</div>
-</section>
 
-<!-- STATEMENT -->
-<section class="stmt">
-<div class="wrap">
-  <div class="stmt-inner">
-    <div class="stmt-quote" data-r="left">
-      <span class="accent">„Rolnicy w Szwajcarii zarabiają 4× więcej na tym samym mleku."</span><br><br>
-      W Polsce większość nadal oddaje za grosze. Postanowiłem to zmienić.
-    </div>
-    <div class="stmt-meta" data-r="right">
-      <p>Widziałem jak działa sprzedaż bezpośrednia za granicą — automat do mleka przy bramie, drewniany pawilon z lokalnymi produktami, stali klienci. <strong>Prosta sprawa, która po prostu działa.</strong></p>
-      <p>Dlatego zamiast sprzedawać samą maszynę, bierzemy cały projekt: pawilon, mlekomat, ustawienie produktów, leasing, wniosek ARiMR. Ty zajmujesz się gospodarstwem — my resztą.</p>
-      <div class="founder">
-        <div class="founder-av">JD</div>
-        <div class="founder-info">
-          <strong>Jakub</strong>
-          Założyciel, Sklep za Stodołą
+  <header class="site-header">
+    <a href="#start" class="brand"><span></span>Sklep za Stodołą</a>
+    <button class="menu-btn" type="button" aria-label="Otwórz menu" aria-expanded="false">☰</button>
+    <nav class="main-nav" aria-label="Główne menu">
+      <a href="#start">Start</a>
+      <a href="#jak-dzialamy">Jak działamy</a>
+      <a href="#pawilony">Pawilony</a>
+      <a href="#mlekomat">Mlekomat</a>
+      <a href="#kontakt">Kontakt</a>
+    </nav>
+    <a class="btn btn-small" href="#kontakt">Porozmawiajmy</a>
+  </header>
+
+  <main id="start">
+    <section class="hero">
+      <div class="hero-photo">
+        <img src="npawilon3.jpg" alt="Drewniany pawilon handlowy przy gospodarstwie" />
+      </div>
+      <div class="hero-content reveal">
+        <p class="eyebrow">Kompleksowa obsługa farmera</p>
+        <h1>Twój sklep. <em>Przy Twoim gospodarstwie.</em></h1>
+        <p class="hero-sub">Nie sprzedajemy samych mlekomatów. Tworzymy dochodowe sklepy przy gospodarstwach: drewniany pawilon, mlekomat Premium, Twoje produkty i gotowa sprzedaż bezpośrednia.</p>
+        <div class="hero-actions">
+          <a class="btn" href="#kontakt">Chcę sklep przy swoim gospodarstwie →</a>
+          <a class="btn btn-light" href="#kalkulator">Sprawdź ile zarobię</a>
         </div>
       </div>
-    </div>
-</section>
+      <span class="scroll-note">przewiń</span>
+    </section>
 
-<!-- PHOTO STRIP -->
-<div class="strip">
-  <div class="strip-grid" data-r>
-    <div class="strip-row-top">
-      <img src="npawilony2.jpg" alt="Pawilon pod mlekomat przy gospodarstwie">
-      <img src="npawilon3.jpg" alt="Pawilon sklepu gospodarczego">
-    </div>
-    <div class="strip-row-bottom">
-      <img src="automat2.jpg" alt="Mlekomat Brunimat Premium — front">
-      <img src="automat3.jpg" alt="Mlekomat Brunimat Premium — wnętrze">
-    </div>
-  </div>
-</div>
-
-<!-- JAK WYGLĄDA GOTOWY SKLEP -->
-<section style="background:var(--bg2);border-top:1px solid var(--line);border-bottom:1px solid var(--line)">
-<div class="wrap" style="padding:5rem 0">
-  <div data-r style="max-width:700px">
-    <p class="sec-label">Jak to działa w praktyce</p>
-    <h2 class="sec-title">Jak wygląda gotowy<br><em>sklep przy gospodarstwie?</em></h2>
-  </div>
-  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:var(--r-lg);overflow:hidden;margin-top:3rem">
-    <div style="background:var(--paper);padding:2rem;text-align:center" data-r data-d="1">
-      <div style="font-size:2.2rem;margin-bottom:.8rem">🚗</div>
-      <p style="font-size:.72rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--forest);margin-bottom:.5rem">Krok 1</p>
-      <p style="font-size:.95rem;font-weight:700;color:var(--ink);margin-bottom:.4rem">Klient przyjeżdża</p>
-      <p style="font-size:.83rem;color:var(--muted);line-height:1.6">Po świeże mleko — o każdej porze, 24/7. Bez kolejek, bez sklepu.</p>
-    </div>
-    <div style="background:var(--paper);padding:2rem;text-align:center" data-r data-d="2">
-      <div style="font-size:2.2rem;margin-bottom:.8rem">🥛</div>
-      <p style="font-size:.72rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--forest);margin-bottom:.5rem">Krok 2</p>
-      <p style="font-size:.95rem;font-weight:700;color:var(--ink);margin-bottom:.4rem">Kupuje mleko</p>
-      <p style="font-size:.83rem;color:var(--muted);line-height:1.6">Kartą, BLIK-iem lub gotówką. Mlekomat wydaje, liczy i chłodzi automatycznie.</p>
-    </div>
-    <div style="background:var(--paper);padding:2rem;text-align:center" data-r data-d="3">
-      <div style="font-size:2.2rem;margin-bottom:.8rem">🧀</div>
-      <p style="font-size:.72rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--forest);margin-bottom:.5rem">Krok 3</p>
-      <p style="font-size:.95rem;font-weight:700;color:var(--ink);margin-bottom:.4rem">Bierze też coś więcej</p>
-      <p style="font-size:.83rem;color:var(--muted);line-height:1.6">Jajka, ser, masło, miód, przetwory — wszystko z Twojego gospodarstwa.</p>
-    </div>
-    <div style="background:var(--paper);padding:2rem;text-align:center" data-r data-d="4">
-      <div style="font-size:2.2rem;margin-bottom:.8rem">💳</div>
-      <p style="font-size:.72rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--forest);margin-bottom:.5rem">Krok 4</p>
-      <p style="font-size:.95rem;font-weight:700;color:var(--ink);margin-bottom:.4rem">Płaci i wraca</p>
-      <p style="font-size:.83rem;color:var(--muted);line-height:1.6">Zostaje stałym klientem. Ty masz wyższe marże niż w skupie — bez pośredników.</p>
-    </div>
-    <div style="background:var(--sage);border-left:3px solid var(--forest);padding:2rem;text-align:center" data-r data-d="5">
-      <div style="font-size:2.2rem;margin-bottom:.8rem">📊</div>
-      <p style="font-size:.72rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--forest);margin-bottom:.5rem">A Ty tymczasem</p>
-      <p style="font-size:.95rem;font-weight:700;color:var(--ink);margin-bottom:.4rem">Zajmujesz się krowami</p>
-      <p style="font-size:.83rem;color:var(--muted);line-height:1.6">Panel online pokazuje sprzedaż. SMS gdy mleko się kończy. Sklep działa sam.</p>
-    </div>
-  </div>
-</div>
-</section>
-
-<!-- ANIMOWANA SEKCJA: LICZBY -->
-<section class="scenario-sec">
-<div class="wrap">
-  <div data-r>
-    <p class="sec-label">Orientacyjny przychód</p>
-    <h2 class="sec-title">Tyle może zarabiać<br><em>sklep przy Twoim gospodarstwie.</em></h2>
-    <p class="sec-body" style="max-width:55ch">Przykład dla średniego gospodarstwa mlecznego — mlekomat + produkty ze sklepu. Twoje liczby policz niżej.</p>
-  </div>
-  <div class="scenario-grid" data-r>
-    <!-- SKŁADNIKI -->
-    <div class="scenario-ingredients">
-      <div class="sc-item" id="sc-mleko">
-        <div class="sc-icon">🥛</div>
-        <div class="sc-label">Mlekomat</div>
-        <div class="sc-val" id="sc-mleko-val">0 zł</div>
-        <div class="sc-sub">miesięcznie</div>
-      </div>
-      <div class="sc-plus">+</div>
-      <div class="sc-item" id="sc-jajka">
-        <div class="sc-icon">🥚</div>
-        <div class="sc-label">Jajka</div>
-        <div class="sc-val" id="sc-jajka-val">0 zł</div>
-        <div class="sc-sub">miesięcznie</div>
-      </div>
-      <div class="sc-plus">+</div>
-      <div class="sc-item" id="sc-sery">
-        <div class="sc-icon">🧀</div>
-        <div class="sc-label">Sery, masło, przetwory</div>
-        <div class="sc-val" id="sc-sery-val">0 zł</div>
-        <div class="sc-sub">miesięcznie</div>
-      </div>
-      <div class="sc-plus">+</div>
-      <div class="sc-item" id="sc-inne">
-        <div class="sc-icon">🍯</div>
-        <div class="sc-label">Miód, warzywa, inne</div>
-        <div class="sc-val" id="sc-inne-val">0 zł</div>
-        <div class="sc-sub">miesięcznie</div>
-      </div>
-    </div>
-    <!-- WYNIK -->
-    <div class="scenario-result">
-      <div class="sc-result-inner">
-        <div class="sc-result-label">= Łączny przychód sklepu</div>
-        <div class="sc-result-val" id="sc-total">0 zł</div>
-        <div class="sc-result-sub" id="sc-total-year">0 zł rocznie</div>
-        <div class="sc-divider"></div>
-        <div class="sc-vs-label">vs. skup mleka</div>
-        <div class="sc-vs-skup" id="sc-skup">0 zł / mies.</div>
-        <div class="sc-result-diff">
-          <span class="sc-diff-badge" id="sc-diff">+0 zł więcej</span>
-          <span class="sc-diff-pct" id="sc-pct">+0%</span>
+    <section class="statement section-alt">
+      <div class="container statement-grid">
+        <h2 class="quote reveal">„Rolnicy w Szwajcarii zarabiają 4× więcej na tym samym mleku.”<br><span>W Polsce większość nadal oddaje za grosze. Postanowiłem to zmienić.</span></h2>
+        <div class="statement-text reveal">
+          <p>Widziałem jak działa sprzedaż bezpośrednia za granicą — automat do mleka przy bramie, drewniany pawilon z lokalnymi produktami, stali klienci. Prosta sprawa, która po prostu działa.</p>
+          <p>Dlatego zamiast sprzedawać samą maszynę, bierzemy cały projekt: pawilon, mlekomat, ustawienie produktów, leasing, wniosek ARiMR. Ty zajmujesz się gospodarstwem — my resztą.</p>
+          <div class="founder"><div>JD</div><p><strong>Jakub</strong>Założyciel, Sklep za Stodołą</p></div>
         </div>
-        <p class="sc-disclaimer">Szacunek orientacyjny dla ~50 krów,<br>30 klientów dziennie</p>
       </div>
-    </div>
-  </div>
-</div>
-</section>
+    </section>
 
-<!-- KALKULATOR ROI -->
-<section class="sec sec-alt" id="kalkulator">
-<div class="wrap">
-  <div data-r>
-    <p class="sec-label">Kalkulator zysku</p>
-    <h2 class="sec-title">Ile może zarobić<br><em>sklep przy Twoim gospodarstwie?</em></h2>
-    <p class="sec-body">Mlekomat przyciąga klientów — ale prawdziwy zysk pochodzi z całego sklepu. Przesuń suwaki i sprawdź pełny obraz.</p>
-  </div>
-
-  <!-- ZAKŁADKI -->
-  <div style="display:flex;gap:.5rem;margin-top:2rem;margin-bottom:1.5rem;flex-wrap:wrap">
-    <button class="calc-tab active" id="tab-mleko" onclick="switchTab('mleko')" type="button">🥛 Zysk z mlekomatu</button>
-    <button class="calc-tab" id="tab-sklep" onclick="switchTab('sklep')" type="button">🛒 Zysk z całego sklepu</button>
-  </div>
-
-  <!-- PANEL: MLEKOMAT -->
-  <div id="panel-mleko">
-  <div class="roi-grid" style="margin-top:0">
-    <div class="slider-wrap" data-r data-d="1">
-      <div class="sl-group">
-        <label for="s1">Dzienna produkcja mleka<span class="v" id="v1">200 L</span></label>
-        <input type="range" id="s1" min="20" max="1000" step="10" value="200" aria-label="Dzienna produkcja mleka">
-      </div>
-      <div class="sl-group">
-        <label for="s2">Aktualna cena skupu<span class="v" id="v2">1,20 zł/L</span></label>
-        <input type="range" id="s2" min="0.50" max="2.50" step="0.05" value="1.20" aria-label="Cena skupu">
-      </div>
-      <div class="sl-group">
-        <label for="s3">Cena przez mlekomat<span class="v" id="v3">4,00 zł/L</span></label>
-        <input type="range" id="s3" min="1.50" max="6.00" step="0.10" value="4.00" aria-label="Cena mlekomat">
-      </div>
-      <div class="sl-group">
-        <label for="s4">Wartość inwestycji<span class="v" id="v4">120 000 zł</span></label>
-        <input type="range" id="s4" min="30000" max="300000" step="5000" value="120000" aria-label="Wartość inwestycji">
-      </div>
-      <button class="toggle-row" id="tog" type="button" aria-pressed="false">
-        <span class="tog"></span>
-        <div>
-          <div class="tog-lbl">Dofinansowanie inwestycji</div>
-          <div class="tog-sub">Włącz jeśli kwalifikujesz się na wsparcie (szacunkowo 50%)</div>
+    <section class="section gallery-section" id="pawilony">
+      <div class="container">
+        <div class="section-head reveal">
+          <p class="eyebrow">Zdjęcia realizacji</p>
+          <h2>Schludna prezentacja pawilonów i mlekomatów</h2>
+          <p>Dwa zdjęcia poziome i dwa pionowe są ułożone w równych kartach. Nie rozpychają strony, nie deformują się i dobrze wyglądają na telefonie.</p>
         </div>
-      </button>
+
+        <div class="photo-showcase reveal">
+          <figure class="photo-card photo-landscape">
+            <img src="npawilony2.jpg" alt="Pawilon z dystrybutorem mleka przy gospodarstwie" />
+          </figure>
+          <figure class="photo-card photo-landscape">
+            <img src="npawilon3.jpg" alt="Drewniany sklep przy gospodarstwie" />
+          </figure>
+          <figure class="photo-card photo-portrait">
+            <img src="automat2.jpg" alt="Mlekomat Brunimat Premium z przodu" />
+          </figure>
+          <figure class="photo-card photo-portrait">
+            <img src="automat3.jpg" alt="Dystrybutor mleka wewnątrz pawilonu" />
+          </figure>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="jak-dzialamy">
+      <div class="container">
+        <div class="section-head reveal">
+          <p class="eyebrow">Jak to działa w praktyce</p>
+          <h2>Jak wygląda gotowy sklep przy gospodarstwie?</h2>
+        </div>
+        <div class="steps">
+          <article class="step reveal"><span>Krok 1</span><h3>Klient przyjeżdża</h3><p>Po świeże mleko — o każdej porze, 24/7. Bez kolejek, bez klasycznego sklepu.</p></article>
+          <article class="step reveal"><span>Krok 2</span><h3>Kupuje mleko</h3><p>Kartą, BLIK-iem lub gotówką. Mlekomat wydaje, liczy i chłodzi automatycznie.</p></article>
+          <article class="step reveal"><span>Krok 3</span><h3>Bierze też coś więcej</h3><p>Jajka, ser, masło, miód, przetwory — wszystko z Twojego gospodarstwa.</p></article>
+          <article class="step reveal"><span>Krok 4</span><h3>Płaci i wraca</h3><p>Zostaje stałym klientem. Ty masz wyższe marże niż w skupie — bez pośredników.</p></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section-alt" id="kalkulator">
+      <div class="container calc-grid">
+        <div class="section-head reveal">
+          <p class="eyebrow">Kalkulator zysku</p>
+          <h2>Ile może zarobić sklep przy Twoim gospodarstwie?</h2>
+          <p>Przesuń suwaki i zobacz orientacyjny obraz sprzedaży mleka oraz dodatkowego koszyka.</p>
+        </div>
+        <div class="calculator reveal">
+          <label>Dzienna produkcja mleka <strong><output id="milkOut">200 L</output></strong><input id="milk" type="range" min="50" max="800" value="200" step="10"></label>
+          <label>Cena skupu <strong><output id="wholesaleOut">1,20 zł/L</output></strong><input id="wholesale" type="range" min="0.8" max="2.5" value="1.2" step="0.05"></label>
+          <label>Cena przez mlekomat <strong><output id="retailOut">4,00 zł/L</output></strong><input id="retail" type="range" min="2" max="8" value="4" step="0.1"></label>
+          <label>Klientów dziennie <strong><output id="clientsOut">30</output></strong><input id="clients" type="range" min="5" max="150" value="30" step="1"></label>
+          <label>Dodatkowy koszyk <strong><output id="basketOut">15 zł</output></strong><input id="basket" type="range" min="0" max="60" value="15" step="1"></label>
+          <label>% klientów kupujących coś więcej <strong><output id="extraOut">40%</output></strong><input id="extra" type="range" min="0" max="100" value="40" step="5"></label>
+        </div>
+        <div class="results reveal">
+          <div><span>Przez skup — miesięcznie</span><strong id="wholesaleResult">0 zł</strong></div>
+          <div><span>Przez mlekomat — miesięcznie</span><strong id="retailResult">0 zł</strong></div>
+          <div><span>Dodatkowy koszyk — miesięcznie</span><strong id="basketResult">0 zł</strong></div>
+          <div class="total"><span>Łączny przychód sklepu</span><strong id="totalResult">0 zł</strong><small id="yearResult">0 zł rocznie</small></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="mlekomat">
+      <div class="container cards">
+        <article class="card reveal"><h3>Jak działamy</h3><p>Drewniany pawilon na Twojej działce, mlekomat, Twoje produkty pięknie podane — od projektu do pierwszej sprzedaży.</p></article>
+        <article class="card reveal"><h3>Mlekomat Premium</h3><p>Automat do mleka z chłodzeniem, rozliczaniem i wygodnymi płatnościami. Serce sklepu, które pracuje 24/7.</p></article>
+        <article class="card reveal"><h3>Kalkulator i finansowanie</h3><p>Pomagamy policzyć sens inwestycji, dobrać leasing, zakup lub dotację do sytuacji gospodarstwa.</p></article>
+      </div>
+    </section>
+
+    <section class="cta section-alt" id="kontakt">
+      <div class="container reveal">
+        <h2>Gotowy, żeby przestać oddawać mleko za grosze?</h2>
+        <p>Bezpłatna rozmowa — ocenimy Twój przypadek, powiemy co ma sens i co możesz zyskać. Bez presji.</p>
+        <div class="hero-actions">
+          <a class="btn" href="tel:533200652">Umów bezpłatną rozmowę →</a>
+          <a class="phone" href="tel:533200652">533 200 652</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-grid">
+      <div><strong>Sklep za Stodołą</strong><p>Tworzymy dochodowe sklepy przy gospodarstwach.</p></div>
+      <div><strong>Strony</strong><a href="#start">Start</a><a href="#jak-dzialamy">Jak działamy</a><a href="#mlekomat">Mlekomat</a><a href="#kontakt">Kontakt</a></div>
+      <div><strong>Kontakt</strong><a href="tel:533200652">533 200 652</a><a href="tel:690000923">690 000 923</a><a href="mailto:kontakt@sklepzastodola.pl">kontakt@sklepzastodola.pl</a></div>
     </div>
-    <div class="roi-results" data-r data-d="2" aria-live="polite">
-      <div class="roi-card">
-        <p class="roi-card-lbl">Przez skup — miesięcznie</p>
-        <p class="roi-card-val neu" id="r1">7 200 zł</p>
-        <p class="roi-card-sub" id="r1s">240 zł/dzień</p>
-      </div>
-      <div class="roi-card">
-        <p class="roi-card-lbl">Przez mlekomat — miesięcznie</p>
-        <p class="roi-card-val neu" id="r2">15 000 zł</p>
-        <p class="roi-card-sub" id="r2s">500 zł/dzień</p>
-      </div>
-      <div class="roi-card hi">
-        <p class="roi-card-lbl">Dodatkowy zysk z mleka</p>
-        <p class="roi-card-val pos" id="r3">+7 800 zł/mies.</p>
-        <p class="roi-card-sub" id="r3s">+93 600 zł rocznie · +108%</p>
-      </div>
-      <div class="roi-card">
-        <p class="roi-card-lbl" id="r4l">Zwrot inwestycji</p>
-        <p class="roi-card-val dim" id="r4">~15 mies.</p>
-        <p class="roi-card-sub" id="r4s">przy 120 000 zł</p>
-      </div>
-    </div>
-  </div>
-  </div>
+    <div class="copyright">© 2026 Sklep za Stodołą Sp. z o.o.</div>
+  </footer>
 
-  <!-- PANEL: CAŁY SKLEP -->
-  <div id="panel-sklep" style="display:none">
-  <div class="roi-grid" style="margin-top:0">
-    <div class="slider-wrap">
-      <div class="sl-group">
-        <label for="s5">Klientów dziennie<span class="v" id="v5">30</span></label>
-        <input type="range" id="s5" min="5" max="120" step="5" value="30" aria-label="Klientów dziennie">
-      </div>
-      <div class="sl-group">
-        <label for="s6">Średni zakup mleka<span class="v" id="v6">8,00 zł</span></label>
-        <input type="range" id="s6" min="2" max="30" step="1" value="8" aria-label="Średni zakup mleka">
-      </div>
-      <div class="sl-group">
-        <label for="s7">Dodatkowy koszyk (jajka, sery, itd.)<span class="v" id="v7">15 zł</span></label>
-        <input type="range" id="s7" min="0" max="60" step="5" value="15" aria-label="Dodatkowy koszyk">
-      </div>
-      <div class="sl-group">
-        <label for="s8">% klientów kupujących coś więcej<span class="v" id="v8">40%</span></label>
-        <input type="range" id="s8" min="0" max="100" step="10" value="40" aria-label="Procent klientów z koszykiem">
-      </div>
-      <div style="padding:.9rem 1.1rem;background:var(--sage);border:1px solid rgba(45,90,39,.2);border-radius:var(--r);font-size:.8rem;color:var(--muted);line-height:1.6">
-        💡 <strong style="color:var(--ink)">Jak to działa?</strong><br>Klient przychodzi po mleko i przy okazji bierze jajka, ser czy masło. Mlekomat jest magnesem — sklep robi zysk.
-      </div>
-    </div>
-    <div class="roi-results" aria-live="polite">
-      <div class="roi-card">
-        <p class="roi-card-lbl">Przychód z mleka — miesięcznie</p>
-        <p class="roi-card-val neu" id="rs1">7 200 zł</p>
-        <p class="roi-card-sub" id="rs1s">240 zł/dzień</p>
-      </div>
-      <div class="roi-card">
-        <p class="roi-card-lbl">Przychód z koszyka — miesięcznie</p>
-        <p class="roi-card-val neu" id="rs2">2 700 zł</p>
-        <p class="roi-card-sub" id="rs2s">90 zł/dzień</p>
-      </div>
-      <div class="roi-card hi">
-        <p class="roi-card-lbl">Łączny przychód sklepu</p>
-        <p class="roi-card-val pos" id="rs3">9 900 zł/mies.</p>
-        <p class="roi-card-sub" id="rs3s">118 800 zł rocznie</p>
-      </div>
-      <div class="roi-card" style="border-color:rgba(155,122,58,.35);background:var(--wheat-bg)">
-        <p class="roi-card-lbl">Koszyk dodaje rocznie</p>
-        <p class="roi-card-val" id="rs4" style="color:var(--wheat)">+32 400 zł</p>
-        <p class="roi-card-sub" id="rs4s">przy 40% klientów kupujących więcej</p>
-      </div>
-    </div>
-  </div>
-  </div>
-
-  <p style="font-size:.75rem;color:var(--muted);margin-top:1.8rem;font-style:italic;max-width:600px" data-r>
-    Szacunek orientacyjny — przychód, nie zysk netto. Rzeczywiste wyniki zależą od lokalizacji, asortymentu i organizacji sprzedaży.
-    <a href="kontakt.html" style="color:var(--forest)">Skontaktuj się</a> po bezpłatną indywidualną analizę.
-  </p>
-</div>
-</section>
-
-<!-- PREVIEW SECTIONS -->
-<section class="preview">
-<div class="wrap">
-  <div class="preview-inner">
-    <div data-r>
-      <p class="sec-label">Wszystko czego potrzebujesz</p>
-      <h2 class="sec-title">Jeden projekt —<br><em>gotowy sklep.</em></h2>
-    </div>
-    <div class="preview-grid">
-      <div class="pcard" data-r data-d="1">
-        <div class="pcard-icon">🏡</div>
-        <h3>Jak działamy</h3>
-        <p>Drewniany pawilon na Twojej działce, mlekomat, Twoje produkty pięknie podane — od projektu do pierwszej sprzedaży. Jeden kontakt, całość po naszej stronie.</p>
-        <a href="jak-dzialamy.html" class="pcard-link">Zobacz cały proces →</a>
-      </div>
-      <div class="pcard" data-r data-d="2">
-        <div class="pcard-icon">🥛</div>
-        <h3>Mlekomat Premium</h3>
-        <p>Szwajcarski automat do mleka z certyfikatem CE-MID — serce sklepu. Chłodzi, liczy, płucze się automatycznie. Płatność kartą, banknotem lub monetą.</p>
-        <a href="mlekomat.html" class="pcard-link">Poznaj mlekomat →</a>
-      </div>
-      <div class="pcard" data-r data-d="3">
-        <div class="pcard-icon">📊</div>
-        <h3>Kalkulator i finansowanie</h3>
-        <p>Sprawdź ile zarobisz więcej niż w skupie. Leasing, zakup lub dotacja ARiMR do 65% — dobieramy finansowanie do Twojej sytuacji.</p>
-        <a href="#kalkulator" class="pcard-link">Policz swój zysk →</a>
-      </div>
-    </div>
-</section>
-
-<!-- CTA BAND -->
-<section class="cta-band">
-<div class="wrap">
-  <div class="cta-band-inner" data-r>
-    <h2>Gotowy żeby<br><em>przestać oddawać mleko za grosze?</em></h2>
-    <p>Bezpłatna rozmowa — ocenimy Twój przypadek, powiemy co ma sens i co możesz zyskać. Bez presji, bez ściemy.</p>
-    <div class="cta-actions">
-      <a href="kontakt.html" class="btn btn-green">Umów bezpłatną rozmowę →</a>
-      <a href="tel:533200652" class="tel-link">📞 533 200 652</a>
-    </div>
-</section>
-
-<!-- FOOTER -->
-<footer class="footer">
-  <div class="footer-inner">
-    <div>
-      <p class="footer-brand">Sklep za Stodołą</p>
-      <p class="footer-sub">Tworzymy dochodowe sklepy przy gospodarstwach. Wyłączny dystrybutor mlekomatu Premium w Polsce.</p>
-      <div class="footer-soc">
-        <a href="https://www.facebook.com/profile.php?id=61590896125832" class="soc-btn" aria-label="Facebook" target="_blank" rel="noopener">f</a>
-        <a href="https://www.instagram.com/sklepzastodola/" class="soc-btn" aria-label="Instagram" target="_blank" rel="noopener">ig</a>
-      </div>
-    </div>
-    <div class="footer-col">
-      <h4>Strony</h4>
-      <ul>
-        <li><a href="index.html">Start</a></li>
-        <li><a href="jak-dzialamy.html">Jak działamy</a></li>
-        <li><a href="mlekomat.html">Mlekomat</a></li>
-        <li><a href="kontakt.html">Kontakt</a></li>
-      </ul>
-    </div>
-    <div class="footer-col">
-      <h4>Kontakt</h4>
-      <ul>
-        <li><a href="tel:533200652">533 200 652</a></li>
-        <li><a href="tel:690000923">690 000 923</a></li>
-        <li><a href="mailto:kontakt@sklepzastodola.pl">kontakt@sklepzastodola.pl</a></li>
-      </ul>
-    </div>
-  </div>
-  <div class="footer-bottom">
-    <p class="footer-copy">© 2026 Sklep za Stodołą Sp. z o.o.</p>
-    <div class="footer-links"><a href="polityka.html">Polityka prywatności</a></div>
-  </div>
-</footer>
-
-<div class="cookie" id="cookie">
-  <p>Ta strona używa plików cookies. <a href="polityka.html">Polityka prywatności</a></p>
-  <div class="cookie-btns">
-    <button class="ck-yes" onclick="setCk('yes')">Akceptuję</button>
-    <button class="ck-no" onclick="setCk('no')">Tylko niezbędne</button>
-  </div>
-</div>
-
-<script>
-  // Jednorazowe czyszczenie starego klucza 'ck' z poprzedniej wersji
-  if(localStorage.getItem('ck') && !localStorage.getItem('cookie_consent')){
-    var v = localStorage.getItem('ck');
-    localStorage.setItem('cookie_consent', v === 'yes' ? 'accept' : 'reject');
-    localStorage.removeItem('ck');
-  }
-</script>
-<script src="nav.js"></script>
-<script>
-/* ── KALKULATOR ROI ── */
-function fmt(n){ return n.toLocaleString('pl-PL',{maximumFractionDigits:0})+' zł'; }
-
-function switchTab(tab) {
-  document.getElementById('panel-mleko').style.display = tab==='mleko'?'':'none';
-  document.getElementById('panel-sklep').style.display = tab==='sklep'?'':'none';
-  document.getElementById('tab-mleko').classList.toggle('active', tab==='mleko');
-  document.getElementById('tab-sklep').classList.toggle('active', tab==='sklep');
-  if(tab==='sklep') calcSklep();
-  if(tab==='mleko') calc();
-}
-
-var _arimr = false;
-function calc(){
-  var s1=document.getElementById('s1'); if(!s1) return;
-  var prod=+s1.value, skup=+document.getElementById('s2').value,
-      ml=+document.getElementById('s3').value, inv=+document.getElementById('s4').value;
-  var sm=prod*30*skup, mm=prod*30*ml, zysk=mm-sm, zyskR=zysk*12;
-  var w=sm>0?Math.round((mm/sm-1)*100):0;
-  var effInv=_arimr?inv*0.5:inv;
-  var zwrot=zysk>0?Math.ceil(effInv/zysk):999;
-  document.getElementById('v1').textContent=prod+' L';
-  document.getElementById('v2').textContent=skup.toFixed(2).replace('.',',')+' zł/L';
-  document.getElementById('v3').textContent=ml.toFixed(2).replace('.',',')+' zł/L';
-  document.getElementById('v4').textContent=inv.toLocaleString('pl-PL')+' zł';
-  document.getElementById('r1').textContent=fmt(sm);
-  document.getElementById('r1s').textContent=fmt(Math.round(sm/30))+'/dzień';
-  document.getElementById('r2').textContent=fmt(mm);
-  document.getElementById('r2s').textContent=fmt(Math.round(mm/30))+'/dzień';
-  document.getElementById('r3').textContent=(zysk>=0?'+':'')+fmt(zysk)+'/mies.';
-  document.getElementById('r3s').textContent=(zyskR>=0?'+':'')+fmt(zyskR)+' rocznie · +'+w+'%';
-  document.getElementById('r4').textContent=zwrot<200?'~'+zwrot+' mies.':'powyżej 16 lat';
-  document.getElementById('r4s').textContent='przy '+effInv.toLocaleString('pl-PL')+' zł'+(_arimr?' (po dofinansowaniu)':'');
-  document.getElementById('r4l').textContent=_arimr?'Zwrot z dofinansowaniem':'Zwrot inwestycji';
-}
-
-function calcSklep(){
-  var s5=document.getElementById('s5'); if(!s5) return;
-  var klienci=+s5.value, mleko=+document.getElementById('s6').value,
-      koszyk=+document.getElementById('s7').value, pct=+document.getElementById('s8').value/100;
-  var mlekoDzien=klienci*mleko, koszykDzien=klienci*pct*koszyk;
-  var mlekMies=mlekoDzien*30, koszykMies=koszykDzien*30, razem=mlekMies+koszykMies;
-  document.getElementById('v5').textContent=klienci;
-  document.getElementById('v6').textContent=mleko.toFixed(0)+' zł';
-  document.getElementById('v7').textContent=koszyk.toFixed(0)+' zł';
-  document.getElementById('v8').textContent=Math.round(pct*100)+'%';
-  document.getElementById('rs1').textContent=fmt(mlekMies);
-  document.getElementById('rs1s').textContent=fmt(Math.round(mlekoDzien))+'/dzień';
-  document.getElementById('rs2').textContent=fmt(koszykMies);
-  document.getElementById('rs2s').textContent=fmt(Math.round(koszykDzien))+'/dzień';
-  document.getElementById('rs3').textContent=fmt(razem)+'/mies.';
-  document.getElementById('rs3s').textContent=fmt(razem*12)+' rocznie';
-  document.getElementById('rs4').textContent='+'+fmt(koszykMies*12);
-  document.getElementById('rs4s').textContent='przy '+Math.round(pct*100)+'% klientów kupujących więcej';
-}
-
-/* ── ANIMOWANA SEKCJA ── */
-var _scPlayed = false;
-
-function animCount(el, to, dur, prefix, suffix){
-  if(!el) return;
-  el.classList.remove('counting'); void el.offsetWidth; el.classList.add('counting');
-  var start=null;
-  function step(ts){
-    if(!start) start=ts;
-    var p=Math.min((ts-start)/dur,1), e=1-Math.pow(1-p,3);
-    el.textContent=(prefix||'')+(Math.round(to*e)).toLocaleString('pl-PL')+(suffix||'');
-    if(p<1) requestAnimationFrame(step);
-    else el.classList.remove('counting');
-  }
-  requestAnimationFrame(step);
-}
-
-function playScenario(){
-  var vals=[
-    {id:'sc-mleko', v:15000},
-    {id:'sc-jajka', v:1350},
-    {id:'sc-sery',  v:1080},
-    {id:'sc-inne',  v:540}
-  ];
-  vals.forEach(function(item,i){
-    setTimeout(function(){
-      var el=document.getElementById(item.id);
-      if(el) el.classList.add('lit');
-      animCount(document.getElementById(item.id+'-val'), item.v, 650, '', ' zł');
-    }, i*420);
-  });
-  var total=vals.reduce(function(a,b){return a+b.v;},0);
-  var skup=7200, diff=total-skup, pct=Math.round(diff/skup*100);
-  setTimeout(function(){
-    animCount(document.getElementById('sc-total'), total, 900, '', ' zł');
-    var yrEl=document.getElementById('sc-total-year');
-    if(yrEl) yrEl.textContent=(total*12).toLocaleString('pl-PL')+' zł rocznie';
-    animCount(document.getElementById('sc-skup'), skup, 600, '', ' zł / mies.');
-  }, vals.length*420+100);
-  setTimeout(function(){
-    var diffEl=document.getElementById('sc-diff');
-    if(diffEl){ diffEl.textContent='+'+diff.toLocaleString('pl-PL')+' zł więcej'; }
-    var pctEl=document.getElementById('sc-pct');
-    if(pctEl){ pctEl.textContent='+'+pct+'%'; }
-  }, vals.length*420+800);
-}
-
-/* ── INIT ── */
-document.addEventListener('DOMContentLoaded', function(){
-  var tog=document.getElementById('tog');
-  if(tog) tog.addEventListener('click',function(){
-    _arimr=!_arimr; tog.classList.toggle('on',_arimr);
-    tog.setAttribute('aria-pressed',_arimr); calc();
-  });
-  ['s1','s2','s3','s4'].forEach(function(id){
-    var el=document.getElementById(id); if(el) el.addEventListener('input',calc);
-  });
-  ['s5','s6','s7','s8'].forEach(function(id){
-    var el=document.getElementById(id); if(el) el.addEventListener('input',calcSklep);
-  });
-  calc(); calcSklep();
-
-  var scSec=document.querySelector('.scenario-sec');
-  if(scSec && window.IntersectionObserver){
-    new IntersectionObserver(function(entries){
-      if(entries[0].isIntersecting && !_scPlayed){
-        _scPlayed=true; playScenario();
-      }
-    },{threshold:0.25}).observe(scSec);
-  }
-});
-</script>
+  <div class="cookie" id="cookieBox"><span>Ta strona używa plików cookies.</span><button id="acceptCookies">Akceptuję</button></div>
 </body>
 </html>
