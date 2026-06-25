@@ -38,9 +38,62 @@
 .founder-info strong { display: block; color: var(--ink); font-size: .83rem; font-weight: 700; }
 
 /* PHOTO STRIP */
-.strip { padding: 0 5vw 3.5rem; }
-.strip-grid { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: .8rem; height: 360px; overflow: hidden; }
-.strip-grid > img { width: 100%; height: 100%; object-fit: cover; object-position: center; border-radius: var(--r-lg); display: block; overflow: hidden; }
+.strip { 
+  padding: 0 5vw 3.5rem; 
+}
+
+.strip-grid { 
+  display: grid; 
+  grid-template-columns: 2fr 1fr 1fr; 
+  gap: .8rem; 
+  align-items: stretch;
+}
+
+.strip-img,
+.strip-stack {
+  width: 100%;
+  min-width: 0;
+  overflow: hidden;
+  border-radius: var(--r-lg);
+}
+
+.strip-img {
+  aspect-ratio: 4 / 3;
+}
+
+.strip-stack {
+  display: grid;
+  grid-template-rows: 1fr 1fr;
+  gap: .8rem;
+}
+
+.strip-stack .strip-img {
+  aspect-ratio: auto;
+  min-height: 0;
+}
+
+.strip-img img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+  object-position: center;
+  border-radius: inherit;
+  transition: transform .45s cubic-bezier(.22,1,.36,1), filter .35s;
+}
+
+.strip-img:hover img {
+  transform: scale(1.035);
+}
+
+.strip-img.main img {
+  object-position: center center;
+}
+
+.strip-img.top img,
+.strip-img.bottom img {
+  object-position: center top;
+}
 
 /* PREVIEW CARDS */
 .preview { padding: 5.5rem 5vw; border-top: 1px solid var(--line); background: var(--bg); }
@@ -66,15 +119,106 @@
 
 @media(max-width:860px){
   .stmt-inner { grid-template-columns: 1fr; gap: 2.5rem; }
-  .strip-grid { grid-template-columns: 1fr 1fr; height: 260px; }
-  .strip-grid > img:first-child { grid-column: 1/3; height: 260px; }
-  .strip-grid > div { height: 260px; overflow: hidden; }
+@media(max-width:860px){
+  .stmt-inner { grid-template-columns: 1fr; gap: 2.5rem; }
+
+  .strip-grid { 
+    grid-template-columns: 1fr 1fr; 
+  }
+
+  .strip-img.main { 
+    grid-column: 1 / -1; 
+    aspect-ratio: 16 / 9;
+  }
+
+  .strip-stack {
+    grid-column: 1 / 2;
+    aspect-ratio: 1 / 1;
+  }
+
+  .strip-grid > .strip-img:last-child {
+    grid-column: 2 / 3;
+    aspect-ratio: 1 / 1;
+  }
+
+  .preview-grid { grid-template-columns: 1fr; }
+  .hero-scroll { display: none; }
+}
+
+@media(max-width:600px){
+  .strip-grid { 
+    grid-template-columns: 1fr; 
+  }
+
+  .strip-img.main,
+  .strip-grid > .strip-img:last-child,
+  .strip-stack {
+    grid-column: auto;
+    aspect-ratio: 4 / 3;
+  }
+
+  .strip-stack {
+    display: grid;
+    grid-template-rows: 1fr 1fr;
+    aspect-ratio: auto;
+  }
+
+  .strip-stack .strip-img {
+    aspect-ratio: 4 / 3;
+  }
+}
   .preview-grid { grid-template-columns: 1fr; }
   .hero-scroll { display: none; }
 }
 @media(max-width:600px){
-  .strip-grid { grid-template-columns: 1fr; height: auto; }
-  .strip-grid > img, .strip-grid > div { height: 200px !important; grid-column: auto; overflow: hidden; }
+@media(max-width:860px){
+  .stmt-inner { grid-template-columns: 1fr; gap: 2.5rem; }
+
+  .strip-grid { 
+    grid-template-columns: 1fr 1fr; 
+  }
+
+  .strip-img.main { 
+    grid-column: 1 / -1; 
+    aspect-ratio: 16 / 9;
+  }
+
+  .strip-stack {
+    grid-column: 1 / 2;
+    aspect-ratio: 1 / 1;
+  }
+
+  .strip-grid > .strip-img:last-child {
+    grid-column: 2 / 3;
+    aspect-ratio: 1 / 1;
+  }
+
+  .preview-grid { grid-template-columns: 1fr; }
+  .hero-scroll { display: none; }
+}
+
+@media(max-width:600px){
+  .strip-grid { 
+    grid-template-columns: 1fr; 
+  }
+
+  .strip-img.main,
+  .strip-grid > .strip-img:last-child,
+  .strip-stack {
+    grid-column: auto;
+    aspect-ratio: 4 / 3;
+  }
+
+  .strip-stack {
+    display: grid;
+    grid-template-rows: 1fr 1fr;
+    aspect-ratio: auto;
+  }
+
+  .strip-stack .strip-img {
+    aspect-ratio: 4 / 3;
+  }
+}
 }
 </style>
 </head>
@@ -159,12 +303,23 @@
 <!-- PHOTO STRIP -->
 <div class="strip">
   <div class="strip-grid" data-r>
-    <img src="npawilony2.jpg" alt="Pawilon pod mlekomat przy gospodarstwie — widok zewnętrzny">
-    <div style="display:grid;grid-template-rows:1fr 1fr;gap:.8rem;height:100%;overflow:hidden">
-      <img src="automat2.jpg" alt="Mlekomat Brunimat Premium — front" style="height:100%;width:100%;object-fit:cover;object-position:center top;border-radius:var(--r-lg);overflow:hidden">
-      <img src="automat3.jpg" alt="Mlekomat Brunimat Premium — wnętrze" style="height:100%;width:100%;object-fit:cover;object-position:center top;border-radius:var(--r-lg);overflow:hidden">
+    <div class="strip-img main">
+      <img src="npawilony2.jpg" alt="Pawilon pod mlekomat przy gospodarstwie — widok zewnętrzny">
     </div>
-    <img src="npawilon3.jpg" alt="Pawilon sklepu gospodarczego — drewniany sklep przy zagrodzie">
+
+    <div class="strip-stack">
+      <div class="strip-img top">
+        <img src="automat2.jpg" alt="Mlekomat Brunimat Premium — front">
+      </div>
+
+      <div class="strip-img bottom">
+        <img src="automat3.jpg" alt="Mlekomat Brunimat Premium — wnętrze">
+      </div>
+    </div>
+
+    <div class="strip-img">
+      <img src="npawilon3.jpg" alt="Pawilon sklepu gospodarczego — drewniany sklep przy zagrodzie">
+    </div>
   </div>
 </div>
 
