@@ -44,10 +44,11 @@
 
 /* PHOTO STRIP */
 .strip { padding: 0 5vw 4.5rem; }
-.strip-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; height: 420px; overflow: hidden; }
-.strip-grid > img { width: 100%; height: 100%; object-fit: cover; object-position: center; border-radius: var(--r-lg); display: block; overflow: hidden; }
-.strip-pair { display: grid; grid-template-rows: 1fr 1fr; gap: 1rem; overflow: hidden; min-height: 0; }
-.strip-pair img { width: 100%; height: 100%; object-fit: cover; object-position: center top; border-radius: var(--r-lg); display: block; min-height: 0; overflow: hidden; }
+.strip-grid { display: flex; flex-direction: column; gap: 1rem; }
+.strip-row-top { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.strip-row-top img { width: 100%; height: 300px; object-fit: cover; object-position: center; border-radius: var(--r-lg); display: block; }
+.strip-row-bottom { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.strip-row-bottom img { width: 100%; height: 360px; object-fit: cover; object-position: center top; border-radius: var(--r-lg); display: block; }
 
 /* PREVIEW CARDS */
 .preview { padding: 5.5rem 5vw; border-top: 1px solid var(--line); background: var(--bg); }
@@ -111,17 +112,16 @@
 
 @media(max-width:860px){
   .stmt-inner { grid-template-columns: 1fr; gap: 2.5rem; }
-  .strip-grid { grid-template-columns: 1fr 1fr; height: 320px; }
-  .strip-grid > img:last-child { display: none; }
-  .strip-pair { height: 320px; }
+  .strip-row-top img { height: 220px; }
+  .strip-row-bottom img { height: 280px; }
   .preview-grid { grid-template-columns: 1fr; }
   .hero-scroll { display: none; }
 }
 @media(max-width:600px){
-  .strip-grid { grid-template-columns: 1fr; height: auto; }
-  .strip-grid > img:last-child { display: block; height: 220px; }
-  .strip-grid > img:first-child { height: 220px; }
-  .strip-pair { height: 460px; }
+  .strip-row-top { grid-template-columns: 1fr; }
+  .strip-row-top img { height: 220px; }
+  .strip-row-bottom { grid-template-columns: 1fr; }
+  .strip-row-bottom img { height: 260px; }
 }
 </style>
 </head>
@@ -206,12 +206,14 @@
 <!-- PHOTO STRIP -->
 <div class="strip">
   <div class="strip-grid" data-r>
-    <img src="npawilony2.jpg" alt="Pawilon pod mlekomat przy gospodarstwie">
-    <div class="strip-pair">
+    <div class="strip-row-top">
+      <img src="npawilony2.jpg" alt="Pawilon pod mlekomat przy gospodarstwie">
+      <img src="npawilon3.jpg" alt="Pawilon sklepu gospodarczego">
+    </div>
+    <div class="strip-row-bottom">
       <img src="automat2.jpg" alt="Mlekomat Brunimat Premium — front">
       <img src="automat3.jpg" alt="Mlekomat Brunimat Premium — wnętrze">
     </div>
-    <img src="npawilon3.jpg" alt="Pawilon sklepu gospodarczego">
   </div>
 </div>
 
