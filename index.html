@@ -38,9 +38,9 @@
 .founder-info strong { display: block; color: var(--ink); font-size: .83rem; font-weight: 700; }
 
 /* PHOTO STRIP */
-.strip { padding: 0 5vw 5rem; }
-.strip-grid { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: .8rem; height: 320px; max-height: 28vw; }
-.strip-grid img { width: 100%; height: 100%; object-fit: cover; object-position: center; border-radius: var(--r-lg); display: block; }
+.strip { padding: 0 5vw 4rem; }
+.strip-grid { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: .8rem; height: 260px; max-height: 22vw; min-height: 180px; }
+.strip-grid > img { width: 100%; height: 100%; object-fit: cover; object-position: center; border-radius: var(--r-lg); display: block; }
 
 /* PREVIEW CARDS */
 .preview { padding: 5.5rem 5vw; border-top: 1px solid var(--line); background: var(--bg); }
@@ -66,15 +66,16 @@
 
 @media(max-width:860px){
   .stmt-inner { grid-template-columns: 1fr; gap: 2.5rem; }
-  .strip-grid { grid-template-columns: 1fr 1fr; grid-template-rows: 180px 180px; height: auto; max-height: none; }
-  .strip-grid img:first-child { grid-column: 1/3; }
+  .strip-grid { grid-template-columns: 1fr 1fr; grid-template-rows: auto; height: auto; max-height: none; min-height: 0; }
+  .strip-grid > img:first-child { grid-column: 1/3; height: 200px; }
+  .strip-grid > div { height: 200px; }
+  .strip-grid > img:last-child { height: 200px; }
   .preview-grid { grid-template-columns: 1fr; }
   .hero-scroll { display: none; }
 }
 @media(max-width:600px){
-  .strip-grid { grid-template-columns: 1fr; height: auto; max-height: none; }
-  .strip-grid img { height: 220px !important; }
-  .strip-grid img:first-child { grid-column: auto; }
+  .strip-grid { grid-template-columns: 1fr; height: auto; max-height: none; min-height: 0; }
+  .strip-grid > img, .strip-grid > div { height: 200px !important; grid-column: auto; }
 }
 </style>
 </head>
@@ -160,8 +161,11 @@
 <div class="strip">
   <div class="strip-grid" data-r>
     <img src="npawilony2.jpg" alt="Pawilon pod mlekomat przy gospodarstwie — widok zewnętrzny">
+    <div style="display:grid;grid-template-rows:1fr 1fr;gap:.8rem;height:100%">
+      <img src="automat2.jpg" alt="Mlekomat Brunimat Premium — front" style="height:100%;width:100%;object-fit:cover;border-radius:var(--r-lg)">
+      <img src="automat3.jpg" alt="Mlekomat Brunimat Premium — wnętrze" style="height:100%;width:100%;object-fit:cover;border-radius:var(--r-lg)">
+    </div>
     <img src="npawilon3.jpg" alt="Pawilon sklepu gospodarczego — drewniany sklep przy zagrodzie">
-    <img src="automat3.jpg" alt="Mlekomat Brunimat Premium — automat do mleka 24/7">
   </div>
 </div>
 
