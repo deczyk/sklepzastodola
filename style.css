@@ -109,7 +109,7 @@ button { cursor: pointer; font-family: inherit; }
 .btn-outline:hover { background: var(--sage); transform: translateY(-1px); }
 
 /* ── CARDS GRID ── */
-.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: var(--r-lg); overflow: hidden; margin-top: 3.5rem; }
+.cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: var(--r-lg); overflow: hidden; margin-top: 3.5rem; }
 .card { background: var(--paper); padding: 2rem; position: relative; overflow: hidden; transition: background .22s; }
 .card::after { content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 3px; background: linear-gradient(90deg, var(--forest), var(--leaf)); transform: scaleX(0); transform-origin: left; transition: transform .3s cubic-bezier(.22,1,.36,1); }
 .card:hover { background: var(--sage); }
