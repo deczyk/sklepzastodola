@@ -1532,3 +1532,383 @@ button {
     transform: none;
   }
 }
+/* ─────────────────────────────────────────────
+   FIX — przywrócenie stylu ROI i formularza
+   Wkleić NA SAM KONIEC style.css
+───────────────────────────────────────────── */
+
+/* ── ROI / KALKULATOR ZYSKU ── */
+
+.roi-grid {
+  display: grid !important;
+  grid-template-columns: 1.1fr .9fr !important;
+  gap: 4rem !important;
+  margin-top: 3.5rem;
+  align-items: start !important;
+  max-width: 900px !important;
+}
+
+.slider-wrap {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 1.7rem !important;
+}
+
+.sl-group label {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: baseline !important;
+  gap: 1rem !important;
+  font-size: .83rem !important;
+  color: var(--muted) !important;
+  margin-bottom: .55rem !important;
+  font-weight: 700 !important;
+}
+
+.sl-group label .v {
+  font-size: .9rem !important;
+  font-weight: 900 !important;
+  color: var(--forest) !important;
+  white-space: nowrap !important;
+}
+
+input[type=range] {
+  -webkit-appearance: none !important;
+  appearance: none !important;
+  width: 100% !important;
+  height: 4px !important;
+  background: var(--line) !important;
+  border-radius: 2px !important;
+  outline: none !important;
+  padding: 0 !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none !important;
+  width: 18px !important;
+  height: 18px !important;
+  border-radius: 50% !important;
+  background: var(--forest) !important;
+  cursor: pointer !important;
+  border: 2px solid #fff !important;
+  box-shadow: 0 2px 6px rgba(45,90,39,.35) !important;
+  transition: transform .15s !important;
+}
+
+input[type=range]::-webkit-slider-thumb:hover {
+  transform: scale(1.15) !important;
+  background: var(--moss) !important;
+}
+
+input[type=range]::-moz-range-thumb {
+  width: 18px !important;
+  height: 18px !important;
+  border-radius: 50% !important;
+  background: var(--forest) !important;
+  cursor: pointer !important;
+  border: 2px solid #fff !important;
+}
+
+.toggle-row {
+  display: flex !important;
+  align-items: center !important;
+  gap: .8rem !important;
+  padding: .9rem 1.1rem !important;
+  background: var(--paper) !important;
+  border: 1.5px solid var(--line) !important;
+  border-radius: var(--r) !important;
+  cursor: pointer !important;
+  width: 100% !important;
+  text-align: left !important;
+  transition: border-color .2s, background .2s !important;
+  box-shadow: var(--shadow) !important;
+  color: var(--ink) !important;
+}
+
+.toggle-row:hover {
+  border-color: var(--forest) !important;
+}
+
+.toggle-row.on {
+  border-color: var(--forest) !important;
+  background: var(--sage) !important;
+}
+
+.tog {
+  width: 36px !important;
+  height: 20px !important;
+  border-radius: 10px !important;
+  background: var(--line) !important;
+  position: relative !important;
+  flex-shrink: 0 !important;
+  transition: background .2s !important;
+}
+
+.tog::after {
+  content: '' !important;
+  position: absolute !important;
+  top: 3px !important;
+  left: 3px !important;
+  width: 14px !important;
+  height: 14px !important;
+  border-radius: 50% !important;
+  background: var(--dim) !important;
+  transition: transform .2s, background .2s !important;
+}
+
+.toggle-row.on .tog {
+  background: var(--forest) !important;
+}
+
+.toggle-row.on .tog::after {
+  transform: translateX(16px) !important;
+  background: #fff !important;
+}
+
+.tog-lbl {
+  font-size: .84rem !important;
+  font-weight: 700 !important;
+  color: var(--ink) !important;
+}
+
+.tog-sub {
+  font-size: .72rem !important;
+  color: var(--muted) !important;
+  margin-top: .1rem !important;
+}
+
+.roi-results {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: .9rem !important;
+  background: transparent !important;
+  border: none !important;
+  border-radius: 0 !important;
+  padding: 0 !important;
+  box-shadow: none !important;
+}
+
+.roi-card {
+  background: var(--paper) !important;
+  border: 1px solid var(--line) !important;
+  border-radius: var(--r) !important;
+  padding: 1.3rem 1.4rem !important;
+  transition: border-color .2s !important;
+  box-shadow: var(--shadow) !important;
+}
+
+.roi-card:hover {
+  border-color: var(--forest) !important;
+}
+
+.roi-card.hi {
+  border-color: rgba(45,90,39,.4) !important;
+  background: var(--sage) !important;
+}
+
+.roi-card-lbl {
+  font-size: .65rem !important;
+  font-weight: 700 !important;
+  letter-spacing: .1em !important;
+  text-transform: uppercase !important;
+  color: var(--dim) !important;
+  margin-bottom: .35rem !important;
+}
+
+.roi-card-val {
+  font-family: var(--sans) !important;
+  font-size: 1.75rem !important;
+  font-weight: 700 !important;
+  line-height: 1 !important;
+}
+
+.roi-card-val.pos {
+  color: var(--forest) !important;
+}
+
+.roi-card-val.neu {
+  color: var(--ink) !important;
+}
+
+.roi-card-val.dim {
+  color: var(--muted) !important;
+}
+
+.roi-card-sub {
+  font-size: .76rem !important;
+  color: var(--muted) !important;
+  margin-top: .2rem !important;
+}
+
+/* ── ZAKŁADKI KALKULATORA ── */
+
+.calc-tab {
+  padding: .6rem 1.4rem !important;
+  border: 1.5px solid var(--line) !important;
+  border-radius: 2rem !important;
+  font-family: var(--sans) !important;
+  font-size: .85rem !important;
+  font-weight: 700 !important;
+  cursor: pointer !important;
+  background: var(--paper) !important;
+  color: var(--muted) !important;
+  transition: all .2s !important;
+  box-shadow: var(--shadow) !important;
+}
+
+.calc-tab:hover {
+  border-color: var(--forest) !important;
+  color: var(--forest) !important;
+}
+
+.calc-tab.active {
+  background: var(--forest) !important;
+  border-color: var(--forest) !important;
+  color: #fff !important;
+}
+
+/* ── FORMULARZ KONTAKTOWY ── */
+
+.cform {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: .9rem !important;
+}
+
+.ff {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: .35rem !important;
+}
+
+.ff label {
+  font-size: .75rem !important;
+  font-weight: 700 !important;
+  letter-spacing: .06em !important;
+  text-transform: uppercase !important;
+  color: var(--muted) !important;
+}
+
+.ff input,
+.ff textarea,
+.ff select {
+  width: 100% !important;
+  background: var(--paper) !important;
+  border: 1.5px solid var(--line) !important;
+  border-radius: var(--r) !important;
+  padding: .78rem .95rem !important;
+  color: var(--ink) !important;
+  font-family: var(--sans) !important;
+  font-size: .9rem !important;
+  transition: border-color .2s, box-shadow .2s !important;
+  outline: none !important;
+  -webkit-appearance: none !important;
+  appearance: none !important;
+  box-shadow: var(--shadow) !important;
+}
+
+.ff input:focus,
+.ff textarea:focus,
+.ff select:focus {
+  border-color: var(--forest) !important;
+  box-shadow: 0 0 0 3px rgba(45,90,39,.1) !important;
+}
+
+.ff textarea {
+  resize: vertical !important;
+  min-height: 100px !important;
+}
+
+.ff select {
+  background-color: var(--paper) !important;
+  cursor: pointer !important;
+}
+
+/* ── KONTAKT — UKŁAD I LINKI ── */
+
+.contact-layout {
+  display: grid !important;
+  grid-template-columns: 1fr 1fr !important;
+  gap: 5rem !important;
+  align-items: start !important;
+  max-width: 900px !important;
+}
+
+.contact-links {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: .6rem !important;
+  margin-top: 1.8rem !important;
+}
+
+.clink {
+  display: flex !important;
+  align-items: center !important;
+  gap: .85rem !important;
+  font-size: .93rem !important;
+  color: var(--dim) !important;
+  padding: .75rem 0 !important;
+  border-bottom: 1px solid var(--line) !important;
+  transition: color .2s !important;
+}
+
+.clink:hover {
+  color: var(--forest) !important;
+}
+
+.clink-icon {
+  width: 36px !important;
+  height: 36px !important;
+  border-radius: var(--r) !important;
+  background: rgba(45,90,39,.14) !important;
+  border: 1px solid rgba(45,90,39,.26) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: .9rem !important;
+  flex-shrink: 0 !important;
+}
+
+.contact-note {
+  font-size: .8rem !important;
+  color: var(--muted) !important;
+  margin-top: 1.5rem !important;
+  line-height: 1.65 !important;
+}
+
+/* ── RESPONSIVE DLA ROI I KONTAKTU ── */
+
+@media (max-width: 860px) {
+  .roi-grid {
+    grid-template-columns: 1fr !important;
+    gap: 2.5rem !important;
+  }
+
+  .contact-layout {
+    grid-template-columns: 1fr !important;
+    gap: 3rem !important;
+  }
+
+  .roi-results[data-r="right"] {
+    transform: translateY(28px) !important;
+  }
+
+  .roi-results[data-r="right"].on {
+    transform: none !important;
+  }
+
+  .calc-tab {
+    font-size: .78rem !important;
+    padding: .55rem 1rem !important;
+  }
+}
+
+@media (max-width: 600px) {
+  .sl-group label {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: .15rem !important;
+  }
+}
