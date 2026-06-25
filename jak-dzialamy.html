@@ -18,8 +18,34 @@
 .info-box strong { color: var(--paper); }
 @media(max-width:860px){ .two-col { grid-template-columns: 1fr; gap: 2.5rem; } }
 
-/* ── CALCULATOR TABS ── */
-.calc-tab {
+/* ── ANCHOR BAR ── */
+.anchor-bar { position: sticky; top: 0; z-index: 90; background: var(--paper); border-bottom: 1px solid var(--line); box-shadow: 0 1px 8px rgba(0,0,0,.06); }
+.anchor-bar-inner { display: flex; align-items: center; gap: 0; max-width: 1200px; margin: 0 auto; padding: 0 5vw; overflow-x: auto; scrollbar-width: none; }
+.anchor-bar-inner::-webkit-scrollbar { display: none; }
+.anchor-link { font-family: var(--sans); font-size: .82rem; font-weight: 600; color: var(--muted); padding: .85rem 1.1rem; white-space: nowrap; text-decoration: none; border-bottom: 2px solid transparent; transition: color .2s, border-color .2s; }
+.anchor-link:hover { color: var(--forest); border-bottom-color: var(--forest); }
+.anchor-link.active { color: var(--forest); border-bottom-color: var(--forest); }
+.anchor-link-cta { margin-left: auto; color: var(--forest); font-weight: 700; background: var(--sage); border-radius: var(--r); padding: .5rem 1rem; border-bottom: none !important; }
+.anchor-link-cta:hover { background: var(--forest); color: #fff; }
+
+/* ── FIN TABLE ── */
+.fin-compare-table { overflow-x: auto; margin-top: 2.5rem; }
+.fin-table { width: 100%; border-collapse: collapse; font-size: .88rem; }
+.fin-table th { background: var(--forest); color: #fff; padding: .9rem 1rem; text-align: left; font-weight: 700; font-size: .82rem; }
+.fin-table th:first-child { width: 160px; border-radius: var(--r) 0 0 0; }
+.fin-table th:last-child { border-radius: 0 var(--r) 0 0; }
+.fin-table td { padding: .85rem 1rem; border-bottom: 1px solid var(--line); vertical-align: top; line-height: 1.5; color: var(--dim); }
+.fin-row-alt td { background: var(--bg2); }
+.fin-row-label { font-weight: 700; color: var(--ink) !important; background: var(--paper) !important; }
+.fin-best { color: var(--forest) !important; font-weight: 700; }
+.fin-note { display: block; font-size: .75rem; color: var(--muted); font-weight: 400; margin-top: .15rem; }
+.fin-disclaimer { font-size: .78rem; color: var(--muted); margin-top: 1rem; font-style: italic; }
+
+/* ── FAQ CATEGORIES ── */
+.faq-category { font-size: .78rem; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; color: var(--wheat); margin: 2rem 0 .5rem; padding-bottom: .5rem; border-bottom: 1px solid var(--line); }
+
+/* ── CALC TABS ── */
+
   font-family: var(--sans);
   font-size: .82rem;
   font-weight: 700;
@@ -67,6 +93,18 @@
   <a href="mlekomat.html">Mlekomat</a>
   <a href="kontakt.html">Kontakt</a>
 </nav>
+
+
+<!-- ANCHOR NAV BAR -->
+<div class="anchor-bar" id="anchor-bar">
+  <div class="anchor-bar-inner">
+    <a href="#jak-dziala" class="anchor-link">Jak działamy</a>
+    <a href="#finansowanie" class="anchor-link">Finansowanie</a>
+    <a href="#kalkulator" class="anchor-link">Kalkulator</a>
+    <a href="#faq" class="anchor-link">FAQ</a>
+    <a href="kontakt.html" class="anchor-link anchor-link-cta">Bezpłatna rozmowa →</a>
+  </div>
+</div>
 
 <header class="page-hero">
 <div class="wrap">
@@ -132,6 +170,7 @@
 </section>
 
 <!-- KROKI -->
+<span id="jak-dziala"></span>
 <section class="sec sec-alt">
 <div class="wrap">
   <div data-r>
@@ -237,7 +276,20 @@
 </div>
 </section>
 
+<!-- KALKULATOR -->
+<section class="sec sec-alt" id="kalkulator">
+<div class="wrap">
+  <div data-r style="text-align:center;max-width:600px;margin:0 auto">
+    <p class="sec-label">Kalkulator zysku</p>
+    <h2 class="sec-title">Ile może zarobić<br><em>Twój sklep?</em></h2>
+    <p class="sec-body">Przesuń suwaki i sprawdź orientacyjny przychód z mlekomatu i całego sklepu przy gospodarstwie.</p>
+    <a href="index.html#kalkulator" class="btn btn-green" style="margin-top:1.5rem;display:inline-flex">Przejdź do kalkulatora →</a>
+  </div>
+</div>
+</section>
+
 <!-- FINANSOWANIE -->
+<span id="finansowanie"></span>
 <section class="sec">
 <div class="wrap">
   <div data-r>
@@ -245,85 +297,114 @@
     <h2 class="sec-title">Sklep się opłaca<br><em>od pierwszego dnia.</em></h2>
     <p class="sec-body">Trzy drogi do inwestycji — dobieramy to co ma sens w Twojej sytuacji finansowej.</p>
   </div>
-  <div class="fin-grid">
-    <div class="fin-card hi" data-r data-d="1">
-      <div class="fin-card-icon">💰</div>
-      <h3>Programy wsparcia rolniczego</h3>
-      <p>Sprawdzamy dostępne programy wsparcia modernizacji gospodarstw. W wybranych naborach część kosztów może kwalifikować się do dofinansowania — każdą inwestycję analizujemy indywidualnie.</p>
-      <ul class="fin-list">
-        <li>Analiza kwalifikowalności Twojej inwestycji</li>
-        <li>Pomoc przy wniosku, jeśli nabór jest aktywny</li>
-        <li>Znamy aktualne programy i procedury</li>
-        <li>Ty skupiasz się na krowach — my na papierach</li>
-      </ul>
-    </div>
-    <div class="fin-card" data-r data-d="2">
-      <div class="fin-card-icon">📋</div>
-      <h3>Leasing rolniczy</h3>
-      <p>Mały wkład własny, stała rata miesięczna. Mlekomat zarabia od pierwszego dnia — spłaca się zanim go w pełni wykupisz.</p>
-      <ul class="fin-list">
-        <li>Niski wkład własny</li>
-        <li>Stała, przewidywalna rata miesięczna</li>
-        <li>Korzyści podatkowe dla działalności rolniczej</li>
-        <li>Wykup po zakończeniu okresu leasingu</li>
-      </ul>
-    </div>
-    <div class="fin-card" data-r data-d="3">
-      <div class="fin-card-icon">🛒</div>
-      <h3>Zakup bezpośredni</h3>
-      <p>Płacisz raz — maszyna i pawilon są Twoje od pierwszego dnia. Przy dotacji ARiMR to najlepsza opcja finansowo.</p>
-      <ul class="fin-list">
-        <li>Pełna własność od razu</li>
-        <li>Najlepsze warunki przy dotacji ARiMR</li>
-        <li>Faktura VAT — odliczenie podatku</li>
-        <li>Pełna gwarancja producenta</li>
-      </ul>
-    </div>
-    <div class="fin-card" data-r data-d="4">
-      <div class="fin-card-icon">🤝</div>
-      <h3>Łączenie finansowania</h3>
-      <p>Leasing + programy wsparcia? Zależy od formy leasingu i aktywnych naborów. Oceniamy indywidualnie i mówimy wprost co się bardziej opłaca.</p>
-      <ul class="fin-list">
-        <li>Analizujemy Twoją sytuację</li>
-        <li>Znamy aktualne programy ARiMR</li>
-        <li>Bezpłatna konsultacja</li>
-        <li>Konkretna odpowiedź, nie marketingowy bełkot</li>
-      </ul>
-    </div>
+  <div class="fin-compare-table" data-r data-d="1">
+    <table class="fin-table">
+      <thead>
+        <tr>
+          <th>Kryterium</th>
+          <th>💰 Dotacja ARiMR</th>
+          <th>📋 Leasing rolniczy</th>
+          <th>🛒 Zakup bezpośredni</th>
+          <th>🤝 Leasing + dotacja</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="fin-row-label">Wkład własny</td>
+          <td>Zależy od programu<br><span class="fin-note">zwykle 20–50%</span></td>
+          <td class="fin-best">Niski<br><span class="fin-note">często 10–20%</span></td>
+          <td>100%</td>
+          <td>Bardzo niski<br><span class="fin-note">dotacja pokrywa część</span></td>
+        </tr>
+        <tr class="fin-row-alt">
+          <td class="fin-row-label">Własność maszyny</td>
+          <td class="fin-best">Od razu Twoja</td>
+          <td>Po wykupie leasingu</td>
+          <td class="fin-best">Od razu Twoja</td>
+          <td>Po wykupie leasingu</td>
+        </tr>
+        <tr>
+          <td class="fin-row-label">Miesięczne koszty</td>
+          <td>Brak rat</td>
+          <td>Stała rata<br><span class="fin-note">~1 400–1 800 zł/mc</span></td>
+          <td>Brak rat</td>
+          <td>Niższa rata<br><span class="fin-note">dotacja redukuje kapitał</span></td>
+        </tr>
+        <tr class="fin-row-alt">
+          <td class="fin-row-label">Czas oczekiwania</td>
+          <td>Dłuższy<br><span class="fin-note">wniosek + nabór ARiMR</span></td>
+          <td class="fin-best">Szybki<br><span class="fin-note">2–4 tygodnie</span></td>
+          <td class="fin-best">Najszybszy<br><span class="fin-note">1–2 tygodnie</span></td>
+          <td>Średni<br><span class="fin-note">leasing szybko, dotacja osobno</span></td>
+        </tr>
+        <tr>
+          <td class="fin-row-label">Korzyść podatkowa</td>
+          <td>Odliczenie VAT</td>
+          <td class="fin-best">Rata w kosztach + VAT</td>
+          <td>Odliczenie VAT</td>
+          <td class="fin-best">Rata w kosztach + VAT</td>
+        </tr>
+        <tr class="fin-row-alt">
+          <td class="fin-row-label">Dla kogo najlepsze</td>
+          <td>Kto czeka na nabór i ma czas na papiery</td>
+          <td>Kto chce zacząć szybko z minimalnym kapitałem</td>
+          <td>Kto ma gotówkę i chce maksymalny zwrot</td>
+          <td>Kto chce najniższy wkład własny ogółem</td>
+        </tr>
+        <tr>
+          <td class="fin-row-label">Pomagamy z tym?</td>
+          <td class="fin-best">✓ Tak</td>
+          <td class="fin-best">✓ Tak</td>
+          <td class="fin-best">✓ Tak</td>
+          <td class="fin-best">✓ Tak</td>
+        </tr>
+      </tbody>
+    </table>
+    <p class="fin-disclaimer">Dane orientacyjne — warunki leasingu i programów wsparcia zależą od aktualnych ofert i naborów. Analizujemy Twoją sytuację indywidualnie i mówimy wprost co się opłaca. <a href="kontakt.html" style="color:var(--forest);font-weight:700">Zapytaj bezpłatnie →</a></p>
   </div>
 </section>
 
 <!-- FAQ -->
+<span id="faq"></span>
 <section class="sec faq-clean-section">
   <div class="wrap">
-    <p class="sec-label" data-r="fade">Pytania</p>
+    <p class="sec-label" data-r="fade">Pytania i odpowiedzi</p>
     <h2 class="sec-title" data-r>Najczęstsze<br><em>pytania.</em></h2>
+    <p class="sec-body" data-r>Zebraliśmy pytania, które słyszymy najczęściej. Jeśli nie znajdziesz odpowiedzi — zadzwoń, odpiszemy tego samego dnia.</p>
 
     <div class="faq-clean" data-r data-d="1">
 
+      <p class="faq-category">💰 Opłacalność i liczby</p>
+
       <div class="faq-clean-item">
         <button class="faq-clean-q" type="button">
-          <span>Czy muszę mieć duże gospodarstwo?</span>
+          <span>Czy to się w ogóle opłaci w mojej wsi?</span>
           <i>+</i>
         </button>
         <div class="faq-clean-a">
-          <p>
-            Nie ma minimalnego progu. Rozmawiamy o każdej skali — od małej farmy rodzinnej po dużą fermę.
-            Jeśli masz mleko i chcesz zarabiać na nim więcej niż w skupie — jesteś naszym klientem.
-          </p>
+          <p>To zależy głównie od ruchu przy Twojej drodze i liczby krów. Nasz kalkulator pokazuje orientacyjne liczby — ale szczerze: jeśli jesteś przy drodze z ruchem kilkudziesięciu aut dziennie i masz minimum 30–40 krów, to jest szansa. Przy mniejszej skali rozmawiamy o samym mlekomacie bez pawilonu.</p>
+          <p>Sprawdź <a href="index.html#kalkulator" style="color:var(--forest);font-weight:700">nasz kalkulator →</a></p>
         </div>
       </div>
 
       <div class="faq-clean-item">
         <button class="faq-clean-q" type="button">
-          <span>Jak wygląda pawilon? Czy potrzebuję pozwolenia?</span>
+          <span>Czy ktoś będzie kupował? Nie wiem czy u mnie jest ruch.</span>
           <i>+</i>
         </button>
         <div class="faq-clean-a">
-          <p>
-            Drewniana konstrukcja — solidna, estetyczna i stworzona z myślą o sprzedaży bezpośredniej.
-            Kwestie formalne omawiamy na etapie rozmowy i doradzamy w zależności od wielkości obiektu oraz lokalizacji.
-          </p>
+          <p>To uczciwe pytanie. Świeże mleko bezpośrednio od rolnika ma rosnące zainteresowanie — lokalne produkty są trendem w całej Europie, nie tylko w miastach. Klienci jeżdżą po mleko nawet kilka kilometrów, jeśli wiedzą że jest świeże i lokalne. Mlekomat pracuje 24/7 bez Twojej obecności, więc nawet przy spokojnym ruchu — zarabia.</p>
+        </div>
+      </div>
+
+      <div class="faq-clean-item">
+        <button class="faq-clean-q" type="button">
+          <span>Ile realnie mogę zarobić miesięcznie?</span>
+          <i>+</i>
+        </button>
+        <div class="faq-clean-a">
+          <p>Dla orientacji: przy 200 litrach dziennie przez mlekomat (cena 4 zł/l) to 24 000 zł przychodu miesięcznie. Vs skup przy 1,86 zł/l (aktualna średnia GUS, marzec 2026) — to 11 160 zł. Różnica: ponad 12 000 zł miesięcznie na tym samym mleku. Do tego dochodzi sprzedaż jajek, serów i innych produktów przez sklep.</p>
+          <p>To są liczby orientacyjne — rzeczywisty wynik zależy od Twojego litrażu, ceny i lokalizacji. <a href="index.html#kalkulator" style="color:var(--forest);font-weight:700">Policz swój scenariusz →</a></p>
         </div>
       </div>
 
@@ -333,36 +414,29 @@
           <i>+</i>
         </button>
         <div class="faq-clean-a">
-          <p>
-            Każdy projekt wyceniamy indywidualnie — zależy od rozmiaru pawilonu, modelu mlekomatu
-            i wyposażenia dodatkowego. Zadzwoń — damy Ci konkretne liczby.
-          </p>
+          <p>Zależy od wariantu. Sam mlekomat Premium (bez pawilonu) to koszt od ok. 55 000–65 000 zł netto z dostawą i instalacją. Pełen pakiet z pawilonem — wyceniamy indywidualnie, bo zależy od rozmiaru, lokalizacji i wyposażenia. Zadzwoń — podamy konkretne liczby bez owijania w bawełnę.</p>
+        </div>
+      </div>
+
+      <p class="faq-category">🔧 Techniczne i formalne</p>
+
+      <div class="faq-clean-item">
+        <button class="faq-clean-q" type="button">
+          <span>Co z awariami? Kto naprawia?</span>
+          <i>+</i>
+        </button>
+        <div class="faq-clean-a">
+          <p>Brunimat Premium to szwajcarska maszyna z certyfikatem CE-MID — awarie zdarzają się rzadko. Jesteśmy wyłącznym dystrybutorem w Polsce, mamy dostęp do części i wiemy jak serwisować. Jesteśmy pod telefonem — jeśli coś się stanie, przyjeżdżamy. Docelowo budujemy sieć serwisową, żeby czas reakcji był jak najkrótszy.</p>
         </div>
       </div>
 
       <div class="faq-clean-item">
         <button class="faq-clean-q" type="button">
-          <span>Czy dotacja ARiMR pokrywa też pawilon?</span>
+          <span>Jak wygląda pawilon? Czy potrzebuję pozwolenia na budowę?</span>
           <i>+</i>
         </button>
         <div class="faq-clean-a">
-          <p>
-            To zależy od konkretnego działania ARiMR i aktualnego naboru. Sprawdzamy Twoją sytuację indywidualnie
-            i doradzamy, co oraz w jakim zakresie może kwalifikować się do dofinansowania.
-          </p>
-        </div>
-      </div>
-
-      <div class="faq-clean-item">
-        <button class="faq-clean-q" type="button">
-          <span>Jak szybko sklep może zacząć działać?</span>
-          <i>+</i>
-        </button>
-        <div class="faq-clean-a">
-          <p>
-            Od decyzji do pierwszej sprzedaży — zależy od dostępności terminów i ewentualnych formalności budowlanych.
-            Naszym celem jest sprawny montaż. Dokładny harmonogram ustalamy po pierwszej rozmowie.
-          </p>
+          <p>Drewniana konstrukcja, solidna i estetyczna — zaprojektowana pod sprzedaż bezpośrednią. Kwestie formalne zależą od wielkości i lokalizacji. Mniejsze obiekty często nie wymagają pozwolenia na budowę, tylko zgłoszenia. Omawiamy to na etapie rozmowy i doradzamy w zależności od Twojej sytuacji.</p>
         </div>
       </div>
 
@@ -372,10 +446,73 @@
           <i>+</i>
         </button>
         <div class="faq-clean-a">
-          <p>
-            Absolutnie nie. Mlekomat generuje stały ruch klientów, ale sklep może sprzedawać wszystko, co masz:
-            jajka, sery, masło, przetwory, miód i inne produkty. Razem dobieramy asortyment pod Twoje gospodarstwo.
-          </p>
+          <p>Absolutnie nie. Mlekomat generuje stały ruch klientów — to magnes. Sklep może sprzedawać wszystko co masz: jajka, sery, masło, przetwory, miód. Razem dobieramy asortyment pod Twoje gospodarstwo. Klient przychodzi po mleko, przy okazji bierze jajka — to jest model który działa w całej Europie.</p>
+        </div>
+      </div>
+
+      <div class="faq-clean-item">
+        <button class="faq-clean-q" type="button">
+          <span>Czy muszę mieć duże gospodarstwo?</span>
+          <i>+</i>
+        </button>
+        <div class="faq-clean-a">
+          <p>Nie. Rozmawiamy z każdą skalą. Mały mlekomat bez pawilonu sprawdzi się nawet przy 20–30 krowach. Duży pełny sklep przy gospodarstwie — to więcej sensu przy 60+ krowach i odpowiednim ruchu. Mówimy Ci wprost co ma sens w Twoim przypadku — też wtedy gdy nie ma sensu.</p>
+        </div>
+      </div>
+
+      <p class="faq-category">📋 Finansowanie i formalności</p>
+
+      <div class="faq-clean-item">
+        <button class="faq-clean-q" type="button">
+          <span>Czy ARiMR rzeczywiście to finansuje?</span>
+          <i>+</i>
+        </button>
+        <div class="faq-clean-a">
+          <p>Programy wsparcia rolniczego mogą obejmować modernizację gospodarstw, w tym infrastrukturę do sprzedaży bezpośredniej. Nie obiecujemy konkretnego procentu dofinansowania — zależy to od aktualnego naboru i Twojej sytuacji. Pomagamy sprawdzić kwalifikowalność i przygotować wniosek jeśli nabór jest aktywny. Zawsze mówimy wprost co jest realne, a co nie.</p>
+        </div>
+      </div>
+
+      <div class="faq-clean-item">
+        <button class="faq-clean-q" type="button">
+          <span>Czy dotacja ARiMR pokrywa też pawilon?</span>
+          <i>+</i>
+        </button>
+        <div class="faq-clean-a">
+          <p>To zależy od konkretnego działania ARiMR i aktualnego naboru. W niektórych programach infrastruktura do sprzedaży bezpośredniej kwalifikuje się jako modernizacja gospodarstwa. Sprawdzamy Twoją sytuację indywidualnie i doradzamy co oraz w jakim zakresie może się kwalifikować.</p>
+        </div>
+      </div>
+
+      <div class="faq-clean-item">
+        <button class="faq-clean-q" type="button">
+          <span>Jak szybko sklep może zacząć działać?</span>
+          <i>+</i>
+        </button>
+        <div class="faq-clean-a">
+          <p>Przy zakupie bezpośrednim lub leasingu — od decyzji do uruchomienia około 3–6 tygodni (zamówienie maszyny ze Szwajcarii + montaż). Przy wniosku o dofinansowanie — dłużej, zależy od naborów ARiMR. Dokładny harmonogram ustalamy po pierwszej rozmowie. Staramy się żeby nie czekać.</p>
+        </div>
+      </div>
+
+      <p class="faq-category">🌍 „Czy to nie jest moda?"</p>
+
+      <div class="faq-clean-item">
+        <button class="faq-clean-q" type="button">
+          <span>Czy to nie jest chwilowy trend, który przeminie?</span>
+          <i>+</i>
+        </button>
+        <div class="faq-clean-a">
+          <p>Sprzedaż bezpośrednia od rolnika do konsumenta nie jest wynalazkiem TikToka. W Szwajcarii, Austrii i Niemczech działa od 30 lat — i rośnie. W Polsce dopiero zaczyna się rozwijać, ale dane są jednoznaczne: ceny skupu mleka w marcu 2026 są o 19% niższe niż rok wcześniej. Rolnicy szukają alternatywy. My ją dajemy.</p>
+          <p><small style="color:var(--muted)">Źródło: <a href="https://www.agrofakt.pl/ceny-skupu-mleka-2026-rolnicy-stawki/" target="_blank" rel="noopener" style="color:var(--forest)">Agrofakt.pl, kwiecień 2026</a></small></p>
+        </div>
+      </div>
+
+      <div class="faq-clean-item">
+        <button class="faq-clean-q" type="button">
+          <span>Czy klienci zapłacą więcej za „lokalne"?</span>
+          <i>+</i>
+        </button>
+        <div class="faq-clean-a">
+          <p>Tak — i to nie jest marketing. Świeże mleko prosto od rolnika przez automat kosztuje typowo 3,50–5 zł/litr. Mleko w sklepie sieci: 2,50–3,50 zł za przetworzone UHT. Klient płaci więcej, bo dostaje coś czego sieć nie daje: świeżość, lokalność i możliwość kupienia o każdej porze. Trend lokalnych produktów w Polsce jest potwierdzony przez niezależne raporty branżowe.</p>
+          <p><small style="color:var(--muted)">Źródło: <a href="https://www.przegladhandlowy.pl/13381/branza-spozywcza-w-polsce-w-2026-roku-trendy-wyzwania-i-kierunki-rozwoju/" target="_blank" rel="noopener" style="color:var(--forest)">Przegląd Handlowy, styczeń 2026</a>; <a href="https://rolnicy.com/sprzedaz-bezposrednia-vs-skup-gdzie-rolnik-realnie-wiecej-zarabia/" target="_blank" rel="noopener" style="color:var(--forest)">Rolnicy.com, kwiecień 2026</a></small></p>
         </div>
       </div>
 
@@ -553,6 +690,27 @@ document.addEventListener('DOMContentLoaded', function(){
   calc();
   calcSklep();
 });
+</script>
+<script>
+// Anchor bar active state on scroll
+(function(){
+  var links = document.querySelectorAll('.anchor-link[href^="#"]');
+  var sections = [];
+  links.forEach(function(link) {
+    var id = link.getAttribute('href').slice(1);
+    var el = document.getElementById(id);
+    if(el) sections.push({link:link, el:el});
+  });
+  window.addEventListener('scroll', function(){
+    var y = window.scrollY + 130;
+    var active = null;
+    sections.forEach(function(s){
+      if(s.el.getBoundingClientRect().top + window.scrollY <= y) active = s;
+    });
+    links.forEach(function(l){ l.classList.remove('active'); });
+    if(active) active.link.classList.add('active');
+  }, {passive:true});
+})();
 </script>
 </body>
 </html>
