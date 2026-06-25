@@ -1,0 +1,195 @@
+
+<!doctype html>
+<html lang="pl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sklep za Stodołą Advisor® EU</title>
+  <style>
+    :root{--green:#244b2f;--light:#eef5ef;--accent:#c9a24a;--ink:#1e1e1e;--muted:#666;--line:#d8ded8;--blue:#2f5f8f}
+    *{box-sizing:border-box} body{margin:0;font-family:Arial,Helvetica,sans-serif;color:var(--ink);background:#f6f7f4}
+    header{background:linear-gradient(135deg,var(--green),#17301e);color:white;padding:28px 36px}
+    header h1{margin:0;font-size:30px} header p{margin:8px 0 0;color:#e6efe8}
+    .wrap{max-width:1180px;margin:auto;padding:24px}.grid{display:grid;grid-template-columns:1.1fr .9fr;gap:18px}
+    .card{background:white;border:1px solid var(--line);border-radius:14px;padding:20px;box-shadow:0 2px 10px #0000000d;margin-bottom:18px}
+    h2{margin:0 0 14px;color:var(--green);font-size:20px} h3{margin:16px 0 8px;color:var(--green)}
+    label{display:block;font-size:13px;color:var(--muted);margin:12px 0 5px}
+    input,select,textarea{width:100%;padding:10px;border:1px solid #cfd7cf;border-radius:9px;font-size:14px;background:white}
+    textarea{min-height:72px}.row{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.row3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+    .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.kpi{background:var(--light);border-radius:12px;padding:14px;border:1px solid #d8eadb}
+    .kpi b{display:block;font-size:24px;color:var(--green)}.kpi span{font-size:12px;color:var(--muted)}
+    .score{height:18px;background:#e7e7e7;border-radius:20px;overflow:hidden}.score div{height:100%;background:linear-gradient(90deg,#d17c36,#c9a24a,#3d7d4e);width:0%}
+    button{background:var(--green);color:white;border:0;border-radius:10px;padding:11px 16px;cursor:pointer;font-weight:bold;margin:6px 6px 6px 0}
+    button.secondary{background:#6d745f}button.gold{background:var(--accent);color:#1d1d1d}
+    table{width:100%;border-collapse:collapse;font-size:13px}th,td{border-bottom:1px solid var(--line);padding:9px;text-align:left}th{background:var(--light);color:var(--green)}
+    .tag{display:inline-block;background:#edf2ed;border:1px solid #d9e2d9;padding:5px 8px;border-radius:99px;margin:3px;font-size:12px}
+    .warn{background:#fff4df;border-left:4px solid var(--accent);padding:12px;border-radius:8px}.ok{background:#eaf6ed;border-left:4px solid #3d7d4e;padding:12px;border-radius:8px}.bad{background:#fdecec;border-left:4px solid #b44;padding:12px;border-radius:8px}
+    .eu{background:#eef5ff;border-left:4px solid var(--blue);padding:12px;border-radius:8px}
+    footer{padding:22px 36px;color:#777;text-align:center}.printOnly{display:none}
+    @media(max-width:900px){.grid,.row,.row3,.kpis{grid-template-columns:1fr}}
+    @media print{body{background:white}header,.noPrint,button{display:none!important}.wrap{max-width:none;padding:0}.card{box-shadow:none;border:0;border-radius:0;page-break-inside:avoid}.printOnly{display:block}}
+  </style>
+</head>
+<body>
+<header>
+  <h1>Sklep za Stodołą Advisor® EU</h1>
+  <p>Audyt inwestycji: sklep farmerski 24/7 + mlekomat Premium + dotacja UE + finansowanie + ROI</p>
+</header>
+
+<div class="wrap">
+  <div class="card noPrint">
+    <button onclick="calculate()">Przelicz analizę</button>
+    <button class="gold" onclick="window.print()">Generuj raport PDF / drukuj</button>
+    <button class="secondary" onclick="saveData()">Zapisz dane</button>
+    <button class="secondary" onclick="loadData()">Wczytaj dane</button>
+    <button class="secondary" onclick="resetAll()">Wyczyść</button>
+  </div>
+
+  <div class="grid">
+    <section class="card">
+      <h2>1. Dane gospodarstwa</h2>
+      <div class="row"><div><label>Nazwa gospodarstwa</label><input id="farm"></div><div><label>Osoba kontaktowa</label><input id="owner"></div></div>
+      <div class="row3"><div><label>Województwo</label><input id="region"></div><div><label>Powiat</label><input id="county"></div><div><label>Telefon</label><input id="phone"></div></div>
+      <div class="row3"><div><label>Liczba krów mlecznych</label><input type="number" id="cows" value="80"></div><div><label>Średnia wydajność l/krowę/dzień</label><input type="number" id="yield" value="30"></div><div><label>Powierzchnia gospodarstwa ha</label><input type="number" id="ha" value="50"></div></div>
+    </section>
+
+    <section class="card">
+      <h2>2. Wynik inwestycji</h2>
+      <div class="kpis">
+        <div class="kpi"><b id="scoreTxt">0%</b><span>potencjał projektu</span></div>
+        <div class="kpi"><b id="roiTxt">0</b><span>ROI bez dotacji / lata</span></div>
+        <div class="kpi"><b id="roiEuTxt">0</b><span>ROI z dotacją / lata</span></div>
+        <div class="kpi"><b id="profitYearTxt">0 zł</b><span>dodatkowy zysk roczny</span></div>
+      </div>
+      <label>Ocena potencjału</label><div class="score"><div id="scoreBar"></div></div>
+      <div id="advice" style="margin-top:14px" class="warn">Uzupełnij dane i kliknij „Przelicz analizę”.</div>
+    </section>
+  </div>
+
+  <div class="grid">
+    <section class="card">
+      <h2>3. Audyt projektu</h2>
+      <table><thead><tr><th>Pytanie</th><th>Odpowiedź</th></tr></thead><tbody id="auditTable"></tbody></table>
+    </section>
+
+    <section class="card">
+      <h2>4. Ekonomia i finansowanie</h2>
+      <div class="row"><div><label>Cena mleka w mleczarni PLN/l</label><input type="number" step="0.01" id="priceDairy" value="2.20"></div><div><label>Cena sprzedaży bezpośredniej PLN/l</label><input type="number" step="0.01" id="priceDirect" value="5.50"></div></div>
+      <div class="row"><div><label>Koszt produkcji mleka PLN/l</label><input type="number" step="0.01" id="costMilk" value="1.80"></div><div><label>Sprzedaż przez mlekomat l/dzień</label><input type="number" id="litersDirect" value="100"></div></div>
+      <div class="row"><div><label>Koszt inwestycji PLN</label><input type="number" id="investment" value="180000"></div><div><label>Dni sprzedaży w roku</label><input type="number" id="days" value="365"></div></div>
+      <h3>Leasing / kredyt</h3>
+      <div class="row3"><div><label>Wkład własny %</label><input type="number" id="down" value="20"></div><div><label>Okres finansowania lata</label><input type="number" id="years" value="5"></div><div><label>Oprocentowanie roczne %</label><input type="number" step="0.1" id="rate" value="8"></div></div>
+      <div id="financeResult" class="ok" style="margin-top:14px"></div>
+    </section>
+  </div>
+
+  <section class="card">
+    <h2>5. Moduł dotacji UE</h2>
+    <div class="row3">
+      <div><label>Czy klient chce analizować dotację UE?</label><select id="euEnable"><option value="1">TAK</option><option value="0">NIE</option></select></div>
+      <div><label>Zakładany poziom dofinansowania %</label><input type="number" id="euPercent" value="50"></div>
+      <div><label>Maksymalna kwota dotacji PLN</label><input type="number" id="euLimit" value="100000"></div>
+    </div>
+    <div class="row3">
+      <div><label>Koszty kwalifikowalne PLN</label><input type="number" id="eligibleCost" value="180000"></div>
+      <div><label>Szacowane koszty niekwalifikowalne PLN</label><input type="number" id="nonEligibleCost" value="0"></div>
+      <div><label>Ryzyko / status naboru</label><select id="euRisk"><option value="medium">Do sprawdzenia</option><option value="high">Wysokie szanse</option><option value="low">Niskie szanse / brak naboru</option></select></div>
+    </div>
+    <div id="euResult" class="eu" style="margin-top:14px"></div>
+    <p style="font-size:12px;color:#666">Uwaga: moduł dotacji jest narzędziem doradczym. Nie stanowi gwarancji otrzymania wsparcia. Każdy nabór wymaga sprawdzenia aktualnego regulaminu, kosztów kwalifikowalnych i decyzji instytucji przyznającej pomoc.</p>
+  </section>
+
+  <section class="card">
+    <h2>6. Rekomendowane rozwiązanie</h2>
+    <div id="solution"></div>
+  </section>
+
+  <section class="card">
+    <h2>7. Dokumenty do dotacji / finansowania</h2>
+    <table>
+      <thead><tr><th>Dokument / decyzja</th><th>Status</th><th>Uwagi</th></tr></thead>
+      <tbody>
+        <tr><td>Numer producenta rolnego</td><td>Do weryfikacji</td><td>Podstawowy dokument identyfikacyjny</td></tr>
+        <tr><td>Biznesplan inwestycji</td><td>Wymagany</td><td>Opis sklepu, mlekomatu, ROI, harmonogram</td></tr>
+        <tr><td>Oferta na mlekomat i wyposażenie</td><td>Wymagana</td><td>Brunimat + pawilon + automaty dodatkowe</td></tr>
+        <tr><td>Dokumenty własności / dzierżawy</td><td>Do sprawdzenia</td><td>Działka, budynek, miejsce inwestycji</td></tr>
+        <tr><td>Zgody budowlane / zgłoszenie</td><td>Do sprawdzenia</td><td>Zależne od pawilonu i lokalizacji</td></tr>
+        <tr><td>Uzgodnienia weterynaryjne</td><td>Do sprawdzenia</td><td>Sprzedaż mleka i produktów pochodzenia zwierzęcego</td></tr>
+        <tr><td>Oświadczenie o wkładzie własnym</td><td>Wymagane</td><td>Środki własne, leasing, kredyt pomostowy</td></tr>
+        <tr><td>Historia wcześniejszej pomocy UE</td><td>Do sprawdzenia</td><td>Limity pomocy i kumulacja wsparcia</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section class="card">
+    <h2>8. Harmonogram wdrożenia</h2>
+    <table>
+      <thead><tr><th>Etap</th><th>Zakres</th><th>Orientacyjny czas</th></tr></thead>
+      <tbody>
+        <tr><td>1. Audyt</td><td>Analiza gospodarstwa i lokalizacji</td><td>1 dzień</td></tr>
+        <tr><td>2. Koncepcja</td><td>Dobór pawilonu, mlekomatu, automatów i wyposażenia</td><td>3–7 dni</td></tr>
+        <tr><td>3. Dotacja / finansowanie</td><td>Sprawdzenie naboru, biznesplan, wniosek, leasing pomostowy</td><td>2–12 tygodni+</td></tr>
+        <tr><td>4. Realizacja</td><td>Produkcja, dostawa, montaż</td><td>zgodnie z ofertą</td></tr>
+        <tr><td>5. Start sprzedaży</td><td>Szkolenie, marketing otwarcia, serwis</td><td>1–3 dni</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section class="card"><h2>9. Notatki doradcy</h2><textarea id="notes"></textarea></section>
+</div>
+
+<footer>Sklep za Stodołą Advisor® EU — prototyp v2.0</footer>
+
+<script>
+const auditQuestions = [
+  ["milkProduction","Czy gospodarstwo prowadzi produkcję mleka?",15],
+  ["producerNumber","Czy gospodarstwo posiada numer producenta?",10],
+  ["directSales","Czy rolnik planuje sprzedaż bezpośrednią?",12],
+  ["ownProducts","Czy gospodarstwo ma produkty dodatkowe: jaja, sery, miód, warzywa?",10],
+  ["location","Czy lokalizacja jest blisko miasta / osiedla / ruchliwej drogi?",12],
+  ["parking","Czy jest miejsce na parking i bezpieczny dojazd?",8],
+  ["power","Czy jest dostęp do energii elektrycznej?",6],
+  ["water","Czy jest dostęp do wody / możliwość mycia?",6],
+  ["internet","Czy jest internet / zasięg GSM?",5],
+  ["capital","Czy klient ma wkład własny lub zdolność leasingową?",12],
+  ["vet","Czy klient akceptuje wymogi weterynaryjne i rejestry?",10],
+  ["marketing","Czy klient chce budować markę gospodarstwa?",10],
+  ["euExperience","Czy klient korzystał wcześniej z dotacji i ma dokumentację?",6],
+  ["businessPlan","Czy klient jest gotów przygotować biznesplan?",8],
+  ["ownContribution","Czy klient ma środki na wkład własny i prefinansowanie?",12]
+];
+function initAudit(){const tb=document.getElementById("auditTable");tb.innerHTML="";auditQuestions.forEach(q=>{tb.innerHTML+=`<tr><td>${q[1]}</td><td><select id="${q[0]}"><option value="1">TAK</option><option value="0.5">NIE WIEM / częściowo</option><option value="0">NIE</option></select></td></tr>`;});}
+function v(id){return parseFloat(document.getElementById(id).value)||0;} function money(x){return Math.round(x).toLocaleString("pl-PL")+" zł";}
+function calculate(){
+  let max=0,pts=0;auditQuestions.forEach(q=>{max+=q[2];pts+=(parseFloat(document.getElementById(q[0]).value)||0)*q[2];});
+  const score=Math.round(pts/max*100), prod=v("cows")*v("yield"), liters=Math.min(v("litersDirect"),prod||v("litersDirect"));
+  const extraMargin=(v("priceDirect")-v("costMilk"))-(v("priceDairy")-v("costMilk"));
+  const profitDay=extraMargin*liters, profitYear=profitDay*v("days"), inv=v("investment"), roi=profitYear>0?inv/profitYear:0;
+  const euEnabled=v("euEnable")===1, euGrantRaw=v("eligibleCost")*v("euPercent")/100, euGrant=euEnabled?Math.min(euGrantRaw,v("euLimit")):0;
+  const ownAfterEu=Math.max(0,inv+v("nonEligibleCost")-euGrant), roiEu=profitYear>0?ownAfterEu/profitYear:0;
+  const principal=ownAfterEu*(1-v("down")/100), months=v("years")*12, mr=v("rate")/100/12;
+  const payment=mr>0?principal*(mr*Math.pow(1+mr,months))/(Math.pow(1+mr,months)-1):principal/months;
+  const cashAfterFinance=profitYear-payment*12;
+
+  document.getElementById("scoreTxt").innerText=score+"%";document.getElementById("scoreBar").style.width=score+"%";
+  document.getElementById("roiTxt").innerText=roi.toFixed(1);document.getElementById("roiEuTxt").innerText=roiEu.toFixed(1);document.getElementById("profitYearTxt").innerText=money(profitYear);
+  const advice=document.getElementById("advice"); advice.className=score>=80?"ok":score>=60?"warn":"bad";
+  advice.innerText=score>=80?"Projekt ma wysoki potencjał. Warto przygotować ofertę, ROI, koncepcję sklepu i sprawdzić aktualny nabór UE.":score>=60?"Projekt ma potencjał, ale wymaga doprecyzowania lokalizacji, finansowania, dokumentów lub kwalifikowalności kosztów.":"Projekt wymaga dalszej analizy przed ofertą i wnioskiem o finansowanie.";
+
+  document.getElementById("financeResult").innerHTML=`<b>Produkcja mleka:</b> ${Math.round(prod).toLocaleString("pl-PL")} l/dzień<br><b>Sprzedaż przez mlekomat:</b> ${Math.round(liters).toLocaleString("pl-PL")} l/dzień<br><b>Dodatkowy zysk roczny:</b> ${money(profitYear)}<br><b>Inwestycja brutto:</b> ${money(inv)}<br><b>Zwrot bez dotacji:</b> ${roi.toFixed(1)} lat<br><b>Rata po uwzględnieniu dotacji:</b> ${money(payment)}/mies.<br><b>Cashflow roczny po finansowaniu:</b> ${money(cashAfterFinance)}`;
+  let risk=document.getElementById("euRisk").value, riskTxt=risk==="high"?"wysokie szanse – przygotować dokumenty i sprawdzić nabór":risk==="low"?"niskie szanse lub brak aktywnego naboru – rozważyć leasing/kredyt":"do sprawdzenia – konieczna weryfikacja aktualnego programu";
+  document.getElementById("euResult").innerHTML=`<b>Szacowana dotacja UE:</b> ${money(euGrant)}<br><b>Inwestycja po dotacji / do sfinansowania:</b> ${money(ownAfterEu)}<br><b>Wkład własny przy finansowaniu:</b> ${money(ownAfterEu*v("down")/100)}<br><b>Zwrot z dotacją:</b> ${roiEu.toFixed(1)} lat<br><b>Status:</b> ${riskTxt}`;
+
+  let sol=[]; if(v("cows")>=80) sol.push("Pawilon farmerski 24/7 + mlekomat Premium + automaty chłodnicze."); else sol.push("Pakiet START: mlekomat + mały punkt sprzedaży + przygotowanie do rozbudowy.");
+  if(document.getElementById("ownProducts").value>0) sol.push("Dodać jajomat / lodówkę na sery, masło, jogurty i produkty regionalne.");
+  if(euEnabled) sol.push("Sprawdzić aktualny nabór UE oraz kwalifikowalność: pawilon, mlekomat, chłodnie, automaty, instalacja, oprogramowanie.");
+  sol.push("Kolejny krok: raport ROI + koncepcja wizualna + lista dokumentów do finansowania.");
+  document.getElementById("solution").innerHTML=sol.map(s=>`<span class="tag">${s}</span>`).join("");
+}
+function saveData(){const data={};document.querySelectorAll("input,select,textarea").forEach(el=>data[el.id]=el.value);localStorage.setItem("advisorDataEU",JSON.stringify(data));alert("Dane zapisane.");}
+function loadData(){const data=JSON.parse(localStorage.getItem("advisorDataEU")||"{}");Object.entries(data).forEach(([k,val])=>{const el=document.getElementById(k);if(el)el.value=val;});calculate();}
+function resetAll(){localStorage.removeItem("advisorDataEU");location.reload();}
+initAudit();calculate();
+</script>
+</body>
+</html>
