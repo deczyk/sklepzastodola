@@ -466,103 +466,107 @@
 </script>
 <script src="nav.js"></script>
 <script>
-/* ── ZAKŁADKI KALKULATORA ── */
+/* ── WSZYSTKO GLOBALNE — brak IIFE żeby switchTab miało dostęp do calc funkcji ── */
+
+function fmt(n){ return n.toLocaleString('pl-PL',{maximumFractionDigits:0})+' zł'; }
+
+/* ── ZAKŁADKI ── */
 function switchTab(tab) {
   document.getElementById('panel-mleko').style.display = tab === 'mleko' ? '' : 'none';
   document.getElementById('panel-sklep').style.display = tab === 'sklep' ? '' : 'none';
   document.getElementById('tab-mleko').classList.toggle('active', tab === 'mleko');
   document.getElementById('tab-sklep').classList.toggle('active', tab === 'sklep');
-  // Uruchom odpowiedni kalkulator po przełączeniu
-  if(tab === 'sklep' && typeof calcSklepFn === 'function') calcSklepFn();
+  if(tab === 'sklep') calcSklep();
+  if(tab === 'mleko') calc();
 }
 
-(function(){
-  function fmt(n){ return n.toLocaleString('pl-PL',{maximumFractionDigits:0})+' zł'; }
+/* ── KALKULATOR 1: MLEKOMAT ── */
+var _arimr = false;
 
-  /* ── KALKULATOR 1: MLEKOMAT ── */
-  var arimr = false;
+function calc(){
+  var s1 = document.getElementById('s1');
+  if(!s1) return;
+  var prod = +s1.value,
+      skup = +document.getElementById('s2').value,
+      ml   = +document.getElementById('s3').value,
+      inv  = +document.getElementById('s4').value;
+  var sm = prod*30*skup, mm = prod*30*ml, zysk = mm-sm, zyskR = zysk*12;
+  var w = sm>0 ? Math.round((mm/sm-1)*100) : 0;
+  var effInv = _arimr ? inv*0.5 : inv;
+  var zwrot  = zysk>0 ? Math.ceil(effInv/zysk) : 999;
+
+  document.getElementById('v1').textContent = prod+' L';
+  document.getElementById('v2').textContent = skup.toFixed(2).replace('.',',')+' zł/L';
+  document.getElementById('v3').textContent = ml.toFixed(2).replace('.',',')+' zł/L';
+  document.getElementById('v4').textContent = inv.toLocaleString('pl-PL')+' zł';
+  document.getElementById('r1').textContent = fmt(sm);
+  document.getElementById('r1s').textContent = fmt(Math.round(sm/30))+'/dzień';
+  document.getElementById('r2').textContent = fmt(mm);
+  document.getElementById('r2s').textContent = fmt(Math.round(mm/30))+'/dzień';
+  document.getElementById('r3').textContent = (zysk>=0?'+':'')+fmt(zysk)+'/mies.';
+  document.getElementById('r3s').textContent = (zyskR>=0?'+':'')+fmt(zyskR)+' rocznie · +'+w+'%';
+  document.getElementById('r4').textContent = zwrot<200 ? '~'+zwrot+' mies.' : 'powyżej 16 lat';
+  document.getElementById('r4s').textContent = 'przy '+effInv.toLocaleString('pl-PL')+' zł'+(_arimr?' (po dofinansowaniu)':'');
+  document.getElementById('r4l').textContent = _arimr ? 'Zwrot z dofinansowaniem' : 'Zwrot inwestycji';
+}
+
+/* ── KALKULATOR 2: CAŁY SKLEP ── */
+function calcSklep(){
+  var s5 = document.getElementById('s5');
+  if(!s5) return;
+  var klienci = +s5.value;
+  var mleko   = +document.getElementById('s6').value;
+  var koszyk  = +document.getElementById('s7').value;
+  var pct     = +document.getElementById('s8').value / 100;
+
+  var mlekoDzien  = klienci * mleko;
+  var koszykDzien = klienci * pct * koszyk;
+  var mlekMies    = mlekoDzien * 30;
+  var koszykMies  = koszykDzien * 30;
+  var razem       = mlekMies + koszykMies;
+  var koszykRoc   = koszykMies * 12;
+
+  document.getElementById('v5').textContent = klienci;
+  document.getElementById('v6').textContent = mleko.toFixed(0)+' zł';
+  document.getElementById('v7').textContent = koszyk.toFixed(0)+' zł';
+  document.getElementById('v8').textContent = Math.round(pct*100)+'%';
+
+  document.getElementById('rs1').textContent  = fmt(mlekMies);
+  document.getElementById('rs1s').textContent = fmt(Math.round(mlekoDzien))+'/dzień';
+  document.getElementById('rs2').textContent  = fmt(koszykMies);
+  document.getElementById('rs2s').textContent = fmt(Math.round(koszykDzien))+'/dzień';
+  document.getElementById('rs3').textContent  = fmt(razem)+'/mies.';
+  document.getElementById('rs3s').textContent = fmt(razem*12)+' rocznie';
+  document.getElementById('rs4').textContent  = '+'+fmt(koszykRoc);
+  document.getElementById('rs4s').textContent = 'przy '+Math.round(pct*100)+'% klientów kupujących więcej';
+}
+
+/* ── INIT po załadowaniu DOM ── */
+document.addEventListener('DOMContentLoaded', function(){
+  /* toggle dofinansowanie */
   var tog = document.getElementById('tog');
-  if(tog) {
+  if(tog){
     tog.addEventListener('click', function(){
-      arimr = !arimr;
-      tog.classList.toggle('on', arimr);
-      tog.setAttribute('aria-pressed', arimr);
+      _arimr = !_arimr;
+      tog.classList.toggle('on', _arimr);
+      tog.setAttribute('aria-pressed', _arimr);
       calc();
     });
   }
-
-  function calc(){
-    var s1 = document.getElementById('s1');
-    if(!s1) return;
-    var prod = +s1.value,
-        skup = +document.getElementById('s2').value,
-        ml   = +document.getElementById('s3').value,
-        inv  = +document.getElementById('s4').value;
-    var sm = prod*30*skup, mm = prod*30*ml, zysk = mm-sm, zyskR = zysk*12;
-    var w = sm>0 ? Math.round((mm/sm-1)*100) : 0;
-    var effInv = arimr ? inv*0.5 : inv;
-    var zwrot  = zysk>0 ? Math.ceil(effInv/zysk) : 999;
-
-    document.getElementById('v1').textContent = prod+' L';
-    document.getElementById('v2').textContent = skup.toFixed(2).replace('.',',')+' zł/L';
-    document.getElementById('v3').textContent = ml.toFixed(2).replace('.',',')+' zł/L';
-    document.getElementById('v4').textContent = inv.toLocaleString('pl-PL')+' zł';
-    document.getElementById('r1').textContent = fmt(sm);
-    document.getElementById('r1s').textContent = fmt(Math.round(sm/30))+'/dzień';
-    document.getElementById('r2').textContent = fmt(mm);
-    document.getElementById('r2s').textContent = fmt(Math.round(mm/30))+'/dzień';
-    document.getElementById('r3').textContent = (zysk>=0?'+':'')+fmt(zysk)+'/mies.';
-    document.getElementById('r3s').textContent = (zyskR>=0?'+':'')+fmt(zyskR)+' rocznie · +'+w+'%';
-    document.getElementById('r4').textContent = zwrot<200 ? '~'+zwrot+' mies.' : 'powyżej 16 lat';
-    document.getElementById('r4s').textContent = 'przy '+effInv.toLocaleString('pl-PL')+' zł'+(arimr?' (po dofinansowaniu)':'');
-    document.getElementById('r4l').textContent = arimr ? 'Zwrot z dofinansowaniem' : 'Zwrot inwestycji';
-  }
-
+  /* suwaki mlekomat */
   ['s1','s2','s3','s4'].forEach(function(id){
     var el = document.getElementById(id);
     if(el) el.addEventListener('input', calc);
   });
-  calc();
-
-  /* ── KALKULATOR 2: CAŁY SKLEP ── */
-  var calcSklepFn;
-  calcSklepFn = function calcSklep(){
-    var s5 = document.getElementById('s5');
-    if(!s5) return;
-    var klienci = +s5.value;
-    var mleko   = +document.getElementById('s6').value;
-    var koszyk  = +document.getElementById('s7').value;
-    var pct     = +document.getElementById('s8').value / 100;
-
-    var mlekoDzien  = klienci * mleko;
-    var koszykDzien = klienci * pct * koszyk;
-    var mlekMies    = mlekoDzien * 30;
-    var koszykMies  = koszykDzien * 30;
-    var razem       = mlekMies + koszykMies;
-    var koszykRoc   = koszykMies * 12;
-
-    document.getElementById('v5').textContent = klienci;
-    document.getElementById('v6').textContent = mleko.toFixed(0)+' zł';
-    document.getElementById('v7').textContent = koszyk.toFixed(0)+' zł';
-    document.getElementById('v8').textContent = Math.round(pct*100)+'%';
-
-    document.getElementById('rs1').textContent  = fmt(mlekMies);
-    document.getElementById('rs1s').textContent = fmt(Math.round(mlekoDzien))+'/dzień';
-    document.getElementById('rs2').textContent  = fmt(koszykMies);
-    document.getElementById('rs2s').textContent = fmt(Math.round(koszykDzien))+'/dzień';
-    document.getElementById('rs3').textContent  = fmt(razem)+'/mies.';
-    document.getElementById('rs3s').textContent = fmt(razem*12)+' rocznie';
-    document.getElementById('rs4').textContent  = '+'+fmt(koszykRoc);
-    document.getElementById('rs4s').textContent = 'przy '+Math.round(pct*100)+'% klientów kupujących więcej';
-  }
-
+  /* suwaki sklep */
   ['s5','s6','s7','s8'].forEach(function(id){
     var el = document.getElementById(id);
-    if(el) el.addEventListener('input', calcSklepFn);
+    if(el) el.addEventListener('input', calcSklep);
   });
-  calcSklepFn();
-
-})();
+  /* pierwsze uruchomienie */
+  calc();
+  calcSklep();
+});
 </script>
 </body>
 </html>
