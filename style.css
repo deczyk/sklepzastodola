@@ -2214,3 +2214,691 @@ input[type=range]::-moz-range-thumb {
     font-size: clamp(1.65rem, 9vw, 2.25rem) !important;
   }
 }
+/* ─────────────────────────────────────────────
+   FIX — mlekomat.html / pawilony.html / jak-dzialamy.html
+   FAQ, parametry, listy ikon, karty informacyjne
+   Wkleić NA SAM KONIEC style.css
+───────────────────────────────────────────── */
+
+
+/* ─────────────────────
+   OGÓLNY RYTM SEKCJI
+───────────────────── */
+
+.sec,
+.section,
+.page-section,
+.product-section,
+.pavilion-section,
+.milk-section,
+.faq-section {
+  position: relative;
+}
+
+.sec .wrap,
+.section .wrap,
+.page-section .wrap {
+  max-width: 1100px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+
+/* ─────────────────────
+   FAQ — mlekomat.html / jak-dzialamy.html
+───────────────────── */
+
+.faq-list,
+.faqs,
+.accordion,
+.qa-list {
+  display: grid !important;
+  gap: .85rem !important;
+  max-width: 900px !important;
+  margin-top: 2rem !important;
+}
+
+.faq-item,
+.qa-item,
+.accordion-item {
+  background: var(--paper) !important;
+  border: 1px solid var(--line) !important;
+  border-radius: var(--r-lg) !important;
+  box-shadow: var(--shadow) !important;
+  overflow: hidden !important;
+}
+
+.faq-q,
+.faq-question,
+.qa-q,
+.accordion-btn,
+.accordion-button,
+.faq-item > button,
+.qa-item > button,
+.accordion-item > button {
+  width: 100% !important;
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  border: 0 !important;
+  background: var(--paper) !important;
+  color: var(--ink) !important;
+  padding: 1.15rem 1.35rem !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 1rem !important;
+  text-align: left !important;
+  font-family: var(--sans) !important;
+  font-size: .98rem !important;
+  line-height: 1.35 !important;
+  font-weight: 800 !important;
+  cursor: pointer !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+.faq-q:hover,
+.faq-question:hover,
+.qa-q:hover,
+.accordion-btn:hover,
+.accordion-button:hover,
+.faq-item > button:hover,
+.qa-item > button:hover,
+.accordion-item > button:hover {
+  background: var(--sage) !important;
+  color: var(--forest) !important;
+}
+
+.faq-q span,
+.faq-question span,
+.qa-q span,
+.accordion-btn span,
+.accordion-button span,
+.faq-item > button span,
+.qa-item > button span,
+.accordion-item > button span {
+  flex: 0 0 auto !important;
+  width: 1.7rem !important;
+  height: 1.7rem !important;
+  border-radius: 50% !important;
+  background: var(--sage) !important;
+  border: 1px solid rgba(45,90,39,.18) !important;
+  color: var(--forest) !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: .9rem !important;
+  font-weight: 900 !important;
+  line-height: 1 !important;
+}
+
+.faq-a,
+.faq-answer,
+.qa-a,
+.accordion-content,
+.accordion-panel {
+  padding: 0 1.35rem 1.2rem !important;
+  color: var(--muted) !important;
+  font-size: .93rem !important;
+  line-height: 1.75 !important;
+}
+
+.faq-a p,
+.faq-answer p,
+.qa-a p,
+.accordion-content p,
+.accordion-panel p {
+  margin: 0 !important;
+  color: var(--muted) !important;
+  line-height: 1.75 !important;
+}
+
+
+/* Awaryjnie: gdy FAQ nie ma klas, ale pytania są buttonami w sekcji */
+section button:not(.burger):not(.mob-close):not(.ck-yes):not(.ck-no):not(.calc-tab):not(.toggle-row) {
+  font-family: var(--sans);
+}
+
+
+/* ─────────────────────
+   PAWILONY — parametry orientacyjne
+───────────────────── */
+
+.params-card,
+.param-card,
+.parameters-card,
+.spec-card,
+.spec-box,
+.params-box,
+.pav-params,
+.pavilion-params {
+  background: var(--paper) !important;
+  border: 1px solid var(--line) !important;
+  border-radius: var(--r-lg) !important;
+  box-shadow: var(--shadow-lg) !important;
+  padding: clamp(1.35rem, 2.5vw, 2rem) !important;
+}
+
+.params-card h3,
+.param-card h3,
+.parameters-card h3,
+.spec-card h3,
+.spec-box h3,
+.params-box h3,
+.pav-params h3,
+.pavilion-params h3,
+.params-card h4,
+.param-card h4,
+.parameters-card h4,
+.spec-card h4,
+.spec-box h4,
+.params-box h4,
+.pav-params h4,
+.pavilion-params h4 {
+  color: var(--ink) !important;
+  font-size: 1rem !important;
+  line-height: 1.25 !important;
+  font-weight: 900 !important;
+  margin: 0 0 1.15rem !important;
+}
+
+.params-list,
+.param-list,
+.parameters-list,
+.spec-list,
+.pav-param-list,
+.pavilion-param-list {
+  list-style: none !important;
+  display: grid !important;
+  gap: .65rem !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.params-list li,
+.param-list li,
+.parameters-list li,
+.spec-list li,
+.pav-param-list li,
+.pavilion-param-list li,
+.param-row,
+.spec-row {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: baseline !important;
+  gap: 1rem !important;
+  padding: .55rem 0 !important;
+  border-bottom: 1px solid var(--line) !important;
+  color: var(--muted) !important;
+  font-size: .92rem !important;
+  line-height: 1.45 !important;
+}
+
+.params-list li:last-child,
+.param-list li:last-child,
+.parameters-list li:last-child,
+.spec-list li:last-child,
+.pav-param-list li:last-child,
+.pavilion-param-list li:last-child,
+.param-row:last-child,
+.spec-row:last-child {
+  border-bottom: 0 !important;
+}
+
+.param-row span:first-child,
+.spec-row span:first-child,
+.params-list li span:first-child,
+.param-list li span:first-child,
+.parameters-list li span:first-child,
+.spec-list li span:first-child {
+  color: var(--muted) !important;
+}
+
+.param-row strong,
+.spec-row strong,
+.params-list li strong,
+.param-list li strong,
+.parameters-list li strong,
+.spec-list li strong,
+.param-row span:last-child,
+.spec-row span:last-child,
+.params-list li span:last-child,
+.param-list li span:last-child,
+.parameters-list li span:last-child,
+.spec-list li span:last-child {
+  color: var(--ink) !important;
+  font-weight: 800 !important;
+  text-align: right !important;
+}
+
+
+/* ─────────────────────
+   PAWILONY — układ typu pawilonu
+───────────────────── */
+
+.pav-type,
+.pavilion-type,
+.type-section,
+.model-section {
+  padding: 5.5rem 5vw !important;
+  border-bottom: 1px solid var(--line) !important;
+}
+
+.pav-type-grid,
+.pavilion-type-grid,
+.type-grid,
+.model-grid,
+.pav-grid {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) minmax(300px, .9fr) !important;
+  gap: clamp(2rem, 5vw, 4.5rem) !important;
+  align-items: center !important;
+}
+
+.pav-type-copy,
+.pavilion-copy,
+.model-copy {
+  max-width: 560px !important;
+}
+
+.type-badge,
+.pav-badge,
+.model-badge {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: .28rem .75rem !important;
+  border-radius: 999px !important;
+  background: var(--sage) !important;
+  border: 1px solid rgba(45,90,39,.22) !important;
+  color: var(--forest) !important;
+  font-size: .68rem !important;
+  font-weight: 900 !important;
+  letter-spacing: .1em !important;
+  text-transform: uppercase !important;
+  margin-bottom: 1.15rem !important;
+}
+
+.pav-type h2,
+.pavilion-type h2,
+.model-section h2,
+.type-section h2 {
+  font-size: clamp(1.8rem, 3.4vw, 3rem) !important;
+  line-height: 1.08 !important;
+  letter-spacing: -.03em !important;
+  margin: 0 0 1rem !important;
+  color: var(--ink) !important;
+}
+
+.pav-type h2 em,
+.pavilion-type h2 em,
+.model-section h2 em,
+.type-section h2 em {
+  color: var(--forest) !important;
+  font-style: italic !important;
+}
+
+.pav-type p,
+.pavilion-type p,
+.model-section p,
+.type-section p {
+  color: var(--muted) !important;
+  line-height: 1.75 !important;
+  font-size: .95rem !important;
+}
+
+
+/* ─────────────────────
+   IKONKI / TAGI / CECHY
+───────────────────── */
+
+.icon-list,
+.feature-list,
+.feature-row,
+.pill-row,
+.tags-row,
+.tags,
+.chips,
+.assort-list,
+.assortment-list,
+.product-pills,
+.feature-pills {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: .65rem .75rem !important;
+  align-items: center !important;
+  margin-top: 1.35rem !important;
+}
+
+.icon-list span,
+.feature-list span,
+.feature-row span,
+.pill-row span,
+.tags-row span,
+.tags span,
+.chips span,
+.assort-list span,
+.assortment-list span,
+.product-pills span,
+.feature-pills span,
+.icon-pill,
+.feature-pill,
+.tag,
+.chip,
+.assort-pill,
+.product-pill {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: .45rem !important;
+  padding: .48rem .78rem !important;
+  border-radius: 999px !important;
+  background: var(--paper) !important;
+  border: 1px solid var(--line) !important;
+  box-shadow: var(--shadow) !important;
+  color: var(--ink) !important;
+  font-size: .86rem !important;
+  font-weight: 700 !important;
+  line-height: 1.2 !important;
+}
+
+
+/* ─────────────────────
+   LISTY "CO WCHODZI W SKŁAD"
+───────────────────── */
+
+.includes,
+.includes-list,
+.whats-included,
+.included-list,
+.check-list,
+.offer-list {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: .8rem !important;
+  list-style: none !important;
+  margin: 1.5rem 0 0 !important;
+  padding: 0 !important;
+}
+
+.includes li,
+.includes-list li,
+.whats-included li,
+.included-list li,
+.check-list li,
+.offer-list li {
+  display: flex !important;
+  align-items: flex-start !important;
+  gap: .65rem !important;
+  padding: .85rem .95rem !important;
+  border-radius: var(--r) !important;
+  background: var(--paper) !important;
+  border: 1px solid var(--line) !important;
+  box-shadow: var(--shadow) !important;
+  color: var(--ink) !important;
+  font-size: .9rem !important;
+  line-height: 1.45 !important;
+}
+
+.includes li::before,
+.includes-list li::before,
+.whats-included li::before,
+.included-list li::before,
+.check-list li::before,
+.offer-list li::before {
+  content: "✓" !important;
+  width: 1.35rem !important;
+  height: 1.35rem !important;
+  border-radius: 50% !important;
+  background: var(--sage) !important;
+  color: var(--forest) !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: .72rem !important;
+  font-weight: 900 !important;
+  flex: 0 0 auto !important;
+}
+
+
+/* ─────────────────────
+   MLEKOMAT — karty możliwości / kroki / CTA
+───────────────────── */
+
+.machine-features,
+.milk-features,
+.feature-grid,
+.capabilities-grid {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: 1px !important;
+  background: var(--line) !important;
+  border: 1px solid var(--line) !important;
+  border-radius: var(--r-lg) !important;
+  overflow: hidden !important;
+  margin-top: 2.5rem !important;
+}
+
+.machine-features > *,
+.milk-features > *,
+.feature-grid > *,
+.capabilities-grid > * {
+  background: var(--paper) !important;
+  padding: 1.35rem !important;
+  color: var(--ink) !important;
+  font-size: .92rem !important;
+  line-height: 1.45 !important;
+}
+
+.process,
+.process-grid,
+.how-grid,
+.steps-grid {
+  display: grid !important;
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  gap: 1rem !important;
+  margin-top: 2rem !important;
+}
+
+.process-step,
+.how-step,
+.step-card {
+  background: var(--paper) !important;
+  border: 1px solid var(--line) !important;
+  border-radius: var(--r-lg) !important;
+  box-shadow: var(--shadow) !important;
+  padding: 1.25rem !important;
+}
+
+.process-step h3,
+.how-step h3,
+.step-card h3 {
+  font-size: 1rem !important;
+  line-height: 1.25 !important;
+  margin-bottom: .45rem !important;
+}
+
+.process-step p,
+.how-step p,
+.step-card p {
+  color: var(--muted) !important;
+  font-size: .9rem !important;
+  line-height: 1.65 !important;
+}
+
+.machine-cta,
+.milk-cta,
+.product-cta,
+.quote-card {
+  background: var(--paper) !important;
+  border: 1px solid var(--line) !important;
+  border-radius: var(--r-lg) !important;
+  box-shadow: var(--shadow-lg) !important;
+  padding: clamp(1.4rem, 3vw, 2rem) !important;
+}
+
+
+/* ─────────────────────
+   JAK DZIAŁAMY — asortyment / obraz / notatka
+───────────────────── */
+
+.assortment,
+.assort-section,
+.products-section {
+  padding: 5.5rem 5vw !important;
+}
+
+.assort-grid,
+.assortment-grid,
+.products-grid {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) minmax(300px, .9fr) !important;
+  gap: clamp(2rem, 5vw, 4.5rem) !important;
+  align-items: start !important;
+}
+
+.assort-img,
+.assortment-img,
+.products-img,
+.assortment-photo,
+.products-photo {
+  border-radius: var(--r-lg) !important;
+  overflow: hidden !important;
+  border: 1px solid var(--line) !important;
+  box-shadow: var(--shadow-lg) !important;
+  background: var(--bg3) !important;
+}
+
+.assort-img img,
+.assortment-img img,
+.products-img img,
+.assortment-photo img,
+.products-photo img {
+  width: 100% !important;
+  height: auto !important;
+  display: block !important;
+  object-fit: cover !important;
+}
+
+.note-box,
+.info-box,
+.tip-box,
+.assort-note,
+.products-note {
+  margin-top: 1.5rem !important;
+  background: var(--wheat-bg) !important;
+  border: 1px solid rgba(155,122,58,.25) !important;
+  border-radius: var(--r-lg) !important;
+  padding: 1.4rem 1.55rem !important;
+  color: var(--muted) !important;
+  font-size: .92rem !important;
+  line-height: 1.75 !important;
+  box-shadow: var(--shadow) !important;
+}
+
+.note-box strong,
+.info-box strong,
+.tip-box strong,
+.assort-note strong,
+.products-note strong {
+  color: var(--ink) !important;
+}
+
+
+/* ─────────────────────
+   RESPONSIVE
+───────────────────── */
+
+@media (max-width: 920px) {
+  .pav-type-grid,
+  .pavilion-type-grid,
+  .type-grid,
+  .model-grid,
+  .pav-grid,
+  .assort-grid,
+  .assortment-grid,
+  .products-grid {
+    grid-template-columns: 1fr !important;
+    gap: 2rem !important;
+  }
+
+  .machine-features,
+  .milk-features,
+  .feature-grid,
+  .capabilities-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  .process,
+  .process-grid,
+  .how-grid,
+  .steps-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .faq-q,
+  .faq-question,
+  .qa-q,
+  .accordion-btn,
+  .accordion-button,
+  .faq-item > button,
+  .qa-item > button,
+  .accordion-item > button {
+    padding: 1rem !important;
+    font-size: .92rem !important;
+  }
+
+  .faq-a,
+  .faq-answer,
+  .qa-a,
+  .accordion-content,
+  .accordion-panel {
+    padding: 0 1rem 1rem !important;
+  }
+
+  .params-list li,
+  .param-list li,
+  .parameters-list li,
+  .spec-list li,
+  .pav-param-list li,
+  .pavilion-param-list li,
+  .param-row,
+  .spec-row {
+    align-items: flex-start !important;
+    flex-direction: column !important;
+    gap: .18rem !important;
+  }
+
+  .param-row strong,
+  .spec-row strong,
+  .params-list li strong,
+  .param-list li strong,
+  .parameters-list li strong,
+  .spec-list li strong,
+  .param-row span:last-child,
+  .spec-row span:last-child,
+  .params-list li span:last-child,
+  .param-list li span:last-child,
+  .parameters-list li span:last-child,
+  .spec-list li span:last-child {
+    text-align: left !important;
+  }
+
+  .includes,
+  .includes-list,
+  .whats-included,
+  .included-list,
+  .check-list,
+  .offer-list,
+  .machine-features,
+  .milk-features,
+  .feature-grid,
+  .capabilities-grid,
+  .process,
+  .process-grid,
+  .how-grid,
+  .steps-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
