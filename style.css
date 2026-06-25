@@ -2153,3 +2153,64 @@ input[type=range]::-moz-range-thumb {
     flex-direction: column !important;
   }
 }
+
+/* ─────────────────────────────────────────────
+   FIX — schludniejsze dolne CTA na index.html
+───────────────────────────────────────────── */
+
+.cta-band {
+  padding: 4.5rem 5vw !important;
+}
+
+.cta-band-inner {
+  max-width: 900px !important;
+  margin: 0 auto !important;
+  display: grid !important;
+  grid-template-columns: minmax(0, .9fr) minmax(280px, .8fr) !important;
+  gap: 3.5rem !important;
+  align-items: center !important;
+}
+
+.cta-band h2 {
+  font-size: clamp(1.75rem, 3vw, 2.65rem) !important;
+  line-height: 1.12 !important;
+  letter-spacing: -.025em !important;
+  max-width: 13ch !important;
+}
+
+.cta-band h2 em {
+  font-size: .95em !important;
+  line-height: 1.12 !important;
+}
+
+.cta-band p {
+  max-width: 430px !important;
+  font-size: .95rem !important;
+  line-height: 1.75 !important;
+}
+
+.cta-actions {
+  margin-top: 1.45rem !important;
+}
+
+@media (max-width: 860px) {
+  .cta-band-inner {
+    max-width: 620px !important;
+    grid-template-columns: 1fr !important;
+    gap: 1.8rem !important;
+  }
+
+  .cta-band h2 {
+    max-width: 100% !important;
+  }
+}
+
+@media (max-width: 600px) {
+  .cta-band {
+    padding: 3.8rem 5vw !important;
+  }
+
+  .cta-band h2 {
+    font-size: clamp(1.65rem, 9vw, 2.25rem) !important;
+  }
+}
