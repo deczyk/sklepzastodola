@@ -10,40 +10,56 @@
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
 
   <title>Dlaczego to działa — Sklep za Stodołą</title>
-  <meta name="description" content="Dlaczego sklep przy gospodarstwie działa? Zobacz realia rynku mleka, trendy konsumenckie, potencjał sprzedaży lokalnej i powód, dla którego Sklep za Stodołą odpowiada na te wyzwania.">
+  <meta name="description" content="Dlaczego sprzedaż bezpośrednia przy gospodarstwie ma sens? Fakty o rynku mleka, marży, trendach konsumenckich i potencjale lokalnej żywności.">
 
   <link rel="stylesheet" href="style.css">
 
-  <!-- Font Awesome — jeśli masz już ten link w innych plikach, możesz zostawić albo usunąć duplikat -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" referrerpolicy="no-referrer">
+  <!-- Font Awesome: ikony do kart -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" referrerpolicy="no-referrer">
 </head>
 
 <body>
 
-<div class="top-marquee">
-  <div class="marquee-track">
-    <span>Kompleksowa obsługa farmera</span>
-    <span>Drewniany pawilon pod klucz</span>
-    <span>Mlekomat Premium CE-MID</span>
-    <span>Pomoc przy finansowaniu inwestycji</span>
-    <span>Leasing rolniczy</span>
-    <span>Instalacja i serwis — cała Polska</span>
-    <span>Kompleksowa obsługa farmera</span>
-    <span>Drewniany pawilon pod klucz</span>
-    <span>Mlekomat Premium CE-MID</span>
-    <span>Pomoc przy finansowaniu inwestycji</span>
-    <span>Leasing rolniczy</span>
-    <span>Instalacja i serwis — cała Polska</span>
+  <!-- TOP TICKER -->
+  <div class="top-ticker" aria-hidden="true">
+    <div class="ticker-track">
+      <span>Kompleksowa obsługa farmera</span>
+      <span>Drewniany pawilon pod klucz</span>
+      <span>Mlekomat Premium CE-MID</span>
+      <span>Pomoc przy finansowaniu inwestycji</span>
+      <span>Leasing rolniczy</span>
+      <span>Instalacja i serwis — cała Polska</span>
+      <span>Kompleksowa obsługa farmera</span>
+      <span>Drewniany pawilon pod klucz</span>
+      <span>Mlekomat Premium CE-MID</span>
+      <span>Pomoc przy finansowaniu inwestycji</span>
+      <span>Leasing rolniczy</span>
+      <span>Instalacja i serwis — cała Polska</span>
+    </div>
   </div>
-</div>
 
-<header class="site-header">
-  <a href="index.html" class="logo">
-    <span class="logo-dot"></span>
-    <span>Sklep za Stodołą</span>
-  </a>
+  <!-- NAV -->
+  <nav class="nav" id="nav">
+    <a href="index.html" class="nav-logo"><span class="nav-logo-dot"></span>Sklep za Stodołą</a>
 
-  <nav class="desktop-nav">
+    <ul class="nav-links">
+      <li><a href="index.html">Start</a></li>
+      <li><a href="jak-dzialamy.html">Jak działamy</a></li>
+      <li><a href="pawilony.html">Pawilony</a></li>
+      <li><a href="mlekomat.html">Mlekomat</a></li>
+      <li><a href="dlaczego.html" class="active">Dlaczego to działa</a></li>
+      <li><a href="kontakt.html">Kontakt</a></li>
+    </ul>
+
+    <a href="kontakt.html" class="nav-cta">Porozmawiajmy</a>
+
+    <button class="burger" id="burger" aria-label="Menu" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+
+  <nav class="mob-nav" id="mob-nav" aria-label="Menu mobilne">
+    <button class="mob-close" id="mob-close" aria-label="Zamknij">✕</button>
     <a href="index.html">Start</a>
     <a href="jak-dzialamy.html">Jak działamy</a>
     <a href="pawilony.html">Pawilony</a>
@@ -52,460 +68,316 @@
     <a href="kontakt.html">Kontakt</a>
   </nav>
 
-  <a class="btn btn-small desktop-cta" href="kontakt.html">Porozmawiajmy</a>
+  <main>
 
-  <button class="menu-toggle" type="button" aria-label="Otwórz menu">
-    <span></span>
-    <span></span>
-  </button>
-</header>
+    <!-- HERO / INTRO -->
+    <section class="why-hero">
+      <div class="wrap">
+        <div class="why-hero-inner">
+          <p class="sec-label" data-r="fade">Dlaczego to działa</p>
 
-<div class="mobile-menu" id="mobileMenu">
-  <button class="mobile-close" type="button" aria-label="Zamknij menu">✕</button>
-  <a href="index.html">Start</a>
-  <a href="jak-dzialamy.html">Jak działamy</a>
-  <a href="pawilony.html">Pawilony</a>
-  <a href="mlekomat.html">Mlekomat</a>
-  <a href="dlaczego.html">Dlaczego to działa</a>
-  <a href="kontakt.html">Kontakt</a>
-</div>
+          <h1 class="why-title" data-r>
+            Rynek się zmienia.<br>
+            <em>Rolnik nie musi już oddawać marży pośrednikom.</em>
+          </h1>
 
-<main>
+          <p class="why-lead" data-r data-d="1">
+            Sprzedaż bezpośrednia przy gospodarstwie działa, bo łączy trzy rzeczy:
+            realny problem niskich cen w skupie, gotowość klientów do płacenia za lokalny produkt
+            oraz prostą infrastrukturę, która sprzedaje bez stałej obsługi.
+          </p>
 
-  <!-- HERO PODSTRONY -->
-
-  <section class="subhero why-page-hero">
-    <div class="wrap" data-r>
-      <p class="sec-label">Dlaczego to działa</p>
-      <h1>
-        Rynek się zmienił.<br>
-        <em>Rolnik może sprzedawać bliżej klienta.</em>
-      </h1>
-      <p>
-        Sklep przy gospodarstwie działa, bo odpowiada na cztery konkretne zjawiska:
-        presję cen w skupach, potrzebę wyższej marży, zmianę zachowań konsumentów
-        i rosnący potencjał rynku lokalnej żywności.
-      </p>
-      <div class="why-hero-actions">
-        <a class="btn" href="kontakt.html">Chcę sprawdzić swój przypadek →</a>
-        <a class="btn btn-light" href="index.html#kalkulator">Policz orientacyjny zysk</a>
+          <div class="why-hero-actions" data-r data-d="2">
+            <a href="#fakty" class="btn btn-green">Zobacz 8 faktów →</a>
+            <a href="kontakt.html" class="btn btn-outline">Porozmawiajmy o Twoim gospodarstwie</a>
+          </div>
+        </div>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <!-- DLACZEGO TO DZIAŁA -->
+    <!-- FACTS -->
+    <section class="why-section" id="fakty">
+      <div class="wrap">
 
-  <section class="sec why-proof-sec">
-    <div class="wrap">
+        <div class="why-section-head" data-r>
+          <p class="sec-label">Fakty, nie obietnice</p>
+          <h2 class="sec-title">Dlaczego sprzedaż bezpośrednia<br><em>ma teraz sens?</em></h2>
+          <p>
+            Poniżej znajdziesz 8 konkretnych argumentów pogrupowanych w 4 obszary:
+            rynek, model sprzedaży, zachowania klientów i skala potencjału.
+          </p>
+        </div>
 
-      <div class="why-proof-head" data-r>
-        <p class="sec-label">8 faktów</p>
-        <h2 class="sec-title">
-          To nie jest moda.<br>
-          <em>To odpowiedź na realny problem rynku.</em>
-        </h2>
-        <p class="sec-body">
-          Poniżej masz uporządkowane argumenty: od sytuacji w skupach, przez model sprzedaży
-          bezpośredniej, aż po zachowania klientów i skalę rynku.
-        </p>
-      </div>
+        <div class="why-grid">
 
-      <div class="why-category-grid">
-
-        <!-- KATEGORIA 1 -->
-
-        <article class="why-category-card why-category-wide" data-r data-d="1">
-          <div class="why-category-head">
-            <div class="why-category-icon">
-              <i class="fa-solid fa-chart-line"></i>
+          <!-- CATEGORY 1 -->
+          <article class="why-card why-card-wide" data-r data-d="1">
+            <div class="why-card-top">
+              <div class="why-icon"><i class="fa-solid fa-chart-line"></i></div>
+              <div>
+                <p class="why-kicker">Kategoria 1</p>
+                <h3>Realia rynku i kryzys w skupach</h3>
+              </div>
             </div>
+
+            <div class="why-facts">
+              <div class="why-fact">
+                <span class="why-number">01</span>
+                <div>
+                  <h4>Spadek cen w skupach</h4>
+                  <p>Średnia cena skupu mleka w marcu 2026 r. wyniosła zaledwie <strong>1,86 zł/l</strong>, czyli o <strong>19% mniej rok do roku</strong>.</p>
+                  <a class="why-source" href="https://www.agrofakt.pl/ceny-skupu-mleka-2026-rolnicy-stawki/" target="_blank" rel="noopener noreferrer">
+                    Zobacz źródło <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                  </a>
+                </div>
+              </div>
+
+              <div class="why-fact">
+                <span class="why-number">02</span>
+                <div>
+                  <h4>Drastyczne tąpnięcie rok do roku</h4>
+                  <p>Dane GUS z początku 2026 r. potwierdzają kryzys — w grudniu 2025 cena spadła do <strong>1,99 zł/hl</strong>, co oznacza spadek aż o <strong>23% r/r</strong>.</p>
+                  <a class="why-source" href="https://www.topagrar.pl/articles/rynek-mleka/ceny-mleka-pod-presja-jak-gus-zamknal-2025-rok-2638029" target="_blank" rel="noopener noreferrer">
+                    Zobacz źródło <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                  </a>
+                </div>
+              </div>
+
+              <div class="why-fact">
+                <span class="why-number">03</span>
+                <div>
+                  <h4>Niesprawiedliwe wyceny</h4>
+                  <p>Rozbieżności między mleczarniami za to samo mleko sięgają od <strong>1,20 zł do 2,50 zł/l</strong>. Tradycyjny skup staje się loterią.</p>
+                  <a class="why-source" href="https://www.cenyrolnicze.pl/wiadomosci/rynki-rolne/mleko" target="_blank" rel="noopener noreferrer">
+                    Zobacz źródło <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                  </a>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <!-- CATEGORY 2 -->
+          <article class="why-card" data-r data-d="2">
+            <div class="why-card-top">
+              <div class="why-icon"><i class="fa-solid fa-hand-holding-dollar"></i></div>
+              <div>
+                <p class="why-kicker">Kategoria 2</p>
+                <h3>Nowy model sprzedaży</h3>
+              </div>
+            </div>
+
+            <div class="why-facts">
+              <div class="why-fact">
+                <span class="why-number">04</span>
+                <div>
+                  <h4>Wyższa marża i niezależność</h4>
+                  <p>Sprzedaż bezpośrednia pomija pośredników i pozwala rolnikowi zatrzymać znacznie większą część marży na każdym litrze. Kluczowa jest gotowa infrastruktura: mlekomat, pawilon i dobrze ułożony proces sprzedaży.</p>
+                  <p class="why-note">Źródło wskazane w materiale: Rolnicy.com</p>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <!-- CATEGORY 3 -->
+          <article class="why-card why-card-wide" data-r data-d="3">
+            <div class="why-card-top">
+              <div class="why-icon"><i class="fa-solid fa-basket-shopping"></i></div>
+              <div>
+                <p class="why-kicker">Kategoria 3</p>
+                <h3>Trendy konsumenckie</h3>
+              </div>
+            </div>
+
+            <div class="why-facts">
+              <div class="why-fact">
+                <span class="why-number">05</span>
+                <div>
+                  <h4>Gotowość do płacenia więcej</h4>
+                  <p>Nowoczesny konsument szuka <strong>autentyczności, dziedzictwa i jasnej historii produktu</strong>. Lokalność nie jest dodatkiem — jest powodem zakupu.</p>
+                  <p class="why-note">Źródło wskazane w materiale: PrzeglądHandlowy.pl, 2026</p>
+                </div>
+              </div>
+
+              <div class="why-fact">
+                <span class="why-number">06</span>
+                <div>
+                  <h4>Eksplozja trendu „Local & Organic”</h4>
+                  <p>Świadomi klienci coraz częściej wybierają zakupy prosto z gospodarstw: żywność sezonową, organiczną, świeżą i kupowaną od konkretnego producenta.</p>
+                  <p class="why-note">Źródło wskazane w materiale: Biologico.pl</p>
+                </div>
+              </div>
+
+              <div class="why-fact">
+                <span class="why-number">07</span>
+                <div>
+                  <h4>Poszukiwanie autentyczności</h4>
+                  <p>W czasach niepewności rynkowej autentyczność oraz kulturowe dziedzictwo jedzenia mocno zyskują na wartości w oczach odbiorców.</p>
+                  <p class="why-note">Źródło wskazane w materiale: FoodFakty.pl</p>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <!-- CATEGORY 4 -->
+          <article class="why-card" data-r data-d="4">
+            <div class="why-card-top">
+              <div class="why-icon"><i class="fa-solid fa-seedling"></i></div>
+              <div>
+                <p class="why-kicker">Kategoria 4</p>
+                <h3>Potencjał rynkowy</h3>
+              </div>
+            </div>
+
+            <div class="why-facts">
+              <div class="why-fact">
+                <span class="why-number">08</span>
+                <div>
+                  <h4>Rynek wart miliardy</h4>
+                  <p>Wartość rynku żywności funkcjonalnej i lokalnej w Polsce dynamicznie rośnie i ma szansę osiągnąć nawet <strong>30 miliardów złotych</strong>.</p>
+                  <a class="why-source" href="https://czytamyetykiety.pl/trendy-spozywcze-na-2025-rok/" target="_blank" rel="noopener noreferrer">
+                    Zobacz źródło <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                  </a>
+                </div>
+              </div>
+            </div>
+          </article>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- WHY US -->
+    <section class="why-summary">
+      <div class="wrap">
+        <div class="why-summary-box" data-r>
+          <div class="why-summary-copy">
+            <p class="sec-label">Dlaczego my?</p>
+
+            <h2>
+              Sklep za Stodołą to odpowiedź na dokładnie te wyzwania.
+            </h2>
+
+            <p>
+              Rolnik nie potrzebuje kolejnej teorii o sprzedaży bezpośredniej. Potrzebuje gotowego rozwiązania,
+              które można postawić przy gospodarstwie i uruchomić bez budowania wszystkiego od zera.
+            </p>
+
+            <p>
+              Dlatego łączymy <strong>drewniany pawilon, mlekomat Premium, ekspozycję produktów, płatności,
+              organizację sprzedaży, finansowanie, instalację i serwis</strong> w jeden projekt. Klient przyjeżdża po świeże mleko,
+              a przy okazji kupuje jajka, sery, masło, miód lub inne produkty z gospodarstwa.
+            </p>
+
+            <p>
+              Ty zajmujesz się gospodarstwem. My pomagamy zbudować miejsce, które sprzedaje lokalność,
+              świeżość i prawdziwą historię Twojego produktu — bez pośredników i bez oddawania marży w skupie.
+            </p>
+
+            <div class="why-summary-actions">
+              <a href="kontakt.html" class="btn btn-green">Chcę sprawdzić, czy to zadziała u mnie →</a>
+              <a href="tel:533200652" class="why-phone"><i class="fa-solid fa-phone"></i> 533 200 652</a>
+            </div>
+          </div>
+
+          <div class="why-summary-points" aria-label="Najważniejsze korzyści">
             <div>
-              <span>kategoria 1</span>
-              <h3>Realia rynku i kryzys w skupach</h3>
-            </div>
-          </div>
-
-          <div class="why-fact-list">
-
-            <div class="why-fact-card">
-              <div class="why-fact-icon">
-                <i class="fa-solid fa-arrow-trend-down"></i>
-              </div>
-              <div class="why-fact-content">
-                <h4>Spadek cen w skupach</h4>
-                <p>
-                  Średnia cena skupu mleka w marcu 2026 r. wyniosła zaledwie
-                  <strong>1,86 zł/l</strong>, czyli około <strong>19% mniej rok do roku</strong>.
-                  To pokazuje, jak mocno rolnik zależy od aktualnych stawek narzucanych przez rynek.
-                </p>
-                <a class="why-source-link" href="https://www.agrofakt.pl/ceny-skupu-mleka-2026-rolnicy-stawki/" target="_blank" rel="noopener noreferrer">
-                  Zobacz źródło <i class="fa-solid fa-arrow-up-right-from-square"></i>
-                </a>
-              </div>
-            </div>
-
-            <div class="why-fact-card">
-              <div class="why-fact-icon">
-                <i class="fa-solid fa-triangle-exclamation"></i>
-              </div>
-              <div class="why-fact-content">
-                <h4>Drastyczne tąpnięcie rok do roku</h4>
-                <p>
-                  Dane GUS z początku 2026 r. potwierdzają presję na rynku.
-                  W grudniu 2025 r. cena spadła do około <strong>1,99 zł/l</strong>,
-                  co oznacza spadek aż o <strong>23% rok do roku</strong>.
-                </p>
-                <a class="why-source-link" href="https://www.topagrar.pl/articles/rynek-mleka/ceny-mleka-pod-presja-jak-gus-zamknal-2025-rok-2638029" target="_blank" rel="noopener noreferrer">
-                  Zobacz źródło <i class="fa-solid fa-arrow-up-right-from-square"></i>
-                </a>
-              </div>
-            </div>
-
-            <div class="why-fact-card">
-              <div class="why-fact-icon">
-                <i class="fa-solid fa-scale-unbalanced-flip"></i>
-              </div>
-              <div class="why-fact-content">
-                <h4>Niesprawiedliwe wyceny</h4>
-                <p>
-                  Rozbieżności cenowe między mleczarniami za podobne mleko potrafią sięgać
-                  od <strong>1,20 zł do 2,50 zł/l</strong>. Tradycyjny skup staje się loterią,
-                  w której rolnik często nie ma realnej kontroli nad ceną.
-                </p>
-                <a class="why-source-link" href="https://www.cenyrolnicze.pl/wiadomosci/rynki-rolne/mleko" target="_blank" rel="noopener noreferrer">
-                  Zobacz źródło <i class="fa-solid fa-arrow-up-right-from-square"></i>
-                </a>
-              </div>
-            </div>
-
-          </div>
-        </article>
-
-        <!-- KATEGORIA 2 -->
-
-        <article class="why-category-card" data-r data-d="2">
-          <div class="why-category-head">
-            <div class="why-category-icon">
               <i class="fa-solid fa-store"></i>
+              <span>Gotowy sklep przy gospodarstwie</span>
             </div>
             <div>
-              <span>kategoria 2</span>
-              <h3>Nowy model sprzedaży</h3>
-            </div>
-          </div>
-
-          <div class="why-fact-list">
-            <div class="why-fact-card">
-              <div class="why-fact-icon">
-                <i class="fa-solid fa-hand-holding-dollar"></i>
-              </div>
-              <div class="why-fact-content">
-                <h4>Wyższa marża i niezależność</h4>
-                <p>
-                  Sprzedaż bezpośrednia pomija pośredników i pozwala odzyskać kontrolę
-                  nad ceną każdego litra. Żeby działała powtarzalnie, potrzebuje jednak
-                  organizacji: mlekomatu, płatności, miejsca sprzedaży i gotowej infrastruktury.
-                </p>
-                <span class="why-source-note">Źródło: Rolnicy.com</span>
-              </div>
-            </div>
-          </div>
-        </article>
-
-        <!-- KATEGORIA 3 -->
-
-        <article class="why-category-card why-category-wide" data-r data-d="3">
-          <div class="why-category-head">
-            <div class="why-category-icon">
-              <i class="fa-solid fa-basket-shopping"></i>
+              <i class="fa-solid fa-robot"></i>
+              <span>Automatyzacja sprzedaży 24/7</span>
             </div>
             <div>
-              <span>kategoria 3</span>
-              <h3>Trendy konsumenckie</h3>
-            </div>
-          </div>
-
-          <div class="why-fact-list">
-
-            <div class="why-fact-card">
-              <div class="why-fact-icon">
-                <i class="fa-solid fa-heart"></i>
-              </div>
-              <div class="why-fact-content">
-                <h4>Gotowość do płacenia więcej</h4>
-                <p>
-                  Nowoczesny konsument szuka autentyczności i historii produktu.
-                  Klient chce wiedzieć, skąd pochodzi mleko, kto je wyprodukował
-                  i dlaczego warto zapłacić więcej niż za anonimowy produkt z półki.
-                </p>
-                <span class="why-source-note">Źródło: PrzeglądHandlowy.pl, 2026</span>
-              </div>
-            </div>
-
-            <div class="why-fact-card">
-              <div class="why-fact-icon">
-                <i class="fa-solid fa-seedling"></i>
-              </div>
-              <div class="why-fact-content">
-                <h4>Eksplozja trendu „local & organic”</h4>
-                <p>
-                  Świadomi konsumenci coraz częściej wybierają zakupy prosto z gospodarstw:
-                  lokalne, sezonowe i mniej anonimowe. To naturalna przewaga rolnika,
-                  który może pokazać źródło produktu.
-                </p>
-                <span class="why-source-note">Źródło: Biologico.pl</span>
-              </div>
-            </div>
-
-            <div class="why-fact-card">
-              <div class="why-fact-icon">
-                <i class="fa-solid fa-fingerprint"></i>
-              </div>
-              <div class="why-fact-content">
-                <h4>Poszukiwanie autentyczności</h4>
-                <p>
-                  W czasach niepewności rynkowej autentyczność, prosty skład i kulturowe
-                  dziedzictwo jedzenia zyskują na wartości. Gospodarstwo nie musi udawać marki —
-                  ono już ma historię.
-                </p>
-                <span class="why-source-note">Źródło: FoodFakty.pl</span>
-              </div>
-            </div>
-
-          </div>
-        </article>
-
-        <!-- KATEGORIA 4 -->
-
-        <article class="why-category-card" data-r data-d="4">
-          <div class="why-category-head">
-            <div class="why-category-icon">
-              <i class="fa-solid fa-chart-pie"></i>
-            </div>
-            <div>
-              <span>kategoria 4</span>
-              <h3>Potencjał rynkowy</h3>
-            </div>
-          </div>
-
-          <div class="why-fact-list">
-            <div class="why-fact-card">
-              <div class="why-fact-icon">
-                <i class="fa-solid fa-coins"></i>
-              </div>
-              <div class="why-fact-content">
-                <h4>Rynek wart miliardy</h4>
-                <p>
-                  Rynek żywności funkcjonalnej, lokalnej i produktów wybieranych świadomie
-                  dynamicznie rośnie. Według prognoz może osiągnąć wartość nawet
-                  <strong>30 miliardów złotych</strong>.
-                </p>
-                <a class="why-source-link" href="https://czytamyetykiety.pl/trendy-spozywcze-na-2025-rok/" target="_blank" rel="noopener noreferrer">
-                  Zobacz źródło <i class="fa-solid fa-arrow-up-right-from-square"></i>
-                </a>
-              </div>
-            </div>
-          </div>
-        </article>
-
-      </div>
-
-      <!-- PODSUMOWANIE -->
-
-      <section class="why-summary" data-r>
-        <div class="why-summary-content">
-          <p class="sec-label">Dlaczego Sklep za Stodołą?</p>
-          <h2>
-            Nasze rozwiązanie jest odpowiedzią na dokładnie te wyzwania.
-          </h2>
-          <p>
-            Rolnik nie potrzebuje kolejnej teorii o sprzedaży bezpośredniej. Potrzebuje gotowego,
-            działającego systemu: miejsca sprzedaży, mlekomatu, ekspozycji produktów, płatności,
-            finansowania, montażu i wsparcia po uruchomieniu.
-          </p>
-          <p>
-            Dlatego Sklep za Stodołą nie sprzedaje samej maszyny. Tworzymy kompletny sklep przy
-            gospodarstwie — z drewnianym pawilonem, mlekomatem Premium, miejscem na jajka, sery,
-            masło, przetwory i inne produkty. Klient przychodzi po świeże mleko, a wychodzi
-            z większym koszykiem. Rolnik odzyskuje marżę, kontakt z klientem i niezależność
-            od pośredników.
-          </p>
-
-          <div class="why-summary-points">
-            <div>
-              <i class="fa-solid fa-house-chimney"></i>
-              <span>Pawilon pod klucz</span>
-            </div>
-            <div>
-              <i class="fa-solid fa-bottle-droplet"></i>
-              <span>Mlekomat Premium CE-MID</span>
-            </div>
-            <div>
-              <i class="fa-solid fa-credit-card"></i>
-              <span>Płatności i sprzedaż 24/7</span>
-            </div>
-            <div>
-              <i class="fa-solid fa-file-signature"></i>
-              <span>Leasing i wsparcie formalne</span>
+              <i class="fa-solid fa-coins"></i>
+              <span>Większa marża bez pośredników</span>
             </div>
             <div>
               <i class="fa-solid fa-screwdriver-wrench"></i>
-              <span>Montaż, serwis i części</span>
-            </div>
-            <div>
-              <i class="fa-solid fa-mobile-screen-button"></i>
-              <span>Panel online i powiadomienia</span>
+              <span>Instalacja, wdrożenie i serwis</span>
             </div>
           </div>
+        </div>
+      </div>
+    </section>
 
-          <div class="why-summary-actions">
-            <a class="btn" href="kontakt.html">Porozmawiajmy o Twoim sklepie →</a>
-            <a class="why-summary-phone" href="tel:533200652">533 200 652</a>
+    <!-- CTA BAND -->
+    <section class="cta-band">
+      <div class="wrap">
+        <div class="cta-band-inner" data-r>
+          <h2>Gotowy żeby<br><em>przestać oddawać mleko za grosze?</em></h2>
+          <p>Bezpłatna rozmowa — ocenimy Twój przypadek, powiemy co ma sens i co możesz zyskać. Bez presji, bez ściemy.</p>
+
+          <div class="cta-actions">
+            <a href="kontakt.html" class="btn btn-green">Umów bezpłatną rozmowę →</a>
+            <a href="tel:533200652" class="tel-link">533 200 652</a>
           </div>
         </div>
+      </div>
+    </section>
 
-        <div class="why-summary-side">
-          <div class="why-summary-badge">
-            <span>bez pośredników</span>
-            <strong>większa kontrola nad marżą</strong>
-          </div>
-          <div class="why-summary-badge">
-            <span>pod klucz</span>
-            <strong>rolnik zajmuje się gospodarstwem</strong>
-          </div>
-          <div class="why-summary-badge">
-            <span>24/7</span>
-            <strong>sklep sprzedaje także bez Twojej obecności</strong>
-          </div>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="footer-inner">
+
+      <div>
+        <p class="footer-brand">Sklep za Stodołą</p>
+        <p class="footer-sub">Tworzymy dochodowe sklepy przy gospodarstwach. Wyłączny dystrybutor mlekomatu Premium w Polsce.</p>
+
+        <div class="footer-soc">
+          <a href="https://www.facebook.com/profile.php?id=61590896125832" class="soc-btn" aria-label="Facebook" target="_blank" rel="noopener">f</a>
+          <a href="https://www.instagram.com/sklepzastodola/" class="soc-btn" aria-label="Instagram" target="_blank" rel="noopener">ig</a>
         </div>
-      </section>
-
-    </div>
-  </section>
-
-  <!-- CTA -->
-
-  <section class="cta-band">
-    <div class="wrap cta-band-inner" data-r>
-      <h2>Chcesz sprawdzić,<br><em>czy to zadziała u Ciebie?</em></h2>
-      <p>
-        Bezpłatnie ocenimy Twoje gospodarstwo, lokalizację, potencjalny asortyment
-        i możliwości finansowania. Powiemy wprost, czy sklep przy gospodarstwie ma sens.
-      </p>
-
-      <div class="hero-actions">
-        <a href="kontakt.html" class="btn">Umów bezpłatną rozmowę →</a>
-        <a href="tel:533200652" style="font-weight:800;color:var(--forest)">533 200 652</a>
       </div>
-    </div>
-  </section>
 
-</main>
-
-<footer class="footer">
-  <div class="wrap footer-grid">
-
-    <div>
-      <h3>Sklep za Stodołą</h3>
-      <p>Tworzymy dochodowe sklepy przy gospodarstwach. Wyłączny dystrybutor mlekomatu Premium w Polsce.</p>
-      <div class="socials">
-        <a href="https://www.facebook.com/sklepzastodola" target="_blank" rel="noopener">f</a>
-        <a href="https://www.instagram.com/sklepzastodola" target="_blank" rel="noopener">ig</a>
+      <div class="footer-col">
+        <h4>Strony</h4>
+        <ul>
+          <li><a href="index.html">Start</a></li>
+          <li><a href="jak-dzialamy.html">Jak działamy</a></li>
+          <li><a href="pawilony.html">Pawilony</a></li>
+          <li><a href="mlekomat.html">Mlekomat</a></li>
+          <li><a href="dlaczego.html">Dlaczego to działa</a></li>
+          <li><a href="kontakt.html">Kontakt</a></li>
+        </ul>
       </div>
+
+      <div class="footer-col">
+        <h4>Kontakt</h4>
+        <ul>
+          <li><a href="tel:533200652">533 200 652</a></li>
+          <li><a href="tel:690000923">690 000 923</a></li>
+          <li><a href="mailto:kontakt@sklepzastodola.pl">kontakt@sklepzastodola.pl</a></li>
+        </ul>
+      </div>
+
     </div>
 
-    <div>
-      <h4>Strony</h4>
-      <a href="index.html">Start</a>
-      <a href="jak-dzialamy.html">Jak działamy</a>
-      <a href="pawilony.html">Pawilony</a>
-      <a href="mlekomat.html">Mlekomat</a>
-      <a href="dlaczego.html">Dlaczego to działa</a>
-      <a href="kontakt.html">Kontakt</a>
+    <div class="footer-bottom">
+      <p class="footer-copy">© 2026 Sklep za Stodołą Sp. z o.o.</p>
+      <div class="footer-links"><a href="polityka.html">Polityka prywatności</a></div>
     </div>
+  </footer>
 
-    <div>
-      <h4>Kontakt</h4>
-      <p>533 200 652</p>
-      <p>690 000 923</p>
-      <p>kontakt@sklepzastodola.pl</p>
+  <div class="cookie" id="cookie">
+    <p>Ta strona używa plików cookies. <a href="polityka.html">Polityka prywatności</a></p>
+
+    <div class="cookie-btns">
+      <button class="ck-yes" onclick="setCk('yes')">Akceptuję</button>
+      <button class="ck-no" onclick="setCk('no')">Tylko niezbędne</button>
     </div>
-
   </div>
 
-  <div class="footer-bottom">
-    <span>© 2026 Sklep za Stodołą Sp. z o.o.</span>
-    <a href="polityka-prywatnosci.html">Polityka prywatności</a>
-  </div>
-</footer>
-
-<div class="cookie-box" id="cookieBox">
-  <p>Ta strona używa plików cookies. <a href="polityka-prywatnosci.html">Polityka prywatności</a></p>
-  <div>
-    <button type="button" id="acceptCookies">Akceptuję</button>
-    <button type="button" id="necessaryCookies">Tylko niezbędne</button>
-  </div>
-</div>
-
-<script>
-const menuToggle = document.querySelector('.menu-toggle');
-const mobileMenu = document.getElementById('mobileMenu');
-const mobileClose = document.querySelector('.mobile-close');
-
-if (menuToggle && mobileMenu) {
-  menuToggle.addEventListener('click', () => {
-    mobileMenu.classList.add('open');
-    document.body.classList.add('menu-open');
-  });
-}
-
-if (mobileClose && mobileMenu) {
-  mobileClose.addEventListener('click', () => {
-    mobileMenu.classList.remove('open');
-    document.body.classList.remove('menu-open');
-  });
-}
-
-document.querySelectorAll('.mobile-menu a').forEach(link => {
-  link.addEventListener('click', () => {
-    if (mobileMenu) mobileMenu.classList.remove('open');
-    document.body.classList.remove('menu-open');
-  });
-});
-
-const revealItems = document.querySelectorAll('[data-r]');
-
-const revealObserver = new IntersectionObserver((entries) => {
-  entries.forEach(entry => {
-    if (entry.isIntersecting) {
-      const delay = entry.target.dataset.d || 0;
-      entry.target.style.transitionDelay = `${delay * 90}ms`;
-      entry.target.classList.add('in');
-      revealObserver.unobserve(entry.target);
+  <script>
+    if(localStorage.getItem('ck') && !localStorage.getItem('cookie_consent')){
+      var v = localStorage.getItem('ck');
+      localStorage.setItem('cookie_consent', v === 'yes' ? 'accept' : 'reject');
+      localStorage.removeItem('ck');
     }
-  });
-}, {
-  threshold: .12
-});
+  </script>
 
-revealItems.forEach(item => revealObserver.observe(item));
-
-const cookieBox = document.getElementById('cookieBox');
-const acceptCookies = document.getElementById('acceptCookies');
-const necessaryCookies = document.getElementById('necessaryCookies');
-
-if (localStorage.getItem('cookies-ok') === 'yes' && cookieBox) {
-  cookieBox.style.display = 'none';
-}
-
-function closeCookies() {
-  localStorage.setItem('cookies-ok', 'yes');
-  if (cookieBox) cookieBox.style.display = 'none';
-}
-
-if (acceptCookies) acceptCookies.addEventListener('click', closeCookies);
-if (necessaryCookies) necessaryCookies.addEventListener('click', closeCookies);
-</script>
-
+  <script src="nav.js"></script>
 </body>
 </html>
