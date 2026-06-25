@@ -182,6 +182,66 @@
   <div class="hero-scroll" aria-hidden="true">przewiń</div>
 </section>
 
+<!-- ANIMOWANA SEKCJA: LICZBY -->
+<section class="scenario-sec">
+<div class="wrap">
+  <div data-r>
+    <p class="sec-label">Orientacyjny przychód</p>
+    <h2 class="sec-title">Tyle może zarabiać<br><em>sklep przy Twoim gospodarstwie.</em></h2>
+    <p class="sec-body" style="max-width:55ch">Przykład dla średniego gospodarstwa mlecznego — mlekomat + produkty ze sklepu. Twoje liczby policz niżej.</p>
+  </div>
+  <div class="scenario-grid" data-r>
+    <!-- SKŁADNIKI -->
+    <div class="scenario-ingredients">
+      <div class="sc-item" id="sc-mleko">
+        <div class="sc-icon">🥛</div>
+        <div class="sc-label">Mlekomat</div>
+        <div class="sc-val" id="sc-mleko-val">0 zł</div>
+        <div class="sc-sub">miesięcznie</div>
+      </div>
+      <div class="sc-plus">+</div>
+      <div class="sc-item" id="sc-jajka">
+        <div class="sc-icon">🥚</div>
+        <div class="sc-label">Jajka</div>
+        <div class="sc-val" id="sc-jajka-val">0 zł</div>
+        <div class="sc-sub">miesięcznie</div>
+      </div>
+      <div class="sc-plus">+</div>
+      <div class="sc-item" id="sc-sery">
+        <div class="sc-icon">🧀</div>
+        <div class="sc-label">Sery, masło, przetwory</div>
+        <div class="sc-val" id="sc-sery-val">0 zł</div>
+        <div class="sc-sub">miesięcznie</div>
+      </div>
+      <div class="sc-plus">+</div>
+      <div class="sc-item" id="sc-inne">
+        <div class="sc-icon">🍯</div>
+        <div class="sc-label">Miód, warzywa, inne</div>
+        <div class="sc-val" id="sc-inne-val">0 zł</div>
+        <div class="sc-sub">miesięcznie</div>
+      </div>
+    </div>
+    <!-- WYNIK -->
+    <div class="scenario-result">
+      <div class="sc-result-inner">
+        <div class="sc-result-label">= Łączny przychód sklepu</div>
+        <div class="sc-result-val" id="sc-total">0 zł</div>
+        <div class="sc-result-sub" id="sc-total-year">0 zł rocznie</div>
+        <div class="sc-divider"></div>
+        <div class="sc-vs-label">vs. skup mleka</div>
+        <div class="sc-vs-skup" id="sc-skup">0 zł / mies.</div>
+        <div class="sc-result-diff">
+          <span class="sc-diff-badge" id="sc-diff">+0 zł więcej</span>
+          <span class="sc-diff-pct" id="sc-pct">+0%</span>
+        </div>
+        <p class="sc-disclaimer">Szacunek orientacyjny dla ~50 krów,<br>30 klientów dziennie</p>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+  
 <!-- STATEMENT -->
 <section class="stmt">
 <div class="wrap">
@@ -258,66 +318,6 @@
   </div>
 </div>
 </section>
-
-<!-- ANIMOWANA SEKCJA: LICZBY -->
-<section class="scenario-sec">
-<div class="wrap">
-  <div data-r>
-    <p class="sec-label">Orientacyjny przychód</p>
-    <h2 class="sec-title">Tyle może zarabiać<br><em>sklep przy Twoim gospodarstwie.</em></h2>
-    <p class="sec-body" style="max-width:55ch">Przykład dla średniego gospodarstwa mlecznego — mlekomat + produkty ze sklepu. Twoje liczby policz niżej.</p>
-  </div>
-  <div class="scenario-grid" data-r>
-    <!-- SKŁADNIKI -->
-    <div class="scenario-ingredients">
-      <div class="sc-item" id="sc-mleko">
-        <div class="sc-icon">🥛</div>
-        <div class="sc-label">Mlekomat</div>
-        <div class="sc-val" id="sc-mleko-val">0 zł</div>
-        <div class="sc-sub">miesięcznie</div>
-      </div>
-      <div class="sc-plus">+</div>
-      <div class="sc-item" id="sc-jajka">
-        <div class="sc-icon">🥚</div>
-        <div class="sc-label">Jajka</div>
-        <div class="sc-val" id="sc-jajka-val">0 zł</div>
-        <div class="sc-sub">miesięcznie</div>
-      </div>
-      <div class="sc-plus">+</div>
-      <div class="sc-item" id="sc-sery">
-        <div class="sc-icon">🧀</div>
-        <div class="sc-label">Sery, masło, przetwory</div>
-        <div class="sc-val" id="sc-sery-val">0 zł</div>
-        <div class="sc-sub">miesięcznie</div>
-      </div>
-      <div class="sc-plus">+</div>
-      <div class="sc-item" id="sc-inne">
-        <div class="sc-icon">🍯</div>
-        <div class="sc-label">Miód, warzywa, inne</div>
-        <div class="sc-val" id="sc-inne-val">0 zł</div>
-        <div class="sc-sub">miesięcznie</div>
-      </div>
-    </div>
-    <!-- WYNIK -->
-    <div class="scenario-result">
-      <div class="sc-result-inner">
-        <div class="sc-result-label">= Łączny przychód sklepu</div>
-        <div class="sc-result-val" id="sc-total">0 zł</div>
-        <div class="sc-result-sub" id="sc-total-year">0 zł rocznie</div>
-        <div class="sc-divider"></div>
-        <div class="sc-vs-label">vs. skup mleka</div>
-        <div class="sc-vs-skup" id="sc-skup">0 zł / mies.</div>
-        <div class="sc-result-diff">
-          <span class="sc-diff-badge" id="sc-diff">+0 zł więcej</span>
-          <span class="sc-diff-pct" id="sc-pct">+0%</span>
-        </div>
-        <p class="sc-disclaimer">Szacunek orientacyjny dla ~50 krów,<br>30 klientów dziennie</p>
-      </div>
-    </div>
-  </div>
-</div>
-</section>
-
 <!-- KALKULATOR ROI -->
 <section class="sec sec-alt" id="kalkulator">
 <div class="wrap">
