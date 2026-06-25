@@ -6,41 +6,64 @@
 <title>Polityka Prywatności i Cookies | Sklep za Stodołą</title>
 <meta name="robots" content="index, follow"/>
 <link rel="stylesheet" href="style.css"/>
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌾</text></svg>">
+<link rel="icon" type="image/x-icon" href="favicon.ico">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
 <style>
-.policy-wrap { max-width: 780px; margin: 0 auto; padding: 3rem 1.5rem; }
-.policy-wrap h1 { font-size: 1.6rem; color: var(--zielony,#1a5c2a); margin-bottom: .4rem; }
-.policy-wrap .updated { font-size: .8rem; color: #888; margin-bottom: 2.5rem; }
-.policy-wrap h2 { font-size: 1.05rem; font-weight: 700; color: var(--zielony,#1a5c2a);
-  margin: 2rem 0 .6rem; padding-bottom: .3rem; border-bottom: 1px solid #e5ddd0; }
-.policy-wrap p { font-size: .9rem; color: #444; line-height: 1.7; margin-bottom: .8rem; }
-.policy-wrap ul { margin: .4rem 0 .8rem 1.4rem; font-size: .9rem; color: #444; line-height: 1.7; }
+.policy-wrap { max-width: 780px; margin: 0 auto; padding: 3.5rem 1.5rem 5rem; }
+.policy-wrap h1 { font-size: clamp(1.5rem,3vw,2rem); font-weight: 800; color: var(--ink); margin-bottom: .3rem; }
+.policy-wrap .updated { font-size: .8rem; color: var(--muted); margin-bottom: 2.5rem; display: block; }
+.policy-wrap h2 { font-size: 1rem; font-weight: 700; color: var(--forest); margin: 2.2rem 0 .6rem; padding-bottom: .4rem; border-bottom: 1px solid var(--line); }
+.policy-wrap p { font-size: .9rem; color: var(--dim); line-height: 1.75; margin-bottom: .8rem; }
+.policy-wrap ul { margin: .4rem 0 .8rem 1.4rem; font-size: .9rem; color: var(--dim); line-height: 1.75; }
 .policy-wrap li { margin-bottom: .3rem; }
-.policy-wrap table { width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: .85rem; }
-.policy-wrap th { background: var(--zielony,#1a5c2a); color: #fff; padding: .45rem .8rem; text-align: left; }
-.policy-wrap td { padding: .45rem .8rem; border-bottom: 1px solid #e5ddd0; vertical-align: top; }
+.policy-wrap table { width: 100%; border-collapse: collapse; margin: 1.2rem 0; font-size: .83rem; }
+.policy-wrap th { background: var(--forest); color: #fff; padding: .55rem .9rem; text-align: left; font-weight: 700; }
+.policy-wrap td { padding: .55rem .9rem; border-bottom: 1px solid var(--line); vertical-align: top; color: var(--dim); line-height: 1.6; }
 .policy-wrap tr:last-child td { border-bottom: none; }
-.policy-wrap .box { background: #f4f7f4; border-left: 3px solid var(--zielony,#1a5c2a);
-  padding: .8rem 1rem; margin: 1rem 0; font-size: .85rem; border-radius: 0 6px 6px 0; }
-.policy-wrap a { color: var(--zielony,#1a5c2a); }
+.policy-wrap .box { background: var(--sage); border-left: 3px solid var(--forest); padding: .9rem 1.1rem; margin: 1rem 0 1.8rem; font-size: .88rem; color: var(--dim); border-radius: 0 var(--r) var(--r) 0; line-height: 1.7; }
+.policy-wrap .todo { background: #fff8e6; border-left: 3px solid var(--wheat); padding: .7rem 1rem; font-size: .82rem; color: #7a5c00; border-radius: 0 var(--r) var(--r) 0; margin: .5rem 0 1rem; }
+.policy-wrap a { color: var(--forest); }
 </style>
 </head>
 <body>
 
-<nav>
-  <a href="index.html" class="nav-logo">Sklep za Stodołą</a>
+<div class="ticker">
+  <div class="ticker-inner">
+    <span>Kompleksowa obsługa farmera</span><span>Drewniany pawilon pod klucz</span><span>Mlekomat Premium CE-MID</span><span>Pomoc przy finansowaniu inwestycji</span><span>Leasing rolniczy</span><span>Instalacja i serwis — cała Polska</span><span>Kompleksowa obsługa farmera</span><span>Drewniany pawilon pod klucz</span><span>Mlekomat Premium CE-MID</span><span>Pomoc przy finansowaniu inwestycji</span><span>Leasing rolniczy</span><span>Instalacja i serwis — cała Polska</span>
+  </div>
+</div>
+
+<nav class="nav" id="nav">
+  <a href="index.html" class="nav-logo"><span class="nav-logo-dot"></span>Sklep za Stodołą</a>
   <ul class="nav-links">
     <li><a href="index.html">Start</a></li>
-    <li><a href="rolnik.html">Dla rolników</a></li>
-    <li><a href="oferta.html">Maszyny i serwis</a></li>
+    <li><a href="jak-dzialamy.html">Jak działamy</a></li>
+    <li><a href="dlaczego.html">Dlaczego to działa?</a></li>
+    <li><a href="pawilony.html">Pawilony</a></li>
+    <li><a href="mlekomat.html">Mlekomat</a></li>
     <li><a href="kontakt.html">Kontakt</a></li>
   </ul>
+  <a href="kontakt.html" class="nav-cta">Porozmawiajmy</a>
+  <button class="burger" id="burger" aria-label="Menu" aria-expanded="false">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<nav class="mob-nav" id="mob-nav" aria-label="Menu mobilne">
+  <button class="mob-close" id="mob-close" aria-label="Zamknij">✕</button>
+  <a href="index.html">Start</a>
+  <a href="jak-dzialamy.html">Jak działamy</a>
+  <a href="dlaczego.html">Dlaczego to działa?</a>
+  <a href="pawilony.html">Pawilony</a>
+  <a href="mlekomat.html">Mlekomat</a>
+  <a href="kontakt.html">Kontakt</a>
 </nav>
 
 <div class="policy-wrap">
 
 <h1>Polityka Prywatności i Cookies</h1>
-<p class="updated">Ostatnia aktualizacja: czerwiec 2026</p>
+<span class="updated">Ostatnia aktualizacja: czerwiec 2026</span>
 
 <div class="box">
   Niniejszy dokument dotyczy serwisu internetowego <strong>sklepzastodola.pl</strong> prowadzonego przez <strong>Sklep za Stodołą Sp. z o.o.</strong> z siedzibą w Katowicach. Korzystając z naszej strony, akceptujesz zasady opisane w tej polityce.
@@ -50,94 +73,100 @@
 <p>Administratorem danych osobowych jest:</p>
 <p>
   <strong>Sklep za Stodołą Sp. z o.o.</strong><br/>
-  Siedziba: Katowice (adres zostanie uzupełniony po rejestracji spółki)<br/>
-  NIP: (zostanie uzupełniony po rejestracji)<br/>
-  KRS: (zostanie uzupełniony po rejestracji)<br/>
+  Siedziba: Katowice<br/>
+  NIP: <em class="todo">⚠ uzupełnić po rejestracji spółki</em><br/>
+  KRS: <em class="todo">⚠ uzupełnić po rejestracji spółki</em><br/>
   Email: <a href="mailto:kontakt@sklepzastodola.pl">kontakt@sklepzastodola.pl</a><br/>
-  Telefon: 690 000 923
+  Telefon: <a href="tel:533200652">533 200 652</a>
 </p>
+<p>Nie wyznaczyliśmy Inspektora Ochrony Danych — w sprawach RODO kontaktuj się bezpośrednio na powyższy adres email.</p>
 
 <h2>§2. Jakie dane zbieramy i po co</h2>
+<p>Przetwarzamy dane osobowe wyłącznie w zakresie niezbędnym do prowadzenia działalności. Poniżej zestawienie wszystkich kategorii danych:</p>
 
 <table>
-  <tr><th>Dane</th><th>Cel</th><th>Podstawa prawna</th><th>Czas przechowywania</th></tr>
+  <tr><th>Dane</th><th>Cel</th><th>Podstawa prawna (RODO)</th><th>Czas przechowywania</th></tr>
   <tr>
     <td>Imię, telefon, email — formularz kontaktowy</td>
     <td>Odpowiedź na zapytanie, przygotowanie oferty</td>
-    <td>Art. 6 ust. 1 lit. b RODO (wykonanie umowy / działania przed zawarciem umowy)</td>
+    <td>Art. 6 ust. 1 lit. b — działania przed zawarciem umowy</td>
     <td>Do 3 lat od ostatniego kontaktu</td>
   </tr>
   <tr>
-    <td>Imię, telefon, email — kalkulator ROI</td>
-    <td>Przesłanie spersonalizowanej kalkulacji</td>
-    <td>Art. 6 ust. 1 lit. a RODO (zgoda)</td>
-    <td>Do cofnięcia zgody lub 3 lat od ostatniego kontaktu</td>
+    <td>Imię/nazwa firmy, adres, NIP, dane do faktury — umowy z klientami B2B (rolnicy, przedsiębiorcy)</td>
+    <td>Zawarcie i realizacja umowy, wystawienie faktury, rozliczenia podatkowe</td>
+    <td>Art. 6 ust. 1 lit. b — wykonanie umowy; art. 6 ust. 1 lit. c — obowiązek prawny (przepisy podatkowe i rachunkowe)</td>
+    <td>5 lat od końca roku podatkowego, w którym wystawiono fakturę (wymóg ustawy o rachunkowości)</td>
+  </tr>
+  <tr>
+    <td>Dane kontaktowe klientów i potencjalnych klientów (email, telefon, notatki ze spotkań)</td>
+    <td>Zarządzanie relacją handlową, kontakt w sprawie realizacji zamówienia</td>
+    <td>Art. 6 ust. 1 lit. b — wykonanie umowy / działania przed zawarciem umowy; art. 6 ust. 1 lit. f — uzasadniony interes (obsługa klienta)</td>
+    <td>Przez czas trwania relacji handlowej + 3 lata po jej zakończeniu</td>
   </tr>
   <tr>
     <td>Adres IP, dane o przeglądarce i systemie</td>
     <td>Statystyki, bezpieczeństwo serwisu</td>
-    <td>Art. 6 ust. 1 lit. f RODO (uzasadniony interes administratora)</td>
+    <td>Art. 6 ust. 1 lit. f — uzasadniony interes administratora</td>
     <td>Do 12 miesięcy</td>
   </tr>
   <tr>
     <td>Dane z plików cookies analitycznych</td>
-    <td>Analiza ruchu na stronie (np. Google Analytics)</td>
-    <td>Art. 6 ust. 1 lit. a RODO (zgoda)</td>
-    <td>Zgodnie z polityką dostawcy</td>
+    <td>Analiza ruchu na stronie (Google Analytics)</td>
+    <td>Art. 6 ust. 1 lit. a — zgoda</td>
+    <td>Zgodnie z polityką Google (domyślnie 14 miesięcy)</td>
   </tr>
 </table>
 
-<p>Nie zbieramy danych wrażliwych (PESEL, NIP, dane zdrowotne, dane o orientacji seksualnej itp.) za pośrednictwem formularzy na stronie.</p>
+<p>Nie zbieramy danych wrażliwych (dane zdrowotne, biometryczne, dotyczące przekonań religijnych, orientacji seksualnej itp.) za pośrednictwem formularzy na stronie ani w ramach obsługi klientów.</p>
 
 <h2>§3. Prawa osoby, której dane dotyczą</h2>
 <p>Na podstawie RODO (Rozporządzenie UE 2016/679) przysługują Ci następujące prawa:</p>
 <ul>
   <li><strong>Prawo dostępu</strong> — możesz żądać kopii swoich danych które przetwarzamy</li>
-  <li><strong>Prawo sprostowania</strong> — możesz żądać poprawienia nieprawidłowych danych</li>
-  <li><strong>Prawo usunięcia</strong> — możesz żądać usunięcia danych (prawo do bycia zapomnianym)</li>
-  <li><strong>Prawo ograniczenia przetwarzania</strong> — możesz żądać ograniczenia zakresu przetwarzania</li>
-  <li><strong>Prawo przenoszenia danych</strong> — możesz żądać danych w formacie nadającym się do odczytu maszynowego</li>
-  <li><strong>Prawo sprzeciwu</strong> — możesz sprzeciwić się przetwarzaniu opartemu na uzasadnionym interesie</li>
-  <li><strong>Prawo cofnięcia zgody</strong> — możesz cofnąć zgodę w dowolnym momencie bez wpływu na zgodność przetwarzania przed cofnięciem</li>
+  <li><strong>Prawo sprostowania</strong> — możesz żądać poprawienia nieprawidłowych lub niekompletnych danych</li>
+  <li><strong>Prawo usunięcia</strong> — możesz żądać usunięcia danych (prawo do bycia zapomnianym), o ile nie sprzeciwia się temu obowiązek prawny (np. archiwizacja faktur)</li>
+  <li><strong>Prawo ograniczenia przetwarzania</strong> — możesz żądać ograniczenia zakresu przetwarzania w określonych przypadkach</li>
+  <li><strong>Prawo przenoszenia danych</strong> — możesz żądać danych w formacie nadającym się do odczytu maszynowego (dotyczy danych przetwarzanych na podstawie zgody lub umowy)</li>
+  <li><strong>Prawo sprzeciwu</strong> — możesz sprzeciwić się przetwarzaniu opartemu na uzasadnionym interesie administratora</li>
+  <li><strong>Prawo cofnięcia zgody</strong> — możesz cofnąć zgodę w dowolnym momencie; cofnięcie nie wpływa na zgodność przetwarzania sprzed jego cofnięcia</li>
 </ul>
-<p>Aby skorzystać z powyższych praw, napisz na: <a href="mailto:kontakt@sklepzastodola.pl">kontakt@sklepzastodola.pl</a>. Odpowiemy w ciągu 30 dni.</p>
-<p>Masz też prawo wniesienia skargi do Prezesa Urzędu Ochrony Danych Osobowych (uodo.gov.pl) jeśli uważasz że przetwarzamy Twoje dane niezgodnie z prawem.</p>
+<p>Aby skorzystać z powyższych praw, napisz na: <a href="mailto:kontakt@sklepzastodola.pl">kontakt@sklepzastodola.pl</a>. Odpowiemy w ciągu 30 dni (termin może zostać przedłużony o kolejne 60 dni w uzasadnionych przypadkach — poinformujemy Cię o tym).</p>
+<p>Masz prawo wniesienia skargi do Prezesa Urzędu Ochrony Danych Osobowych (<a href="https://uodo.gov.pl" target="_blank" rel="noopener">uodo.gov.pl</a>) jeśli uważasz że przetwarzamy Twoje dane niezgodnie z prawem.</p>
 
 <h2>§4. Komu przekazujemy dane</h2>
-<p>Twoje dane możemy przekazywać wyłącznie:</p>
+<p>Twoje dane przekazujemy wyłącznie podmiotom niezbędnym do prowadzenia działalności, na podstawie stosownych umów powierzenia przetwarzania lub standardowych klauzul umownych (SCC) w przypadku przekazywania danych do państw trzecich (poza EOG):</p>
 <ul>
-  <li><strong>Formspree Inc.</strong> — obsługa formularzy kontaktowych (serwery w USA, certyfikat Privacy Shield / standardowe klauzule umowne)</li>
-  <li><strong>Vercel Inc.</strong> — hosting serwisu (serwery w UE i USA, certyfikat Privacy Shield)</li>
-  <li><strong>HubSpot Inc.</strong> — system CRM do zarządzania kontaktami (serwery w USA, standardowe klauzule umowne)</li>
-  <li><strong>Google LLC</strong> — Google Analytics (jeśli wyraziłeś zgodę na cookies analityczne)</li>
-  <li><strong>Biuro rachunkowe</strong> — w zakresie niezbędnym do wykonania umowy i prowadzenia księgowości</li>
+  <li><strong>Formspree Inc.</strong> (USA) — obsługa formularzy kontaktowych na stronie; przekazanie danych do USA odbywa się na podstawie standardowych klauzul umownych (SCC) zatwierdzonych przez Komisję Europejską</li>
+  <li><strong>Google LLC</strong> (USA) — Google Analytics (wyłącznie jeśli wyraziłeś zgodę na cookies analityczne); przekazanie danych do USA na podstawie SCC; dane anonimizowane przed przesłaniem</li>
+  <li><strong>Dostawca hostingu / serwer strony</strong> — w zakresie niezbędnym do utrzymania serwisu</li>
+  <li><strong>Biuro rachunkowe PG Partner Gospodarczy</strong> — w zakresie danych z faktur i umów, niezbędnych do prowadzenia księgowości; podmiot przetwarzający dane na podstawie umowy powierzenia</li>
+  <li><strong>Operatorzy leasingowi i finansowi</strong> — w przypadku gdy klient korzysta z finansowania, przekazujemy dane niezbędne do obsługi wniosku leasingowego, za wiedzą i zgodą klienta</li>
 </ul>
-<p>Nie sprzedajemy Twoich danych ani nie udostępniamy ich reklamodawcom.</p>
+<p>Nie sprzedajemy danych osobowych ani nie udostępniamy ich reklamodawcom. Nie stosujemy profilowania ani zautomatyzowanego podejmowania decyzji.</p>
 
 <h2>§5. Polityka cookies</h2>
-
 <p>Strona sklepzastodola.pl używa plików cookies (ciasteczek) — małych plików tekstowych zapisywanych w Twojej przeglądarce.</p>
 
 <h2>§5.1. Jakich cookies używamy</h2>
-
 <table>
   <tr><th>Typ</th><th>Przykłady</th><th>Cel</th><th>Zgoda wymagana?</th></tr>
   <tr>
     <td><strong>Niezbędne</strong></td>
-    <td>Sesja, CSRF token</td>
-    <td>Prawidłowe działanie strony — nie można ich wyłączyć</td>
-    <td>NIE — niezbędne do działania</td>
+    <td>cookie_consent (zapamiętanie wyboru), sesja</td>
+    <td>Prawidłowe działanie strony i zapamiętanie Twojej decyzji o cookies — nie można ich wyłączyć</td>
+    <td>NIE</td>
   </tr>
   <tr>
     <td><strong>Analityczne</strong></td>
     <td>_ga, _gid (Google Analytics)</td>
-    <td>Analiza ruchu i zachowania użytkowników (anonimowa)</td>
+    <td>Anonimowa analiza ruchu i zachowania użytkowników — pomaga nam poprawiać stronę</td>
     <td>TAK — wymagana zgoda</td>
   </tr>
   <tr>
     <td><strong>Marketingowe</strong></td>
-    <td>fbp (Meta Pixel)</td>
-    <td>Retargeting reklam (jeśli używamy Meta Ads)</td>
+    <td>_fbp (Meta Pixel)</td>
+    <td>Retargeting reklam (jeśli aktywnie prowadzimy kampanie Meta Ads)</td>
     <td>TAK — wymagana zgoda</td>
   </tr>
 </table>
@@ -145,72 +174,81 @@
 <h2>§5.2. Jak zarządzać cookies</h2>
 <p>Możesz zarządzać cookies poprzez:</p>
 <ul>
-  <li><strong>Baner cookies</strong> — który pojawia się przy pierwszej wizycie na stronie</li>
-  <li><strong>Ustawienia przeglądarki</strong> — w każdej przeglądarce możesz zablokować lub usunąć cookies:
+  <li><strong>Baner cookies</strong> — który pojawia się przy pierwszej wizycie na stronie; możesz zaakceptować wszystkie lub wybrać tylko niezbędne</li>
+  <li><strong>Ustawienia przeglądarki</strong> — możesz zablokować lub usunąć cookies:
     <ul>
       <li>Chrome: Ustawienia → Prywatność i bezpieczeństwo → Pliki cookie</li>
       <li>Firefox: Opcje → Prywatność i bezpieczeństwo</li>
       <li>Safari: Preferencje → Prywatność</li>
+      <li>Edge: Ustawienia → Pliki cookie i uprawnienia witryn</li>
     </ul>
   </li>
-  <li><strong>Google Analytics Opt-out</strong>: <a href="https://tools.google.com/dlpage/gaoptout" target="_blank">tools.google.com/dlpage/gaoptout</a></li>
+  <li><strong>Google Analytics Opt-out:</strong> <a href="https://tools.google.com/dlpage/gaoptout" target="_blank" rel="noopener">tools.google.com/dlpage/gaoptout</a></li>
 </ul>
 <p>Wyłączenie niektórych cookies może wpłynąć na działanie strony.</p>
 
 <h2>§6. Bezpieczeństwo danych</h2>
-<p>Stosujemy odpowiednie środki techniczne i organizacyjne w celu ochrony Twoich danych:</p>
+<p>Stosujemy odpowiednie środki techniczne i organizacyjne w celu ochrony danych:</p>
 <ul>
-  <li>Połączenie szyfrowane HTTPS (certyfikat SSL)</li>
-  <li>Ograniczony dostęp do danych (tylko upoważnione osoby)</li>
-  <li>Regularne aktualizacje systemów</li>
-  <li>Hasła przechowywane w menedżerze haseł (nie w czystym tekście)</li>
+  <li>Połączenie szyfrowane HTTPS (certyfikat SSL/TLS)</li>
+  <li>Ograniczony dostęp do danych — wyłącznie upoważnione osoby</li>
+  <li>Dane z formularzy przekazywane przez szyfrowany kanał (Formspree)</li>
+  <li>Regularne aktualizacje oprogramowania i systemów</li>
+  <li>Hasła przechowywane w menedżerze haseł</li>
 </ul>
 
 <h2>§7. Linki do zewnętrznych serwisów</h2>
-<p>Strona może zawierać linki do serwisów zewnętrznych (Facebook, Instagram, YouTube). Kliknięcie w taki link przenosi Cię na stronę trzecią, do której niniejsza polityka nie ma zastosowania. Zachęcamy do zapoznania się z polityką prywatności tych serwisów.</p>
+<p>Strona zawiera linki do serwisów zewnętrznych (Facebook, Instagram). Kliknięcie w taki link przenosi Cię na stronę trzecią, do której niniejsza polityka nie ma zastosowania. Zachęcamy do zapoznania się z polityką prywatności tych serwisów.</p>
 
 <h2>§8. Zmiany polityki prywatności</h2>
-<p>Zastrzegamy sobie prawo do zmiany niniejszej polityki. O istotnych zmianach poinformujemy przez aktualizację daty na górze dokumentu. Zachęcamy do regularnego przeglądania tej strony.</p>
+<p>Zastrzegamy sobie prawo do zmiany niniejszej polityki w miarę rozwoju działalności lub zmian przepisów prawa. O istotnych zmianach poinformujemy przez aktualizację daty na górze dokumentu. Zachęcamy do regularnego przeglądania tej strony.</p>
 
 <h2>§9. Kontakt w sprawach RODO</h2>
 <p>
   Wszelkie pytania i żądania dotyczące ochrony danych osobowych kieruj na:<br/>
   <strong>Email:</strong> <a href="mailto:kontakt@sklepzastodola.pl">kontakt@sklepzastodola.pl</a><br/>
-  <strong>Telefon:</strong> 690 000 923<br/>
-  <strong>Adres korespondencyjny:</strong> Sklep za Stodołą Sp. z o.o., Katowice (adres zostanie uzupełniony po rejestracji)
+  <strong>Telefon:</strong> <a href="tel:533200652">533 200 652</a><br/>
+  <strong>Adres korespondencyjny:</strong> Sklep za Stodołą Sp. z o.o., Katowice <em class="todo">⚠ uzupełnić adres po rejestracji</em>
 </p>
 
-</div><!-- /policy-wrap -->
+</div>
 
-<footer>
+<footer class="footer">
   <div class="footer-inner">
     <div>
-      <h4>Sklep za Stodołą</h4>
-      <p>Maszyny rolnicze · Leasing · Dofinansowania ARiMR<br>Instalacja · Serwis</p>
+      <p class="footer-brand">Sklep za Stodołą</p>
+      <p class="footer-sub">Tworzymy dochodowe sklepy przy gospodarstwach. Wyłączny dystrybutor mlekomatu Premium w Polsce.</p>
+      <div class="footer-soc">
+        <a href="https://www.facebook.com/profile.php?id=61590896125832" class="soc-btn" aria-label="Facebook" target="_blank" rel="noopener">f</a>
+        <a href="https://www.instagram.com/sklepzastodola/" class="soc-btn" aria-label="Instagram" target="_blank" rel="noopener">ig</a>
+      </div>
     </div>
-    <div>
-      <h4>Nawigacja</h4>
-      <p>
-        <a href="index.html">Strona główna</a><br>
-        <a href="rolnik.html">Dla rolników</a><br>
-        <a href="oferta.html">Maszyny i serwis</a><br>
-        <a href="kontakt.html">Kontakt</a>
-      </p>
+    <div class="footer-col">
+      <h4>Strony</h4>
+      <ul>
+        <li><a href="index.html">Start</a></li>
+        <li><a href="jak-dzialamy.html">Jak działamy</a></li>
+        <li><a href="dlaczego.html">Dlaczego to działa?</a></li>
+        <li><a href="pawilony.html">Pawilony</a></li>
+        <li><a href="mlekomat.html">Mlekomat</a></li>
+        <li><a href="kontakt.html">Kontakt</a></li>
+      </ul>
     </div>
-    <div>
+    <div class="footer-col">
       <h4>Kontakt</h4>
-      <p>
-        <a href="tel:533200652">533 200 652</a><br>
-        <a href="mailto:kontakt@sklepzastodola.pl">kontakt@sklepzastodola.pl</a>
-      </p>
+      <ul>
+        <li><a href="tel:533200652">533 200 652</a></li>
+        <li><a href="tel:690000923">690 000 923</a></li>
+        <li><a href="mailto:kontakt@sklepzastodola.pl">kontakt@sklepzastodola.pl</a></li>
+      </ul>
     </div>
   </div>
   <div class="footer-bottom">
-    <span>© 2026 Sklep za Stodołą</span>
-    <span><a href="polityka.html">Polityka prywatności</a></span>
+    <p class="footer-copy">© 2026 Sklep za Stodołą Sp. z o.o.</p>
+    <div class="footer-links"><a href="polityka.html">Polityka prywatności</a></div>
   </div>
 </footer>
 
-<script>function toggleMenu(){document.getElementById('nav-links').classList.toggle('open');}</script>
+<script src="nav.js"></script>
 </body>
 </html>
