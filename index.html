@@ -3,6 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link rel="icon" type="image/png" sizes="192x192" href="favicon-192.png">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+
 <title>Sklep za Stodołą — Dochodowe sklepy przy gospodarstwach</title>
 <meta name="description" content="Nie sprzedajemy mlekomatów. Tworzymy dochodowe sklepy przy gospodarstwach. Drewniany pawilon, mlekomat, Twoje produkty — gotowa sprzedaż bezpośrednia.">
 <link rel="stylesheet" href="style.css">
@@ -39,7 +44,7 @@
 
 /* PHOTO STRIP */
 .strip { padding: 0 5vw 3.5rem; }
-.strip-grid { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: .8rem; height: 360px; overflow: hidden; }
+.strip-grid { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: .8rem; height: 200px; overflow: hidden; }
 .strip-grid > img { width: 100%; height: 100%; object-fit: cover; object-position: center; border-radius: var(--r-lg); display: block; overflow: hidden; }
 
 /* PREVIEW CARDS */
@@ -104,15 +109,15 @@
 
 @media(max-width:860px){
   .stmt-inner { grid-template-columns: 1fr; gap: 2.5rem; }
-  .strip-grid { grid-template-columns: 1fr 1fr; height: 260px; }
-  .strip-grid > img:first-child { grid-column: 1/3; height: 260px; }
-  .strip-grid > div { height: 260px; overflow: hidden; }
+  .strip-grid { grid-template-columns: 1fr 1fr; height: 160px; }
+  .strip-grid > img:first-child { grid-column: 1/3; height: 160px; }
+  .strip-grid > div { height: 160px; overflow: hidden; }
   .preview-grid { grid-template-columns: 1fr; }
   .hero-scroll { display: none; }
 }
 @media(max-width:600px){
   .strip-grid { grid-template-columns: 1fr; height: auto; }
-  .strip-grid > img, .strip-grid > div { height: 200px !important; grid-column: auto; overflow: hidden; }
+  .strip-grid > img, .strip-grid > div { height: 160px !important; grid-column: auto; overflow: hidden; }
 }
 </style>
 </head>
