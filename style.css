@@ -2902,3 +2902,104 @@ section button:not(.burger):not(.mob-close):not(.ck-yes):not(.ck-no):not(.calc-t
     grid-template-columns: 1fr !important;
   }
 }
+/* ─────────────────────────────────────────────
+   JAK DZIAŁAMY — FAQ clean accordion
+───────────────────────────────────────────── */
+
+.faq-clean-section {
+  padding: 5.8rem 5vw !important;
+}
+
+.faq-clean {
+  max-width: 900px !important;
+  margin-top: 2.4rem !important;
+  display: grid !important;
+  gap: .8rem !important;
+}
+
+.faq-clean-item {
+  background: var(--paper) !important;
+  border: 1px solid var(--line) !important;
+  border-radius: var(--r-lg) !important;
+  box-shadow: var(--shadow) !important;
+  overflow: hidden !important;
+}
+
+.faq-clean-q {
+  width: 100% !important;
+  border: 0 !important;
+  background: var(--paper) !important;
+  color: var(--ink) !important;
+  padding: 1.15rem 1.35rem !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 1rem !important;
+  text-align: left !important;
+  font-family: var(--sans) !important;
+  font-size: .98rem !important;
+  line-height: 1.35 !important;
+  font-weight: 800 !important;
+  cursor: pointer !important;
+  transition: background .2s, color .2s !important;
+}
+
+.faq-clean-q:hover {
+  background: var(--sage) !important;
+  color: var(--forest) !important;
+}
+
+.faq-clean-q i {
+  width: 1.8rem !important;
+  height: 1.8rem !important;
+  border-radius: 50% !important;
+  background: var(--sage) !important;
+  border: 1px solid rgba(45,90,39,.18) !important;
+  color: var(--forest) !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-style: normal !important;
+  font-size: 1rem !important;
+  font-weight: 900 !important;
+  flex: 0 0 auto !important;
+  transition: transform .2s, background .2s !important;
+}
+
+.faq-clean-item.open .faq-clean-q i {
+  transform: rotate(45deg) !important;
+  background: var(--forest) !important;
+  color: #fff !important;
+}
+
+.faq-clean-a {
+  display: none !important;
+  padding: 0 1.35rem 1.2rem !important;
+}
+
+.faq-clean-item.open .faq-clean-a {
+  display: block !important;
+}
+
+.faq-clean-a p {
+  color: var(--muted) !important;
+  font-size: .93rem !important;
+  line-height: 1.75 !important;
+  margin: 0 !important;
+  max-width: 78ch !important;
+}
+
+@media (max-width: 640px) {
+  .faq-clean-section {
+    padding: 4.5rem 5vw !important;
+  }
+
+  .faq-clean-q {
+    padding: 1rem !important;
+    font-size: .92rem !important;
+  }
+
+  .faq-clean-a {
+    padding: 0 1rem 1rem !important;
+  }
+}
