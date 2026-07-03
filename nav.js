@@ -1,6 +1,31 @@
 // shared nav + reveal + cookie + faq
 (function(){
 
+  // ── GOOGLE ANALYTICS (ładowany tylko po zgodzie na cookies) ──
+  const GA_ID = 'G-L5MHJSZZ19';
+
+  function loadGA(){
+    if(window.__gaLoaded) return; // nie ładuj dwa razy
+    window.__gaLoaded = true;
+
+    const s = document.createElement('script');
+    s.async = true;
+    s.src = 'https://www.googletagmanager.com/gtag/js?id=' + GA_ID;
+    document.head.appendChild(s);
+
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){ dataLayer.push(arguments); }
+    window.gtag = gtag;
+    gtag('js', new Date());
+    gtag('config', GA_ID);
+  }
+  window.__loadGA = loadGA;
+
+  // Jeśli użytkownik już wcześniej zaakceptował — ładuj GA od razu
+  if(localStorage.getItem('cookie_consent') === 'yes'){
+    loadGA();
+  }
+
   // ── NAV SCROLL ──
   const nav = document.getElementById('nav');
   if(nav) window.addEventListener('scroll', ()=> nav.classList.toggle('scrolled', scrollY > 55), {passive:true});
@@ -31,6 +56,7 @@
     sessionStorage.setItem('cookie_seen', '1');
     const el = document.getElementById('cookie');
     if(el){ el.classList.remove('show'); }
+    if(v === 'yes'){ loadGA(); } // zgoda kliknięta teraz — odpal GA natychmiast
   }
   window.setCk = setCk;
 
