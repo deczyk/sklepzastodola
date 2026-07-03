@@ -926,7 +926,7 @@ button {
 
 .footer-copy {
   font-size: .74rem;
-  color: rgba(247,244,238,.35);
+  color: rgba(247,244,238,.6);
 }
 
 .footer-links {
@@ -936,7 +936,7 @@ button {
 
 .footer-links a {
   font-size: .74rem;
-  color: rgba(247,244,238,.35);
+  color: rgba(247,244,238,.6);
   transition: color .2s;
 }
 
@@ -2087,7 +2087,7 @@ input[type=range]::-moz-range-thumb {
 
 .footer-copy {
   font-size: .74rem !important;
-  color: rgba(247,244,238,.36) !important;
+  color: rgba(247,244,238,.6) !important;
   margin: 0 !important;
 }
 
@@ -2098,7 +2098,7 @@ input[type=range]::-moz-range-thumb {
 
 .footer-links a {
   font-size: .74rem !important;
-  color: rgba(247,244,238,.36) !important;
+  color: rgba(247,244,238,.6) !important;
 }
 
 .footer-links a:hover {
