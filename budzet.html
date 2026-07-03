@@ -5,210 +5,457 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Budżet Startowy – Sklep za Stodołą Sp. z o.o.</title>
 <style>
-* { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: 'Segoe UI', Arial, sans-serif; background: #f4f7f4; color: #222; font-size: 14px; }
-.header { background: linear-gradient(135deg, #1a5c2a 0%, #2e7d45 100%); color: white; padding: 28px 40px; }
-.header h1 { font-size: 1.5rem; font-weight: 700; }
-.header .sub { font-size: 0.85rem; opacity: 0.8; margin-top: 4px; }
-.container { max-width: 1020px; margin: 0 auto; padding: 28px 20px; }
-.section { background: white; border-radius: 12px; margin-bottom: 20px; box-shadow: 0 1px 6px rgba(0,0,0,0.08); overflow: hidden; }
-.section-header { padding: 13px 20px; font-weight: 700; font-size: 0.93rem; display: flex; justify-content: space-between; align-items: center; }
-.sh-green  { background: #1a5c2a; color: white; }
-.sh-amber  { background: #e65100; color: white; }
-.sh-blue   { background: #1565c0; color: white; }
-.sh-gray   { background: #424242; color: white; }
-.sh-teal   { background: #00695c; color: white; }
-.sh-purple { background: #4527a0; color: white; }
-table { width: 100%; border-collapse: collapse; }
-tr { border-bottom: 1px solid #f0f0f0; }
-tr:last-child { border-bottom: none; }
-tr:hover { background: #fafafa; }
-td { padding: 9px 20px; font-size: 0.86rem; vertical-align: middle; }
-td.label { color: #333; font-weight: 500; width: 40%; }
-td.detail { color: #777; font-size: 0.79rem; width: 35%; }
-td.price { text-align: right; font-weight: 700; width: 25%; white-space: nowrap; }
-.pgreen  { color: #1a5c2a; }
-.pred    { color: #c62828; }
-.pamber  { color: #e65100; }
-.pgray   { color: #888; }
-.px      { color: #f57c00; font-style: italic; }
-tr.sub  { background: #f5f5f5; border-top: 2px solid #e0e0e0; }
-tr.sub td { font-weight: 700; font-size: 0.9rem; padding: 11px 20px; }
-.tag { display: inline-block; font-size: 0.68rem; padding: 1px 7px; border-radius: 8px; margin-left: 6px; font-weight: 600; vertical-align: middle; }
-.tag-green { background: #c8e6c9; color: #1a5c2a; }
-.tag-amber { background: #ffe0b2; color: #e65100; }
-.tag-red   { background: #ffcdd2; color: #c62828; }
-.tag-blue  { background: #bbdefb; color: #1565c0; }
-.total-box { background: #1a5c2a; color: white; border-radius: 12px; padding: 22px 28px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; }
-.total-box .lbl { font-size: 1rem; font-weight: 600; }
-.total-box .amt { font-size: 1.9rem; font-weight: 800; }
-.total-box .s { font-size: 0.78rem; opacity: 0.8; margin-top: 3px; }
-.note { background: #fff8e1; border-left: 3px solid #f9a825; padding: 9px 14px; font-size: 0.8rem; color: #555; margin: 0 20px 12px; border-radius: 0 6px 6px 0; }
-.kurs { background: #e8f5e9; border-radius: 8px; padding: 9px 14px; font-size: 0.8rem; color: #2e7d45; margin-bottom: 18px; }
-.legend { display: flex; gap: 18px; flex-wrap: wrap; margin-bottom: 16px; font-size: 0.8rem; color: #555; }
-.legend span { display: flex; align-items: center; gap: 5px; }
-.dot { width: 9px; height: 9px; border-radius: 50%; }
-.footer { background: white; border-radius: 12px; padding: 16px 20px; font-size: 0.79rem; color: #666; box-shadow: 0 1px 6px rgba(0,0,0,0.06); }
+  :root{
+    --green-dark:#2f4a2e;
+    --green:#4a7c3f;
+    --green-light:#e8f0e3;
+    --gold:#c8963e;
+    --gold-light:#faf3e4;
+    --red:#a4443a;
+    --red-light:#fbeceb;
+    --text:#2b2b28;
+    --muted:#6b6a63;
+    --bg:#faf9f6;
+    --card:#ffffff;
+    --border:#e3e0d6;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    line-height:1.5;
+  }
+  .wrap{max-width:1100px;margin:0 auto;padding:24px 18px 60px;}
+  header.page{
+    background:linear-gradient(135deg,var(--green-dark),var(--green));
+    color:#fff;
+    border-radius:14px;
+    padding:32px 28px;
+    margin-bottom:26px;
+  }
+  header.page h1{margin:0 0 8px;font-size:1.7rem;}
+  header.page .sub{font-size:.92rem;opacity:.92;}
+  .badges{margin-top:14px;display:flex;flex-wrap:wrap;gap:8px;}
+  .badge{
+    background:rgba(255,255,255,.15);
+    border:1px solid rgba(255,255,255,.35);
+    border-radius:20px;
+    padding:4px 12px;
+    font-size:.78rem;
+  }
+  .legend{
+    display:flex;flex-wrap:wrap;gap:16px;
+    font-size:.82rem;color:var(--muted);
+    background:var(--card);border:1px solid var(--border);
+    border-radius:10px;padding:12px 16px;margin-bottom:26px;
+  }
+  .legend span b{color:var(--text);}
+  .rate-box{
+    background:var(--gold-light);
+    border:1px solid var(--gold);
+    border-radius:10px;
+    padding:12px 16px;
+    margin-bottom:30px;
+    font-size:.9rem;
+  }
+  section{margin-bottom:34px;}
+  h2.sect{
+    display:flex;align-items:center;gap:10px;
+    font-size:1.15rem;
+    color:var(--green-dark);
+    border-bottom:2px solid var(--green);
+    padding-bottom:8px;
+    margin-bottom:14px;
+  }
+  h2.sect .n{
+    background:var(--green);color:#fff;
+    width:28px;height:28px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    font-size:.85rem;flex-shrink:0;
+  }
+  h3.sub{font-size:.98rem;color:var(--green-dark);margin:18px 0 8px;}
+  .note{font-size:.85rem;color:var(--muted);margin:6px 0 14px;}
+  table{
+    width:100%;border-collapse:collapse;
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:10px;
+    overflow:hidden;
+    font-size:.88rem;
+  }
+  table + table{margin-top:16px;}
+  th,td{
+    padding:10px 12px;
+    text-align:left;
+    border-bottom:1px solid var(--border);
+    vertical-align:top;
+  }
+  th{
+    background:var(--green-light);
+    color:var(--green-dark);
+    font-weight:600;
+    font-size:.82rem;
+    text-transform:uppercase;
+    letter-spacing:.02em;
+  }
+  tr:last-child td{border-bottom:none;}
+  td.val, th.val{white-space:nowrap;text-align:right;font-weight:600;}
+  tr.sum td{
+    background:var(--green-light);
+    font-weight:700;
+    color:var(--green-dark);
+  }
+  tr.profit td{
+    background:var(--gold-light);
+    font-weight:700;
+    color:#7a5a1e;
+  }
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+  @media(max-width:720px){.grid2{grid-template-columns:1fr;} table{font-size:.8rem;} th,td{padding:8px;}}
+  .callout{
+    border-radius:10px;padding:16px 18px;font-size:.9rem;
+  }
+  .callout.blue{background:#eaf1fb;border:1px solid #b9cdea;color:#233b5c;}
+  .callout.red{background:var(--red-light);border:1px solid #e3b6b1;color:var(--red);}
+  .callout.gold{background:var(--gold-light);border:1px solid var(--gold);color:#7a5a1e;}
+  .bignum{
+    font-size:1.9rem;font-weight:700;color:var(--green-dark);
+    margin:4px 0;
+  }
+  .kpi-row{display:flex;gap:14px;flex-wrap:wrap;margin:14px 0;}
+  .kpi{
+    flex:1;min-width:150px;
+    background:var(--card);border:1px solid var(--border);
+    border-radius:10px;padding:14px 16px;text-align:center;
+  }
+  .kpi .lbl{font-size:.75rem;color:var(--muted);text-transform:uppercase;letter-spacing:.03em;}
+  .kpi .num{font-size:1.25rem;font-weight:700;color:var(--green-dark);margin-top:4px;}
+  .alt-tag{
+    display:inline-block;background:var(--red-light);color:var(--red);
+    border:1px solid #e3b6b1;border-radius:6px;
+    font-size:.72rem;padding:2px 8px;margin-left:8px;
+    text-transform:uppercase;letter-spacing:.03em;font-weight:600;
+    vertical-align:middle;
+  }
+  footer.page{
+    margin-top:40px;padding-top:18px;border-top:1px solid var(--border);
+    font-size:.78rem;color:var(--muted);text-align:center;
+  }
 </style>
 </head>
 <body>
-<div class="header">
-  <h1>💰 Budżet Startowy – Sklep za Stodołą Sp. z o.o.</h1>
-  <div class="sub">Pierwsza maszyna Brunimat 650 Premium DUO | Cennik EUR 01.04.2025 | Transport: 350 EUR | T1: od 70 EUR | IMP: 350 zł | Czerwiec 2026</div>
-</div>
-<div class="container">
+<div class="wrap">
 
-<div class="legend">
-  <span><div class="dot" style="background:#1a5c2a"></div> Znana cena</span>
-  <span><div class="dot" style="background:#f57c00"></div> X = wycena lokalna / do ustalenia</span>
-  <span><div class="dot" style="background:#888"></div> 0 zł = brak kosztu</span>
-  <span><div class="dot" style="background:#1565c0"></div> Zwrotne (VAT) lub umarzalne (BGK)</span>
-</div>
+  <header class="page">
+    <h1>💰 Budżet Startowy – Sklep za Stodołą Sp. z o.o.</h1>
+    <div class="sub">Pierwsza maszyna: BRUNIMAT 650 Premium DUO z pełnym wyposażeniem · Cennik EUR 01.04.2025 · Aktualizacja: lipiec 2026, zgodnie z biznesplanem spółki</div>
+    <div class="badges">
+      <span class="badge">Kurs planistyczny: 1 EUR = 4,30 zł</span>
+      <span class="badge">Wnioskowana pożyczka: 20 000 EUR (~86 000 zł)</span>
+      <span class="badge">Koszt zakupu maszyny: 9 750 EUR</span>
+    </div>
+  </header>
 
-<div class="kurs">
-  💱 Kursy orientacyjne: <strong>1 EUR = 4,25 PLN</strong> &nbsp;|&nbsp; <strong>1 CHF ≈ 4,70 PLN</strong> — sprawdź aktualny na <strong>nbp.pl</strong> przed każdym zamówieniem
-</div>
-
-<!-- 1. REJESTRACJA -->
-<div class="section">
-  <div class="section-header sh-green">1. REJESTRACJA SPÓŁKI Z O.O. <span class="tag tag-green">jednorazowo</span></div>
-  <table>
-    <tr><td class="label">Opłata KRS przez S24 (sąd + MSiG)</td><td class="detail">Płatne kartą w systemie S24</td><td class="price pgreen">350 zł</td></tr>
-    <tr><td class="label">Kapitał zakładowy</td><td class="detail">Min. 5 000 zł — majątek spółki, nie przepada</td><td class="price pgreen">5 000 zł</td></tr>
-    <tr><td class="label">Wirtualne biuro / siedziba</td><td class="detail">Biuro29 Katowice — adres do rejestracji KRS, US, GUS</td><td class="price px">X zł/mies.</td></tr>
-    <tr><td class="label">Rejestracja VAT-R</td><td class="detail">Online przez podatki.gov.pl — obowiązkowe dla importera</td><td class="price pgray">0 zł</td></tr>
-    <tr><td class="label">Rejestracja EORI</td><td class="detail">puesc.gov.pl — numer do odpraw celnych</td><td class="price pgray">0 zł</td></tr>
-    <tr><td class="label">Zgłoszenie CRBR</td><td class="detail">⚠️ Obowiązek w 14 dni od KRS — kara do 1 mln zł!</td><td class="price pgray">0 zł</td></tr>
-    <tr><td class="label">Konto bankowe PLN (mBank / PKO)</td><td class="detail">Otwarcie zwykle bezpłatne</td><td class="price pgray">0 zł</td></tr>
-    <tr><td class="label">Konto Revolut Business (EUR/CHF)</td><td class="detail">Do płatności za maszyny — kurs rynkowy</td><td class="price pgreen">0–50 zł/mies.</td></tr>
-    <tr class="sub"><td class="label">SUMA – Rejestracja</td><td class="detail"></td><td class="price pgreen">~5 350 zł + X</td></tr>
-  </table>
-</div>
-
-<!-- 2. PIERWSZA MASZYNA -->
-<div class="section">
-  <div class="section-header sh-amber">2. PIERWSZA MASZYNA BRUNIMAT — konfiguracja z PDF <span class="tag tag-amber">jednorazowo</span></div>
-  <div class="note">Ceny z cennika Brunimat EUR 01.04.2025 (ab Werk = loco fabryka Szwajcaria, bez VAT). Zaznaczone przez Ciebie pozycje ✓</div>
-  <table>
-    <tr><td class="label">BRUNIMAT 650 Premium DUO ✓</td><td class="detail">Max. 2×50 L kanny | zew. 740×1020×2050 mm</td><td class="price pgreen">6 400 EUR = ~27 200 zł</td></tr>
-    <tr><td class="label">Certyfikacja Premium CE-MID</td><td class="detail">Obowiązkowe — zaplombowana dozownia, gwarancja</td><td class="price pgreen">150 EUR = ~640 zł</td></tr>
-    <tr><td class="label">System płatności: reszta + banknoty ✓</td><td class="detail">Bilonarka + czytnik banknotów (combo)</td><td class="price pgreen">1 250 EUR = ~5 310 zł</td></tr>
-    <tr><td class="label">Automatyczne płukanie strefy dozowania ✓</td><td class="detail">Po każdej sprzedaży mleka — higiena HACCP</td><td class="price pgreen">200 EUR = ~850 zł</td></tr>
-    <tr><td class="label">Kanny 50 L × 3 szt. ✓</td><td class="detail">Stal nierdzewna, pokrywa 100% szczelna | 3 × 230 EUR</td><td class="price pgreen">690 EUR = ~2 930 zł</td></tr>
-    <tr style="background:#fff8e1"><td class="label">➕ Opcje do rozważenia (nie w PDF)</td><td class="detail"></td><td class="price"></td></tr>
-    <tr><td class="label">&nbsp;&nbsp;GSM – alarm SMS (niski poziom)</td><td class="detail">Powiadomienie gdy np. zostało 50 L mleka</td><td class="price pgray">160 EUR = ~680 zł</td></tr>
-    <tr><td class="label">&nbsp;&nbsp;Płatność kartą Nayax</td><td class="detail">Terminal bezstykowy — coraz popularniejszy</td><td class="price pgray">650 EUR = ~2 760 zł</td></tr>
-    <tr><td class="label">&nbsp;&nbsp;Ogrzewanie Anti-Frost</td><td class="detail">Ważne — Polska zima, mróz</td><td class="price pamber">100 EUR = ~425 zł</td></tr>
-    <tr style="border-top: 2px solid #e65100;"><td class="label"><strong>SUMA maszyna z wybranymi opcjami (EUR)</strong></td><td class="detail"><strong>8 690 EUR netto ab Werk ≈ 7 500 CHF (Twoja notatka z PDF)</strong></td><td class="price pred">~36 930 zł</td></tr>
-    <tr><td class="label">Transport Szwajcaria → Polska</td><td class="detail">CH-9313 Muolen → Tarnowskie Góry | ~150 kg | wycena spedytora</td><td class="price pgreen">350 EUR = ~1 490 zł</td></tr>
-    <tr><td class="label">Ubezpieczenie cargo</td><td class="detail">~0,3% wartości towaru</td><td class="price pgreen">~110 zł</td></tr>
-    <tr><td class="label">Obsługa celna T1 (tranzyt)</td><td class="detail">Procedura T1 — dokument tranzytowy CH→UE</td><td class="price pgreen">od 70 EUR = ~300 zł</td></tr>
-    <tr><td class="label">Agencja celna – odprawa IMP</td><td class="detail">Zgłoszenie importowe AIS/IMPORT w Polsce</td><td class="price pgreen">350 zł</td></tr>
-    <tr><td class="label">Cło</td><td class="detail">0% przy deklaracji pochodzenia EUR.1 od Brunimat</td><td class="price pgray">0 zł</td></tr>
-    <tr><td class="label">VAT importowy 23% <span class="tag tag-blue">ZWROTNY</span></td><td class="detail">Naliczany od wartości CIF — odliczasz w JPK po ~30-45 dniach</td><td class="price" style="color:#1565c0">~8 500 zł*</td></tr>
-    <tr class="sub"><td class="label">SUMA – Maszyna (gotówka wychodzi)</td><td class="detail">Transport 1 490 zł + T1 ~300 zł + IMP 350 zł + cargo 110 zł | *VAT wraca po ~30-45 dniach</td><td class="price pred">~39 750 zł + VAT ~8 500 zł*</td></tr>
-  </table>
-</div>
-
-<!-- 3. INSTALACJA -->
-<div class="section">
-  <div class="section-header sh-teal">3. INSTALACJA I URUCHOMIENIE U KLIENTA <span class="tag tag-green">per instalacja</span></div>
-  <table>
-    <tr><td class="label">Pawilon drewniany na mlekomat</td><td class="detail">Twój produkt — do wyceny lokalnej u stolarza/producenta</td><td class="price px">X zł</td></tr>
-    <tr><td class="label">Transport maszyny do klienta</td><td class="detail">Lokalnie Śląsk / okolice</td><td class="price pgreen">300–800 zł</td></tr>
-    <tr><td class="label">Instalacja elektryczna</td><td class="detail">Podłączenie 230V — elektryk z uprawnieniami</td><td class="price px">X zł</td></tr>
-    <tr><td class="label">Przyłącze wodne (jeśli model tego wymaga)</td><td class="detail">Zależy od konfiguracji i lokalizacji u rolnika</td><td class="price px">X zł</td></tr>
-    <tr><td class="label">Dokumentacja sanepid / HACCP</td><td class="detail">Przy sprzedaży mleka surowego wymagane</td><td class="price px">X zł</td></tr>
-    <tr><td class="label">Szkolenie klienta-rolnika</td><td class="detail">Obsługa, czyszczenie, wymiana kannn</td><td class="price pgray">0 zł (wliczone w cenę)</td></tr>
-    <tr class="sub"><td class="label">SUMA – Instalacja</td><td class="detail"></td><td class="price px">X + ~500–800 zł</td></tr>
-  </table>
-</div>
-
-<!-- 4. KOSZTY STAŁE -->
-<div class="section">
-  <div class="section-header sh-blue">4. KOSZTY STAŁE MIESIĘCZNE <span class="tag tag-blue">co miesiąc</span></div>
-  <table>
-    <tr><td class="label">Księgowość (PG Partner Gospodarczy)</td><td class="detail">Pełna księgowość sp. z o.o. — do 30 dok./mies. | VAT importowy, KSeF, JPK, CIT | zapytania@partner-gospodarczy.pl</td><td class="price pgreen">650 zł netto/mies.</td></tr>
-    <tr><td class="label">ZUS właściciela (prezes zarządu)</td><td class="detail">Składki społeczne + zdrowotna — jeśli zatrudniony w spółce</td><td class="price pgreen">~1 600 zł/mies.</td></tr>
-    <tr><td class="label">Wirtualne biuro / siedziba</td><td class="detail">Biuro29 Katowice — 600 zł/rok z góry = 50 zł/mies.</td><td class="price pgreen">50 zł/mies.</td></tr>
-    <tr><td class="label">Hosting + domena sklepzastodola.pl</td><td class="detail">Serwer, SSL, poczta firmowa — np. home.pl / kylos.pl</td><td class="price pgreen">~8 zł/mies. (100 zł/rok)</td></tr>
-    <tr><td class="label">Telefon firmowy</td><td class="detail"><strong>lajt mobile Plan Biznes L</strong> — 60 GB, 5G, bez umowy terminowej | lajtmobile.pl</td><td class="price pgreen">30 zł netto/mies.</td></tr>
-    <tr><td class="label">Paliwo / transport serwisowy</td><td class="detail">Wzór: <em>km/mies. × spalanie/100 × cena paliwa</em> + amortyzacja 0,89 zł/km (stawka US 2026). Np. 500 km/mies. × 7L × 6,50 zł + 445 zł = ~740 zł/mies.</td><td class="price pamber">~300–800 zł/mies.</td></tr>
-    <tr><td class="label">Ubezpieczenie OC firmy</td><td class="detail">OC działalności + mienie — roczne</td><td class="price px">X zł/rok</td></tr>
-    <tr><td class="label">Opłaty bankowe (Revolut/mBank)</td><td class="detail">Przelewy SWIFT do Szwajcarii, przewalutowanie EUR/CHF</td><td class="price pgreen">50–150 zł/mies.</td></tr>
-    <tr class="sub"><td class="label">SZACUNEK – koszty stałe/mies.</td><td class="detail">Bez ZUS i pozycji X: min. ~500 zł</td><td class="price px">~2 500–4 500 zł/mies.</td></tr>
-  </table>
-</div>
-
-<!-- 5. MARKETING -->
-<div class="section">
-  <div class="section-header sh-gray">5. MARKETING I SPRZEDAŻ <span class="tag tag-amber">start + miesięcznie</span></div>
-  <table>
-    <tr><td class="label">Materiały drukowane (ulotki, rollup, teczka)</td><td class="detail">Dla rolników, ODR, targi — z info o dotacji ARiMR</td><td class="price px">X zł</td></tr>
-    <tr><td class="label">Google Ads / Meta Ads</td><td class="detail">Targetowanie: rolnicy, producenci mleka, obszary wiejskie</td><td class="price px">X zł/mies.</td></tr>
-    <tr><td class="label">Targi rolnicze (Agra Poznań, Agroshow)</td><td class="detail">Stoisko wystawowe — najlepsze miejsce na demo maszyny</td><td class="price px">X zł/rok</td></tr>
-    <tr><td class="label">Maszyna demonstracyjna (egzemplarz show)</td><td class="detail">Do pokazów na targach / u pierwszego klienta referencyjnego</td><td class="price pamber">~37 000 zł (koszt maszyny)</td></tr>
-    <tr><td class="label">Aktualizacje strony / SEO / blog</td><td class="detail">Treści o dotacjach ARiMR, poradniki dla rolników</td><td class="price px">X zł/mies.</td></tr>
-    <tr><td class="label">Wizytówka Google + profil w ODR</td><td class="detail">Bezpłatne — zrób od razu po rejestracji</td><td class="price pgray">0 zł</td></tr>
-  </table>
-</div>
-
-<!-- 6. REZERWA -->
-<div class="section">
-  <div class="section-header sh-purple">6. REZERWA I BUFOR PŁYNNOŚCIOWY <span class="tag tag-green">zalecane</span></div>
-  <table>
-    <tr><td class="label">Bufor na VAT importowy (do zwrotu)</td><td class="detail">Zamrożone ~30-45 dni — wraca po złożeniu JPK</td><td class="price" style="color:#1565c0">~8 500 zł</td></tr>
-    <tr><td class="label">Rezerwa operacyjna na 3 miesiące</td><td class="detail">Koszty stałe zanim przyjdą pierwsze przychody ze sprzedaży</td><td class="price pgreen">~10 000 zł</td></tr>
-    <tr><td class="label">Bufor walutowy CHF/EUR</td><td class="detail">Na wypadek skoku kursu przy kolejnym zamówieniu</td><td class="price pgreen">~5 000 zł</td></tr>
-    <tr><td class="label">Nieprzewidziane koszty</td><td class="detail">Naprawa, opóźnienie dostawy, dodatkowe opłaty</td><td class="price pgreen">~5 000 zł</td></tr>
-    <tr class="sub"><td class="label">SUMA – Rezerwa</td><td class="detail"></td><td class="price pgreen">~28 500 zł</td></tr>
-  </table>
-</div>
-
-<!-- TOTAL -->
-<div class="total-box">
-  <div>
-    <div class="lbl">MINIMALNE ŚRODKI WŁASNE NA START</div>
-    <div class="s">Rejestracja + maszyna + rezerwa | bez pozycji X | VAT importowy wraca po ~45 dniach</div>
+  <div class="legend">
+    <span><b>Znana cena</b> — wartość z biznesplanu / cennika</span>
+    <span><b>X</b> — wycena lokalna / do ustalenia</span>
+    <span><b>0 zł</b> — brak kosztu</span>
+    <span><b>Zwrotne</b> — VAT odliczany w JPK</span>
   </div>
-  <div style="text-align:right">
-    <div class="amt">~75 000 zł</div>
-    <div class="s">+ koszty instalacji (X) | VAT importowy wraca po ~45 dniach</div>
+
+  <div class="rate-box">
+    💱 <b>Kurs planistyczny biznesplanu: 1 EUR = 4,30 zł</b> (zaokrąglony, zbliżony do średniego kursu NBP z 2 lipca 2026 r.) —
+    sprawdź aktualny kurs na <b>nbp.pl</b> przed każdym zamówieniem i przy ofertowaniu klienta.
   </div>
-</div>
 
-<!-- WARIANT BGK -->
-<div class="section">
-  <div class="section-header sh-green">🚀 WARIANT Z POŻYCZKĄ BGK „Wsparcie w Starcie" — 0,5%/rok, częściowo umarzalna</div>
-  <table>
-    <tr><td class="label">Środki własne minimalne</td><td class="detail">Kapitał zakładowy + rejestracja + bufor osobisty</td><td class="price pgreen">~15 000 zł</td></tr>
-    <tr><td class="label">Pożyczka BGK „Wsparcie w Starcie"</td><td class="detail">Na maszyny, transport, marketing, koszty stałe 6 mies.</td><td class="price pgreen">do 191 000 zł</td></tr>
-    <tr><td class="label">Umorzenie po 12 miesiącach działalności</td><td class="detail">Warunek: nie brałeś dotacji PUP na tę samą działalność</td><td class="price pgreen">~50 000 zł umorzone</td></tr>
-    <tr><td class="label">Ile maszyn możesz kupić od razu?</td><td class="detail">191 000 ÷ ~46 500 zł/szt. ≈ 4 maszyny startowe</td><td class="price pgreen">~4 maszyny</td></tr>
-    <tr class="sub"><td class="label">Status naboru BGK</td><td class="detail">⏳ Zawieszony od 30.03.2026 — śledź pfp.com.pl</td><td class="price pamber">Czekaj na wznowienie</td></tr>
-  </table>
-</div>
+  <!-- 1. REJESTRACJA -->
+  <section>
+    <h2 class="sect"><span class="n">1</span>Rejestracja spółki z o.o. <span style="font-weight:400;font-size:.8rem;color:var(--muted);margin-left:6px;">jednorazowo</span></h2>
+    <table>
+      <tr><th>Pozycja</th><th>Opis</th><th class="val">Koszt</th></tr>
+      <tr><td>Opłata KRS przez S24 (sąd + MSiG)</td><td>Płatne kartą w systemie S24</td><td class="val">350 zł</td></tr>
+      <tr><td>Kapitał zakładowy</td><td>Min. 5 000 zł — majątek spółki, nie przepada</td><td class="val">5 000 zł</td></tr>
+      <tr><td>Wirtualne biuro / siedziba</td><td>Biuro29 Katowice — adres do rejestracji KRS, US, GUS</td><td class="val">X zł</td></tr>
+      <tr><td>Rejestracja VAT-R</td><td>Online przez podatki.gov.pl — obowiązkowe dla importera</td><td class="val">0 zł</td></tr>
+      <tr><td>Rejestracja EORI</td><td>puesc.gov.pl — numer do odpraw celnych</td><td class="val">0 zł</td></tr>
+      <tr><td>Zgłoszenie CRBR</td><td>⚠️ Obowiązek w 14 dni od KRS — kara do 1 mln zł</td><td class="val">0 zł</td></tr>
+      <tr><td>Konto bankowe PLN (mBank / PKO)</td><td>Otwarcie zwykle bezpłatne</td><td class="val">0 zł</td></tr>
+      <tr><td>Konto Revolut Business (EUR/CHF)</td><td>Do płatności za maszyny — kurs rynkowy</td><td class="val">0–50 zł/mies.</td></tr>
+      <tr class="sum"><td colspan="2">SUMA – Rejestracja</td><td class="val">~5 350 zł + X</td></tr>
+    </table>
+  </section>
 
-<!-- PRZYCHODY (prognoza) -->
-<div class="section">
-  <div class="section-header sh-green">📈 SZACUNKOWE PRZYCHODY — prognoza (1 maszyna)</div>
-  <div class="note">Orientacyjnie — ustal cenę sprzedaży maszyny po rozmowach z pierwszymi klientami</div>
-  <table>
-    <tr><td class="label">Cena sprzedaży maszyny klientowi (netto)</td><td class="detail">Marża ~35-50% na koszcie netto ~28 000 zł</td><td class="price pgreen">38 000–42 000 zł</td></tr>
-    <tr><td class="label">+ Pawilon drewniany</td><td class="detail">Jeśli sprzedajesz razem</td><td class="price px">X zł</td></tr>
-    <tr><td class="label">+ Instalacja (usługa)</td><td class="detail">Jednorazowa opłata instalacyjna</td><td class="price px">X zł</td></tr>
-    <tr><td class="label">+ Umowa serwisowa (roczna)</td><td class="detail">Stały przychód pasywny — np. 2 000–4 000 zł/rok/maszynę</td><td class="price pgreen">2 000–4 000 zł/rok</td></tr>
-    <tr><td class="label">Zysk brutto na 1 maszynie</td><td class="detail">Cena sprzedaży minus koszt zakupu ~28 000 zł netto</td><td class="price pgreen">~10 000–14 000 zł</td></tr>
-    <tr><td class="label">Argument ARiMR dla rolnika</td><td class="detail">Rolnik dostaje 45-65% refundacji → Twoja maszyna kosztuje go realnie ~15 000–21 000 zł</td><td class="price pgreen">↑ ułatwia sprzedaż</td></tr>
-  </table>
-</div>
+  <!-- 2. MASZYNA -->
+  <section>
+    <h2 class="sect"><span class="n">2</span>Pierwsza maszyna BRUNIMAT <span style="font-weight:400;font-size:.8rem;color:var(--muted);margin-left:6px;">jednorazowo</span></h2>
+    <p class="note">Zgodnie z biznesplanem — konfiguracja BRUNIMAT 650 Premium DUO z pełnym wyposażeniem, jako <b>jeden, finalny koszt zakupu</b> (poprzedni podział na „opcje do rozważenia” został ujęty w całości).</p>
+    <table>
+      <tr><th>Pozycja</th><th>Opis</th><th class="val">EUR</th><th class="val">PLN (kurs 4,30)</th></tr>
+      <tr><td>BRUNIMAT 650 Premium DUO</td><td>Max. 2×50 L kanny | zew. 740×1020×2050 mm</td><td class="val">6 400 EUR</td><td class="val">27 520 zł</td></tr>
+      <tr><td>Certyfikacja Premium CE-MID</td><td>Obowiązkowe — zaplombowana dozownia, gwarancja</td><td class="val">150 EUR</td><td class="val">645 zł</td></tr>
+      <tr><td>System płatności: reszta + banknoty</td><td>Bilonarka + czytnik banknotów (combo)</td><td class="val">1 250 EUR</td><td class="val">5 375 zł</td></tr>
+      <tr><td>Automatyczne płukanie strefy dozowania</td><td>Po każdej sprzedaży mleka — higiena HACCP</td><td class="val">200 EUR</td><td class="val">860 zł</td></tr>
+      <tr><td>Kanny 50 L × 3 szt.</td><td>Stal nierdzewna, pokrywa 100% szczelna | 3 × 230 EUR</td><td class="val">690 EUR</td><td class="val">2 967 zł</td></tr>
+      <tr><td>GSM – alarm SMS (niski poziom)</td><td>Powiadomienie gdy np. zostało 50 L mleka</td><td class="val">160 EUR</td><td class="val">688 zł</td></tr>
+      <tr><td>Płatność kartą Nayax</td><td>Terminal bezstykowy — wymagany dla fiskalizacji od IV.2027</td><td class="val">650 EUR</td><td class="val">2 795 zł</td></tr>
+      <tr><td>Ogrzewanie Anti-Frost</td><td>Ważne — polska zima, mróz</td><td class="val">100 EUR</td><td class="val">430 zł</td></tr>
+      <tr class="sum"><td colspan="2">SUMA – Koszt zakupu maszyny (ab Werk, netto)</td><td class="val">9 750 EUR</td><td class="val">41 925 zł</td></tr>
+    </table>
+    <p class="note">Kalkulacja zakłada niezmienioną cenę zakupu 9 750 EUR. Nie uwzględnia ewentualnych rabatów ilościowych przy kolejnych zamówieniach.</p>
+  </section>
 
-<div class="footer">
-  <strong style="color:#1a5c2a">Sklep za Stodołą Sp. z o.o.</strong> | Budżet startowy — czerwiec 2026<br>
-  Pozycje <strong style="color:#f57c00">X</strong> wymagają lokalnej wyceny — uzupełnij po rozmowach z wykonawcami.<br>
-  VAT importowy (~8 500 zł) <strong>wraca</strong> po ok. 30–45 dniach od złożenia deklaracji JPK_V7M.<br>
-  Ceny Brunimat z cennika EUR 01.04.2025 | Kurs orientacyjny — sprawdź aktualny na <strong>nbp.pl</strong>
-</div>
+  <!-- 3. TRANSPORT I ODPRAWA -->
+  <section>
+    <h2 class="sect"><span class="n">3</span>Transport i odprawa celna <span style="font-weight:400;font-size:.8rem;color:var(--muted);margin-left:6px;">jednorazowo, per zamówienie</span></h2>
+    <table>
+      <tr><th>Pozycja</th><th>Opis</th><th class="val">Koszt</th></tr>
+      <tr><td>Transport Szwajcaria → Polska</td><td>CH-9313 Muolen → Tarnowskie Góry</td><td class="val">2 610 zł netto</td></tr>
+      <tr><td>VAT od transportu (23%)</td><td>Doliczany do faktury spedytora</td><td class="val">~600 zł</td></tr>
+      <tr><td>Ubezpieczenie cargo</td><td>~0,3% wartości towaru</td><td class="val">~130 zł</td></tr>
+      <tr><td>Obsługa celna T1 (tranzyt)</td><td>Dokument tranzytowy CH → UE</td><td class="val">od 70 EUR (~300 zł)</td></tr>
+      <tr><td>Agencja celna – odprawa IMP</td><td>Zgłoszenie importowe AIS/IMPORT w Polsce</td><td class="val">350 zł</td></tr>
+      <tr><td>Cło</td><td>0% przy deklaracji pochodzenia EUR.1 od Brunimat</td><td class="val">0 zł</td></tr>
+      <tr><td>Transport urządzenia w Polsce</td><td>Do gospodarstwa klienta, Śląsk i okolice</td><td class="val">~800 zł</td></tr>
+      <tr><td>VAT importowy 23% (bufor, zwrotny)</td><td>Naliczany od wartości CIF — odliczany w JPK po ok. 30–45 dniach</td><td class="val">~8 500 zł*</td></tr>
+      <tr class="sum"><td colspan="2">SUMA – Transport i odprawa (z VAT importowym w buforze)</td><td class="val">~13 290 zł</td></tr>
+      <tr class="sum"><td colspan="2">SUMA – gotówka wychodząca bez bufora VAT (VAT wraca po 30–45 dniach)</td><td class="val">~4 790 zł</td></tr>
+    </table>
+  </section>
+
+  <!-- 4. INSTALACJA -->
+  <section>
+    <h2 class="sect"><span class="n">4</span>Instalacja i uruchomienie u klienta <span style="font-weight:400;font-size:.8rem;color:var(--muted);margin-left:6px;">per instalacja</span></h2>
+    <table>
+      <tr><th>Pozycja</th><th>Opis</th><th class="val">Koszt spółki</th></tr>
+      <tr><td>Pawilon drewniany na mlekomat</td><td>Wycena indywidualna po wyborze modelu/producenta — ok. 50% klientów zamawia u nas</td><td class="val">X zł (wycena)</td></tr>
+      <tr><td>Transport maszyny do klienta</td><td>Lokalnie Śląsk / okolice</td><td class="val">~800 zł</td></tr>
+      <tr><td>Instalacja elektryczna</td><td>Podłączenie 230V — elektryk z uprawnieniami (podwykonawca)</td><td class="val">X zł</td></tr>
+      <tr><td>Przyłącze wodne (jeśli wymagane)</td><td>Zależy od konfiguracji i lokalizacji</td><td class="val">X zł</td></tr>
+      <tr><td>Dokumentacja sanepid / HACCP</td><td>Przy sprzedaży mleka surowego wymagane</td><td class="val">X zł</td></tr>
+      <tr><td>Szkolenie klienta-rolnika</td><td>Obsługa, czyszczenie, wymiana kann — wliczone w usługę instalacji</td><td class="val">0 zł</td></tr>
+      <tr class="sum"><td colspan="2">SUMA – koszt spółki na instalację</td><td class="val">X + ~800 zł</td></tr>
+      <tr class="profit"><td colspan="2">Przychód spółki: „Instalacja, uruchomienie i szkolenie” (usługa dla klienta)</td><td class="val">1 500 zł</td></tr>
+    </table>
+    <p class="note">Instalacja i szkolenie to osobna pozycja przychodowa spółki (patrz sekcja 7 — Rentowność), niezależna od marży na samej maszynie.</p>
+  </section>
+
+  <!-- 5. KOSZTY STAŁE -->
+  <section>
+    <h2 class="sect"><span class="n">5</span>Koszty stałe działalności <span style="font-weight:400;font-size:.8rem;color:var(--muted);margin-left:6px;">wg biznesplanu, rocznie</span></h2>
+    <p class="note">Spółka rozpoczyna działalność bez pracowników etatowych i bez wynagrodzeń dla wspólników — dlatego koszty stałe są niskie. Nie obejmują przyszłych wynagrodzeń, zatrudnienia technika ani zakupu samochodu serwisowego.</p>
+    <table>
+      <tr><th>Rodzaj kosztu</th><th class="val">2026</th><th class="val">2027</th><th class="val">2028</th></tr>
+      <tr><td>Wirtualne biuro i siedziba</td><td class="val">600 zł</td><td class="val">600 zł</td><td class="val">600 zł</td></tr>
+      <tr><td>Hosting i domena</td><td class="val">100 zł</td><td class="val">100 zł</td><td class="val">100 zł</td></tr>
+      <tr><td>Telefon firmowy</td><td class="val">180 zł</td><td class="val">360 zł</td><td class="val">360 zł</td></tr>
+      <tr><td>Paliwo i przejazdy</td><td class="val">3 600 zł</td><td class="val">7 200 zł</td><td class="val">9 600 zł</td></tr>
+      <tr><td>Ubezpieczenie OC firmy</td><td class="val">1 200 zł</td><td class="val">1 200 zł</td><td class="val">1 200 zł</td></tr>
+      <tr><td>Opłaty bankowe i walutowe</td><td class="val">600 zł</td><td class="val">1 200 zł</td><td class="val">1 800 zł</td></tr>
+      <tr><td>Księgowość</td><td class="val">0 zł</td><td class="val">6 000 zł</td><td class="val">6 000 zł</td></tr>
+      <tr><td>Marketing</td><td class="val">4 000 zł</td><td class="val">8 000 zł</td><td class="val">16 000 zł</td></tr>
+      <tr class="sum"><td>Łączne koszty operacyjne</td><td class="val">10 280 zł</td><td class="val">24 660 zł</td><td class="val">35 660 zł</td></tr>
+    </table>
+    <p class="note">Budżet marketingowy 2027/2028 ma charakter planistyczny — będzie zwiększany stopniowo, finansowany z bieżących wpływów, pod warunkiem potwierdzonej skuteczności reklam.</p>
+  </section>
+
+  <!-- 6. WSTĘPNA KONTROLA BUDŻETU / FINANSOWANIE -->
+  <section>
+    <h2 class="sect"><span class="n">6</span>Zapotrzebowanie na finansowanie i kontrola budżetu</h2>
+
+    <div class="kpi-row">
+      <div class="kpi"><div class="lbl">Wnioskowana pożyczka</div><div class="num">20 000 EUR</div></div>
+      <div class="kpi"><div class="lbl">Przy kursie 4,30 zł</div><div class="num">~86 000 zł</div></div>
+      <div class="kpi"><div class="lbl">Forma</div><div class="num">Pożyczka prywatna</div></div>
+    </div>
+    <p class="note">Finansowanie dłużne od prywatnego pożyczkodawcy — nie wiąże się z obejmowaniem udziałów ani przekazaniem kontroli nad spółką. Środki mają umożliwić zakup pierwszego urządzenia i pokryć kapitał obrotowy na start.</p>
+
+    <h3 class="sub">Wstępna kontrola zgodności budżetu (kurs 4,30 zł/EUR)</h3>
+    <table>
+      <tr><th>Pozycja</th><th class="val">Wartość orientacyjna</th></tr>
+      <tr><td>Wartość pożyczki</td><td class="val">86 000 zł</td></tr>
+      <tr><td>Maszyna wg kursu 4,30 zł/EUR</td><td class="val">41 925 zł</td></tr>
+      <tr><td>Transport międzynarodowy z VAT</td><td class="val">3 210 zł</td></tr>
+      <tr><td>Transport krajowy</td><td class="val">800 zł</td></tr>
+      <tr><td>Bufor na VAT importowy</td><td class="val">8 500 zł</td></tr>
+      <tr class="sum"><td>Łączne koszty znane przed wyborem pawilonu</td><td class="val">54 435 zł</td></tr>
+      <tr class="profit"><td>Środki pozostające na pawilon, dostosowanie i rezerwę</td><td class="val">~31 565 zł</td></tr>
+    </table>
+    <p class="note">Ostateczny podział pozostałej kwoty zależy od rodzaju pawilonu, producenta, lokalizacji, kosztu dostawy oraz wysokości zaliczki od pierwszego klienta — dlatego nie przyjęto jednej stałej ceny pawilonu.</p>
+
+    <h3 class="sub">Na co idą środki z pożyczki</h3>
+    <table>
+      <tr><th>Przeznaczenie</th></tr>
+      <tr><td>Sfinansowanie pierwszego zakupu maszyny</td></tr>
+      <tr><td>Pokrycie różnicy między zaliczką klienta (50%) a płatnością dla producenta</td></tr>
+      <tr><td>Czasowe finansowanie VAT importowego do czasu zwrotu</td></tr>
+      <tr><td>Pokrycie kosztów pierwszego pawilonu i transportu</td></tr>
+      <tr><td>Utrzymanie minimalnej płynności spółki</td></tr>
+    </table>
+    <p class="note">Przy standardowej cenie mlekomatu (13 900 EUR) pierwsza wpłata klienta (50%) wynosi 6 950 EUR, przy koszcie zakupu 9 750 EUR — spółka musi czasowo sfinansować różnicę ok. <b>2 800 EUR</b> na jedno standardowe urządzenie. Po drugiej wpłacie klienta urządzenie jest w całości opłacone przed dostawą.</p>
+
+    <div class="callout blue" style="margin-top:14px;">
+      🚀 <b>Alternatywna opcja finansowania <span class="alt-tag">nie w biznesplanie</span></b><br>
+      Pożyczka BGK „Wsparcie w Starcie” (0,5%/rok, do 191 000 zł, częściowo umarzalna) była analizowana wcześniej jako opcja niezależna od pożyczki prywatnej opisanej w biznesplanie. Nabór jest zawieszony od 30.03.2026 — status do sprawdzenia na pfp.com.pl. Nie jest częścią aktualnego wniosku do pożyczkodawcy.
+    </div>
+  </section>
+
+  <!-- 7. MODEL CENOWY I RENTOWNOŚĆ -->
+  <section>
+    <h2 class="sect"><span class="n">7</span>Model cenowy i rentowność jednej sprzedaży</h2>
+    <table>
+      <tr><th>Pozycja</th><th class="val">Wartość</th></tr>
+      <tr><td>Koszt zakupu BRUNIMAT 650 Premium DUO z dodatkami</td><td class="val">9 750 EUR</td></tr>
+      <tr><td>Cena pierwszych dwóch urządzeń referencyjnych</td><td class="val">13 500 EUR</td></tr>
+      <tr><td>Standardowa cena sprzedaży (od 3. urządzenia)</td><td class="val">13 900 EUR</td></tr>
+      <tr><td>Cena katalogowa</td><td class="val">14 500 EUR</td></tr>
+      <tr><td>Instalacja, uruchomienie i szkolenie (przychód)</td><td class="val">1 500 zł</td></tr>
+      <tr><td>Obsługa importu i koordynacja (przychód)</td><td class="val">900 zł</td></tr>
+      <tr><td>Udział klientów zamawiających pawilon u nas</td><td class="val">50%</td></tr>
+      <tr><td>Marża na jednym pawilonie</td><td class="val">1 000–2 000 zł</td></tr>
+    </table>
+
+    <div class="grid2" style="margin-top:16px;">
+      <table>
+        <tr><th colspan="2">Urządzenie referencyjne (1. i 2. sztuka)</th></tr>
+        <tr><td>Cena sprzedaży</td><td class="val">13 500 EUR</td></tr>
+        <tr><td>Koszt zakupu</td><td class="val">9 750 EUR</td></tr>
+        <tr class="profit"><td>Zysk handlowy</td><td class="val">3 750 EUR (~16 125 zł)</td></tr>
+        <tr><td>Marża od ceny sprzedaży</td><td class="val">27,8%</td></tr>
+      </table>
+      <table>
+        <tr><th colspan="2">Urządzenie w cenie standardowej (od 3. sztuki)</th></tr>
+        <tr><td>Cena sprzedaży</td><td class="val">13 900 EUR</td></tr>
+        <tr><td>Koszt zakupu</td><td class="val">9 750 EUR</td></tr>
+        <tr class="profit"><td>Zysk handlowy</td><td class="val">4 150 EUR (~17 845 zł)</td></tr>
+        <tr><td>Marża od ceny sprzedaży</td><td class="val">29,9%</td></tr>
+      </table>
+    </div>
+
+    <h3 class="sub">Łączna wartość generowana przez jedno standardowe zamówienie</h3>
+    <table>
+      <tr><th>Element</th><th class="val">Średnia kwota</th></tr>
+      <tr><td>Marża na urządzeniu</td><td class="val">17 845 zł</td></tr>
+      <tr><td>Instalacja i szkolenie</td><td class="val">1 500 zł</td></tr>
+      <tr><td>Obsługa importu</td><td class="val">900 zł</td></tr>
+      <tr><td>Średnia marża na pawilonie (na 1 urządzenie)</td><td class="val">750 zł</td></tr>
+      <tr class="profit"><td>Łączna marża przed rezerwą gwarancyjną</td><td class="val">20 995 zł</td></tr>
+    </table>
+  </section>
+
+  <!-- 8. PROGNOZA PRZYCHODÓW I WYNIKU -->
+  <section>
+    <h2 class="sect"><span class="n">8</span>Prognoza przychodów i zysku (2026–2028)</h2>
+
+    <h3 class="sub">Liczba sprzedanych urządzeń i przychody</h3>
+    <table>
+      <tr><th>Rok</th><th class="val">Liczba urządzeń</th><th class="val">Przychód ze sprzedaży urządzeń</th><th class="val">Przychody z usług</th><th class="val">Łączne przychody bazowe</th></tr>
+      <tr><td>2026</td><td class="val">8</td><td class="val">474 720 zł</td><td class="val">19 200 zł</td><td class="val">493 920 zł</td></tr>
+      <tr><td>2027</td><td class="val">16</td><td class="val">956 320 zł</td><td class="val">38 400 zł</td><td class="val">994 720 zł</td></tr>
+      <tr><td>2028</td><td class="val">32</td><td class="val">1 912 640 zł</td><td class="val">76 800 zł</td><td class="val">1 989 440 zł</td></tr>
+    </table>
+    <p class="note">Przychody bazowe nie zawierają: pełnej wartości sprzedawanych pawilonów, transportu, ubezpieczenia cargo, kosztów odprawy i dokumentacji celnej ani przyszłych przychodów z odpłatnego serwisu — te są rozliczane osobno, wg faktycznych kosztów.</p>
+
+    <h3 class="sub">Koszt zakupu maszyn</h3>
+    <table>
+      <tr><th>Rok</th><th class="val">Liczba urządzeń</th><th class="val">Koszt jednostkowy</th><th class="val">Łączny koszt</th></tr>
+      <tr><td>2026</td><td class="val">8</td><td class="val">41 925 zł</td><td class="val">335 400 zł</td></tr>
+      <tr><td>2027</td><td class="val">16</td><td class="val">41 925 zł</td><td class="val">670 800 zł</td></tr>
+      <tr><td>2028</td><td class="val">32</td><td class="val">41 925 zł</td><td class="val">1 341 600 zł</td></tr>
+    </table>
+
+    <h3 class="sub">Marża handlowa</h3>
+    <table>
+      <tr><th>Pozycja</th><th class="val">2026</th><th class="val">2027</th><th class="val">2028</th></tr>
+      <tr><td>Marża na urządzeniach</td><td class="val">139 320 zł</td><td class="val">285 520 zł</td><td class="val">571 040 zł</td></tr>
+      <tr><td>Instalacja i szkolenie</td><td class="val">12 000 zł</td><td class="val">24 000 zł</td><td class="val">48 000 zł</td></tr>
+      <tr><td>Obsługa importu</td><td class="val">7 200 zł</td><td class="val">14 400 zł</td><td class="val">28 800 zł</td></tr>
+      <tr><td>Marża na pawilonach</td><td class="val">6 000 zł</td><td class="val">12 000 zł</td><td class="val">24 000 zł</td></tr>
+      <tr class="profit"><td>Łączna marża przed kosztami działalności</td><td class="val">164 520 zł</td><td class="val">335 920 zł</td><td class="val">671 840 zł</td></tr>
+    </table>
+
+    <h3 class="sub">Wynik finansowy</h3>
+    <table>
+      <tr><th>Pozycja</th><th class="val">2026</th><th class="val">2027</th><th class="val">2028</th></tr>
+      <tr><td>Łączna marża</td><td class="val">164 520 zł</td><td class="val">335 920 zł</td><td class="val">671 840 zł</td></tr>
+      <tr><td>Koszty operacyjne</td><td class="val">−10 280 zł</td><td class="val">−24 660 zł</td><td class="val">−35 660 zł</td></tr>
+      <tr><td>Rezerwa gwarancyjna (2% sprzedaży maszyn)</td><td class="val">−9 494 zł</td><td class="val">−19 126 zł</td><td class="val">−38 253 zł</td></tr>
+      <tr class="sum"><td>Wynik przed podatkiem i kosztami finansowania</td><td class="val">145 346 zł</td><td class="val">292 134 zł</td><td class="val">597 927 zł</td></tr>
+      <tr><td>Orientacyjny CIT (9%)</td><td class="val">−13 081 zł</td><td class="val">−26 292 zł</td><td class="val">−53 813 zł</td></tr>
+      <tr class="profit"><td>Orientacyjny wynik netto</td><td class="val">132 265 zł</td><td class="val">265 842 zł</td><td class="val">544 114 zł</td></tr>
+    </table>
+    <p class="note">Wynik nie uwzględnia jeszcze odsetek i rat pożyczki (warunki nieustalone) ani przyszłych wynagrodzeń wspólników — ich wprowadzenie obniży prezentowaną nadwyżkę. Stawka CIT 9% wymaga potwierdzenia przez księgowość po spełnieniu ustawowych warunków.</p>
+
+    <h3 class="sub">Scenariusz ostrożny (połowa planu sprzedażowego)</h3>
+    <table>
+      <tr><th>Pozycja</th><th class="val">2026</th><th class="val">2027</th><th class="val">2028</th></tr>
+      <tr><td>Liczba urządzeń</td><td class="val">4</td><td class="val">8</td><td class="val">16</td></tr>
+      <tr><td>Przychody bazowe</td><td class="val">245 240 zł</td><td class="val">497 360 zł</td><td class="val">994 720 zł</td></tr>
+      <tr><td>Wynik przed podatkiem i finansowaniem</td><td class="val">66 147 zł</td><td class="val">133 737 zł</td><td class="val">281 134 zł</td></tr>
+      <tr class="profit"><td>Orientacyjny wynik po CIT</td><td class="val">60 194 zł</td><td class="val">121 700 zł</td><td class="val">255 832 zł</td></tr>
+    </table>
+    <p class="note">Nawet przy sprzedaży niższej o 50% od planu podstawowego działalność pozostaje rentowna — choć niekoniecznie pozwoli na natychmiastową spłatę całej pożyczki.</p>
+  </section>
+
+  <!-- 9. PUNKT RENTOWNOŚCI -->
+  <section>
+    <h2 class="sect"><span class="n">9</span>Punkt rentowności i rezerwa gwarancyjna</h2>
+    <div class="grid2">
+      <table>
+        <tr><th colspan="2">Wkład jednej standardowej sprzedaży</th></tr>
+        <tr><td>Marża na urządzeniu</td><td class="val">17 845 zł</td></tr>
+        <tr><td>Przychód z instalacji</td><td class="val">1 500 zł</td></tr>
+        <tr><td>Przychód z obsługi importu</td><td class="val">900 zł</td></tr>
+        <tr><td>Średnia marża na pawilonie</td><td class="val">750 zł</td></tr>
+        <tr class="profit"><td>Wkład w pokrycie kosztów stałych</td><td class="val">~19 800 zł</td></tr>
+      </table>
+      <table>
+        <tr><th colspan="2">Rezerwa gwarancyjna (2% sprzedaży)</th></tr>
+        <tr><td>2026</td><td class="val">9 494 zł</td></tr>
+        <tr><td>2027</td><td class="val">19 126 zł</td></tr>
+        <tr><td>2028</td><td class="val">38 253 zł</td></tr>
+      </table>
+    </div>
+    <div class="callout gold" style="margin-top:14px;">
+      Matematyczny punkt pokrycia kosztów stałych znajduje się poniżej dwóch urządzeń rocznie. Dla bezpieczeństwa przyjęto praktyczne minimum: <b>2 sprzedane mlekomaty rocznie</b>. Próg wzrośnie po wprowadzeniu wynagrodzeń, zatrudnieniu pracowników lub rozbudowie zaplecza serwisowego.
+    </div>
+    <p class="note">Gwarancja obejmuje: 2 lata, obsługę w języku polskim, reakcję na zgłoszenie w ciągu 48h, bezpłatny dojazd i naprawę wad objętych gwarancją.</p>
+  </section>
+
+  <!-- 10. REZERWA I BUFOR -->
+  <section>
+    <h2 class="sect"><span class="n">10</span>Rezerwa i bufor płynnościowy <span style="font-weight:400;font-size:.8rem;color:var(--muted);margin-left:6px;">zalecane, poza kwotą pożyczki</span></h2>
+    <table>
+      <tr><th>Pozycja</th><th>Opis</th><th class="val">Kwota</th></tr>
+      <tr><td>Bufor na VAT importowy (do zwrotu)</td><td>Zamrożone ~30–45 dni — wraca po złożeniu JPK</td><td class="val">~8 500 zł</td></tr>
+      <tr><td>Rezerwa operacyjna na 3 miesiące</td><td>Koszty stałe zanim przyjdą pierwsze przychody</td><td class="val">~10 000 zł</td></tr>
+      <tr><td>Bufor walutowy CHF/EUR</td><td>Na wypadek skoku kursu przy kolejnym zamówieniu</td><td class="val">~5 000 zł</td></tr>
+      <tr><td>Nieprzewidziane koszty</td><td>Naprawa, opóźnienie dostawy, dodatkowe opłaty</td><td class="val">~5 000 zł</td></tr>
+      <tr class="sum"><td colspan="2">SUMA – Rezerwa</td><td class="val">~28 500 zł</td></tr>
+    </table>
+  </section>
+
+  <!-- PODSUMOWANIE -->
+  <section>
+    <h2 class="sect"><span class="n">✓</span>Podsumowanie budżetu startowego</h2>
+    <div class="kpi-row">
+      <div class="kpi"><div class="lbl">Pożyczka wnioskowana</div><div class="num">86 000 zł</div></div>
+      <div class="kpi"><div class="lbl">Znane koszty przed pawilonem</div><div class="num">54 435 zł</div></div>
+      <div class="kpi"><div class="lbl">Zostaje na pawilon i rezerwę</div><div class="num">~31 565 zł</div></div>
+      <div class="kpi"><div class="lbl">Marża na 1. sprzedaży</div><div class="num">~20 995 zł</div></div>
+    </div>
+    <div class="callout blue">
+      Kwota 20 000 EUR powinna umożliwić zakup pierwszego urządzenia, pokrycie podstawowych kosztów transportu, czasowe sfinansowanie VAT oraz przygotowanie pierwszej realizacji — pod warunkiem kontroli wydatków i wykorzystania zaliczki klienta (50% wpłacane przy podpisaniu umowy).
+    </div>
+  </section>
+
+  <footer class="page">
+    <b>Sklep za Stodołą Sp. z o.o.</b> | Budżet startowy — zaktualizowano zgodnie z biznesplanem, lipiec 2026<br>
+    Pozycje <b>X</b> wymagają lokalnej wyceny — uzupełnij po rozmowach z wykonawcami.<br>
+    VAT importowy (~8 500 zł) <b>wraca</b> po ok. 30–45 dniach od złożenia deklaracji JPK_V7M.<br>
+    Kurs planistyczny 1 EUR = 4,30 zł — sprawdź aktualny na <b>nbp.pl</b>. Ceny Brunimat wg cennika EUR 01.04.2025.
+  </footer>
 
 </div>
 </body>
