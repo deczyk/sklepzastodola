@@ -888,7 +888,7 @@ button {
   font-weight: 700;
 }
 
-.footer-col h4 {
+.footer-col h3 {
   font-size: .85rem;
   text-transform: uppercase;
   letter-spacing: .1em;
@@ -2045,7 +2045,7 @@ input[type=range]::-moz-range-thumb {
   border-color: rgba(255,255,255,.34) !important;
 }
 
-.footer-col h4 {
+.footer-col h3 {
   font-size: .72rem !important;
   text-transform: uppercase !important;
   letter-spacing: .14em !important;
