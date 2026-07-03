@@ -126,8 +126,19 @@
           </select>
         </div>
         <div class="ff">
+          <label for="fl">Ile litrów mleka dziennie? (orientacyjnie)</label>
+          <select id="fl" name="litry_dziennie">
+            <option value="">Wybierz zakres</option>
+            <option value="ponizej-30">poniżej 30 l</option>
+            <option value="30-100">30–100 l</option>
+            <option value="100-200">100–200 l</option>
+            <option value="powyzej-200">powyżej 200 l</option>
+            <option value="brak-jeszcze">nie mam jeszcze krów / dopiero planuję</option>
+          </select>
+        </div>
+        <div class="ff">
           <label for="fw">Wiadomość</label>
-          <textarea id="fw" name="wiadomosc" placeholder="Napisz kilka słów o swoim gospodarstwie — ile litrów mleka dziennie, co chciałbyś sprzedawać, gdzie jesteś..."></textarea>
+          <textarea id="fw" name="wiadomosc" placeholder="Napisz kilka słów o swoim gospodarstwie — co chciałbyś sprzedawać, gdzie jesteś..."></textarea>
         </div>
         <button type="submit" class="btn btn-green" id="sbtn" style="width:100%;justify-content:center">
           <span id="stxt">Wyślij wiadomość →</span>

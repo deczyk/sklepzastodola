@@ -49,9 +49,13 @@
   document.addEventListener('submit', function(e){
     const form = e.target;
     if(form && form.tagName === 'FORM'){
+      const litry = form.querySelector('[name="litry_dziennie"]');
+      const temat = form.querySelector('[name="temat"]');
       track('form_submit', {
         form_id: form.id || 'unknown',
-        page_path: location.pathname
+        page_path: location.pathname,
+        litry_dziennie: litry ? litry.value : '',
+        temat: temat ? temat.value : ''
       });
     }
   });
