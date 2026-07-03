@@ -26,6 +26,36 @@
     loadGA();
   }
 
+  // ── ŚLEDZENIE KONWERSJI (telefon / e-mail / formularz) ──
+  // Wysyła zdarzenie do GA4 tylko jeśli użytkownik zaakceptował cookies (GA jest załadowany)
+  function track(name, params){
+    if(window.__gaLoaded && typeof window.gtag === 'function'){
+      window.gtag('event', name, params || {});
+    }
+  }
+
+  // Klik w numer telefonu lub adres e-mail (działa wszędzie, delegacja na cały dokument)
+  document.addEventListener('click', function(e){
+    const a = e.target.closest('a[href^="tel:"], a[href^="mailto:"]');
+    if(!a) return;
+    const isTel = a.getAttribute('href').startsWith('tel:');
+    track(isTel ? 'phone_click' : 'email_click', {
+      link_url: a.getAttribute('href'),
+      page_path: location.pathname
+    });
+  });
+
+  // Wysłanie formularza kontaktowego (liczy próbę wysyłki — moment kliknięcia "Wyślij")
+  document.addEventListener('submit', function(e){
+    const form = e.target;
+    if(form && form.tagName === 'FORM'){
+      track('form_submit', {
+        form_id: form.id || 'unknown',
+        page_path: location.pathname
+      });
+    }
+  });
+
   // ── NAV SCROLL ──
   const nav = document.getElementById('nav');
   if(nav) window.addEventListener('scroll', ()=> nav.classList.toggle('scrolled', scrollY > 55), {passive:true});
