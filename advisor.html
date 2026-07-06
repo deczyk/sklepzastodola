@@ -1,4 +1,3 @@
-
 <!doctype html>
 <html lang="pl">
 <head>
@@ -55,14 +54,15 @@
 <div class="wrap">
   <div class="intro">
     <p><strong>Do czego służy to narzędzie?</strong> To kalkulator doradczy przygotowany przez Sklep za Stodołą, który pomaga oszacować opłacalność postawienia mlekomatu i sklepu farmerskiego na Twoim gospodarstwie — zwrot z inwestycji, dodatkowy zysk roczny oraz możliwości dofinansowania z UE.</p>
-    <p>Wypełnij dane w polach poniżej (albo zostaw podpowiedzi jako orientacyjny przykład) i kliknij <strong>„Przelicz analizę”</strong>, aby zobaczyć wynik. Wynik możesz zapisać jako PDF lub przesłać nam do dalszej rozmowy.</p>
+    <p>Wypełnij dane w polach poniżej (albo zostaw podpowiedzi jako orientacyjny przykład) i kliknij <strong>„Przelicz i wyślij wynik do Sklep za Stodołą”</strong> — zobaczysz wynik na ekranie, a my dostaniemy komplet danych do dopasowania oferty. Wynik możesz też zapisać jako PDF.</p>
   </div>
   <div class="card noPrint">
-    <button onclick="calculate()">Przelicz analizę</button>
+    <button style="background:var(--blue)" onclick="sendToUs()">📧 Przelicz i wyślij wynik do Sklep za Stodołą</button>
     <button class="gold" onclick="window.print()">Generuj raport PDF / drukuj</button>
     <button class="secondary" onclick="saveData()">Zapisz dane</button>
     <button class="secondary" onclick="loadData()">Wczytaj dane</button>
     <button class="secondary" onclick="resetAll()">Wyczyść</button>
+    <div id="sendStatus" style="margin-top:8px;font-size:13px"></div>
   </div>
 
   <div class="grid">
@@ -82,7 +82,7 @@
         <div class="kpi"><b id="profitYearTxt">0 zł</b><span>dodatkowy zysk roczny</span></div>
       </div>
       <label>Ocena potencjału</label><div class="score"><div id="scoreBar"></div></div>
-      <div id="advice" style="margin-top:14px" class="warn">Uzupełnij dane i kliknij „Przelicz analizę”.</div>
+      <div id="advice" style="margin-top:14px" class="warn">Uzupełnij dane i kliknij „Przelicz i wyślij wynik do Sklep za Stodołą”.</div>
     </section>
   </div>
 
@@ -155,7 +155,7 @@
     </table>
   </section>
 
-  <section class="card"><h2>9. Notatki doradcy</h2><textarea id="notes"></textarea></section>
+  <section class="card"><h2>9. Dodatkowe uwagi</h2><textarea id="notes" placeholder="Miejsce na dodatkowe uwagi, pytania lub informacje dla nas..."></textarea></section>
 </div>
 
 <footer><span class="brand">Sklep za Stodołą Sp. z o.o.</span> — narzędzie doradcze Advisor® EU · <a href="https://www.sklepzastodola.pl">sklepzastodola.pl</a> · kontakt@sklepzastodola.pl</footer>
@@ -207,6 +207,52 @@ function calculate(){
 function saveData(){const data={};document.querySelectorAll("input,select,textarea").forEach(el=>data[el.id]=el.value);localStorage.setItem("advisorDataEU",JSON.stringify(data));alert("Dane zapisane.");}
 function loadData(){const data=JSON.parse(localStorage.getItem("advisorDataEU")||"{}");Object.entries(data).forEach(([k,val])=>{const el=document.getElementById(k);if(el)el.value=val;});calculate();}
 function resetAll(){localStorage.removeItem("advisorDataEU");location.reload();}
+
+async function sendToUs(){
+  calculate(); // upewnij się, że wynik jest aktualny
+  const statusEl = document.getElementById("sendStatus");
+  const farm = document.getElementById("farm").value || "(brak nazwy)";
+  const owner = document.getElementById("owner").value || "(brak osoby kontaktowej)";
+  const phone = document.getElementById("phone").value || "(brak telefonu)";
+  const region = document.getElementById("region").value;
+  const county = document.getElementById("county").value;
+
+  const payload = {
+    _subject: `Advisor EU — wynik kalkulatora: ${farm} (${owner})`,
+    "Gospodarstwo": farm,
+    "Osoba kontaktowa": owner,
+    "Telefon": phone,
+    "Województwo / powiat": `${region} / ${county}`,
+    "Liczba krów": document.getElementById("cows").value,
+    "Wydajność l/krowę/dzień": document.getElementById("yield").value,
+    "Powierzchnia ha": document.getElementById("ha").value,
+    "Potencjał projektu": document.getElementById("scoreTxt").innerText,
+    "ROI bez dotacji (lata)": document.getElementById("roiTxt").innerText,
+    "ROI z dotacją (lata)": document.getElementById("roiEuTxt").innerText,
+    "Dodatkowy zysk roczny": document.getElementById("profitYearTxt").innerText,
+    "Koszt inwestycji": document.getElementById("investment").value + " zł",
+    "Dodatkowe uwagi": document.getElementById("notes").value || "(brak)"
+  };
+
+  statusEl.textContent = "Wysyłanie...";
+  statusEl.style.color = "#666";
+  try{
+    const res = await fetch('https://formspree.io/f/xbdvbrnp', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' }
+    });
+    if(res.ok){
+      statusEl.textContent = "✅ Wynik wysłany! Skontaktujemy się z Tobą wkrótce, żeby dopasować ofertę.";
+      statusEl.style.color = "#2f7a45";
+    } else {
+      throw new Error("Błąd wysyłki");
+    }
+  } catch(e){
+    statusEl.textContent = "⚠ Nie udało się wysłać. Spróbuj ponownie albo napisz do nas bezpośrednio: kontakt@sklepzastodola.pl";
+    statusEl.style.color = "#b44";
+  }
+}
 initAudit();calculate();
 </script>
 </body>
