@@ -72,10 +72,17 @@
 
   /* --- Client table --- */
   .tableWrap{overflow-x:auto}
-  table.clients{width:100%;border-collapse:collapse;font-size:12.5px;min-width:1000px}
+  table.clients{width:100%;border-collapse:collapse;font-size:12.5px;min-width:1500px;table-layout:fixed}
   table.clients th{text-align:left;color:var(--muted);font-weight:bold;font-size:11px;text-transform:uppercase;
-                    letter-spacing:.03em;padding:6px 8px;border-bottom:2px solid var(--line);white-space:nowrap}
-  table.clients td{padding:4px 6px;border-bottom:1px solid #eee;vertical-align:top}
+                    letter-spacing:.03em;padding:6px 8px;border-bottom:2px solid var(--line);white-space:nowrap;overflow:hidden}
+  table.clients td{padding:5px 7px;border-bottom:1px solid #eee;vertical-align:top;overflow:hidden}
+  table.clients col.firma{width:140px} table.clients col.osoba{width:130px}
+  table.clients col.woj{width:110px} table.clients col.miejsc{width:110px}
+  table.clients col.ulica{width:90px} table.clients col.tel{width:120px}
+  table.clients col.email{width:170px} table.clients col.zain{width:150px}
+  table.clients col.prio{width:100px} table.clients col.status{width:130px}
+  table.clients col.kontakt{width:110px} table.clients col.notatki{width:200px}
+  table.clients col.usun{width:60px}
   table.clients input, table.clients select, table.clients textarea{
       width:100%;border:1px solid transparent;background:transparent;padding:5px 6px;border-radius:6px;
       font-size:12.5px;font-family:inherit;color:var(--ink)}
@@ -215,10 +222,16 @@
       </div>
       <div class="tableWrap">
         <table class="clients">
+          <colgroup>
+            <col class="firma"><col class="osoba"><col class="woj"><col class="miejsc">
+            <col class="ulica"><col class="tel"><col class="email"><col class="zain">
+            <col class="prio"><col class="status"><col class="kontakt"><col class="notatki"><col class="usun">
+          </colgroup>
           <thead>
             <tr>
               <th>Firma / gospodarstwo</th><th>Imię i nazwisko</th><th>Województwo</th><th>Miejscowość</th>
-              <th>Ulica</th><th>Telefon</th><th>E-mail</th><th>Priorytet</th><th>Status</th>
+              <th>Ulica</th><th>Telefon</th><th>E-mail</th><th>Co zamówił / zainteresowanie</th>
+              <th>Priorytet</th><th>Status</th>
               <th>Następny kontakt</th><th>Notatki</th><th></th>
             </tr>
           </thead>
@@ -560,6 +573,7 @@ const STATUS_MAP = {
 };
 const PRIO_OPTS = [["A","A – wysoki"],["B","B – średni"],["C","C – niski"]];
 const PRIO_MAP = {"A – wysoki":"A","B – średni":"B","C – niski":"C"};
+const ZAIN_OPTS = ["Mlekomat","Sklep gospodarczy","Pakiet: sklep + mlekomat","Serwis","Inne urządzenie","Inne"];
 
 function clientField(c, field, type){
   if(type==="status"){
@@ -570,6 +584,12 @@ function clientField(c, field, type){
   if(type==="prio"){
     return `<select data-field="priorytet" data-id="${c.id}" onchange="updateClient(this)">
       ${PRIO_OPTS.map(([v,l])=>`<option value="${v}" ${c.priorytet===v?"selected":""}>${l}</option>`).join("")}
+    </select>`;
+  }
+  if(type==="zain"){
+    return `<select data-field="zainteresowanie" data-id="${c.id}" onchange="updateClient(this)">
+      <option value="">—</option>
+      ${ZAIN_OPTS.map(v=>`<option value="${v}" ${c.zainteresowanie===v?"selected":""}>${v}</option>`).join("")}
     </select>`;
   }
   if(type==="textarea"){
@@ -617,7 +637,7 @@ function renderClients(){
   if(fStatus) list = list.filter(c=>c.status===fStatus);
   if(fPrio) list = list.filter(c=>c.priorytet===fPrio);
   if(fText){
-    list = list.filter(c => ["firma","osoba","miejscowosc","telefon","email","wojewodztwo"]
+    list = list.filter(c => ["firma","osoba","miejscowosc","telefon","email","wojewodztwo","zainteresowanie"]
       .some(f => (c[f]||"").toLowerCase().includes(fText)));
   }
   if(sortBy==="priorytet") list.sort((a,b)=>(a.priorytet||"Z").localeCompare(b.priorytet||"Z"));
@@ -630,7 +650,7 @@ function renderClients(){
   });
 
   if(list.length===0){
-    body.innerHTML = `<tr><td colspan="12" class="empty">Brak klientów pasujących do filtrów.</td></tr>`;
+    body.innerHTML = `<tr><td colspan="13" class="empty">Brak klientów pasujących do filtrów.</td></tr>`;
     return;
   }
   body.innerHTML = list.map(c => `
@@ -642,6 +662,7 @@ function renderClients(){
       <td>${clientField(c,"ulica")}</td>
       <td>${clientField(c,"telefon")}</td>
       <td>${clientField(c,"email")}</td>
+      <td>${clientField(c,null,"zain")}</td>
       <td>${clientField(c,null,"prio")}</td>
       <td>${clientField(c,null,"status")}</td>
       <td>${clientField(c,"nastepnyKontakt")}</td>
@@ -653,7 +674,7 @@ function renderClients(){
 
 function addClient(){
   data.klienci.push({id:"c_"+Date.now(), firma:"", osoba:"", wojewodztwo:"", miejscowosc:"", ulica:"",
-                      telefon:"", email:"", priorytet:"B", status:"nowy", nastepnyKontakt:"", notatki:""});
+                      telefon:"", email:"", zainteresowanie:"", priorytet:"B", status:"nowy", nastepnyKontakt:"", notatki:""});
   logActivity("dodał(a) nowego klienta");
   saveData(); renderClients(); renderStatsBar();
 }
@@ -683,6 +704,7 @@ function exportClientsToXlsx(){
   const rows = (data.klienci||[]).map(c => ({
     "Firma / gospodarstwo": c.firma, "Imię i nazwisko": c.osoba, "Województwo": c.wojewodztwo,
     "Miejscowość": c.miejscowosc, "Ulica": c.ulica, "Telefon": c.telefon, "E-mail": c.email,
+    "Zainteresowanie": c.zainteresowanie,
     "Priorytet": PRIO_OPTS.find(p=>p[0]===c.priorytet)?.[1] || c.priorytet,
     "Status": STATUS_OPTS.find(s=>s[0]===c.status)?.[1] || c.status,
     "Następny kontakt": c.nastepnyKontakt, "Notatki": c.notatki
@@ -721,6 +743,7 @@ async function importClientsFromXlsx(){
         ulica: (r["Ulica"]||"").toString(),
         telefon: (r["Telefon"]||"").toString(),
         email: (r["E-mail"]||"").toString(),
+        zainteresowanie: (r["Zainteresowanie"]||"").toString(),
         priorytet: PRIO_MAP[(r["Priorytet"]||"").toString()] || "B",
         status: STATUS_MAP[(r["Status"]||"").toString()] || "nowy",
         nastepnyKontakt: fmtDate(r["Następny kontakt"]),
