@@ -30,7 +30,7 @@
          display:flex;align-items:center;gap:14px}
   header .logo{width:42px;height:42px;flex-shrink:0}
   header h1{margin:0;font-size:22px} header p{margin:4px 0 0;color:#e6efe8;font-size:13px}
-  .wrap{max-width:920px;margin:0 auto;padding:24px 20px 60px}
+  .wrap{max-width:1180px;margin:0 auto;padding:24px 20px 60px}
 
   .section{background:white;border:1px solid var(--line);border-radius:14px;padding:20px 22px;margin-bottom:20px;
             box-shadow:0 2px 10px #0000000d}
@@ -69,6 +69,33 @@
   footer{text-align:center;color:#999;font-size:12px;padding:20px}
   .lockBtn{margin-left:auto;background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.4);
            color:white;border-radius:20px;padding:6px 14px;font-size:12px;cursor:pointer}
+
+  /* --- Client table --- */
+  .tableWrap{overflow-x:auto}
+  table.clients{width:100%;border-collapse:collapse;font-size:12.5px;min-width:1000px}
+  table.clients th{text-align:left;color:var(--muted);font-weight:bold;font-size:11px;text-transform:uppercase;
+                    letter-spacing:.03em;padding:6px 8px;border-bottom:2px solid var(--line);white-space:nowrap}
+  table.clients td{padding:4px 6px;border-bottom:1px solid #eee;vertical-align:top}
+  table.clients input, table.clients select, table.clients textarea{
+      width:100%;border:1px solid transparent;background:transparent;padding:5px 6px;border-radius:6px;
+      font-size:12.5px;font-family:inherit;color:var(--ink)}
+  table.clients input:hover, table.clients select:hover, table.clients textarea:hover,
+  table.clients input:focus, table.clients select:focus, table.clients textarea:focus{
+      border-color:var(--line);background:#fbfcfb}
+  table.clients textarea{resize:vertical;min-height:32px}
+  .prio{font-size:11px;padding:2px 8px;border-radius:12px;font-weight:bold;color:white;display:inline-block}
+  .prio-A{background:#b5493f} .prio-B{background:#c9a24a} .prio-C{background:#7a9a7e}
+  .statCell select{font-weight:bold}
+  .stat-nowy{color:#2f5f8f} .stat-kontakt{color:#8a6d1f} .stat-rozmowa{color:#8a6d1f}
+  .stat-oferta{color:var(--progress)} .stat-negocjacje{color:var(--progress)}
+  .stat-pozniej{color:var(--muted)} .stat-wygrany{color:var(--done);font-weight:bold}
+  .stat-przegrany{color:var(--todo)}
+  .clientActions{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+  .importBtn{background:var(--blue,#2f5f8f);color:white;border:none;border-radius:8px;padding:7px 14px;
+             font-size:12px;cursor:pointer;font-weight:bold}
+  .importBtn:hover{opacity:0.9}
+  .importBtn:disabled{opacity:0.5;cursor:default}
+  #importMsg{font-size:12px;color:var(--muted);align-self:center}
 </style>
 </head>
 <body>
@@ -121,6 +148,26 @@
       <div id="list-dokumenty"></div>
     </div>
 
+    <div class="section" id="section-klienci">
+      <h2>Baza klientów <button class="addBtn" onclick="addClient()">+ Dodaj klienta</button></h2>
+      <div class="clientActions">
+        <button class="importBtn" id="importBtn" onclick="importClientsFromXlsx()">⇩ Wczytaj z pliku XLSX (jednorazowo)</button>
+        <span id="importMsg"></span>
+      </div>
+      <div class="tableWrap">
+        <table class="clients">
+          <thead>
+            <tr>
+              <th>Firma / gospodarstwo</th><th>Imię i nazwisko</th><th>Województwo</th><th>Miejscowość</th>
+              <th>Ulica</th><th>Telefon</th><th>E-mail</th><th>Priorytet</th><th>Status</th>
+              <th>Następny kontakt</th><th>Notatki</th><th></th>
+            </tr>
+          </thead>
+          <tbody id="clientsBody"></tbody>
+        </table>
+      </div>
+    </div>
+
     <div class="section" id="section-sprawy">
       <h2>Sprawy w toku <button class="addBtn" onclick="toggleForm('sprawy')">+ Dodaj</button></h2>
       <div class="newItemForm" id="form-sprawy">
@@ -141,6 +188,7 @@
   </div>
 </div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script>
 const PASSWORD = "stodola2026"; // zmień na własne hasło w kodzie strony
 const STORAGE_KEY = "panel_items_v1";
@@ -189,7 +237,9 @@ function loadData(){
     ],
     sprawy: [
       {id:"s1", title:"Uzupełnienie braków KRS (sygn. 23137/26/118)", link:"", desc:"Lista wspólników + 3 oświadczenia, podpis Jarosława", status:"progress", notes:""}
-    ]
+    ],
+    klienci: [],
+    klienciImported: false
   };
 }
 let data = loadData();
@@ -198,6 +248,7 @@ function saveData(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); }
 function statusLabel(s){ return s==="done"?"Gotowe":s==="progress"?"W trakcie":"Do zrobienia"; }
 
 function render(){
+  renderClients();
   ["dokumenty","sprawy"].forEach(cat=>{
     const list = document.getElementById("list-"+cat);
     list.innerHTML = "";
@@ -268,6 +319,119 @@ function updateNotes(ta){
   const cat = ta.dataset.cat, id = ta.dataset.id;
   const item = data[cat].find(i=>i.id===id);
   if(item){ item.notes = ta.value; saveData(); }
+}
+
+// ================= Baza klientów =================
+const STATUS_OPTS = [
+  ["nowy","Nowy lead"],["kontakt","Do kontaktu"],["rozmowa","Rozmowa odbyta"],
+  ["oferta","Oferta wysłana"],["negocjacje","Negocjacje"],["pozniej","Decyzja później"],
+  ["wygrany","Wygrany"],["przegrany","Przegrany"]
+];
+const STATUS_MAP = {
+  "Nowy lead":"nowy","Do kontaktu":"kontakt","Rozmowa odbyta":"rozmowa","Oferta wysłana":"oferta",
+  "Negocjacje":"negocjacje","Decyzja później":"pozniej","Wygrany":"wygrany","Przegrany":"przegrany"
+};
+const PRIO_OPTS = [["A","A – wysoki"],["B","B – średni"],["C","C – niski"]];
+const PRIO_MAP = {"A – wysoki":"A","B – średni":"B","C – niski":"C"};
+
+function clientField(c, field, type){
+  if(type==="status"){
+    return `<select class="statCell" data-field="status" data-id="${c.id}" onchange="updateClient(this)">
+      ${STATUS_OPTS.map(([v,l])=>`<option value="${v}" ${c.status===v?"selected":""}>${l}</option>`).join("")}
+    </select>`;
+  }
+  if(type==="prio"){
+    return `<select data-field="priorytet" data-id="${c.id}" onchange="updateClient(this)">
+      ${PRIO_OPTS.map(([v,l])=>`<option value="${v}" ${c.priorytet===v?"selected":""}>${l}</option>`).join("")}
+    </select>`;
+  }
+  if(type==="textarea"){
+    return `<textarea data-field="${field}" data-id="${c.id}" onblur="updateClient(this)">${c[field]||""}</textarea>`;
+  }
+  return `<input type="text" value="${(c[field]||"").toString().replace(/"/g,'&quot;')}" data-field="${field}" data-id="${c.id}" onblur="updateClient(this)">`;
+}
+
+function renderClients(){
+  const body = document.getElementById("clientsBody");
+  if(!body) return;
+  if(!data.klienci || data.klienci.length===0){
+    body.innerHTML = `<tr><td colspan="12" class="empty">Brak klientów — dodaj ręcznie albo wczytaj z pliku XLSX powyżej.</td></tr>`;
+    return;
+  }
+  body.innerHTML = data.klienci.map(c => `
+    <tr>
+      <td>${clientField(c,"firma")}</td>
+      <td>${clientField(c,"osoba")}</td>
+      <td>${clientField(c,"wojewodztwo")}</td>
+      <td>${clientField(c,"miejscowosc")}</td>
+      <td>${clientField(c,"ulica")}</td>
+      <td>${clientField(c,"telefon")}</td>
+      <td>${clientField(c,"email")}</td>
+      <td>${clientField(c,null,"prio")}</td>
+      <td>${clientField(c,null,"status")}</td>
+      <td>${clientField(c,"nastepnyKontakt")}</td>
+      <td>${clientField(c,"notatki","textarea")}</td>
+      <td><button class="delBtn" onclick="deleteClient('${c.id}')">Usuń</button></td>
+    </tr>
+  `).join("");
+}
+
+function addClient(){
+  data.klienci.push({id:"c_"+Date.now(), firma:"", osoba:"", wojewodztwo:"", miejscowosc:"", ulica:"",
+                      telefon:"", email:"", priorytet:"B", status:"nowy", nastepnyKontakt:"", notatki:""});
+  saveData(); renderClients();
+}
+
+function deleteClient(id){
+  data.klienci = data.klienci.filter(c=>c.id!==id);
+  saveData(); renderClients();
+}
+
+function updateClient(el){
+  const id = el.dataset.id, field = el.dataset.field;
+  const c = data.klienci.find(x=>x.id===id);
+  if(c){ c[field] = el.value; saveData(); }
+}
+
+async function importClientsFromXlsx(){
+  const btn = document.getElementById("importBtn");
+  const msg = document.getElementById("importMsg");
+  btn.disabled = true; msg.textContent = "Wczytywanie...";
+  try{
+    const res = await fetch("_pliki-0xyqdz4t/Baza_przyszlych_klientow_BRUNIMAT.xlsx");
+    const buf = await res.arrayBuffer();
+    const wb = XLSX.read(buf, {type:"array", cellDates:true});
+    const ws = wb.Sheets["Klienci"];
+    const rows = XLSX.utils.sheet_to_json(ws, {range:3, defval:""}); // wiersz 4 = nagłówki
+    let added = 0;
+    rows.forEach(r=>{
+      const imie = (r["Imię"]||"").toString().trim();
+      const nazwisko = (r["Nazwisko"]||"").toString().trim();
+      const firma = (r["Nazwa gospodarstwa / firmy"]||"").toString().trim();
+      if(!imie && !nazwisko && !firma) return; // pomiń puste wiersze
+      const fmtDate = v => { if(!v) return ""; if(v instanceof Date) return v.toLocaleDateString("pl-PL"); return v.toString(); };
+      data.klienci.push({
+        id:"c_"+Date.now()+"_"+added,
+        firma: firma,
+        osoba: [imie, nazwisko].filter(Boolean).join(" "),
+        wojewodztwo: (r["Województwo"]||"").toString(),
+        miejscowosc: (r["Miejscowość"]||"").toString(),
+        ulica: (r["Ulica"]||"").toString(),
+        telefon: (r["Telefon"]||"").toString(),
+        email: (r["E-mail"]||"").toString(),
+        priorytet: PRIO_MAP[(r["Priorytet"]||"").toString()] || "B",
+        status: STATUS_MAP[(r["Status"]||"").toString()] || "nowy",
+        nastepnyKontakt: fmtDate(r["Następny kontakt"]),
+        notatki: (r["Notatki"]||"").toString()
+      });
+      added++;
+    });
+    saveData(); renderClients();
+    msg.textContent = added>0 ? `Zaimportowano ${added} klientów.` : "Nie znaleziono żadnych wierszy do zaimportowania.";
+  }catch(e){
+    msg.textContent = "Błąd wczytywania pliku: " + e.message;
+  }
+  btn.disabled = false;
 }
 
 render();
