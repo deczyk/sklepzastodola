@@ -153,6 +153,10 @@
   .tabBtn.active{color:var(--green);border-bottom-color:var(--green)}
   .tabPane{display:none}
   .tabPane.active{display:block}
+
+  .kategoriaHeader{font-size:12px;font-weight:bold;color:var(--green);text-transform:uppercase;
+                    letter-spacing:.04em;margin:18px 0 8px;padding-bottom:6px;border-bottom:1px solid var(--line)}
+  .kategoriaHeader:first-child{margin-top:0}
 </style>
 </head>
 <body>
@@ -215,7 +219,11 @@
           <input type="text" id="title-dokumenty" placeholder="Nazwa dokumentu">
           <input type="text" id="link-dokumenty" placeholder="Link do PDF (adres URL)">
         </div>
-        <input type="text" id="desc-dokumenty" placeholder="Krótki opis (opcjonalnie)">
+        <div class="row">
+          <input type="text" id="desc-dokumenty" placeholder="Krótki opis (opcjonalnie)">
+          <input type="text" id="kategoria-dokumenty" placeholder="Kategoria (np. Cennik partnerski)" list="kategorieList">
+        </div>
+        <datalist id="kategorieList"></datalist>
         <div class="actions">
           <button class="cancel" onclick="toggleForm('dokumenty')">Anuluj</button>
           <button class="save" onclick="addItem('dokumenty')">Zapisz</button>
@@ -341,15 +349,15 @@ function switchTab(name){
 function defaultData(){
   return {
     dokumenty: [
-      {id:"d1", title:"Oferta BRUNIMAT PREMIUM 650 DUO z instalacją", link:"_pliki-0xyqdz4t/Oferta_BRUNIMAT_PREMIUM_650_DUO_z_instalacja.pdf", desc:"Oferta handlowa dla klienta", status:"todo", notes:""},
-      {id:"d2", title:"Cennik partnerski EUR 2026", link:"_pliki-0xyqdz4t/Sklep_za_Stodola_Cennik_Partnerski_EUR_2026.pdf", desc:"Ceny dla partnerów", status:"todo", notes:""},
-      {id:"d3", title:"Cennik (obraz)", link:"_pliki-0xyqdz4t/cennik.png", desc:"Cennik w formie grafiki", status:"todo", notes:""},
-      {id:"d4", title:"Umowa sprzedaży mlekomatu", link:"_pliki-0xyqdz4t/umowa-sprzedazy-mlekomatu.docx", desc:"Wzór umowy z klientem końcowym", status:"todo", notes:""},
-      {id:"d5", title:"Biznesplan ARiMR", link:"_pliki-0xyqdz4t/Sklep_za_Stodola_Biznesplan_ARiMR.docx", desc:"Pełny biznesplan pod dotację ARiMR", status:"todo", notes:""},
-      {id:"d6", title:"Biznesplan skrócony", link:"_pliki-0xyqdz4t/Sklep_za_Stodola_Biznesplan_skrocony.docx", desc:"Wersja skrócona dla inwestora", status:"todo", notes:""},
-      {id:"d7", title:"Baza przyszłych klientów BRUNIMAT", link:"_pliki-0xyqdz4t/Baza_przyszlych_klientow_BRUNIMAT.xlsx", desc:"Arkusz CRM / lista prospektów", status:"todo", notes:""},
-      {id:"d8", title:"Katalog Brunimat (PL, ze zdjęciami)", link:"_pliki-0xyqdz4t/BRUNI02072026_tylko_po_polsku_ze_zdjeciami_bez_wszystkich_pustych_stron.pdf", desc:"Materiał produktowy Brunimat", status:"todo", notes:""},
-      {id:"d9", title:"Umowa dystrybucyjna Brunimat — Sklep za Stodołą", link:"_pliki-0xyqdz4t/umowabruni-sklep.pdf", desc:"Umowa wyłącznej dystrybucji (PL)", status:"todo", notes:""}
+      {id:"d1", title:"Oferta BRUNIMAT PREMIUM 650 DUO z instalacją", link:"_pliki-0xyqdz4t/Oferta_BRUNIMAT_PREMIUM_650_DUO_z_instalacja.pdf", desc:"Oferta handlowa dla klienta", kategoria:"Cennik dla Komornicki (10 000 EUR)", status:"todo", notes:""},
+      {id:"d2", title:"Cennik partnerski EUR 2026", link:"_pliki-0xyqdz4t/Sklep_za_Stodola_Cennik_Partnerski_EUR_2026.pdf", desc:"Ceny dla partnerów", kategoria:"Cennik partnerski", status:"todo", notes:""},
+      {id:"d3", title:"Cennik (obraz)", link:"_pliki-0xyqdz4t/cennik.png", desc:"Cennik w formie grafiki", kategoria:"Cennik katalogowy", status:"todo", notes:""},
+      {id:"d4", title:"Umowa sprzedaży mlekomatu", link:"_pliki-0xyqdz4t/umowa-sprzedazy-mlekomatu.docx", desc:"Wzór umowy z klientem końcowym", kategoria:"Inne dokumenty", status:"todo", notes:""},
+      {id:"d5", title:"Biznesplan ARiMR", link:"_pliki-0xyqdz4t/Sklep_za_Stodola_Biznesplan_ARiMR.docx", desc:"Pełny biznesplan pod dotację ARiMR", kategoria:"Inne dokumenty", status:"todo", notes:""},
+      {id:"d6", title:"Biznesplan skrócony", link:"_pliki-0xyqdz4t/Sklep_za_Stodola_Biznesplan_skrocony.docx", desc:"Wersja skrócona dla inwestora", kategoria:"Inne dokumenty", status:"todo", notes:""},
+      {id:"d7", title:"Baza przyszłych klientów BRUNIMAT", link:"_pliki-0xyqdz4t/Baza_przyszlych_klientow_BRUNIMAT.xlsx", desc:"Arkusz CRM / lista prospektów", kategoria:"Inne dokumenty", status:"todo", notes:""},
+      {id:"d8", title:"Katalog Brunimat (PL, ze zdjęciami)", link:"_pliki-0xyqdz4t/BRUNI02072026_tylko_po_polsku_ze_zdjeciami_bez_wszystkich_pustych_stron.pdf", desc:"Materiał produktowy Brunimat", kategoria:"Inne dokumenty", status:"todo", notes:""},
+      {id:"d9", title:"Umowa dystrybucyjna Brunimat — Sklep za Stodołą", link:"_pliki-0xyqdz4t/umowabruni-sklep.pdf", desc:"Umowa wyłącznej dystrybucji (PL)", kategoria:"Inne dokumenty", status:"todo", notes:""}
     ],
     sprawy: [
       {id:"s1", title:"Uzupełnienie braków KRS (sygn. 23137/26/118)", link:"", desc:"Lista wspólników + 3 oświadczenia, podpis Jarosława", status:"progress", notes:""}
@@ -542,50 +550,83 @@ function renderStatsBar(){
 
 function statusLabel(s){ return s==="done"?"Gotowe":s==="progress"?"W trakcie":"Do zrobienia"; }
 
+function renderItemCard(item, cat){
+  const div = document.createElement("div");
+  div.className = "item";
+  let linkHtml;
+  if(item.link){
+    linkHtml = fileChip(item.link, item.title);
+  } else {
+    linkHtml = `<span>${item.title}</span> <span class="noLinkText">(brak linku)</span>`;
+  }
+  const statusHtml = cat==="sprawy" ? `
+        <span class="statusPill status-${item.status}">${statusLabel(item.status)}</span>` : "";
+  const statusSelectHtml = cat==="sprawy" ? `
+        <select class="statusSelect" data-cat="${cat}" data-id="${item.id}" onchange="updateStatus(this)">
+          <option value="todo" ${item.status==="todo"?"selected":""}>Do zrobienia</option>
+          <option value="progress" ${item.status==="progress"?"selected":""}>W trakcie</option>
+          <option value="done" ${item.status==="done"?"selected":""}>Gotowe</option>
+        </select>` : "";
+  div.innerHTML = `
+    <div class="topRow">
+      <div class="titleRow">
+        <span class="title">${linkHtml}</span>${statusHtml}
+      </div>
+      <div style="display:flex;align-items:center;gap:8px">${statusSelectHtml}
+        <button class="delBtn" onclick="deleteItem('${cat}','${item.id}')">Usuń</button>
+      </div>
+    </div>
+    ${item.desc ? `<div class="desc">${item.desc}</div>` : ""}
+    <textarea placeholder="Notatki..." data-cat="${cat}" data-id="${item.id}" onblur="updateNotes(this)">${item.notes||""}</textarea>
+  `;
+  return div;
+}
+
+const KATEGORIA_ORDER = ["Cennik katalogowy","Cennik dla Komornicki (10 000 EUR)","Cennik partnerski","Inne dokumenty"];
+
 function render(){
   document.getElementById("whoAmI").value = getWhoAmI();
   renderStatsBar();
   renderActivityLog();
   renderClients();
-  ["dokumenty","sprawy"].forEach(cat=>{
-    const list = document.getElementById("list-"+cat);
-    list.innerHTML = "";
-    if(!data[cat] || data[cat].length===0){
-      list.innerHTML = '<div class="empty">Brak pozycji — dodaj pierwszą.</div>';
-      return;
-    }
-    data[cat].forEach(item=>{
-      const div = document.createElement("div");
-      div.className = "item";
-      let linkHtml;
-      if(item.link){
-        linkHtml = fileChip(item.link, item.title);
-      } else {
-        linkHtml = `<span>${item.title}</span> <span class="noLinkText">(brak linku)</span>`;
-      }
-      const statusHtml = cat==="sprawy" ? `
-            <span class="statusPill status-${item.status}">${statusLabel(item.status)}</span>` : "";
-      const statusSelectHtml = cat==="sprawy" ? `
-            <select class="statusSelect" data-cat="${cat}" data-id="${item.id}" onchange="updateStatus(this)">
-              <option value="todo" ${item.status==="todo"?"selected":""}>Do zrobienia</option>
-              <option value="progress" ${item.status==="progress"?"selected":""}>W trakcie</option>
-              <option value="done" ${item.status==="done"?"selected":""}>Gotowe</option>
-            </select>` : "";
-      div.innerHTML = `
-        <div class="topRow">
-          <div class="titleRow">
-            <span class="title">${linkHtml}</span>${statusHtml}
-          </div>
-          <div style="display:flex;align-items:center;gap:8px">${statusSelectHtml}
-            <button class="delBtn" onclick="deleteItem('${cat}','${item.id}')">Usuń</button>
-          </div>
-        </div>
-        ${item.desc ? `<div class="desc">${item.desc}</div>` : ""}
-        <textarea placeholder="Notatki..." data-cat="${cat}" data-id="${item.id}" onblur="updateNotes(this)">${item.notes||""}</textarea>
-      `;
-      list.appendChild(div);
+
+  // --- Dokumenty: grupowane wg kategorii ---
+  const dokList = document.getElementById("list-dokumenty");
+  dokList.innerHTML = "";
+  if(!data.dokumenty || data.dokumenty.length===0){
+    dokList.innerHTML = '<div class="empty">Brak pozycji — dodaj pierwszą.</div>';
+  } else {
+    const groups = {};
+    data.dokumenty.forEach(item=>{
+      const k = item.kategoria || "Inne dokumenty";
+      if(!groups[k]) groups[k] = [];
+      groups[k].push(item);
     });
-  });
+    const orderedKeys = [
+      ...KATEGORIA_ORDER.filter(k=>groups[k]),
+      ...Object.keys(groups).filter(k=>!KATEGORIA_ORDER.includes(k)).sort()
+    ];
+    // update datalist for category autocomplete
+    const dl = document.getElementById("kategorieList");
+    if(dl) dl.innerHTML = Object.keys(groups).map(k=>`<option value="${k}">`).join("");
+
+    orderedKeys.forEach(kategoria=>{
+      const header = document.createElement("div");
+      header.className = "kategoriaHeader";
+      header.textContent = kategoria;
+      dokList.appendChild(header);
+      groups[kategoria].forEach(item=>dokList.appendChild(renderItemCard(item, "dokumenty")));
+    });
+  }
+
+  // --- Sprawy: lista płaska, bez grupowania ---
+  const sprawyList = document.getElementById("list-sprawy");
+  sprawyList.innerHTML = "";
+  if(!data.sprawy || data.sprawy.length===0){
+    sprawyList.innerHTML = '<div class="empty">Brak pozycji — dodaj pierwszą.</div>';
+  } else {
+    data.sprawy.forEach(item=>sprawyList.appendChild(renderItemCard(item, "sprawy")));
+  }
 }
 
 function toggleForm(cat){
@@ -596,13 +637,16 @@ function addItem(cat){
   const title = document.getElementById("title-"+cat).value.trim();
   const link = document.getElementById("link-"+cat).value.trim();
   const desc = document.getElementById("desc-"+cat).value.trim();
+  const kategoriaEl = document.getElementById("kategoria-"+cat);
+  const kategoria = kategoriaEl ? kategoriaEl.value.trim() : "";
   if(!title) return;
-  data[cat].push({id:"item_"+Date.now(), title, link, desc, status:"todo", notes:""});
+  data[cat].push({id:"item_"+Date.now(), title, link, desc, kategoria: kategoria || "Inne dokumenty", status:"todo", notes:""});
   logActivity(`dodał(a) pozycję „${title}” (${cat})`);
   saveData();
   document.getElementById("title-"+cat).value="";
   document.getElementById("link-"+cat).value="";
   document.getElementById("desc-"+cat).value="";
+  if(kategoriaEl) kategoriaEl.value="";
   toggleForm(cat);
   render();
 }
