@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Panel — Sklep za Stodołą</title>
+<style>
+  :root{--green:#244b2f;--light:#eef5ef;--accent:#c9a24a;--ink:#1e1e1e;--muted:#666;--line:#d8ded8;
+        --done:#2f7a45;--progress:#c9a24a;--todo:#b5493f}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:Arial,Helvetica,sans-serif;color:var(--ink);background:#f6f7f4;min-height:100vh}
+
+  /* --- Password gate --- */
+  #gate{position:fixed;inset:0;background:linear-gradient(135deg,var(--green),#17301e);
+        display:flex;align-items:center;justify-content:center;z-index:100}
+  .gateBox{background:white;border-radius:16px;padding:36px 32px;width:320px;text-align:center;
+           box-shadow:0 10px 40px #0000004d}
+  .gateBox .logo{width:48px;height:48px;margin:0 auto 14px}
+  .gateBox h2{margin:0 0 6px;font-size:20px;color:var(--green)}
+  .gateBox p{margin:0 0 18px;color:var(--muted);font-size:13px}
+  .gateBox input{width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:8px;font-size:15px;text-align:center}
+  .gateBox button{margin-top:12px;width:100%;padding:11px;border:none;border-radius:8px;background:var(--green);
+                   color:white;font-size:14px;font-weight:bold;cursor:pointer}
+  .gateBox button:hover{background:#1a3a23}
+  #gateErr{color:var(--todo);font-size:12px;height:16px;margin-top:8px}
+
+  /* --- App --- */
+  header{background:linear-gradient(135deg,var(--green),#17301e);color:white;padding:22px 32px;
+         display:flex;align-items:center;gap:14px}
+  header .logo{width:42px;height:42px;flex-shrink:0}
+  header h1{margin:0;font-size:22px} header p{margin:4px 0 0;color:#e6efe8;font-size:13px}
+  .wrap{max-width:920px;margin:0 auto;padding:24px 20px 60px}
+
+  .section{background:white;border:1px solid var(--line);border-radius:14px;padding:20px 22px;margin-bottom:20px;
+            box-shadow:0 2px 10px #0000000d}
+  .section h2{margin:0 0 14px;font-size:16px;color:var(--green);display:flex;align-items:center;justify-content:space-between}
+  .addBtn{background:var(--light);border:1px solid var(--line);color:var(--green);border-radius:8px;
+          padding:6px 12px;font-size:12px;cursor:pointer;font-weight:bold}
+  .addBtn:hover{background:#dcebe0}
+
+  .item{border:1px solid var(--line);border-radius:10px;padding:14px 16px;margin-bottom:10px;background:#fbfcfb}
+  .item .topRow{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+  .item .titleRow{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .item .title{font-weight:bold;font-size:14.5px}
+  .item .title a{color:var(--green);text-decoration:none}
+  .item .title a:hover{text-decoration:underline}
+  .statusPill{font-size:11px;padding:3px 10px;border-radius:20px;color:white;font-weight:bold;white-space:nowrap}
+  .status-todo{background:var(--todo)} .status-progress{background:var(--progress)} .status-done{background:var(--done)}
+  select.statusSelect{border:1px solid var(--line);border-radius:6px;font-size:12px;padding:3px 6px;color:var(--muted)}
+  .item textarea{width:100%;margin-top:10px;border:1px solid var(--line);border-radius:8px;padding:8px 10px;
+                  font-family:inherit;font-size:13px;resize:vertical;min-height:44px;color:#333}
+  .item .desc{color:var(--muted);font-size:12.5px;margin-top:2px}
+  .delBtn{background:none;border:none;color:#c0392b;cursor:pointer;font-size:12px;opacity:0.55}
+  .delBtn:hover{opacity:1}
+
+  .newItemForm{display:none;gap:8px;flex-direction:column;border:1px dashed var(--line);border-radius:10px;
+               padding:14px;margin-bottom:10px;background:#fafdfb}
+  .newItemForm.open{display:flex}
+  .newItemForm input{padding:8px 10px;border:1px solid var(--line);border-radius:6px;font-size:13px}
+  .newItemForm .row{display:flex;gap:8px}
+  .newItemForm .row input{flex:1}
+  .newItemForm .actions{display:flex;gap:8px;justify-content:flex-end}
+  .newItemForm button{padding:7px 14px;border-radius:6px;border:none;font-size:12px;cursor:pointer;font-weight:bold}
+  .newItemForm .save{background:var(--green);color:white}
+  .newItemForm .cancel{background:#eee;color:#555}
+
+  .empty{color:var(--muted);font-size:13px;font-style:italic;padding:6px 0}
+  footer{text-align:center;color:#999;font-size:12px;padding:20px}
+  .lockBtn{margin-left:auto;background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.4);
+           color:white;border-radius:20px;padding:6px 14px;font-size:12px;cursor:pointer}
+</style>
+</head>
+<body>
+
+<div id="gate">
+  <div class="gateBox">
+    <svg class="logo" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+      <rect width="100" height="100" rx="22" fill="#2d5a27"/>
+      <line x1="50" y1="85" x2="50" y2="48" stroke="rgba(255,255,255,0.7)" stroke-width="5" stroke-linecap="round"/>
+      <path d="M50 55 C42 50 20 48 14 28 C14 28 36 20 50 42 Z" fill="#a8d4a4"/>
+      <path d="M50 44 C56 38 76 28 82 10 C82 10 60 8 50 30 Z" fill="rgba(255,255,255,0.88)"/>
+    </svg>
+    <h2>Panel prywatny</h2>
+    <p>Tylko dla Ciebie — podaj hasło</p>
+    <input type="password" id="pwInput" placeholder="Hasło" autofocus>
+    <button onclick="tryUnlock()">Wejdź</button>
+    <div id="gateErr"></div>
+  </div>
+</div>
+
+<div id="app" style="display:none">
+  <header>
+    <svg class="logo" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+      <rect width="100" height="100" rx="22" fill="#2d5a27"/>
+      <line x1="50" y1="85" x2="50" y2="48" stroke="rgba(255,255,255,0.7)" stroke-width="5" stroke-linecap="round"/>
+      <path d="M50 55 C42 50 20 48 14 28 C14 28 36 20 50 42 Z" fill="#a8d4a4"/>
+      <path d="M50 44 C56 38 76 28 82 10 C82 10 60 8 50 30 Z" fill="rgba(255,255,255,0.88)"/>
+    </svg>
+    <div>
+      <h1>Panel — dokumenty i sprawy</h1>
+      <p>Prywatna lista roboczcza. Widoczna tylko dla Ciebie.</p>
+    </div>
+    <button class="lockBtn" onclick="lock()">Zablokuj</button>
+  </header>
+
+  <div class="wrap">
+    <div class="section" id="section-dokumenty">
+      <h2>Dokumenty / oferty <button class="addBtn" onclick="toggleForm('dokumenty')">+ Dodaj</button></h2>
+      <div class="newItemForm" id="form-dokumenty">
+        <div class="row">
+          <input type="text" id="title-dokumenty" placeholder="Nazwa dokumentu">
+          <input type="text" id="link-dokumenty" placeholder="Link do PDF (adres URL)">
+        </div>
+        <input type="text" id="desc-dokumenty" placeholder="Krótki opis (opcjonalnie)">
+        <div class="actions">
+          <button class="cancel" onclick="toggleForm('dokumenty')">Anuluj</button>
+          <button class="save" onclick="addItem('dokumenty')">Zapisz</button>
+        </div>
+      </div>
+      <div id="list-dokumenty"></div>
+    </div>
+
+    <div class="section" id="section-sprawy">
+      <h2>Sprawy w toku <button class="addBtn" onclick="toggleForm('sprawy')">+ Dodaj</button></h2>
+      <div class="newItemForm" id="form-sprawy">
+        <div class="row">
+          <input type="text" id="title-sprawy" placeholder="Nazwa sprawy">
+          <input type="text" id="link-sprawy" placeholder="Link (opcjonalnie)">
+        </div>
+        <input type="text" id="desc-sprawy" placeholder="Krótki opis (opcjonalnie)">
+        <div class="actions">
+          <button class="cancel" onclick="toggleForm('sprawy')">Anuluj</button>
+          <button class="save" onclick="addItem('sprawy')">Zapisz</button>
+        </div>
+      </div>
+      <div id="list-sprawy"></div>
+    </div>
+
+    <footer>Dane zapisywane lokalnie w tej przeglądarce (localStorage). Na innym urządzeniu lista będzie pusta.</footer>
+  </div>
+</div>
+
+<script>
+const PASSWORD = "stodola2026"; // zmień na własne hasło w kodzie strony
+const STORAGE_KEY = "panel_items_v1";
+
+function tryUnlock(){
+  const val = document.getElementById("pwInput").value;
+  if(val === PASSWORD){
+    sessionStorage.setItem("panel_unlocked","1");
+    document.getElementById("gate").style.display="none";
+    document.getElementById("app").style.display="block";
+    render();
+  } else {
+    document.getElementById("gateErr").textContent = "Złe hasło, spróbuj ponownie.";
+  }
+}
+document.getElementById("pwInput").addEventListener("keydown", e=>{ if(e.key==="Enter") tryUnlock(); });
+
+function lock(){
+  sessionStorage.removeItem("panel_unlocked");
+  document.getElementById("app").style.display="none";
+  document.getElementById("gate").style.display="flex";
+  document.getElementById("pwInput").value="";
+}
+
+if(sessionStorage.getItem("panel_unlocked")==="1"){
+  document.getElementById("gate").style.display="none";
+  document.getElementById("app").style.display="block";
+}
+
+function loadData(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(raw) return JSON.parse(raw);
+  }catch(e){}
+  return {
+    dokumenty: [
+      {id:"d1", title:"Oferta 1", link:"", desc:"Podmień link po wgraniu pliku PDF do repo", status:"todo", notes:""},
+      {id:"d2", title:"Oferta 2", link:"", desc:"Podmień link po wgraniu pliku PDF do repo", status:"todo", notes:""},
+      {id:"d3", title:"Oferta 3", link:"", desc:"Podmień link po wgraniu pliku PDF do repo", status:"todo", notes:""}
+    ],
+    sprawy: [
+      {id:"s1", title:"Uzupełnienie braków KRS (sygn. 23137/26/118)", link:"", desc:"Lista wspólników + 3 oświadczenia, podpis Jarosława", status:"progress", notes:""}
+    ]
+  };
+}
+let data = loadData();
+function saveData(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); }
+
+function statusLabel(s){ return s==="done"?"Gotowe":s==="progress"?"W trakcie":"Do zrobienia"; }
+
+function render(){
+  ["dokumenty","sprawy"].forEach(cat=>{
+    const list = document.getElementById("list-"+cat);
+    list.innerHTML = "";
+    if(!data[cat] || data[cat].length===0){
+      list.innerHTML = '<div class="empty">Brak pozycji — dodaj pierwszą.</div>';
+      return;
+    }
+    data[cat].forEach(item=>{
+      const div = document.createElement("div");
+      div.className = "item";
+      const linkHtml = item.link
+        ? `<a href="${item.link}" target="_blank" rel="noopener">${item.title}</a>`
+        : `${item.title} <span style="color:#bbb;font-size:11px">(brak linku)</span>`;
+      div.innerHTML = `
+        <div class="topRow">
+          <div class="titleRow">
+            <span class="title">${linkHtml}</span>
+            <span class="statusPill status-${item.status}">${statusLabel(item.status)}</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <select class="statusSelect" data-cat="${cat}" data-id="${item.id}" onchange="updateStatus(this)">
+              <option value="todo" ${item.status==="todo"?"selected":""}>Do zrobienia</option>
+              <option value="progress" ${item.status==="progress"?"selected":""}>W trakcie</option>
+              <option value="done" ${item.status==="done"?"selected":""}>Gotowe</option>
+            </select>
+            <button class="delBtn" onclick="deleteItem('${cat}','${item.id}')">Usuń</button>
+          </div>
+        </div>
+        ${item.desc ? `<div class="desc">${item.desc}</div>` : ""}
+        <textarea placeholder="Notatki..." data-cat="${cat}" data-id="${item.id}" onblur="updateNotes(this)">${item.notes||""}</textarea>
+      `;
+      list.appendChild(div);
+    });
+  });
+}
+
+function toggleForm(cat){
+  document.getElementById("form-"+cat).classList.toggle("open");
+}
+
+function addItem(cat){
+  const title = document.getElementById("title-"+cat).value.trim();
+  const link = document.getElementById("link-"+cat).value.trim();
+  const desc = document.getElementById("desc-"+cat).value.trim();
+  if(!title) return;
+  data[cat].push({id:"item_"+Date.now(), title, link, desc, status:"todo", notes:""});
+  saveData();
+  document.getElementById("title-"+cat).value="";
+  document.getElementById("link-"+cat).value="";
+  document.getElementById("desc-"+cat).value="";
+  toggleForm(cat);
+  render();
+}
+
+function deleteItem(cat, id){
+  data[cat] = data[cat].filter(i=>i.id!==id);
+  saveData();
+  render();
+}
+
+function updateStatus(sel){
+  const cat = sel.dataset.cat, id = sel.dataset.id;
+  const item = data[cat].find(i=>i.id===id);
+  if(item){ item.status = sel.value; saveData(); render(); }
+}
+
+function updateNotes(ta){
+  const cat = ta.dataset.cat, id = ta.dataset.id;
+  const item = data[cat].find(i=>i.id===id);
+  if(item){ item.notes = ta.value; saveData(); }
+}
+
+render();
+</script>
+</body>
+</html>
