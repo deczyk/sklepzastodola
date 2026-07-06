@@ -72,7 +72,7 @@
 
   /* --- Client table --- */
   .tableWrap{overflow-x:auto}
-  table.clients{width:100%;border-collapse:collapse;font-size:12.5px;min-width:1500px;table-layout:fixed}
+  table.clients{width:100%;border-collapse:collapse;font-size:12.5px;min-width:1650px;table-layout:fixed}
   table.clients th{text-align:left;color:var(--muted);font-weight:bold;font-size:11px;text-transform:uppercase;
                     letter-spacing:.03em;padding:6px 8px;border-bottom:2px solid var(--line);white-space:nowrap;overflow:hidden}
   table.clients td{padding:5px 7px;border-bottom:1px solid #eee;vertical-align:top;overflow:hidden}
@@ -81,7 +81,7 @@
   table.clients col.ulica{width:90px} table.clients col.tel{width:120px}
   table.clients col.email{width:170px} table.clients col.zain{width:150px}
   table.clients col.prio{width:100px} table.clients col.status{width:130px}
-  table.clients col.kontakt{width:110px} table.clients col.notatki{width:200px}
+  table.clients col.kontakt{width:110px} table.clients col.notatki{width:340px}
   table.clients col.usun{width:60px}
   table.clients input, table.clients select, table.clients textarea{
       width:100%;border:1px solid transparent;background:transparent;padding:5px 6px;border-radius:6px;
@@ -89,7 +89,7 @@
   table.clients input:hover, table.clients select:hover, table.clients textarea:hover,
   table.clients input:focus, table.clients select:focus, table.clients textarea:focus{
       border-color:var(--line);background:#fbfcfb}
-  table.clients textarea{resize:vertical;min-height:32px}
+  table.clients textarea{resize:vertical;min-height:70px;line-height:1.35}
   .prio{font-size:11px;padding:2px 8px;border-radius:12px;font-weight:bold;color:white;display:inline-block}
   .prio-A{background:#b5493f} .prio-B{background:#c9a24a} .prio-C{background:#7a9a7e}
   .statCell select{font-weight:bold}
@@ -379,11 +379,23 @@ async function initApp(){
   const remote = await fetchRemote();
   const local = loadLocalCache();
   data = remote || local || defaultData();
-  if(!data.klienci) data.klienci = [];
-  if(!data.log) data.log = [];
+  const wasIncomplete = fillMissingDefaults(data);
   localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-  if(SYNC_ENABLED) setSyncStatus("Zsynchronizowano ✓", false);
+  if(SYNC_ENABLED){
+    setSyncStatus("Zsynchronizowano ✓", false);
+    if(wasIncomplete) pushRemote(data); // napraw brakujące dane w chmurze na stałe
+  }
   render();
+}
+
+function fillMissingDefaults(d){
+  const dflt = defaultData();
+  let changed = false;
+  if(!d.dokumenty || d.dokumenty.length===0){ d.dokumenty = dflt.dokumenty; changed = true; }
+  if(!d.sprawy || d.sprawy.length===0){ d.sprawy = dflt.sprawy; changed = true; }
+  if(!d.klienci){ d.klienci = []; changed = true; }
+  if(!d.log){ d.log = []; changed = true; }
+  return changed;
 }
 
 async function refreshFromRemote(){
@@ -392,7 +404,7 @@ async function refreshFromRemote(){
   const remote = await fetchRemote();
   if(remote){
     data = remote;
-    if(!data.klienci) data.klienci = [];
+    fillMissingDefaults(data);
     localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
     render();
     setSyncStatus("Zsynchronizowano ✓", false);
@@ -456,7 +468,7 @@ function renderStatsBar(){
   const bar = document.getElementById("statsBar");
   if(!bar) return;
   const klienci = data.klienci || [];
-  const wPipeline = klienci.filter(c=>["oferta","negocjacje","rozmowa","kontakt"].includes(c.status)).length;
+  const wPipeline = klienci.filter(c=>["oferta","negocjacje","rozmowa","kontakt","zglosil_sie"].includes(c.status)).length;
   const wygrani = klienci.filter(c=>c.status==="wygrany").length;
   const sprawyOpen = (data.sprawy||[]).filter(s=>s.status!=="done").length;
   const dokDoZrobienia = (data.dokumenty||[]).filter(d=>d.status!=="done").length;
@@ -563,12 +575,12 @@ function updateNotes(ta){
 
 // ================= Baza klientów =================
 const STATUS_OPTS = [
-  ["nowy","Nowy lead"],["kontakt","Do kontaktu"],["rozmowa","Rozmowa odbyta"],
+  ["nowy","Nowy lead"],["zglosil_sie","Zgłosił się sam (zainteresowany)"],["kontakt","Do kontaktu"],["rozmowa","Rozmowa odbyta"],
   ["oferta","Oferta wysłana"],["negocjacje","Negocjacje"],["pozniej","Decyzja później"],
   ["wygrany","Wygrany"],["przegrany","Przegrany"]
 ];
 const STATUS_MAP = {
-  "Nowy lead":"nowy","Do kontaktu":"kontakt","Rozmowa odbyta":"rozmowa","Oferta wysłana":"oferta",
+  "Nowy lead":"nowy","Zgłosił się sam (zainteresowany)":"zglosil_sie","Do kontaktu":"kontakt","Rozmowa odbyta":"rozmowa","Oferta wysłana":"oferta",
   "Negocjacje":"negocjacje","Decyzja później":"pozniej","Wygrany":"wygrany","Przegrany":"przegrany"
 };
 const PRIO_OPTS = [["A","A – wysoki"],["B","B – średni"],["C","C – niski"]];
