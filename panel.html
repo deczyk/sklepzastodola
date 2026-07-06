@@ -81,7 +81,7 @@
   table.clients col.ulica{width:90px} table.clients col.tel{width:120px}
   table.clients col.email{width:170px} table.clients col.zain{width:150px}
   table.clients col.prio{width:100px} table.clients col.status{width:130px}
-  table.clients col.notatki{width:450px}
+  table.clients col.notatki{width:450px} table.clients col.hist{width:70px}
   table.clients col.usun{width:60px}
   table.clients input, table.clients select, table.clients textarea{
       width:100%;border:1px solid transparent;background:transparent;padding:5px 6px;border-radius:6px;
@@ -132,18 +132,24 @@
   .logRow .who{font-weight:bold;color:var(--green)}
   .logRow .when{color:#aaa;font-size:11px;margin-left:6px}
 
-  /* --- File chip (clickable document indicator) --- */
-  .fileChip{display:inline-flex;align-items:center;gap:8px;padding:6px 12px 6px 8px;border-radius:10px;
+  /* --- File card with thumbnail preview --- */
+  .fileCard{display:inline-flex;align-items:center;gap:12px;padding:8px 14px 8px 8px;border-radius:10px;
             border:1px solid var(--line);background:#fbfcfb;text-decoration:none;color:var(--ink);
-            font-weight:bold;transition:box-shadow .15s,border-color .15s,transform .1s}
-  .fileChip:hover{box-shadow:0 3px 10px #0000001a;border-color:var(--green);transform:translateY(-1px)}
-  .fileChip .icon{width:26px;height:26px;border-radius:6px;display:flex;align-items:center;justify-content:center;
-                   font-size:14px;color:white;flex-shrink:0}
-  .fileChip .ext{font-size:9px;font-weight:bold;color:var(--muted);text-transform:uppercase;
-                  border:1px solid var(--line);border-radius:4px;padding:1px 5px;margin-left:2px}
+            transition:box-shadow .15s,border-color .15s,transform .1s;max-width:100%}
+  .fileCard:hover{box-shadow:0 3px 10px #0000001a;border-color:var(--green);transform:translateY(-1px)}
+  .fileThumb{width:52px;height:64px;border-radius:6px;overflow:hidden;background:#eef1ee;flex-shrink:0;
+             position:relative;display:flex;align-items:center;justify-content:center}
+  .fileThumb img{width:100%;height:100%;object-fit:cover}
+  .fileThumb iframe{width:400%;height:400%;transform:scale(0.25);transform-origin:top left;border:none;pointer-events:none}
+  .fileThumb .bigIcon{font-size:22px;color:white;width:100%;height:100%;display:flex;align-items:center;justify-content:center}
+  .fileCardInfo{display:flex;flex-direction:column;gap:4px;min-width:0}
+  .fileCardTitle{font-weight:bold;white-space:normal;line-height:1.25}
+  .ext{font-size:9px;font-weight:bold;color:var(--muted);text-transform:uppercase;
+       border:1px solid var(--line);border-radius:4px;padding:1px 5px;align-self:flex-start}
   .icon-pdf{background:#c0392b} .icon-docx{background:#2f5f8f} .icon-xlsx{background:#2f7a45}
   .icon-img{background:#8e44ad} .icon-file{background:#7a8a80}
   .noLinkText{color:#bbb;font-size:11px}
+  .dateCaption{color:#bbb;font-size:10.5px;margin-top:4px}
 
   /* --- Tabs --- */
   .tabNav{display:flex;gap:6px;margin-bottom:16px;border-bottom:2px solid var(--line);flex-wrap:wrap}
@@ -157,6 +163,94 @@
   .kategoriaHeader{font-size:12px;font-weight:bold;color:var(--green);text-transform:uppercase;
                     letter-spacing:.04em;margin:18px 0 8px;padding-bottom:6px;border-bottom:1px solid var(--line)}
   .kategoriaHeader:first-child{margin-top:0}
+
+  .dupeRow{background:#fff8e1}
+  .dupeBadge{color:#c0392b;margin-right:4px;cursor:help}
+  .mapPin{text-decoration:none;margin-left:2px;cursor:pointer}
+  .mapPin:hover{opacity:0.7}
+
+  .histBtn{background:var(--light);border:1px solid var(--line);border-radius:8px;padding:5px 8px;
+           font-size:12px;cursor:pointer;color:var(--green);font-weight:bold}
+  .histBtn:hover{background:#dcebe0}
+  .historyBox{background:white;border-radius:12px;width:520px;max-width:92vw;max-height:80vh;
+              padding:22px 24px;position:relative;overflow-y:auto}
+  .historyBox h3{margin:0 0 14px;color:var(--green)}
+  .historyEntry{border-bottom:1px solid #eee;padding:10px 0;font-size:13px}
+  .historyEntry .who{font-weight:bold;color:var(--green)}
+  .historyEntry .when{color:#aaa;font-size:11px;margin-left:6px}
+  .historyEntry .txt{margin-top:4px;color:#333}
+  .historyAdd{margin-top:16px;display:flex;flex-direction:column;gap:8px}
+  .historyAdd textarea{border:1px solid var(--line);border-radius:8px;padding:8px 10px;font-family:inherit;
+                        font-size:13px;min-height:60px;resize:vertical}
+  .historyAdd button{align-self:flex-end}
+
+  .docSearch{width:100%;border:1px solid var(--line);border-radius:8px;padding:9px 12px;font-size:13px;
+             margin-bottom:14px}
+
+  /* --- Terminy --- */
+  .terminItem{display:flex;align-items:center;gap:14px;border:1px solid var(--line);border-radius:10px;
+              padding:12px 16px;margin-bottom:8px;background:#fbfcfb}
+  .terminItem.term-overdue{background:#fdecea;border-color:#e6b3ad}
+  .terminItem.term-soon{background:#fff8e1;border-color:#e6d68a}
+  .terminDate{font-weight:bold;min-width:90px;color:var(--green)}
+  .terminItem.term-overdue .terminDate{color:var(--todo)}
+  .terminItem.term-soon .terminDate{color:#a67c00}
+  .terminInfo{flex:1}
+  .terminInfo .nazwa{font-weight:bold}
+  .terminInfo .notatka{color:var(--muted);font-size:12.5px;margin-top:2px}
+  .terminBadge{font-size:10px;font-weight:bold;padding:2px 8px;border-radius:10px;color:white}
+  .badge-overdue{background:var(--todo)} .badge-soon{background:#c9a24a} .badge-ok{background:var(--done)}
+
+  /* --- Instalacje --- */
+  .instItem{border:1px solid var(--line);border-radius:10px;padding:12px 16px;margin-bottom:8px;background:#fbfcfb}
+  .instTop{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+  .instTitle{font-weight:bold}
+  .instMeta{color:var(--muted);font-size:12px;margin-top:3px}
+  .status-planowana{background:#7a8a9a} .status-montaz{background:#c9a24a}
+  .status-dziala{background:var(--done)} .status-serwis{background:#d97706} .status-wylaczona{background:var(--todo)}
+
+  /* --- Finanse --- */
+  .finanseSummary{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap}
+  .finItem{display:flex;justify-content:space-between;align-items:center;border:1px solid var(--line);
+           border-radius:10px;padding:10px 16px;margin-bottom:6px;background:#fbfcfb}
+  .finItem .kwota-przychod{color:var(--done);font-weight:bold}
+  .finItem .kwota-koszt{color:var(--todo);font-weight:bold}
+
+  /* --- Linki --- */
+  .linksGrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px}
+  .linkCard{display:flex;align-items:center;justify-content:space-between;gap:8px;border:1px solid var(--line);
+            border-radius:10px;padding:12px 14px;background:#fbfcfb;text-decoration:none;color:var(--ink);font-weight:bold}
+  .linkCard:hover{border-color:var(--green);box-shadow:0 3px 10px #0000001a}
+  .linkCard .del{color:#c0392b;font-weight:normal;font-size:11px}
+
+  /* --- Dashboard --- */
+  .dashGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px}
+  .dashCard{background:white;border:1px solid var(--line);border-radius:14px;padding:20px 22px;
+            box-shadow:0 2px 10px #0000000d}
+  .dashCardTitle{font-size:13px;font-weight:bold;color:var(--green);margin-bottom:14px;
+                 text-transform:uppercase;letter-spacing:.03em}
+  .dashHero{grid-column:1/-1;background:linear-gradient(135deg,var(--green),#17301e);color:white;
+            display:flex;flex-direction:column;justify-content:center;min-height:90px}
+  .dashHeroTitle{font-size:24px;font-weight:bold}
+  .dashHeroSub{color:#e6efe8;font-size:13px;margin-top:4px;text-transform:capitalize}
+
+  .dashFunnel{display:flex;flex-direction:column;gap:8px}
+  .dashFunnelRow{display:flex;align-items:center;gap:10px;font-size:12.5px}
+  .dashFunnelLabel{width:130px;flex-shrink:0;color:var(--muted)}
+  .dashFunnelBarWrap{flex:1;background:#eef1ee;border-radius:6px;overflow:hidden;height:16px}
+  .dashFunnelBar{height:100%;background:var(--green);border-radius:6px;transition:width .3s}
+  .dashFunnelNum{width:24px;text-align:right;font-weight:bold;color:var(--green)}
+
+  .dashFinance{display:flex;justify-content:space-around;text-align:center}
+  .dashFinance .big{font-size:22px;font-weight:bold}
+  .dashFinance .lbl{font-size:11px;color:var(--muted);text-transform:uppercase}
+
+  .dashMiniStats{display:flex;flex-wrap:wrap;gap:8px}
+  .dashPill{font-size:11px;font-weight:bold;color:white;padding:4px 10px;border-radius:12px}
+
+  .dashListRow{font-size:12.5px;padding:6px 0;border-bottom:1px solid #f0f0f0;display:flex;justify-content:space-between;gap:8px}
+  .dashListRow:last-child{border-bottom:none}
+  .dashEmpty{color:#bbb;font-size:12.5px;font-style:italic}
 </style>
 </head>
 <body>
@@ -206,9 +300,48 @@
     </div>
 
     <div class="tabNav">
-      <button class="tabBtn active" data-tab="klienci" onclick="switchTab('klienci')">👥 Baza klientów</button>
+      <button class="tabBtn active" data-tab="dashboard" onclick="switchTab('dashboard')">✨ Dashboard</button>
+      <button class="tabBtn" data-tab="klienci" onclick="switchTab('klienci')">👥 Baza klientów</button>
       <button class="tabBtn" data-tab="dokumenty" onclick="switchTab('dokumenty')">📄 Dokumenty i oferty</button>
       <button class="tabBtn" data-tab="sprawy" onclick="switchTab('sprawy')">📋 Sprawy i aktywność</button>
+      <button class="tabBtn" data-tab="terminy" onclick="switchTab('terminy')">📅 Terminy</button>
+      <button class="tabBtn" data-tab="instalacje" onclick="switchTab('instalacje')">🥛 Instalacje</button>
+      <button class="tabBtn" data-tab="finanse" onclick="switchTab('finanse')">💰 Finanse</button>
+      <button class="tabBtn" data-tab="linki" onclick="switchTab('linki')">🔗 Szybkie linki</button>
+    </div>
+
+    <div class="tabPane active" id="tabpane-dashboard">
+      <div class="dashGrid">
+        <div class="dashCard dashHero">
+          <div class="dashHeroTitle">Cześć, <span id="dashWho">Jakub</span> 👋</div>
+          <div class="dashHeroSub" id="dashDate"></div>
+        </div>
+
+        <div class="dashCard">
+          <div class="dashCardTitle">👥 Lejek sprzedażowy</div>
+          <div id="dashFunnel" class="dashFunnel"></div>
+        </div>
+
+        <div class="dashCard">
+          <div class="dashCardTitle">💰 Bilans finansowy</div>
+          <div id="dashFinance" class="dashFinance"></div>
+        </div>
+
+        <div class="dashCard">
+          <div class="dashCardTitle">📅 Najbliższe terminy</div>
+          <div id="dashTerminy"></div>
+        </div>
+
+        <div class="dashCard">
+          <div class="dashCardTitle">🥛 Instalacje</div>
+          <div id="dashInstalacje" class="dashMiniStats"></div>
+        </div>
+
+        <div class="dashCard">
+          <div class="dashCardTitle">🕓 Ostatnia aktywność</div>
+          <div id="dashActivity"></div>
+        </div>
+      </div>
     </div>
 
     <div class="tabPane" id="tabpane-dokumenty">
@@ -229,11 +362,12 @@
           <button class="save" onclick="addItem('dokumenty')">Zapisz</button>
         </div>
       </div>
+      <input type="text" id="searchDokumenty" class="docSearch" placeholder="🔍 Szukaj dokumentu (nazwa, opis, kategoria)..." oninput="render()">
       <div id="list-dokumenty"></div>
     </div>
     </div>
 
-    <div class="tabPane active" id="tabpane-klienci">
+    <div class="tabPane" id="tabpane-klienci">
     <div class="section" id="section-klienci">
       <h2>Baza klientów <button class="addBtn" onclick="addClient()">+ Dodaj klienta</button></h2>
       <div class="clientActions">
@@ -261,14 +395,14 @@
           <colgroup>
             <col class="firma"><col class="osoba"><col class="woj"><col class="miejsc">
             <col class="ulica"><col class="tel"><col class="email"><col class="zain">
-            <col class="prio"><col class="status"><col class="notatki"><col class="usun">
+            <col class="prio"><col class="status"><col class="notatki"><col class="hist"><col class="usun">
           </colgroup>
           <thead>
             <tr>
               <th>Firma / gospodarstwo</th><th>Imię i nazwisko</th><th>Województwo</th><th>Miejscowość</th>
               <th>Ulica</th><th>Telefon</th><th>E-mail</th><th>Co zamówił / zainteresowanie</th>
               <th>Priorytet</th><th>Status</th>
-              <th>Notatki</th><th></th>
+              <th>Notatki</th><th>Historia</th><th></th>
             </tr>
           </thead>
           <tbody id="clientsBody"></tbody>
@@ -300,6 +434,94 @@
     </div>
     </div>
 
+    <div class="tabPane" id="tabpane-terminy">
+    <div class="section">
+      <h2>Terminy <button class="addBtn" onclick="toggleForm('terminy')">+ Dodaj termin</button></h2>
+      <div class="newItemForm" id="form-terminy">
+        <div class="row">
+          <input type="text" id="nazwa-terminy" placeholder="Nazwa terminu (np. Fiskalizacja mlekomatów)">
+          <input type="date" id="data-terminy">
+        </div>
+        <input type="text" id="notatka-terminy" placeholder="Notatka (opcjonalnie)">
+        <div class="actions">
+          <button class="cancel" onclick="toggleForm('terminy')">Anuluj</button>
+          <button class="save" onclick="addTermin()">Zapisz</button>
+        </div>
+      </div>
+      <div id="list-terminy"></div>
+    </div>
+    </div>
+
+    <div class="tabPane" id="tabpane-instalacje">
+    <div class="section">
+      <h2>Instalacje mlekomatów <button class="addBtn" onclick="toggleForm('instalacje')">+ Dodaj instalację</button></h2>
+      <div class="newItemForm" id="form-instalacje">
+        <div class="row">
+          <input type="text" id="klient-instalacje" placeholder="Klient / gospodarstwo">
+          <input type="text" id="adres-instalacje" placeholder="Adres / lokalizacja">
+        </div>
+        <div class="row">
+          <input type="date" id="data-instalacje">
+          <select id="status-instalacje">
+            <option value="planowana">Planowana</option>
+            <option value="montaz">W trakcie montażu</option>
+            <option value="dziala">Zainstalowana i działa</option>
+            <option value="serwis">Wymaga serwisu</option>
+            <option value="wylaczona">Wyłączona</option>
+          </select>
+        </div>
+        <input type="text" id="notatki-instalacje" placeholder="Notatki (opcjonalnie)">
+        <div class="actions">
+          <button class="cancel" onclick="toggleForm('instalacje')">Anuluj</button>
+          <button class="save" onclick="addInstalacja()">Zapisz</button>
+        </div>
+      </div>
+      <div id="list-instalacje"></div>
+    </div>
+    </div>
+
+    <div class="tabPane" id="tabpane-finanse">
+    <div class="section">
+      <h2>Finanse <button class="addBtn" onclick="toggleForm('finanse')">+ Dodaj wpis</button></h2>
+      <div class="finanseSummary" id="finanseSummary"></div>
+      <div class="newItemForm" id="form-finanse">
+        <div class="row">
+          <input type="date" id="data-finanse">
+          <input type="text" id="opis-finanse" placeholder="Opis (np. Zakup mlekomatu #4)">
+        </div>
+        <div class="row">
+          <select id="typ-finanse">
+            <option value="przychod">Przychód</option>
+            <option value="koszt">Koszt</option>
+          </select>
+          <input type="number" id="kwota-finanse" placeholder="Kwota PLN" step="0.01">
+        </div>
+        <div class="actions">
+          <button class="cancel" onclick="toggleForm('finanse')">Anuluj</button>
+          <button class="save" onclick="addFinanse()">Zapisz</button>
+        </div>
+      </div>
+      <div id="list-finanse"></div>
+    </div>
+    </div>
+
+    <div class="tabPane" id="tabpane-linki">
+    <div class="section">
+      <h2>Szybkie linki <button class="addBtn" onclick="toggleForm('linki')">+ Dodaj link</button></h2>
+      <div class="newItemForm" id="form-linki">
+        <div class="row">
+          <input type="text" id="nazwa-linki" placeholder="Nazwa (np. PRS - moje sprawy)">
+          <input type="text" id="url-linki" placeholder="Adres URL">
+        </div>
+        <div class="actions">
+          <button class="cancel" onclick="toggleForm('linki')">Anuluj</button>
+          <button class="save" onclick="addLink()">Zapisz</button>
+        </div>
+      </div>
+      <div id="list-linki" class="linksGrid"></div>
+    </div>
+    </div>
+
     <footer>Dane synchronizowane między urządzeniami (wspólny magazyn) — jeśli synchronizacja nie jest skonfigurowana, dane zostają tylko lokalnie w tej przeglądarce.</footer>
   </div>
 
@@ -307,6 +529,18 @@
     <div class="previewBox">
       <button class="previewClose" onclick="closePreview()">✕ Zamknij</button>
       <iframe id="previewFrame"></iframe>
+    </div>
+  </div>
+
+  <div id="historyModal" class="previewModal" onclick="if(event.target===this) closeHistoryModal()">
+    <div class="historyBox">
+      <button class="previewClose" onclick="closeHistoryModal()">✕ Zamknij</button>
+      <h3 id="historyClientName">Historia kontaktu</h3>
+      <div id="historyEntries"></div>
+      <div class="historyAdd">
+        <textarea id="historyNewEntry" placeholder="Np. Dzwoniłem, zainteresowany, oddzwaniam za tydzień..."></textarea>
+        <button class="save" onclick="addHistoryEntry()">+ Dodaj wpis</button>
+      </div>
     </div>
   </div>
 </div>
@@ -364,7 +598,21 @@ function defaultData(){
     ],
     klienci: [],
     klienciImported: false,
-    log: []
+    log: [],
+    terminy: [
+      {id:"t1", nazwa:"Obowiązkowa fiskalizacja mlekomatów", data:"2027-04-01", notatka:"Termin ustawowy — Nayax + kasy fiskalne"},
+      {id:"t2", nazwa:"Zgłoszenie CRBR (beneficjenci rzeczywiści)", data:"2026-07-13", notatka:"7 dni od wpisu do KRS"}
+    ],
+    instalacje: [],
+    finanse: [],
+    linki: [
+      {id:"l1", nazwa:"PRS - Portal Rejestrów Sądowych", url:"https://prs.ms.gov.pl"},
+      {id:"l2", nazwa:"jsonbin.io - panel", url:"https://jsonbin.io/app/bins"},
+      {id:"l3", nazwa:"GitHub - repo strony", url:"https://github.com/deczyk/sklepzastodola"},
+      {id:"l4", nazwa:"Vercel - dashboard", url:"https://vercel.com/dashboard"},
+      {id:"l5", nazwa:"Advisor EU (kalkulator)", url:"https://www.sklepzastodola.pl/advisor.html"},
+      {id:"l6", nazwa:"Strona główna Sklep za Stodołą", url:"https://www.sklepzastodola.pl"}
+    ]
   };
 }
 
@@ -439,6 +687,10 @@ function fillMissingDefaults(d){
   if(!d.sprawy || d.sprawy.length===0){ d.sprawy = dflt.sprawy; changed = true; }
   if(!d.klienci){ d.klienci = []; changed = true; }
   if(!d.log){ d.log = []; changed = true; }
+  if(!d.terminy || d.terminy.length===0){ d.terminy = dflt.terminy; changed = true; }
+  if(!d.instalacje){ d.instalacje = []; changed = true; }
+  if(!d.finanse){ d.finanse = []; changed = true; }
+  if(!d.linki || d.linki.length===0){ d.linki = dflt.linki; changed = true; }
   return changed;
 }
 
@@ -510,14 +762,27 @@ function fileTypeInfo(link){
 
 function fileChip(link, title){
   const info = fileTypeInfo(link);
+  const ext = (link.match(/\.(\w+)$/)||[,""])[1].toLowerCase();
   const clickAttr = isPreviewable(link)
     ? `href="javascript:void(0)" onclick="openPreview('${link}')"`
     : `href="${link}" target="_blank" rel="noopener"`;
   const hint = isPreviewable(link) ? "Kliknij, aby podejrzeć" : "Kliknij, aby otworzyć / pobrać";
-  return `<a class="fileChip" ${clickAttr} title="${hint}">
-    <span class="icon ${info.cls}">${info.icon}</span>
-    <span>${title}</span>
-    <span class="ext">${info.label}</span>
+
+  let thumb;
+  if(["png","jpg","jpeg"].includes(ext)){
+    thumb = `<img src="${link}" loading="lazy" alt="">`;
+  } else if(ext==="pdf"){
+    thumb = `<iframe src="${link}#page=1&toolbar=0&navpanes=0&scrollbar=0" loading="lazy"></iframe>`;
+  } else {
+    thumb = `<span class="bigIcon ${info.cls}">${info.icon}</span>`;
+  }
+
+  return `<a class="fileCard" ${clickAttr} title="${hint}">
+    <div class="fileThumb">${thumb}</div>
+    <div class="fileCardInfo">
+      <div class="fileCardTitle">${title}</div>
+      <span class="ext">${info.label}</span>
+    </div>
   </a>`;
 }
 function openPreview(link){
@@ -527,6 +792,55 @@ function openPreview(link){
 function closePreview(){
   document.getElementById("previewModal").classList.remove("open");
   document.getElementById("previewFrame").src = "";
+}
+
+// ================= Historia kontaktu =================
+let currentHistoryClientId = null;
+
+function openHistoryModal(clientId){
+  currentHistoryClientId = clientId;
+  const c = data.klienci.find(x=>x.id===clientId);
+  if(!c) return;
+  document.getElementById("historyClientName").textContent = `Historia kontaktu — ${c.firma || c.osoba || "bez nazwy"}`;
+  renderHistoryEntries(c);
+  document.getElementById("historyModal").classList.add("open");
+}
+
+function closeHistoryModal(){
+  document.getElementById("historyModal").classList.remove("open");
+  document.getElementById("historyNewEntry").value = "";
+  currentHistoryClientId = null;
+}
+
+function renderHistoryEntries(c){
+  const el = document.getElementById("historyEntries");
+  const hist = c.historia || [];
+  if(hist.length===0){
+    el.innerHTML = '<div class="empty">Brak wpisów — dodaj pierwszy poniżej.</div>';
+    return;
+  }
+  el.innerHTML = [...hist].reverse().map(h => `
+    <div class="historyEntry">
+      <span class="who">${h.kto}</span><span class="when">${formatDT(h.data)}</span>
+      <div class="txt">${h.tekst}</div>
+    </div>
+  `).join("");
+}
+
+function addHistoryEntry(){
+  const ta = document.getElementById("historyNewEntry");
+  const tekst = ta.value.trim();
+  if(!tekst || !currentHistoryClientId) return;
+  const c = data.klienci.find(x=>x.id===currentHistoryClientId);
+  if(!c) return;
+  if(!c.historia) c.historia = [];
+  c.historia.push({tekst, kto: getWhoAmI(), data: new Date().toISOString()});
+  c.zaktualizowano = new Date().toISOString();
+  logActivity(`dodał(a) wpis w historii kontaktu klienta „${c.firma||c.osoba||'bez nazwy'}”`);
+  saveData();
+  ta.value = "";
+  renderHistoryEntries(c);
+  renderClients(); // odśwież licznik na przycisku
 }
 
 // ================= Podsumowanie u góry =================
@@ -553,6 +867,9 @@ function statusLabel(s){ return s==="done"?"Gotowe":s==="progress"?"W trakcie":"
 function renderItemCard(item, cat){
   const div = document.createElement("div");
   div.className = "item";
+  if(item.utworzono){
+    div.title = `Dodano: ${formatDT(item.utworzono)} | Zaktualizowano: ${item.zaktualizowano?formatDT(item.zaktualizowano):"—"}`;
+  }
   let linkHtml;
   if(item.link){
     linkHtml = fileChip(item.link, item.title);
@@ -567,6 +884,8 @@ function renderItemCard(item, cat){
           <option value="progress" ${item.status==="progress"?"selected":""}>W trakcie</option>
           <option value="done" ${item.status==="done"?"selected":""}>Gotowe</option>
         </select>` : "";
+  const dateCaption = (cat==="dokumenty" && item.utworzono)
+    ? `<div class="dateCaption">Dodano ${formatDT(item.utworzono)}</div>` : "";
   div.innerHTML = `
     <div class="topRow">
       <div class="titleRow">
@@ -577,6 +896,7 @@ function renderItemCard(item, cat){
       </div>
     </div>
     ${item.desc ? `<div class="desc">${item.desc}</div>` : ""}
+    ${dateCaption}
     <textarea placeholder="Notatki..." data-cat="${cat}" data-id="${item.id}" onblur="updateNotes(this)">${item.notes||""}</textarea>
   `;
   return div;
@@ -590,14 +910,24 @@ function render(){
   renderActivityLog();
   renderClients();
 
-  // --- Dokumenty: grupowane wg kategorii ---
+  // --- Dokumenty: grupowane wg kategorii, z wyszukiwarką ---
   const dokList = document.getElementById("list-dokumenty");
+  const searchEl = document.getElementById("searchDokumenty");
+  const searchQ = searchEl ? searchEl.value.trim().toLowerCase() : "";
   dokList.innerHTML = "";
-  if(!data.dokumenty || data.dokumenty.length===0){
-    dokList.innerHTML = '<div class="empty">Brak pozycji — dodaj pierwszą.</div>';
+  let dokFiltered = data.dokumenty || [];
+  if(searchQ){
+    dokFiltered = dokFiltered.filter(item =>
+      (item.title||"").toLowerCase().includes(searchQ) ||
+      (item.desc||"").toLowerCase().includes(searchQ) ||
+      (item.kategoria||"").toLowerCase().includes(searchQ)
+    );
+  }
+  if(dokFiltered.length===0){
+    dokList.innerHTML = `<div class="empty">${searchQ ? "Brak dokumentów pasujących do wyszukiwania." : "Brak pozycji — dodaj pierwszą."}</div>`;
   } else {
     const groups = {};
-    data.dokumenty.forEach(item=>{
+    dokFiltered.forEach(item=>{
       const k = item.kategoria || "Inne dokumenty";
       if(!groups[k]) groups[k] = [];
       groups[k].push(item);
@@ -606,9 +936,12 @@ function render(){
       ...KATEGORIA_ORDER.filter(k=>groups[k]),
       ...Object.keys(groups).filter(k=>!KATEGORIA_ORDER.includes(k)).sort()
     ];
-    // update datalist for category autocomplete
+    // update datalist for category autocomplete (zawsze z pełnej listy, nie przefiltrowanej)
     const dl = document.getElementById("kategorieList");
-    if(dl) dl.innerHTML = Object.keys(groups).map(k=>`<option value="${k}">`).join("");
+    if(dl){
+      const allCats = [...new Set((data.dokumenty||[]).map(d=>d.kategoria||"Inne dokumenty"))];
+      dl.innerHTML = allCats.map(k=>`<option value="${k}">`).join("");
+    }
 
     orderedKeys.forEach(kategoria=>{
       const header = document.createElement("div");
@@ -627,6 +960,12 @@ function render(){
   } else {
     data.sprawy.forEach(item=>sprawyList.appendChild(renderItemCard(item, "sprawy")));
   }
+
+  renderTerminy();
+  renderInstalacje();
+  renderFinanse();
+  renderLinki();
+  renderDashboard();
 }
 
 function toggleForm(cat){
@@ -640,7 +979,8 @@ function addItem(cat){
   const kategoriaEl = document.getElementById("kategoria-"+cat);
   const kategoria = kategoriaEl ? kategoriaEl.value.trim() : "";
   if(!title) return;
-  data[cat].push({id:"item_"+Date.now(), title, link, desc, kategoria: kategoria || "Inne dokumenty", status:"todo", notes:""});
+  const nowTs = new Date().toISOString();
+  data[cat].push({id:"item_"+Date.now(), title, link, desc, kategoria: kategoria || "Inne dokumenty", status:"todo", notes:"", utworzono: nowTs, zaktualizowano: nowTs});
   logActivity(`dodał(a) pozycję „${title}” (${cat})`);
   saveData();
   document.getElementById("title-"+cat).value="";
@@ -672,7 +1012,7 @@ function updateStatus(sel){
 function updateNotes(ta){
   const cat = ta.dataset.cat, id = ta.dataset.id;
   const item = data[cat].find(i=>i.id===id);
-  if(item){ item.notes = ta.value; saveData(); renderStatsBar(); }
+  if(item){ item.notes = ta.value; item.zaktualizowano = new Date().toISOString(); saveData(); renderStatsBar(); }
 }
 
 // ================= Baza klientów =================
@@ -741,15 +1081,27 @@ function renderClients(){
   if(sortBy==="miejscowosc") list.sort((a,b)=>(a.miejscowosc||"").localeCompare(b.miejscowosc||""));
 
   if(list.length===0){
-    body.innerHTML = `<tr><td colspan="12" class="empty">Brak klientów pasujących do filtrów.</td></tr>`;
+    body.innerHTML = `<tr><td colspan="13" class="empty">Brak klientów pasujących do filtrów.</td></tr>`;
     return;
   }
-  body.innerHTML = list.map(c => `
-    <tr>
-      <td>${clientField(c,"firma")}</td>
+  const phoneCounts = {};
+  (data.klienci||[]).forEach(c=>{
+    const p = (c.telefon||"").replace(/\D/g,"");
+    if(p) phoneCounts[p] = (phoneCounts[p]||0)+1;
+  });
+
+  body.innerHTML = list.map(c => {
+    const p = (c.telefon||"").replace(/\D/g,"");
+    const isDupe = p && phoneCounts[p] > 1;
+    const addr = [c.ulica, c.miejscowosc, c.wojewodztwo].filter(Boolean).join(", ");
+    const mapsUrl = addr ? `https://www.google.com/maps/search/${encodeURIComponent(addr)}` : "";
+    const rowTitle = `Dodano: ${c.utworzono?formatDT(c.utworzono):"—"} | Zaktualizowano: ${c.zaktualizowano?formatDT(c.zaktualizowano):"—"}`;
+    return `
+    <tr title="${rowTitle}" class="${isDupe?'dupeRow':''}">
+      <td>${isDupe?'<span class="dupeBadge" title="Możliwy duplikat — ten numer telefonu występuje więcej niż raz">⚠</span>':''}${clientField(c,"firma")}</td>
       <td>${clientField(c,"osoba")}</td>
       <td>${clientField(c,"wojewodztwo")}</td>
-      <td>${clientField(c,"miejscowosc")}</td>
+      <td>${clientField(c,"miejscowosc")}${mapsUrl?` <a href="${mapsUrl}" target="_blank" rel="noopener" class="mapPin" title="Otwórz w Google Maps">📍</a>`:''}</td>
       <td>${clientField(c,"ulica")}</td>
       <td>${clientField(c,"telefon")}</td>
       <td>${clientField(c,"email")}</td>
@@ -757,14 +1109,23 @@ function renderClients(){
       <td>${clientField(c,null,"prio")}</td>
       <td>${clientField(c,null,"status")}</td>
       <td>${clientField(c,"notatki","textarea")}</td>
+      <td><button class="histBtn" onclick="openHistoryModal('${c.id}')">📜 ${(c.historia||[]).length}</button></td>
       <td><button class="delBtn" onclick="deleteClient('${c.id}')">Usuń</button></td>
     </tr>
-  `).join("");
+  `;
+  }).join("");
+}
+
+function formatDT(iso){
+  try{ return new Date(iso).toLocaleString("pl-PL", {day:"2-digit",month:"2-digit",year:"numeric",hour:"2-digit",minute:"2-digit"}); }
+  catch(e){ return "—"; }
 }
 
 function addClient(){
+  const now = new Date().toISOString();
   data.klienci.push({id:"c_"+Date.now(), firma:"", osoba:"", wojewodztwo:"", miejscowosc:"", ulica:"",
-                      telefon:"", email:"", zainteresowanie:"", priorytet:"B", status:"nowy", notatki:""});
+                      telefon:"", email:"", zainteresowanie:"", priorytet:"B", status:"nowy", notatki:"",
+                      utworzono: now, zaktualizowano: now, historia: []});
   logActivity("dodał(a) nowego klienta");
   saveData(); renderClients(); renderStatsBar();
 }
@@ -782,6 +1143,7 @@ function updateClient(el){
   if(c){
     const oldVal = c[field];
     c[field] = el.value;
+    c.zaktualizowano = new Date().toISOString();
     if(field==="status" && oldVal!==el.value){
       logActivity(`zmienił(a) status klienta „${c.firma||c.osoba||'bez nazwy'}” na ${STATUS_OPTS.find(s=>s[0]===el.value)[1]}`);
     }
@@ -823,6 +1185,7 @@ async function importClientsFromXlsx(){
       const nazwisko = (r["Nazwisko"]||"").toString().trim();
       const firma = (r["Nazwa gospodarstwa / firmy"]||"").toString().trim();
       if(!imie && !nazwisko && !firma) return; // pomiń puste wiersze
+      const nowImp = new Date().toISOString();
       data.klienci.push({
         id:"c_"+Date.now()+"_"+added,
         firma: firma,
@@ -835,7 +1198,8 @@ async function importClientsFromXlsx(){
         zainteresowanie: (r["Zainteresowanie"]||"").toString(),
         priorytet: PRIO_MAP[(r["Priorytet"]||"").toString()] || "B",
         status: STATUS_MAP[(r["Status"]||"").toString()] || "nowy",
-        notatki: (r["Notatki"]||"").toString()
+        notatki: (r["Notatki"]||"").toString(),
+        utworzono: nowImp, zaktualizowano: nowImp, historia: []
       });
       added++;
     });
@@ -846,6 +1210,267 @@ async function importClientsFromXlsx(){
     msg.textContent = "Błąd wczytywania pliku: " + e.message;
   }
   btn.disabled = false;
+}
+
+// ================= Terminy =================
+function daysUntil(dateStr){
+  const today = new Date(); today.setHours(0,0,0,0);
+  const d = new Date(dateStr);
+  return Math.round((d - today) / 86400000);
+}
+
+function renderTerminy(){
+  const list = document.getElementById("list-terminy");
+  if(!list) return;
+  const items = [...(data.terminy||[])].sort((a,b)=> new Date(a.data) - new Date(b.data));
+  if(items.length===0){
+    list.innerHTML = '<div class="empty">Brak terminów — dodaj pierwszy.</div>';
+    return;
+  }
+  list.innerHTML = items.map(t=>{
+    const dni = daysUntil(t.data);
+    let cls = "", badge = "";
+    if(dni < 0){ cls = "term-overdue"; badge = `<span class="terminBadge badge-overdue">PRZETERMINOWANE</span>`; }
+    else if(dni <= 14){ cls = "term-soon"; badge = `<span class="terminBadge badge-soon">za ${dni} dni</span>`; }
+    else { badge = `<span class="terminBadge badge-ok">za ${dni} dni</span>`; }
+    const dataFmt = new Date(t.data).toLocaleDateString("pl-PL");
+    return `
+      <div class="terminItem ${cls}">
+        <div class="terminDate">${dataFmt}</div>
+        <div class="terminInfo">
+          <div class="nazwa">${t.nazwa}</div>
+          ${t.notatka ? `<div class="notatka">${t.notatka}</div>` : ""}
+        </div>
+        ${badge}
+        <button class="delBtn" onclick="deleteTermin('${t.id}')">Usuń</button>
+      </div>
+    `;
+  }).join("");
+}
+
+function addTermin(){
+  const nazwa = document.getElementById("nazwa-terminy").value.trim();
+  const dataVal = document.getElementById("data-terminy").value;
+  const notatka = document.getElementById("notatka-terminy").value.trim();
+  if(!nazwa || !dataVal) return;
+  data.terminy.push({id:"t_"+Date.now(), nazwa, data:dataVal, notatka});
+  logActivity(`dodał(a) termin „${nazwa}”`);
+  saveData();
+  document.getElementById("nazwa-terminy").value="";
+  document.getElementById("data-terminy").value="";
+  document.getElementById("notatka-terminy").value="";
+  toggleForm("terminy");
+  renderTerminy();
+}
+
+function deleteTermin(id){
+  data.terminy = data.terminy.filter(t=>t.id!==id);
+  saveData(); renderTerminy();
+}
+
+// ================= Instalacje mlekomatów =================
+const INST_STATUS_LABELS = {
+  planowana:"Planowana", montaz:"W trakcie montażu", dziala:"Zainstalowana i działa",
+  serwis:"Wymaga serwisu", wylaczona:"Wyłączona"
+};
+
+function renderInstalacje(){
+  const list = document.getElementById("list-instalacje");
+  if(!list) return;
+  const items = data.instalacje || [];
+  if(items.length===0){
+    list.innerHTML = '<div class="empty">Brak instalacji — dodaj pierwszą.</div>';
+    return;
+  }
+  list.innerHTML = items.map(i=>`
+    <div class="instItem">
+      <div class="instTop">
+        <div>
+          <div class="instTitle">${i.klient}</div>
+          <div class="instMeta">${i.adres||""}${i.dataMontazu ? " · montaż: "+new Date(i.dataMontazu).toLocaleDateString("pl-PL") : ""}</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span class="statusPill status-${i.status}">${INST_STATUS_LABELS[i.status]||i.status}</span>
+          <button class="delBtn" onclick="deleteInstalacja('${i.id}')">Usuń</button>
+        </div>
+      </div>
+      ${i.notatki ? `<div class="desc" style="margin-top:8px">${i.notatki}</div>` : ""}
+    </div>
+  `).join("");
+}
+
+function addInstalacja(){
+  const klient = document.getElementById("klient-instalacje").value.trim();
+  const adres = document.getElementById("adres-instalacje").value.trim();
+  const dataMontazu = document.getElementById("data-instalacje").value;
+  const status = document.getElementById("status-instalacje").value;
+  const notatki = document.getElementById("notatki-instalacje").value.trim();
+  if(!klient) return;
+  data.instalacje.push({id:"i_"+Date.now(), klient, adres, dataMontazu, status, notatki});
+  logActivity(`dodał(a) instalację u „${klient}”`);
+  saveData();
+  document.getElementById("klient-instalacje").value="";
+  document.getElementById("adres-instalacje").value="";
+  document.getElementById("data-instalacje").value="";
+  document.getElementById("notatki-instalacje").value="";
+  toggleForm("instalacje");
+  renderInstalacje();
+}
+
+function deleteInstalacja(id){
+  data.instalacje = data.instalacje.filter(i=>i.id!==id);
+  saveData(); renderInstalacje();
+}
+
+// ================= Finanse =================
+function renderFinanse(){
+  const list = document.getElementById("list-finanse");
+  const summary = document.getElementById("finanseSummary");
+  if(!list) return;
+  const items = [...(data.finanse||[])].sort((a,b)=> new Date(b.data) - new Date(a.data));
+  const przychody = (data.finanse||[]).filter(f=>f.typ==="przychod").reduce((s,f)=>s+parseFloat(f.kwota||0),0);
+  const koszty = (data.finanse||[]).filter(f=>f.typ==="koszt").reduce((s,f)=>s+parseFloat(f.kwota||0),0);
+  const bilans = przychody - koszty;
+  if(summary){
+    summary.innerHTML = `
+      <div class="statCard"><div class="num" style="color:var(--done)">${przychody.toFixed(2)} zł</div><div class="lbl">Przychody</div></div>
+      <div class="statCard"><div class="num" style="color:var(--todo)">${koszty.toFixed(2)} zł</div><div class="lbl">Koszty</div></div>
+      <div class="statCard"><div class="num" style="color:${bilans>=0?'var(--done)':'var(--todo)'}">${bilans.toFixed(2)} zł</div><div class="lbl">Bilans</div></div>
+    `;
+  }
+  if(items.length===0){
+    list.innerHTML = '<div class="empty">Brak wpisów finansowych — dodaj pierwszy.</div>';
+    return;
+  }
+  list.innerHTML = items.map(f=>`
+    <div class="finItem">
+      <div>
+        <strong>${f.opis}</strong>
+        <div class="instMeta">${new Date(f.data).toLocaleDateString("pl-PL")}</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px">
+        <span class="kwota-${f.typ}">${f.typ==="koszt"?"-":"+"}${parseFloat(f.kwota).toFixed(2)} zł</span>
+        <button class="delBtn" onclick="deleteFinanse('${f.id}')">Usuń</button>
+      </div>
+    </div>
+  `).join("");
+}
+
+function addFinanse(){
+  const dataVal = document.getElementById("data-finanse").value;
+  const opis = document.getElementById("opis-finanse").value.trim();
+  const typ = document.getElementById("typ-finanse").value;
+  const kwota = document.getElementById("kwota-finanse").value;
+  if(!opis || !kwota) return;
+  data.finanse.push({id:"f_"+Date.now(), data:dataVal||new Date().toISOString().slice(0,10), opis, typ, kwota});
+  logActivity(`dodał(a) wpis finansowy „${opis}” (${typ==="koszt"?"-":"+"}${kwota} zł)`);
+  saveData();
+  document.getElementById("opis-finanse").value="";
+  document.getElementById("kwota-finanse").value="";
+  document.getElementById("data-finanse").value="";
+  toggleForm("finanse");
+  renderFinanse();
+}
+
+function deleteFinanse(id){
+  data.finanse = data.finanse.filter(f=>f.id!==id);
+  saveData(); renderFinanse();
+}
+
+// ================= Szybkie linki =================
+function renderLinki(){
+  const list = document.getElementById("list-linki");
+  if(!list) return;
+  const items = data.linki || [];
+  if(items.length===0){
+    list.innerHTML = '<div class="empty">Brak linków — dodaj pierwszy.</div>';
+    return;
+  }
+  list.innerHTML = items.map(l=>`
+    <a class="linkCard" href="${l.url}" target="_blank" rel="noopener">
+      <span>🔗 ${l.nazwa}</span>
+      <span class="del" onclick="event.preventDefault();event.stopPropagation();deleteLink('${l.id}')">✕</span>
+    </a>
+  `).join("");
+}
+
+function addLink(){
+  const nazwa = document.getElementById("nazwa-linki").value.trim();
+  const url = document.getElementById("url-linki").value.trim();
+  if(!nazwa || !url) return;
+  data.linki.push({id:"l_"+Date.now(), nazwa, url});
+  logActivity(`dodał(a) szybki link „${nazwa}”`);
+  saveData();
+  document.getElementById("nazwa-linki").value="";
+  document.getElementById("url-linki").value="";
+  toggleForm("linki");
+  renderLinki();
+}
+
+function deleteLink(id){
+  data.linki = data.linki.filter(l=>l.id!==id);
+  saveData(); renderLinki();
+}
+
+// ================= Dashboard =================
+function renderDashboard(){
+  const heroWho = document.getElementById("dashWho");
+  if(!heroWho) return; // dashboard nie jest jeszcze w DOM
+  heroWho.textContent = getWhoAmI();
+  const dashDate = document.getElementById("dashDate");
+  dashDate.textContent = new Date().toLocaleDateString("pl-PL", {weekday:"long", day:"numeric", month:"long", year:"numeric"});
+
+  // Lejek sprzedażowy
+  const klienci = data.klienci || [];
+  const funnelStages = [
+    ["nowy","Nowy lead"],["zglosil_sie","Zgłosił się sam"],["kontakt","Do kontaktu"],
+    ["rozmowa","Rozmowa odbyta"],["oferta","Oferta wysłana"],["negocjacje","Negocjacje"],["wygrany","Wygrany"]
+  ];
+  const maxCount = Math.max(1, ...funnelStages.map(([v])=>klienci.filter(c=>c.status===v).length));
+  document.getElementById("dashFunnel").innerHTML = funnelStages.map(([v,l])=>{
+    const n = klienci.filter(c=>c.status===v).length;
+    const pct = Math.round((n/maxCount)*100);
+    return `<div class="dashFunnelRow">
+      <div class="dashFunnelLabel">${l}</div>
+      <div class="dashFunnelBarWrap"><div class="dashFunnelBar" style="width:${pct}%"></div></div>
+      <div class="dashFunnelNum">${n}</div>
+    </div>`;
+  }).join("");
+
+  // Finanse
+  const przychody = (data.finanse||[]).filter(f=>f.typ==="przychod").reduce((s,f)=>s+parseFloat(f.kwota||0),0);
+  const koszty = (data.finanse||[]).filter(f=>f.typ==="koszt").reduce((s,f)=>s+parseFloat(f.kwota||0),0);
+  const bilans = przychody - koszty;
+  document.getElementById("dashFinance").innerHTML = `
+    <div><div class="big" style="color:var(--done)">${przychody.toFixed(0)} zł</div><div class="lbl">Przychody</div></div>
+    <div><div class="big" style="color:var(--todo)">${koszty.toFixed(0)} zł</div><div class="lbl">Koszty</div></div>
+    <div><div class="big" style="color:${bilans>=0?'var(--done)':'var(--todo)'}">${bilans.toFixed(0)} zł</div><div class="lbl">Bilans</div></div>
+  `;
+
+  // Najbliższe terminy (max 4)
+  const nadchodzace = [...(data.terminy||[])].sort((a,b)=>new Date(a.data)-new Date(b.data)).slice(0,4);
+  const dashTerminyEl = document.getElementById("dashTerminy");
+  dashTerminyEl.innerHTML = nadchodzace.length ? nadchodzace.map(t=>{
+    const dni = daysUntil(t.data);
+    const color = dni<0 ? "var(--todo)" : dni<=14 ? "#c9a24a" : "var(--muted)";
+    return `<div class="dashListRow"><span>${t.nazwa}</span><span style="color:${color};font-weight:bold">${dni<0?"po terminie":"za "+dni+" dni"}</span></div>`;
+  }).join("") : '<div class="dashEmpty">Brak zaplanowanych terminów.</div>';
+
+  // Instalacje mini-stats
+  const inst = data.instalacje || [];
+  const instCounts = {};
+  inst.forEach(i=>{ instCounts[i.status] = (instCounts[i.status]||0)+1; });
+  const dashInstEl = document.getElementById("dashInstalacje");
+  dashInstEl.innerHTML = inst.length ? Object.entries(instCounts).map(([status,n])=>
+    `<span class="dashPill status-${status}">${INST_STATUS_LABELS[status]||status}: ${n}</span>`
+  ).join("") : '<div class="dashEmpty">Brak zarejestrowanych instalacji.</div>';
+
+  // Ostatnia aktywność (max 5)
+  const dashActEl = document.getElementById("dashActivity");
+  const logs = (data.log||[]).slice(0,5);
+  dashActEl.innerHTML = logs.length ? logs.map(l=>
+    `<div class="dashListRow"><span><strong>${l.who}</strong> ${l.text}</span><span style="color:#bbb">${l.when}</span></div>`
+  ).join("") : '<div class="dashEmpty">Brak zapisanych zmian.</div>';
 }
 </script>
 </body>
