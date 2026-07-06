@@ -255,6 +255,13 @@
   .zadanieTekst{flex:1;font-size:14px}
   .ktoBadge{font-size:11px;font-weight:bold;padding:3px 10px;border-radius:12px;background:var(--light);
             color:var(--green);border:1px solid #d8eadb;white-space:nowrap}
+  .doneBtn{background:#eaf5ec;border:1px solid #bfe0c6;color:var(--done);border-radius:8px;
+           padding:5px 10px;font-size:12px;cursor:pointer;font-weight:bold;white-space:nowrap}
+  .doneBtn:hover{background:#d9eedd}
+  .archiveToggle{cursor:pointer;font-size:12.5px;color:var(--muted);font-weight:bold;padding:10px 4px;
+                 border-top:1px solid var(--line);margin-top:6px;user-select:none}
+  .archiveToggle:hover{color:var(--green)}
+  .archiveBox{margin-top:6px}
 
   /* --- Dashboard --- */
   .dashGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px}
@@ -1610,19 +1617,47 @@ function deleteLink(id){
 function renderZadania(){
   const list = document.getElementById("list-zadania");
   if(!list) return;
-  const items = [...(data.zadania||[])].sort((a,b)=> (a.zrobione===b.zrobione) ? 0 : a.zrobione ? 1 : -1);
-  if(items.length===0){
-    list.innerHTML = '<div class="empty">Brak zadań — dodaj pierwsze.</div>';
-    return;
+  const all = data.zadania||[];
+  const aktywne = all.filter(z=>!z.zrobione);
+  const zrobione = all.filter(z=>z.zrobione);
+
+  let html = "";
+  if(aktywne.length===0){
+    html += '<div class="empty">Brak aktywnych zadań — dodaj pierwsze.</div>';
+  } else {
+    html += aktywne.map(z=>`
+      <div class="zadanieItem">
+        <span class="zadanieTekst">${z.tekst}</span>
+        <span class="ktoBadge">${z.kto}</span>
+        <button class="doneBtn" onclick="toggleZadanie('${z.id}')">✔ Zrobione</button>
+        <button class="delBtn" onclick="deleteZadanie('${z.id}')">Usuń</button>
+      </div>
+    `).join("");
   }
-  list.innerHTML = items.map(z=>`
-    <div class="zadanieItem ${z.zrobione?'done':''}">
-      <input type="checkbox" ${z.zrobione?"checked":""} onchange="toggleZadanie('${z.id}')">
-      <span class="zadanieTekst">${z.tekst}</span>
-      <span class="ktoBadge">${z.kto}</span>
-      <button class="delBtn" onclick="deleteZadanie('${z.id}')">Usuń</button>
-    </div>
-  `).join("");
+
+  html += `<div class="archiveToggle" onclick="toggleArchiwumZadan()">📦 Archiwum (${zrobione.length}) <span id="archArrow">▸</span></div>`;
+  html += `<div id="archiwumZadan" class="archiveBox" style="display:none">`;
+  html += zrobione.length===0
+    ? '<div class="empty">Brak zrobionych zadań.</div>'
+    : zrobione.map(z=>`
+      <div class="zadanieItem done">
+        <span class="zadanieTekst">${z.tekst}</span>
+        <span class="ktoBadge">${z.kto}</span>
+        <button class="doneBtn" onclick="toggleZadanie('${z.id}')">↩ Przywróć</button>
+        <button class="delBtn" onclick="deleteZadanie('${z.id}')">Usuń</button>
+      </div>
+    `).join("");
+  html += `</div>`;
+
+  list.innerHTML = html;
+}
+
+function toggleArchiwumZadan(){
+  const box = document.getElementById("archiwumZadan");
+  const arrow = document.getElementById("archArrow");
+  const open = box.style.display !== "none";
+  box.style.display = open ? "none" : "block";
+  arrow.textContent = open ? "▸" : "▾";
 }
 
 function addZadanie(){
