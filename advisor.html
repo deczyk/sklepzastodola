@@ -93,9 +93,9 @@
 
     <section class="card">
       <h2>4. Ekonomia i finansowanie</h2>
-      <div class="row"><div><label>Cena mleka w mleczarni PLN/l</label><input type="number" step="0.01" id="priceDairy" value="2.20"></div><div><label>Cena sprzedaży bezpośredniej PLN/l</label><input type="number" step="0.01" id="priceDirect" value="5.50"></div></div>
-      <div class="row"><div><label>Koszt produkcji mleka PLN/l</label><input type="number" step="0.01" id="costMilk" value="1.80"></div><div><label>Sprzedaż przez mlekomat l/dzień</label><input type="number" id="litersDirect" value="100"></div></div>
-      <div class="row"><div><label>Koszt inwestycji PLN</label><input type="number" id="investment" value="70000"></div><div><label>Dni sprzedaży w roku</label><input type="number" id="days" value="365"></div></div>
+      <div class="row"><div><label>Cena mleka w skupie PLN/l</label><input type="number" step="0.01" id="priceDairy" value="1.90"></div><div><label>Cena sprzedaży bezpośredniej PLN/l</label><input type="number" step="0.01" id="priceDirect" value="5.50"></div></div>
+      <div class="row"><div><label>Sprzedaż przez mlekomat l/dzień</label><input type="number" id="litersDirect" value="100"></div><div><label>Koszt inwestycji PLN</label><input type="number" id="investment" value="70000"></div></div>
+      <div class="row"><div><label>Dni sprzedaży w roku</label><input type="number" id="days" value="365"></div></div>
       <h3>Leasing / kredyt</h3>
       <div class="row3"><div><label>Wkład własny %</label><input type="number" id="down" value="20"></div><div><label>Okres finansowania lata</label><input type="number" id="years" value="5"></div><div><label>Oprocentowanie roczne %</label><input type="number" step="0.1" id="rate" value="8"></div></div>
       <div id="financeResult" class="ok" style="margin-top:14px"></div>
@@ -170,19 +170,17 @@ const auditQuestions = [
   ["power","Czy jest dostęp do energii elektrycznej?",6],
   ["water","Czy jest dostęp do wody / możliwość mycia?",6],
   ["internet","Czy jest internet / zasięg GSM?",5],
-  ["capital","Czy klient ma wkład własny lub zdolność leasingową?",12],
   ["vet","Czy klient akceptuje wymogi weterynaryjne i rejestry?",10],
   ["marketing","Czy klient chce budować markę gospodarstwa?",10],
   ["euExperience","Czy klient korzystał wcześniej z dotacji i ma dokumentację?",6],
-  ["businessPlan","Czy klient jest gotów przygotować biznesplan?",8],
-  ["ownContribution","Czy klient ma środki na wkład własny i prefinansowanie?",12]
+  ["businessPlan","Czy klient jest gotów przygotować biznesplan?",8]
 ];
 function initAudit(){const tb=document.getElementById("auditTable");tb.innerHTML="";auditQuestions.forEach(q=>{tb.innerHTML+=`<tr><td>${q[1]}</td><td><select id="${q[0]}"><option value="1">TAK</option><option value="0.5">NIE WIEM / częściowo</option><option value="0">NIE</option></select></td></tr>`;});}
 function v(id){return parseFloat(document.getElementById(id).value)||0;} function money(x){return Math.round(x).toLocaleString("pl-PL")+" zł";}
 function calculate(){
   let max=0,pts=0;auditQuestions.forEach(q=>{max+=q[2];pts+=(parseFloat(document.getElementById(q[0]).value)||0)*q[2];});
   const score=Math.round(pts/max*100), prod=v("cows")*v("yield"), liters=Math.min(v("litersDirect"),prod||v("litersDirect"));
-  const extraMargin=(v("priceDirect")-v("costMilk"))-(v("priceDairy")-v("costMilk"));
+  const extraMargin=v("priceDirect")-v("priceDairy");
   const profitDay=extraMargin*liters, profitYear=profitDay*v("days"), inv=v("investment"), roi=profitYear>0?inv/profitYear:0;
   const euEnabled=v("euEnable")===1, euGrantRaw=v("eligibleCost")*v("euPercent")/100, euGrant=euEnabled?Math.min(euGrantRaw,v("euLimit")):0;
   const ownAfterEu=Math.max(0,inv+v("nonEligibleCost")-euGrant), roiEu=profitYear>0?ownAfterEu/profitYear:0;
