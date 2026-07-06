@@ -81,7 +81,7 @@
   table.clients col.ulica{width:90px} table.clients col.tel{width:120px}
   table.clients col.email{width:170px} table.clients col.zain{width:150px}
   table.clients col.prio{width:100px} table.clients col.status{width:130px}
-  table.clients col.kontakt{width:110px} table.clients col.notatki{width:340px}
+  table.clients col.notatki{width:450px}
   table.clients col.usun{width:60px}
   table.clients input, table.clients select, table.clients textarea{
       width:100%;border:1px solid transparent;background:transparent;padding:5px 6px;border-radius:6px;
@@ -118,8 +118,6 @@
   .filterRow select, .filterRow input{border:1px solid var(--line);border-radius:8px;padding:6px 10px;font-size:12.5px}
   .filterRow input{flex:1;min-width:160px}
 
-  tr.overdue{background:#fdecea}
-  tr.overdue td:first-child{border-left:3px solid var(--todo)}
 
   .previewModal{display:none;position:fixed;inset:0;background:#000000b3;z-index:200;
                 align-items:center;justify-content:center}
@@ -133,6 +131,28 @@
   .logRow{padding:5px 0;border-bottom:1px solid #f0f0f0}
   .logRow .who{font-weight:bold;color:var(--green)}
   .logRow .when{color:#aaa;font-size:11px;margin-left:6px}
+
+  /* --- File chip (clickable document indicator) --- */
+  .fileChip{display:inline-flex;align-items:center;gap:8px;padding:6px 12px 6px 8px;border-radius:10px;
+            border:1px solid var(--line);background:#fbfcfb;text-decoration:none;color:var(--ink);
+            font-weight:bold;transition:box-shadow .15s,border-color .15s,transform .1s}
+  .fileChip:hover{box-shadow:0 3px 10px #0000001a;border-color:var(--green);transform:translateY(-1px)}
+  .fileChip .icon{width:26px;height:26px;border-radius:6px;display:flex;align-items:center;justify-content:center;
+                   font-size:14px;color:white;flex-shrink:0}
+  .fileChip .ext{font-size:9px;font-weight:bold;color:var(--muted);text-transform:uppercase;
+                  border:1px solid var(--line);border-radius:4px;padding:1px 5px;margin-left:2px}
+  .icon-pdf{background:#c0392b} .icon-docx{background:#2f5f8f} .icon-xlsx{background:#2f7a45}
+  .icon-img{background:#8e44ad} .icon-file{background:#7a8a80}
+  .noLinkText{color:#bbb;font-size:11px}
+
+  /* --- Tabs --- */
+  .tabNav{display:flex;gap:6px;margin-bottom:16px;border-bottom:2px solid var(--line);flex-wrap:wrap}
+  .tabBtn{background:none;border:none;padding:10px 16px;font-size:13.5px;font-weight:bold;color:var(--muted);
+          cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-2px;white-space:nowrap}
+  .tabBtn:hover{color:var(--green)}
+  .tabBtn.active{color:var(--green);border-bottom-color:var(--green)}
+  .tabPane{display:none}
+  .tabPane.active{display:block}
 </style>
 </head>
 <body>
@@ -181,6 +201,13 @@
       </select>
     </div>
 
+    <div class="tabNav">
+      <button class="tabBtn active" data-tab="klienci" onclick="switchTab('klienci')">👥 Baza klientów</button>
+      <button class="tabBtn" data-tab="dokumenty" onclick="switchTab('dokumenty')">📄 Dokumenty i oferty</button>
+      <button class="tabBtn" data-tab="sprawy" onclick="switchTab('sprawy')">📋 Sprawy i aktywność</button>
+    </div>
+
+    <div class="tabPane" id="tabpane-dokumenty">
     <div class="section" id="section-dokumenty">
       <h2>Dokumenty / oferty <button class="addBtn" onclick="toggleForm('dokumenty')">+ Dodaj</button></h2>
       <div class="newItemForm" id="form-dokumenty">
@@ -196,7 +223,9 @@
       </div>
       <div id="list-dokumenty"></div>
     </div>
+    </div>
 
+    <div class="tabPane active" id="tabpane-klienci">
     <div class="section" id="section-klienci">
       <h2>Baza klientów <button class="addBtn" onclick="addClient()">+ Dodaj klienta</button></h2>
       <div class="clientActions">
@@ -214,7 +243,6 @@
         <input type="text" id="filterText" placeholder="Szukaj (nazwa, miasto, telefon...)" oninput="renderClients()">
         <select id="sortBy" onchange="renderClients()">
           <option value="">Bez sortowania</option>
-          <option value="nastepnyKontakt">Sortuj: najbliższy kontakt</option>
           <option value="priorytet">Sortuj: priorytet</option>
           <option value="status">Sortuj: status</option>
           <option value="miejscowosc">Sortuj: miejscowość</option>
@@ -225,21 +253,23 @@
           <colgroup>
             <col class="firma"><col class="osoba"><col class="woj"><col class="miejsc">
             <col class="ulica"><col class="tel"><col class="email"><col class="zain">
-            <col class="prio"><col class="status"><col class="kontakt"><col class="notatki"><col class="usun">
+            <col class="prio"><col class="status"><col class="notatki"><col class="usun">
           </colgroup>
           <thead>
             <tr>
               <th>Firma / gospodarstwo</th><th>Imię i nazwisko</th><th>Województwo</th><th>Miejscowość</th>
               <th>Ulica</th><th>Telefon</th><th>E-mail</th><th>Co zamówił / zainteresowanie</th>
               <th>Priorytet</th><th>Status</th>
-              <th>Następny kontakt</th><th>Notatki</th><th></th>
+              <th>Notatki</th><th></th>
             </tr>
           </thead>
           <tbody id="clientsBody"></tbody>
         </table>
       </div>
     </div>
+    </div>
 
+    <div class="tabPane" id="tabpane-sprawy">
     <div class="section" id="section-sprawy">
       <h2>Sprawy w toku <button class="addBtn" onclick="toggleForm('sprawy')">+ Dodaj</button></h2>
       <div class="newItemForm" id="form-sprawy">
@@ -259,6 +289,7 @@
     <div class="section" id="section-log">
       <h2>Ostatnia aktywność</h2>
       <div id="activityLog" class="empty">Brak zapisanych zmian.</div>
+    </div>
     </div>
 
     <footer>Dane synchronizowane między urządzeniami (wspólny magazyn) — jeśli synchronizacja nie jest skonfigurowana, dane zostają tylko lokalnie w tej przeglądarce.</footer>
@@ -300,6 +331,11 @@ function lock(){
   document.getElementById("app").style.display="none";
   document.getElementById("gate").style.display="flex";
   document.getElementById("pwInput").value="";
+}
+
+function switchTab(name){
+  document.querySelectorAll(".tabBtn").forEach(b=>b.classList.toggle("active", b.dataset.tab===name));
+  document.querySelectorAll(".tabPane").forEach(p=>p.classList.toggle("active", p.id==="tabpane-"+name));
 }
 
 function defaultData(){
@@ -454,6 +490,28 @@ function renderActivityLog(){
 function isPreviewable(link){
   return /\.(pdf|png|jpg|jpeg)$/i.test(link||"");
 }
+
+function fileTypeInfo(link){
+  const ext = (link.match(/\.(\w+)$/)||[,""])[1].toLowerCase();
+  if(ext==="pdf") return {icon:"📄", cls:"icon-pdf", label:"PDF"};
+  if(["doc","docx"].includes(ext)) return {icon:"📝", cls:"icon-docx", label:"WORD"};
+  if(["xls","xlsx"].includes(ext)) return {icon:"📊", cls:"icon-xlsx", label:"EXCEL"};
+  if(["png","jpg","jpeg"].includes(ext)) return {icon:"🖼️", cls:"icon-img", label:ext.toUpperCase()};
+  return {icon:"📎", cls:"icon-file", label:ext.toUpperCase()||"PLIK"};
+}
+
+function fileChip(link, title){
+  const info = fileTypeInfo(link);
+  const clickAttr = isPreviewable(link)
+    ? `href="javascript:void(0)" onclick="openPreview('${link}')"`
+    : `href="${link}" target="_blank" rel="noopener"`;
+  const hint = isPreviewable(link) ? "Kliknij, aby podejrzeć" : "Kliknij, aby otworzyć / pobrać";
+  return `<a class="fileChip" ${clickAttr} title="${hint}">
+    <span class="icon ${info.cls}">${info.icon}</span>
+    <span>${title}</span>
+    <span class="ext">${info.label}</span>
+  </a>`;
+}
 function openPreview(link){
   document.getElementById("previewFrame").src = link;
   document.getElementById("previewModal").classList.add("open");
@@ -471,13 +529,13 @@ function renderStatsBar(){
   const wPipeline = klienci.filter(c=>["oferta","negocjacje","rozmowa","kontakt","zglosil_sie"].includes(c.status)).length;
   const wygrani = klienci.filter(c=>c.status==="wygrany").length;
   const sprawyOpen = (data.sprawy||[]).filter(s=>s.status!=="done").length;
-  const dokDoZrobienia = (data.dokumenty||[]).filter(d=>d.status!=="done").length;
+  const dokLiczba = (data.dokumenty||[]).length;
   const cards = [
     [klienci.length, "Klientów łącznie"],
     [wPipeline, "W toku (kontakt/oferta/negocjacje)"],
     [wygrani, "Wygranych"],
     [sprawyOpen, "Otwartych spraw"],
-    [dokDoZrobienia, "Dokumentów do przejrzenia"]
+    [dokLiczba, "Dokumentów w bazie"]
   ];
   bar.innerHTML = cards.map(([n,l])=>`<div class="statCard"><div class="num">${n}</div><div class="lbl">${l}</div></div>`).join("");
 }
@@ -500,25 +558,25 @@ function render(){
       const div = document.createElement("div");
       div.className = "item";
       let linkHtml;
-      if(item.link && isPreviewable(item.link)){
-        linkHtml = `<a href="javascript:void(0)" onclick="openPreview('${item.link}')">${item.title}</a>`;
-      } else if(item.link){
-        linkHtml = `<a href="${item.link}" target="_blank" rel="noopener">${item.title}</a>`;
+      if(item.link){
+        linkHtml = fileChip(item.link, item.title);
       } else {
-        linkHtml = `${item.title} <span style="color:#bbb;font-size:11px">(brak linku)</span>`;
+        linkHtml = `<span>${item.title}</span> <span class="noLinkText">(brak linku)</span>`;
       }
-      div.innerHTML = `
-        <div class="topRow">
-          <div class="titleRow">
-            <span class="title">${linkHtml}</span>
-            <span class="statusPill status-${item.status}">${statusLabel(item.status)}</span>
-          </div>
-          <div style="display:flex;align-items:center;gap:8px">
+      const statusHtml = cat==="sprawy" ? `
+            <span class="statusPill status-${item.status}">${statusLabel(item.status)}</span>` : "";
+      const statusSelectHtml = cat==="sprawy" ? `
             <select class="statusSelect" data-cat="${cat}" data-id="${item.id}" onchange="updateStatus(this)">
               <option value="todo" ${item.status==="todo"?"selected":""}>Do zrobienia</option>
               <option value="progress" ${item.status==="progress"?"selected":""}>W trakcie</option>
               <option value="done" ${item.status==="done"?"selected":""}>Gotowe</option>
-            </select>
+            </select>` : "";
+      div.innerHTML = `
+        <div class="topRow">
+          <div class="titleRow">
+            <span class="title">${linkHtml}</span>${statusHtml}
+          </div>
+          <div style="display:flex;align-items:center;gap:8px">${statusSelectHtml}
             <button class="delBtn" onclick="deleteItem('${cat}','${item.id}')">Usuń</button>
           </div>
         </div>
@@ -617,24 +675,6 @@ function populateFilterOptions(){
   if(fp && fp.options.length===1) PRIO_OPTS.forEach(([v,l])=>fp.add(new Option(l,v)));
 }
 
-function parsePlDate(str){
-  if(!str) return null;
-  const m = str.toString().match(/(\d{1,2})[.\/](\d{1,2})[.\/](\d{2,4})/);
-  if(!m) return null;
-  let [_, d, mo, y] = m;
-  if(y.length===2) y = "20"+y;
-  const dt = new Date(+y, +mo-1, +d);
-  return isNaN(dt) ? null : dt;
-}
-
-function isOverdue(c){
-  if(["wygrany","przegrany"].includes(c.status)) return false;
-  const dt = parsePlDate(c.nastepnyKontakt);
-  if(!dt) return false;
-  const today = new Date(); today.setHours(0,0,0,0);
-  return dt < today;
-}
-
 function renderClients(){
   populateFilterOptions();
   const body = document.getElementById("clientsBody");
@@ -655,18 +695,13 @@ function renderClients(){
   if(sortBy==="priorytet") list.sort((a,b)=>(a.priorytet||"Z").localeCompare(b.priorytet||"Z"));
   if(sortBy==="status") list.sort((a,b)=>(a.status||"").localeCompare(b.status||""));
   if(sortBy==="miejscowosc") list.sort((a,b)=>(a.miejscowosc||"").localeCompare(b.miejscowosc||""));
-  if(sortBy==="nastepnyKontakt") list.sort((a,b)=>{
-    const da=parsePlDate(a.nastepnyKontakt), db=parsePlDate(b.nastepnyKontakt);
-    if(!da && !db) return 0; if(!da) return 1; if(!db) return -1;
-    return da-db;
-  });
 
   if(list.length===0){
-    body.innerHTML = `<tr><td colspan="13" class="empty">Brak klientów pasujących do filtrów.</td></tr>`;
+    body.innerHTML = `<tr><td colspan="12" class="empty">Brak klientów pasujących do filtrów.</td></tr>`;
     return;
   }
   body.innerHTML = list.map(c => `
-    <tr class="${isOverdue(c)?'overdue':''}">
+    <tr>
       <td>${clientField(c,"firma")}</td>
       <td>${clientField(c,"osoba")}</td>
       <td>${clientField(c,"wojewodztwo")}</td>
@@ -677,7 +712,6 @@ function renderClients(){
       <td>${clientField(c,null,"zain")}</td>
       <td>${clientField(c,null,"prio")}</td>
       <td>${clientField(c,null,"status")}</td>
-      <td>${clientField(c,"nastepnyKontakt")}</td>
       <td>${clientField(c,"notatki","textarea")}</td>
       <td><button class="delBtn" onclick="deleteClient('${c.id}')">Usuń</button></td>
     </tr>
@@ -686,7 +720,7 @@ function renderClients(){
 
 function addClient(){
   data.klienci.push({id:"c_"+Date.now(), firma:"", osoba:"", wojewodztwo:"", miejscowosc:"", ulica:"",
-                      telefon:"", email:"", zainteresowanie:"", priorytet:"B", status:"nowy", nastepnyKontakt:"", notatki:""});
+                      telefon:"", email:"", zainteresowanie:"", priorytet:"B", status:"nowy", notatki:""});
   logActivity("dodał(a) nowego klienta");
   saveData(); renderClients(); renderStatsBar();
 }
@@ -708,7 +742,7 @@ function updateClient(el){
       logActivity(`zmienił(a) status klienta „${c.firma||c.osoba||'bez nazwy'}” na ${STATUS_OPTS.find(s=>s[0]===el.value)[1]}`);
     }
     saveData();
-    if(field==="status" || field==="priorytet" || field==="nastepnyKontakt") renderStatsBar();
+    if(field==="status" || field==="priorytet") renderStatsBar();
   }
 }
 
@@ -719,7 +753,7 @@ function exportClientsToXlsx(){
     "Zainteresowanie": c.zainteresowanie,
     "Priorytet": PRIO_OPTS.find(p=>p[0]===c.priorytet)?.[1] || c.priorytet,
     "Status": STATUS_OPTS.find(s=>s[0]===c.status)?.[1] || c.status,
-    "Następny kontakt": c.nastepnyKontakt, "Notatki": c.notatki
+    "Notatki": c.notatki
   }));
   const ws = XLSX.utils.json_to_sheet(rows);
   const wb = XLSX.utils.book_new();
@@ -745,7 +779,6 @@ async function importClientsFromXlsx(){
       const nazwisko = (r["Nazwisko"]||"").toString().trim();
       const firma = (r["Nazwa gospodarstwa / firmy"]||"").toString().trim();
       if(!imie && !nazwisko && !firma) return; // pomiń puste wiersze
-      const fmtDate = v => { if(!v) return ""; if(v instanceof Date) return v.toLocaleDateString("pl-PL"); return v.toString(); };
       data.klienci.push({
         id:"c_"+Date.now()+"_"+added,
         firma: firma,
@@ -758,7 +791,6 @@ async function importClientsFromXlsx(){
         zainteresowanie: (r["Zainteresowanie"]||"").toString(),
         priorytet: PRIO_MAP[(r["Priorytet"]||"").toString()] || "B",
         status: STATUS_MAP[(r["Status"]||"").toString()] || "nowy",
-        nastepnyKontakt: fmtDate(r["Następny kontakt"]),
         notatki: (r["Notatki"]||"").toString()
       });
       added++;
