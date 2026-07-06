@@ -237,6 +237,15 @@
   table.planTable .negNum{color:var(--todo)}
   .budgetNote{font-size:11.5px;color:var(--muted);font-style:italic;margin:-2px 0 4px}
 
+  .loanCalcInputs{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:14px}
+  .loanCalcInputs label{display:block;font-size:11px;color:var(--muted);margin-bottom:4px}
+  .loanCalcInputs input{border:1px solid var(--line);border-radius:8px;padding:8px 12px;font-size:14px;width:200px}
+  .loanScenario{border:1px solid var(--line);border-radius:10px;padding:14px 18px;margin-bottom:10px;background:#fbfcfb}
+  .loanScenario h4{margin:0 0 10px;color:var(--green);font-size:13px}
+  .loanRow{display:flex;justify-content:space-between;font-size:13px;padding:4px 0;border-bottom:1px solid #f0f0f0}
+  .loanRow:last-child{border-bottom:none;font-weight:bold}
+  .loanRow .v{font-weight:bold}
+
   /* --- Dashboard --- */
   .dashGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px}
   .dashCard{background:white;border:1px solid var(--line);border-radius:14px;padding:20px 22px;
@@ -570,6 +579,19 @@
           </tbody>
         </table>
       </div>
+
+      <div class="budgetSubTitle">🏦 Kalkulator spłaty dodatkowej pożyczki</div>
+      <div class="loanCalcInputs">
+        <div>
+          <label>Kwota pożyczki (zł)</label>
+          <input type="number" id="loanKwota" value="20000" step="500" oninput="renderLoanCalc()">
+        </div>
+        <div>
+          <label>Do spłaty łącznie (zł) — 0% odsetek = ta sama kwota</label>
+          <input type="number" id="loanDoSplaty" value="20000" step="500" oninput="renderLoanCalc()">
+        </div>
+      </div>
+      <div id="loanCalcResult"></div>
     </div>
 
     <div class="section">
@@ -1056,6 +1078,7 @@ function render(){
   renderInstalacje();
   renderFinanse();
   renderLinki();
+  renderLoanCalc();
   renderDashboard();
 }
 
@@ -1537,6 +1560,46 @@ function deleteLink(id){
 }
 
 // ================= Dashboard =================
+// ================= Kalkulator spłaty pożyczki =================
+// Dane bazowe z biznesplanu (rok 2026): marża/nadwyżka na sprzedaż i tempo sprzedaży
+const LOAN_SCENARIOS = [
+  {label:"Plan zarządu (8 urządzeń w 2026)", unitsRok:8, nadwyzkaRok:145346},
+  {label:"Wariant ostrożny (4 urządzenia w 2026)", unitsRok:4, nadwyzkaRok:66000}
+];
+
+function renderLoanCalc(){
+  const elResult = document.getElementById("loanCalcResult");
+  if(!elResult) return;
+  const kwotaEl = document.getElementById("loanKwota");
+  const doSplatyEl = document.getElementById("loanDoSplaty");
+  const kwota = parseFloat(kwotaEl.value) || 0;
+  const doSplaty = parseFloat(doSplatyEl.value) || 0;
+  const odsetki = doSplaty - kwota;
+
+  elResult.innerHTML = LOAN_SCENARIOS.map(sc=>{
+    const nadwyzkaPerUnit = sc.nadwyzkaRok / sc.unitsRok;
+    const daysPerUnit = 365 / sc.unitsRok;
+    const unitsToRepay = doSplaty / nadwyzkaPerUnit;
+    const daysToRepay = Math.round(unitsToRepay * daysPerUnit);
+    const monthsToRepay = (daysToRepay/30.4).toFixed(1);
+    const pctRoku = (doSplaty / sc.nadwyzkaRok * 100);
+    const pozostaje = sc.nadwyzkaRok - doSplaty;
+    return `
+      <div class="loanScenario">
+        <h4>${sc.label}</h4>
+        <div class="loanRow"><span>Nadwyżka z jednej sprzedaży (średnio)</span><span class="v">${nadwyzkaPerUnit.toFixed(0)} zł</span></div>
+        <div class="loanRow"><span>Ile sprzedaży potrzeba na spłatę</span><span class="v">${unitsToRepay.toFixed(2)} urządzenia</span></div>
+        <div class="loanRow"><span>Kiedy spłacimy (przy tym tempie sprzedaży)</span><span class="v">~${daysToRepay} dni (${monthsToRepay} mies.)</span></div>
+        <div class="loanRow"><span>Spłata pochłania z rocznej nadwyżki</span><span class="v" style="color:var(--todo)">${pctRoku.toFixed(1)}%</span></div>
+        <div class="loanRow"><span>Nadwyżka pozostająca po spłacie (ten rok)</span><span class="v" style="color:var(--done)">${pozostaje.toFixed(0)} zł</span></div>
+      </div>
+    `;
+  }).join("") + `
+    <div class="budgetNote">Jak spłacimy: z marży kolejnych sprzedaży mlekomatów (ok. 19 800 zł wkładu na urządzenie przed kosztami stałymi) — zgodnie z modelem z biznesplanu, bez oddzielnego kredytowania.
+    ${odsetki>0 ? ` Odsetki w tym wariancie: ${odsetki.toFixed(0)} zł.` : " Wariant bez odsetek — oddajemy dokładnie tyle, ile pożyczyliśmy."}</div>
+  `;
+}
+
 function renderDashboard(){
   const heroWho = document.getElementById("dashWho");
   if(!heroWho) return; // dashboard nie jest jeszcze w DOM
