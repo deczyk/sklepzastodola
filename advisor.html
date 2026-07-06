@@ -1,4 +1,3 @@
-
 <!doctype html>
 <html lang="pl">
 <head>
@@ -8,8 +7,13 @@
   <style>
     :root{--green:#244b2f;--light:#eef5ef;--accent:#c9a24a;--ink:#1e1e1e;--muted:#666;--line:#d8ded8;--blue:#2f5f8f}
     *{box-sizing:border-box} body{margin:0;font-family:Arial,Helvetica,sans-serif;color:var(--ink);background:#f6f7f4}
-    header{background:linear-gradient(135deg,var(--green),#17301e);color:white;padding:28px 36px}
-    header h1{margin:0;font-size:30px} header p{margin:8px 0 0;color:#e6efe8}
+    header{background:linear-gradient(135deg,var(--green),#17301e);color:white;padding:24px 36px;display:flex;align-items:center;gap:16px}
+    header .logo{width:52px;height:52px;flex-shrink:0}
+    header h1{margin:0;font-size:28px} header p{margin:6px 0 0;color:#e6efe8}
+    .intro{background:white;border:1px solid var(--line);border-radius:14px;padding:18px 20px;margin-bottom:18px;box-shadow:0 2px 10px #0000000d}
+    .intro p{margin:0 0 8px;color:#333;line-height:1.5} .intro p:last-child{margin-bottom:0}
+    .intro strong{color:var(--green)}
+    footer .brand{font-weight:bold;color:#aaa} footer a{color:#aaa}
     .wrap{max-width:1180px;margin:auto;padding:24px}.grid{display:grid;grid-template-columns:1.1fr .9fr;gap:18px}
     .card{background:white;border:1px solid var(--line);border-radius:14px;padding:20px;box-shadow:0 2px 10px #0000000d;margin-bottom:18px}
     h2{margin:0 0 14px;color:var(--green);font-size:20px} h3{margin:16px 0 8px;color:var(--green)}
@@ -32,11 +36,26 @@
 </head>
 <body>
 <header>
-  <h1>Sklep za Stodołą Advisor® EU</h1>
-  <p>Audyt inwestycji: sklep farmerski 24/7 + mlekomat Premium + dotacja UE + finansowanie + ROI</p>
+  <a href="https://www.sklepzastodola.pl" style="display:flex;align-items:center;gap:16px;text-decoration:none;color:inherit;flex:1">
+    <svg class="logo" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+      <rect width="100" height="100" rx="22" fill="#2d5a27"/>
+      <line x1="50" y1="85" x2="50" y2="48" stroke="rgba(255,255,255,0.7)" stroke-width="5" stroke-linecap="round"/>
+      <path d="M50 55 C42 50 20 48 14 28 C14 28 36 20 50 42 Z" fill="#a8d4a4"/>
+      <path d="M50 44 C56 38 76 28 82 10 C82 10 60 8 50 30 Z" fill="rgba(255,255,255,0.88)"/>
+    </svg>
+    <div>
+      <h1>Sklep za Stodołą Advisor® EU</h1>
+      <p>Audyt inwestycji: sklep farmerski 24/7 + mlekomat Premium + dotacja UE + finansowanie + ROI</p>
+    </div>
+  </a>
+  <a href="https://www.sklepzastodola.pl" class="noPrint" style="color:#e6efe8;font-size:13px;white-space:nowrap;text-decoration:none;border:1px solid rgba(255,255,255,0.4);padding:8px 14px;border-radius:20px">← Strona główna</a>
 </header>
 
 <div class="wrap">
+  <div class="intro">
+    <p><strong>Do czego służy to narzędzie?</strong> To kalkulator doradczy przygotowany przez Sklep za Stodołą, który pomaga oszacować opłacalność postawienia mlekomatu i sklepu farmerskiego na Twoim gospodarstwie — zwrot z inwestycji, dodatkowy zysk roczny oraz możliwości dofinansowania z UE.</p>
+    <p>Wypełnij dane w polach poniżej (albo zostaw podpowiedzi jako orientacyjny przykład) i kliknij <strong>„Przelicz analizę”</strong>, aby zobaczyć wynik. Wynik możesz zapisać jako PDF lub przesłać nam do dalszej rozmowy.</p>
+  </div>
   <div class="card noPrint">
     <button onclick="calculate()">Przelicz analizę</button>
     <button class="gold" onclick="window.print()">Generuj raport PDF / drukuj</button>
@@ -50,7 +69,7 @@
       <h2>1. Dane gospodarstwa</h2>
       <div class="row"><div><label>Nazwa gospodarstwa</label><input id="farm"></div><div><label>Osoba kontaktowa</label><input id="owner"></div></div>
       <div class="row3"><div><label>Województwo</label><input id="region"></div><div><label>Powiat</label><input id="county"></div><div><label>Telefon</label><input id="phone"></div></div>
-      <div class="row3"><div><label>Liczba krów mlecznych</label><input type="number" id="cows" value="80"></div><div><label>Średnia wydajność l/krowę/dzień</label><input type="number" id="yield" value="30"></div><div><label>Powierzchnia gospodarstwa ha</label><input type="number" id="ha" value="50"></div></div>
+      <div class="row3"><div><label>Liczba krów mlecznych</label><input type="number" id="cows" value="15"></div><div><label>Średnia wydajność l/krowę/dzień</label><input type="number" id="yield" value="25"></div><div><label>Powierzchnia gospodarstwa ha</label><input type="number" id="ha" value="20"></div></div>
     </section>
 
     <section class="card">
@@ -76,7 +95,7 @@
       <h2>4. Ekonomia i finansowanie</h2>
       <div class="row"><div><label>Cena mleka w mleczarni PLN/l</label><input type="number" step="0.01" id="priceDairy" value="2.20"></div><div><label>Cena sprzedaży bezpośredniej PLN/l</label><input type="number" step="0.01" id="priceDirect" value="5.50"></div></div>
       <div class="row"><div><label>Koszt produkcji mleka PLN/l</label><input type="number" step="0.01" id="costMilk" value="1.80"></div><div><label>Sprzedaż przez mlekomat l/dzień</label><input type="number" id="litersDirect" value="100"></div></div>
-      <div class="row"><div><label>Koszt inwestycji PLN</label><input type="number" id="investment" value="180000"></div><div><label>Dni sprzedaży w roku</label><input type="number" id="days" value="365"></div></div>
+      <div class="row"><div><label>Koszt inwestycji PLN</label><input type="number" id="investment" value="70000"></div><div><label>Dni sprzedaży w roku</label><input type="number" id="days" value="365"></div></div>
       <h3>Leasing / kredyt</h3>
       <div class="row3"><div><label>Wkład własny %</label><input type="number" id="down" value="20"></div><div><label>Okres finansowania lata</label><input type="number" id="years" value="5"></div><div><label>Oprocentowanie roczne %</label><input type="number" step="0.1" id="rate" value="8"></div></div>
       <div id="financeResult" class="ok" style="margin-top:14px"></div>
@@ -86,12 +105,12 @@
   <section class="card">
     <h2>5. Moduł dotacji UE</h2>
     <div class="row3">
-      <div><label>Czy klient chce analizować dotację UE?</label><select id="euEnable"><option value="1">TAK</option><option value="0">NIE</option></select></div>
+      <div><label>Czy klient chce analizować dotację UE?</label><select id="euEnable"><option value="0" selected>NIE</option><option value="1">TAK</option></select></div>
       <div><label>Zakładany poziom dofinansowania %</label><input type="number" id="euPercent" value="50"></div>
       <div><label>Maksymalna kwota dotacji PLN</label><input type="number" id="euLimit" value="100000"></div>
     </div>
     <div class="row3">
-      <div><label>Koszty kwalifikowalne PLN</label><input type="number" id="eligibleCost" value="180000"></div>
+      <div><label>Koszty kwalifikowalne PLN</label><input type="number" id="eligibleCost" value="70000"></div>
       <div><label>Szacowane koszty niekwalifikowalne PLN</label><input type="number" id="nonEligibleCost" value="0"></div>
       <div><label>Ryzyko / status naboru</label><select id="euRisk"><option value="medium">Do sprawdzenia</option><option value="high">Wysokie szanse</option><option value="low">Niskie szanse / brak naboru</option></select></div>
     </div>
@@ -138,7 +157,7 @@
   <section class="card"><h2>9. Notatki doradcy</h2><textarea id="notes"></textarea></section>
 </div>
 
-<footer>Sklep za Stodołą Advisor® EU — prototyp v2.0</footer>
+<footer><span class="brand">Sklep za Stodołą Sp. z o.o.</span> — narzędzie doradcze Advisor® EU · <a href="https://www.sklepzastodola.pl">sklepzastodola.pl</a> · kontakt@sklepzastodola.pl</footer>
 
 <script>
 const auditQuestions = [
