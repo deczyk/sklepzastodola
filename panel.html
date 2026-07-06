@@ -96,6 +96,36 @@
   .importBtn:hover{opacity:0.9}
   .importBtn:disabled{opacity:0.5;cursor:default}
   #importMsg{font-size:12px;color:var(--muted);align-self:center}
+
+  /* --- Stats bar --- */
+  .statsBar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+  .statCard{background:white;border:1px solid var(--line);border-radius:10px;padding:10px 16px;
+            box-shadow:0 2px 8px #0000000a;min-width:110px}
+  .statCard .num{font-size:22px;font-weight:bold;color:var(--green)}
+  .statCard .lbl{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.03em}
+
+  .whoRow{font-size:12px;color:var(--muted);margin-bottom:14px;display:flex;align-items:center;gap:6px}
+  .whoRow select{border:1px solid var(--line);border-radius:6px;padding:4px 8px;font-size:12px}
+
+  .filterRow{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+  .filterRow select, .filterRow input{border:1px solid var(--line);border-radius:8px;padding:6px 10px;font-size:12.5px}
+  .filterRow input{flex:1;min-width:160px}
+
+  tr.overdue{background:#fdecea}
+  tr.overdue td:first-child{border-left:3px solid var(--todo)}
+
+  .previewModal{display:none;position:fixed;inset:0;background:#000000b3;z-index:200;
+                align-items:center;justify-content:center}
+  .previewModal.open{display:flex}
+  .previewBox{background:white;border-radius:10px;width:90vw;height:88vh;position:relative;overflow:hidden}
+  .previewBox iframe{width:100%;height:100%;border:none}
+  .previewClose{position:absolute;top:10px;right:10px;z-index:5;background:var(--green);color:white;
+                border:none;border-radius:20px;padding:6px 14px;font-size:12px;cursor:pointer}
+
+  #activityLog{font-size:12.5px;color:#444;max-height:220px;overflow-y:auto}
+  .logRow{padding:5px 0;border-bottom:1px solid #f0f0f0}
+  .logRow .who{font-weight:bold;color:var(--green)}
+  .logRow .when{color:#aaa;font-size:11px;margin-left:6px}
 </style>
 </head>
 <body>
@@ -128,10 +158,22 @@
       <h1>Panel — dokumenty i sprawy</h1>
       <p>Prywatna lista roboczcza. Widoczna tylko dla Ciebie.</p>
     </div>
+    <span id="syncStatus" style="font-size:11px;color:#cfe8d6;margin-left:auto;margin-right:4px"></span>
+    <button class="lockBtn" onclick="refreshFromRemote()">⟳ Odśwież</button>
     <button class="lockBtn" onclick="lock()">Zablokuj</button>
   </header>
 
   <div class="wrap">
+    <div class="statsBar" id="statsBar"></div>
+    <div class="whoRow">
+      Piszesz jako:
+      <select id="whoAmI" onchange="setWhoAmI(this.value)">
+        <option value="Jakub">Jakub</option>
+        <option value="Jarosław">Jarosław</option>
+        <option value="Filip">Filip</option>
+      </select>
+    </div>
+
     <div class="section" id="section-dokumenty">
       <h2>Dokumenty / oferty <button class="addBtn" onclick="toggleForm('dokumenty')">+ Dodaj</button></h2>
       <div class="newItemForm" id="form-dokumenty">
@@ -152,7 +194,24 @@
       <h2>Baza klientów <button class="addBtn" onclick="addClient()">+ Dodaj klienta</button></h2>
       <div class="clientActions">
         <button class="importBtn" id="importBtn" onclick="importClientsFromXlsx()">⇩ Wczytaj z pliku XLSX (jednorazowo)</button>
+        <button class="importBtn" style="background:#3a6b4a" onclick="exportClientsToXlsx()">⇧ Eksportuj do XLSX</button>
         <span id="importMsg"></span>
+      </div>
+      <div class="filterRow">
+        <select id="filterStatus" onchange="renderClients()">
+          <option value="">Wszystkie statusy</option>
+        </select>
+        <select id="filterPrio" onchange="renderClients()">
+          <option value="">Wszystkie priorytety</option>
+        </select>
+        <input type="text" id="filterText" placeholder="Szukaj (nazwa, miasto, telefon...)" oninput="renderClients()">
+        <select id="sortBy" onchange="renderClients()">
+          <option value="">Bez sortowania</option>
+          <option value="nastepnyKontakt">Sortuj: najbliższy kontakt</option>
+          <option value="priorytet">Sortuj: priorytet</option>
+          <option value="status">Sortuj: status</option>
+          <option value="miejscowosc">Sortuj: miejscowość</option>
+        </select>
       </div>
       <div class="tableWrap">
         <table class="clients">
@@ -184,14 +243,31 @@
       <div id="list-sprawy"></div>
     </div>
 
-    <footer>Dane zapisywane lokalnie w tej przeglądarce (localStorage). Na innym urządzeniu lista będzie pusta.</footer>
+    <div class="section" id="section-log">
+      <h2>Ostatnia aktywność</h2>
+      <div id="activityLog" class="empty">Brak zapisanych zmian.</div>
+    </div>
+
+    <footer>Dane synchronizowane między urządzeniami (wspólny magazyn) — jeśli synchronizacja nie jest skonfigurowana, dane zostają tylko lokalnie w tej przeglądarce.</footer>
+  </div>
+
+  <div id="previewModal" class="previewModal" onclick="if(event.target===this) closePreview()">
+    <div class="previewBox">
+      <button class="previewClose" onclick="closePreview()">✕ Zamknij</button>
+      <iframe id="previewFrame"></iframe>
+    </div>
   </div>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script>
 const PASSWORD = "stodola2026"; // zmień na własne hasło w kodzie strony
-const STORAGE_KEY = "panel_items_v1";
+const STORAGE_KEY = "panel_items_v2";
+
+// ==== Wspólny magazyn danych (jsonbin.io) — uzupełnij po założeniu konta ====
+const JSONBIN_API_KEY = "$2a$10$C/bp91tzVg.vkmR8ijQQQ.sQw//hz0FdV23nPQpt.X1kAhHu06YcG";  // Twój X-Master-Key z jsonbin.io
+const JSONBIN_BIN_ID  = "";  // ID binu utworzonego na jsonbin.io — wklej po kliknięciu "Save Bin"
+const SYNC_ENABLED = !!(JSONBIN_API_KEY && JSONBIN_BIN_ID);
 
 function tryUnlock(){
   const val = document.getElementById("pwInput").value;
@@ -199,7 +275,7 @@ function tryUnlock(){
     sessionStorage.setItem("panel_unlocked","1");
     document.getElementById("gate").style.display="none";
     document.getElementById("app").style.display="block";
-    render();
+    initApp();
   } else {
     document.getElementById("gateErr").textContent = "Złe hasło, spróbuj ponownie.";
   }
@@ -213,16 +289,7 @@ function lock(){
   document.getElementById("pwInput").value="";
 }
 
-if(sessionStorage.getItem("panel_unlocked")==="1"){
-  document.getElementById("gate").style.display="none";
-  document.getElementById("app").style.display="block";
-}
-
-function loadData(){
-  try{
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if(raw) return JSON.parse(raw);
-  }catch(e){}
+function defaultData(){
   return {
     dokumenty: [
       {id:"d1", title:"Oferta BRUNIMAT PREMIUM 650 DUO z instalacją", link:"_pliki-0xyqdz4t/Oferta_BRUNIMAT_PREMIUM_650_DUO_z_instalacja.pdf", desc:"Oferta handlowa dla klienta", status:"todo", notes:""},
@@ -239,15 +306,163 @@ function loadData(){
       {id:"s1", title:"Uzupełnienie braków KRS (sygn. 23137/26/118)", link:"", desc:"Lista wspólników + 3 oświadczenia, podpis Jarosława", status:"progress", notes:""}
     ],
     klienci: [],
-    klienciImported: false
+    klienciImported: false,
+    log: []
   };
 }
-let data = loadData();
-function saveData(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); }
+
+let data = null;
+let saveTimer = null;
+
+function loadLocalCache(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(raw) return JSON.parse(raw);
+  }catch(e){}
+  return null;
+}
+
+async function fetchRemote(){
+  if(!SYNC_ENABLED) return null;
+  try{
+    const res = await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}/latest`, {
+      headers: { "X-Master-Key": JSONBIN_API_KEY }
+    });
+    if(!res.ok) throw new Error("HTTP "+res.status);
+    const json = await res.json();
+    return json.record;
+  }catch(e){
+    console.warn("Nie udało się pobrać danych ze wspólnego magazynu:", e);
+    return null;
+  }
+}
+
+async function pushRemote(payload){
+  if(!SYNC_ENABLED) return;
+  try{
+    await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Master-Key": JSONBIN_API_KEY,
+        "X-Bin-Versioning": "false"
+      },
+      body: JSON.stringify(payload)
+    });
+    setSyncStatus("Zsynchronizowano ✓", false);
+  }catch(e){
+    console.warn("Nie udało się zapisać do wspólnego magazynu:", e);
+    setSyncStatus("Zapisano tylko lokalnie (brak sieci) ⚠", true);
+  }
+}
+
+function setSyncStatus(text, warn){
+  const el = document.getElementById("syncStatus");
+  if(el){ el.textContent = text; el.style.color = warn ? "#f0c419" : "#cfe8d6"; }
+}
+
+async function initApp(){
+  setSyncStatus(SYNC_ENABLED ? "Wczytywanie danych..." : "Tryb lokalny (bez synchronizacji)", !SYNC_ENABLED);
+  const remote = await fetchRemote();
+  const local = loadLocalCache();
+  data = remote || local || defaultData();
+  if(!data.klienci) data.klienci = [];
+  if(!data.log) data.log = [];
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  if(SYNC_ENABLED) setSyncStatus("Zsynchronizowano ✓", false);
+  render();
+}
+
+async function refreshFromRemote(){
+  if(!SYNC_ENABLED){ setSyncStatus("Synchronizacja wyłączona — uzupełnij klucz jsonbin.io w kodzie", true); return; }
+  setSyncStatus("Odświeżanie...", false);
+  const remote = await fetchRemote();
+  if(remote){
+    data = remote;
+    if(!data.klienci) data.klienci = [];
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    render();
+    setSyncStatus("Zsynchronizowano ✓", false);
+  } else {
+    setSyncStatus("Nie udało się odświeżyć", true);
+  }
+}
+
+function saveData(){
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  if(!SYNC_ENABLED) return;
+  setSyncStatus("Zapisywanie...", false);
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(()=>pushRemote(data), 500); // debounce
+}
+
+if(sessionStorage.getItem("panel_unlocked")==="1"){
+  document.getElementById("gate").style.display="none";
+  document.getElementById("app").style.display="block";
+  initApp();
+}
+
+// ================= Kto edytuje / log aktywności =================
+function getWhoAmI(){ return localStorage.getItem("panel_who") || "Jakub"; }
+function setWhoAmI(v){ localStorage.setItem("panel_who", v); }
+
+function logActivity(text){
+  if(!data.log) data.log = [];
+  data.log.unshift({ who: getWhoAmI(), text, when: new Date().toLocaleString("pl-PL") });
+  data.log = data.log.slice(0, 30); // trzymaj ostatnie 30 wpisów
+  renderActivityLog();
+}
+
+function renderActivityLog(){
+  const el = document.getElementById("activityLog");
+  if(!el) return;
+  if(!data.log || data.log.length===0){
+    el.innerHTML = '<div class="empty">Brak zapisanych zmian.</div>';
+    return;
+  }
+  el.innerHTML = data.log.map(l =>
+    `<div class="logRow"><span class="who">${l.who}</span> — ${l.text} <span class="when">${l.when}</span></div>`
+  ).join("");
+}
+
+// ================= Podgląd dokumentów =================
+function isPreviewable(link){
+  return /\.(pdf|png|jpg|jpeg)$/i.test(link||"");
+}
+function openPreview(link){
+  document.getElementById("previewFrame").src = link;
+  document.getElementById("previewModal").classList.add("open");
+}
+function closePreview(){
+  document.getElementById("previewModal").classList.remove("open");
+  document.getElementById("previewFrame").src = "";
+}
+
+// ================= Podsumowanie u góry =================
+function renderStatsBar(){
+  const bar = document.getElementById("statsBar");
+  if(!bar) return;
+  const klienci = data.klienci || [];
+  const wPipeline = klienci.filter(c=>["oferta","negocjacje","rozmowa","kontakt"].includes(c.status)).length;
+  const wygrani = klienci.filter(c=>c.status==="wygrany").length;
+  const sprawyOpen = (data.sprawy||[]).filter(s=>s.status!=="done").length;
+  const dokDoZrobienia = (data.dokumenty||[]).filter(d=>d.status!=="done").length;
+  const cards = [
+    [klienci.length, "Klientów łącznie"],
+    [wPipeline, "W toku (kontakt/oferta/negocjacje)"],
+    [wygrani, "Wygranych"],
+    [sprawyOpen, "Otwartych spraw"],
+    [dokDoZrobienia, "Dokumentów do przejrzenia"]
+  ];
+  bar.innerHTML = cards.map(([n,l])=>`<div class="statCard"><div class="num">${n}</div><div class="lbl">${l}</div></div>`).join("");
+}
 
 function statusLabel(s){ return s==="done"?"Gotowe":s==="progress"?"W trakcie":"Do zrobienia"; }
 
 function render(){
+  document.getElementById("whoAmI").value = getWhoAmI();
+  renderStatsBar();
+  renderActivityLog();
   renderClients();
   ["dokumenty","sprawy"].forEach(cat=>{
     const list = document.getElementById("list-"+cat);
@@ -259,9 +474,14 @@ function render(){
     data[cat].forEach(item=>{
       const div = document.createElement("div");
       div.className = "item";
-      const linkHtml = item.link
-        ? `<a href="${item.link}" target="_blank" rel="noopener">${item.title}</a>`
-        : `${item.title} <span style="color:#bbb;font-size:11px">(brak linku)</span>`;
+      let linkHtml;
+      if(item.link && isPreviewable(item.link)){
+        linkHtml = `<a href="javascript:void(0)" onclick="openPreview('${item.link}')">${item.title}</a>`;
+      } else if(item.link){
+        linkHtml = `<a href="${item.link}" target="_blank" rel="noopener">${item.title}</a>`;
+      } else {
+        linkHtml = `${item.title} <span style="color:#bbb;font-size:11px">(brak linku)</span>`;
+      }
       div.innerHTML = `
         <div class="topRow">
           <div class="titleRow">
@@ -295,6 +515,7 @@ function addItem(cat){
   const desc = document.getElementById("desc-"+cat).value.trim();
   if(!title) return;
   data[cat].push({id:"item_"+Date.now(), title, link, desc, status:"todo", notes:""});
+  logActivity(`dodał(a) pozycję „${title}” (${cat})`);
   saveData();
   document.getElementById("title-"+cat).value="";
   document.getElementById("link-"+cat).value="";
@@ -304,7 +525,9 @@ function addItem(cat){
 }
 
 function deleteItem(cat, id){
+  const item = data[cat].find(i=>i.id===id);
   data[cat] = data[cat].filter(i=>i.id!==id);
+  if(item) logActivity(`usunął(-ęła) pozycję „${item.title}” (${cat})`);
   saveData();
   render();
 }
@@ -312,13 +535,17 @@ function deleteItem(cat, id){
 function updateStatus(sel){
   const cat = sel.dataset.cat, id = sel.dataset.id;
   const item = data[cat].find(i=>i.id===id);
-  if(item){ item.status = sel.value; saveData(); render(); }
+  if(item){
+    item.status = sel.value;
+    logActivity(`zmienił(a) status „${item.title}” na ${statusLabel(sel.value)}`);
+    saveData(); render();
+  }
 }
 
 function updateNotes(ta){
   const cat = ta.dataset.cat, id = ta.dataset.id;
   const item = data[cat].find(i=>i.id===id);
-  if(item){ item.notes = ta.value; saveData(); }
+  if(item){ item.notes = ta.value; saveData(); renderStatsBar(); }
 }
 
 // ================= Baza klientów =================
@@ -351,15 +578,63 @@ function clientField(c, field, type){
   return `<input type="text" value="${(c[field]||"").toString().replace(/"/g,'&quot;')}" data-field="${field}" data-id="${c.id}" onblur="updateClient(this)">`;
 }
 
+function populateFilterOptions(){
+  const fs = document.getElementById("filterStatus");
+  const fp = document.getElementById("filterPrio");
+  if(fs && fs.options.length===1) STATUS_OPTS.forEach(([v,l])=>fs.add(new Option(l,v)));
+  if(fp && fp.options.length===1) PRIO_OPTS.forEach(([v,l])=>fp.add(new Option(l,v)));
+}
+
+function parsePlDate(str){
+  if(!str) return null;
+  const m = str.toString().match(/(\d{1,2})[.\/](\d{1,2})[.\/](\d{2,4})/);
+  if(!m) return null;
+  let [_, d, mo, y] = m;
+  if(y.length===2) y = "20"+y;
+  const dt = new Date(+y, +mo-1, +d);
+  return isNaN(dt) ? null : dt;
+}
+
+function isOverdue(c){
+  if(["wygrany","przegrany"].includes(c.status)) return false;
+  const dt = parsePlDate(c.nastepnyKontakt);
+  if(!dt) return false;
+  const today = new Date(); today.setHours(0,0,0,0);
+  return dt < today;
+}
+
 function renderClients(){
+  populateFilterOptions();
   const body = document.getElementById("clientsBody");
   if(!body) return;
-  if(!data.klienci || data.klienci.length===0){
-    body.innerHTML = `<tr><td colspan="12" class="empty">Brak klientów — dodaj ręcznie albo wczytaj z pliku XLSX powyżej.</td></tr>`;
+  let list = [...(data.klienci||[])];
+
+  const fStatus = document.getElementById("filterStatus").value;
+  const fPrio = document.getElementById("filterPrio").value;
+  const fText = document.getElementById("filterText").value.trim().toLowerCase();
+  const sortBy = document.getElementById("sortBy").value;
+
+  if(fStatus) list = list.filter(c=>c.status===fStatus);
+  if(fPrio) list = list.filter(c=>c.priorytet===fPrio);
+  if(fText){
+    list = list.filter(c => ["firma","osoba","miejscowosc","telefon","email","wojewodztwo"]
+      .some(f => (c[f]||"").toLowerCase().includes(fText)));
+  }
+  if(sortBy==="priorytet") list.sort((a,b)=>(a.priorytet||"Z").localeCompare(b.priorytet||"Z"));
+  if(sortBy==="status") list.sort((a,b)=>(a.status||"").localeCompare(b.status||""));
+  if(sortBy==="miejscowosc") list.sort((a,b)=>(a.miejscowosc||"").localeCompare(b.miejscowosc||""));
+  if(sortBy==="nastepnyKontakt") list.sort((a,b)=>{
+    const da=parsePlDate(a.nastepnyKontakt), db=parsePlDate(b.nastepnyKontakt);
+    if(!da && !db) return 0; if(!da) return 1; if(!db) return -1;
+    return da-db;
+  });
+
+  if(list.length===0){
+    body.innerHTML = `<tr><td colspan="12" class="empty">Brak klientów pasujących do filtrów.</td></tr>`;
     return;
   }
-  body.innerHTML = data.klienci.map(c => `
-    <tr>
+  body.innerHTML = list.map(c => `
+    <tr class="${isOverdue(c)?'overdue':''}">
       <td>${clientField(c,"firma")}</td>
       <td>${clientField(c,"osoba")}</td>
       <td>${clientField(c,"wojewodztwo")}</td>
@@ -379,18 +654,45 @@ function renderClients(){
 function addClient(){
   data.klienci.push({id:"c_"+Date.now(), firma:"", osoba:"", wojewodztwo:"", miejscowosc:"", ulica:"",
                       telefon:"", email:"", priorytet:"B", status:"nowy", nastepnyKontakt:"", notatki:""});
-  saveData(); renderClients();
+  logActivity("dodał(a) nowego klienta");
+  saveData(); renderClients(); renderStatsBar();
 }
 
 function deleteClient(id){
+  const c = data.klienci.find(x=>x.id===id);
   data.klienci = data.klienci.filter(c=>c.id!==id);
-  saveData(); renderClients();
+  if(c) logActivity(`usunął(-ęła) klienta „${c.firma||c.osoba||'bez nazwy'}”`);
+  saveData(); renderClients(); renderStatsBar();
 }
 
 function updateClient(el){
   const id = el.dataset.id, field = el.dataset.field;
   const c = data.klienci.find(x=>x.id===id);
-  if(c){ c[field] = el.value; saveData(); }
+  if(c){
+    const oldVal = c[field];
+    c[field] = el.value;
+    if(field==="status" && oldVal!==el.value){
+      logActivity(`zmienił(a) status klienta „${c.firma||c.osoba||'bez nazwy'}” na ${STATUS_OPTS.find(s=>s[0]===el.value)[1]}`);
+    }
+    saveData();
+    if(field==="status" || field==="priorytet" || field==="nastepnyKontakt") renderStatsBar();
+  }
+}
+
+function exportClientsToXlsx(){
+  const rows = (data.klienci||[]).map(c => ({
+    "Firma / gospodarstwo": c.firma, "Imię i nazwisko": c.osoba, "Województwo": c.wojewodztwo,
+    "Miejscowość": c.miejscowosc, "Ulica": c.ulica, "Telefon": c.telefon, "E-mail": c.email,
+    "Priorytet": PRIO_OPTS.find(p=>p[0]===c.priorytet)?.[1] || c.priorytet,
+    "Status": STATUS_OPTS.find(s=>s[0]===c.status)?.[1] || c.status,
+    "Następny kontakt": c.nastepnyKontakt, "Notatki": c.notatki
+  }));
+  const ws = XLSX.utils.json_to_sheet(rows);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "Klienci");
+  const dateStr = new Date().toISOString().slice(0,10);
+  XLSX.writeFile(wb, `Baza_klientow_${dateStr}.xlsx`);
+  logActivity("wyeksportował(a) bazę klientów do XLSX");
 }
 
 async function importClientsFromXlsx(){
@@ -426,15 +728,14 @@ async function importClientsFromXlsx(){
       });
       added++;
     });
-    saveData(); renderClients();
+    saveData(); renderClients(); renderStatsBar();
+    if(added>0) logActivity(`zaimportował(a) ${added} klientów z pliku XLSX`);
     msg.textContent = added>0 ? `Zaimportowano ${added} klientów.` : "Nie znaleziono żadnych wierszy do zaimportowania.";
   }catch(e){
     msg.textContent = "Błąd wczytywania pliku: " + e.message;
   }
   btn.disabled = false;
 }
-
-render();
 </script>
 </body>
 </html>
