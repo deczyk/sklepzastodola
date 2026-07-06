@@ -246,6 +246,16 @@
   .loanRow:last-child{border-bottom:none;font-weight:bold}
   .loanRow .v{font-weight:bold}
 
+  /* --- Do zrobienia --- */
+  .zadanieItem{display:flex;align-items:center;gap:12px;border:1px solid var(--line);border-radius:10px;
+               padding:10px 14px;margin-bottom:8px;background:#fbfcfb}
+  .zadanieItem.done{opacity:0.55}
+  .zadanieItem.done .zadanieTekst{text-decoration:line-through}
+  .zadanieItem input[type="checkbox"]{width:18px;height:18px;flex-shrink:0;cursor:pointer}
+  .zadanieTekst{flex:1;font-size:14px}
+  .ktoBadge{font-size:11px;font-weight:bold;padding:3px 10px;border-radius:12px;background:var(--light);
+            color:var(--green);border:1px solid #d8eadb;white-space:nowrap}
+
   /* --- Dashboard --- */
   .dashGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px}
   .dashCard{background:white;border:1px solid var(--line);border-radius:14px;padding:20px 22px;
@@ -318,12 +328,12 @@
       <select id="whoAmI" onchange="setWhoAmI(this.value)">
         <option value="Jakub">Jakub</option>
         <option value="Jarosław">Jarosław</option>
-        <option value="Filip">Filip</option>
       </select>
     </div>
 
     <div class="tabNav">
       <button class="tabBtn active" data-tab="dashboard" onclick="switchTab('dashboard')">✨ Dashboard</button>
+      <button class="tabBtn" data-tab="zadania" onclick="switchTab('zadania')">✅ Do zrobienia</button>
       <button class="tabBtn" data-tab="klienci" onclick="switchTab('klienci')">👥 Baza klientów</button>
       <button class="tabBtn" data-tab="dokumenty" onclick="switchTab('dokumenty')">📄 Dokumenty i oferty</button>
       <button class="tabBtn" data-tab="sprawy" onclick="switchTab('sprawy')">📋 Sprawy i aktywność</button>
@@ -365,6 +375,26 @@
           <div id="dashActivity"></div>
         </div>
       </div>
+    </div>
+
+    <div class="tabPane" id="tabpane-zadania">
+    <div class="section">
+      <h2>Do zrobienia <button class="addBtn" onclick="toggleForm('zadania')">+ Dodaj zadanie</button></h2>
+      <div class="newItemForm" id="form-zadania">
+        <div class="row">
+          <input type="text" id="tekst-zadania" placeholder="Co trzeba zrobić?">
+          <select id="kto-zadania">
+            <option value="Jakub">Jakub</option>
+            <option value="Jarosław">Jarosław</option>
+          </select>
+        </div>
+        <div class="actions">
+          <button class="cancel" onclick="toggleForm('zadania')">Anuluj</button>
+          <button class="save" onclick="addZadanie()">Zapisz</button>
+        </div>
+      </div>
+      <div id="list-zadania"></div>
+    </div>
     </div>
 
     <div class="tabPane" id="tabpane-dokumenty">
@@ -725,6 +755,21 @@ function defaultData(){
       {id:"l4", nazwa:"Vercel - dashboard", url:"https://vercel.com/dashboard"},
       {id:"l5", nazwa:"Advisor EU (kalkulator)", url:"https://www.sklepzastodola.pl/advisor.html"},
       {id:"l6", nazwa:"Strona główna Sklep za Stodołą", url:"https://www.sklepzastodola.pl"}
+    ],
+    zadania: [
+      {id:"z1", tekst:"Przetłumacz na polski https://www.brunimat.ch/", kto:"Jakub", zrobione:false},
+      {id:"z2", tekst:"Baza adresowa potencjalnych klientów", kto:"Jakub", zrobione:false},
+      {id:"z3", tekst:"Oferta na OLX", kto:"Jakub", zrobione:false},
+      {id:"z4", tekst:"Ustalić marże maszyny, dodatków do maszyny", kto:"Jakub", zrobione:false},
+      {id:"z5", tekst:"Naklejki na automat, na butelki", kto:"Jakub", zrobione:false},
+      {id:"z6", tekst:"Producent szklanych butelek", kto:"Jakub", zrobione:false},
+      {id:"z7", tekst:"Dowiedzieć się o instalacji, elektryk itd.", kto:"Jakub", zrobione:false},
+      {id:"z8", tekst:"Oferta Loray Merlin", kto:"Jakub", zrobione:false},
+      {id:"z9", tekst:"Badanie rynku Niemcy", kto:"Jakub", zrobione:false},
+      {id:"z10", tekst:"Na stronie wszędzie gdzie dotacja — tam przekierowanie na źródło", kto:"Jakub", zrobione:false},
+      {id:"z11", tekst:"Figurka krowy", kto:"Jakub", zrobione:false},
+      {id:"z12", tekst:"Advisor - strona główna", kto:"Jakub", zrobione:false},
+      {id:"z13", tekst:"Przekierowanie na Social Media", kto:"Jakub", zrobione:false}
     ]
   };
 }
@@ -804,6 +849,7 @@ function fillMissingDefaults(d){
   if(!d.instalacje){ d.instalacje = []; changed = true; }
   if(!d.finanse){ d.finanse = []; changed = true; }
   if(!d.linki || d.linki.length===0){ d.linki = dflt.linki; changed = true; }
+  if(!d.zadania || d.zadania.length===0){ d.zadania = dflt.zadania; changed = true; }
   return changed;
 }
 
@@ -1078,6 +1124,7 @@ function render(){
   renderInstalacje();
   renderFinanse();
   renderLinki();
+  renderZadania();
   renderLoanCalc();
   renderDashboard();
 }
@@ -1557,6 +1604,53 @@ function addLink(){
 function deleteLink(id){
   data.linki = data.linki.filter(l=>l.id!==id);
   saveData(); renderLinki();
+}
+
+// ================= Do zrobienia =================
+function renderZadania(){
+  const list = document.getElementById("list-zadania");
+  if(!list) return;
+  const items = [...(data.zadania||[])].sort((a,b)=> (a.zrobione===b.zrobione) ? 0 : a.zrobione ? 1 : -1);
+  if(items.length===0){
+    list.innerHTML = '<div class="empty">Brak zadań — dodaj pierwsze.</div>';
+    return;
+  }
+  list.innerHTML = items.map(z=>`
+    <div class="zadanieItem ${z.zrobione?'done':''}">
+      <input type="checkbox" ${z.zrobione?"checked":""} onchange="toggleZadanie('${z.id}')">
+      <span class="zadanieTekst">${z.tekst}</span>
+      <span class="ktoBadge">${z.kto}</span>
+      <button class="delBtn" onclick="deleteZadanie('${z.id}')">Usuń</button>
+    </div>
+  `).join("");
+}
+
+function addZadanie(){
+  const tekst = document.getElementById("tekst-zadania").value.trim();
+  const kto = document.getElementById("kto-zadania").value;
+  if(!tekst) return;
+  data.zadania.push({id:"z_"+Date.now(), tekst, kto, zrobione:false});
+  logActivity(`dodał(a) zadanie „${tekst}” (${kto})`);
+  saveData();
+  document.getElementById("tekst-zadania").value="";
+  toggleForm("zadania");
+  renderZadania();
+}
+
+function toggleZadanie(id){
+  const z = (data.zadania||[]).find(x=>x.id===id);
+  if(z){
+    z.zrobione = !z.zrobione;
+    logActivity(`oznaczył(a) zadanie „${z.tekst}” jako ${z.zrobione?"zrobione":"do zrobienia"}`);
+    saveData(); renderZadania();
+  }
+}
+
+function deleteZadanie(id){
+  const z = (data.zadania||[]).find(x=>x.id===id);
+  data.zadania = (data.zadania||[]).filter(x=>x.id!==id);
+  if(z) logActivity(`usunął(-ęła) zadanie „${z.tekst}”`);
+  saveData(); renderZadania();
 }
 
 // ================= Dashboard =================
