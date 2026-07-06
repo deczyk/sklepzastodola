@@ -299,31 +299,74 @@ function loadData(){const data=JSON.parse(localStorage.getItem("advisorDataEU")|
 function resetAll(){localStorage.removeItem("advisorDataEU");location.reload();}
 
 async function sendToUs(){
-  calculate(); // upewnij się, że wynik jest aktualny
+  calculate(); // upewnij się, że wynik jest aktualny i tabela audytu odpowiada wyborowi
   const statusEl = document.getElementById("sendStatus");
   const farm = document.getElementById("farm").value || "(brak nazwy)";
   const owner = document.getElementById("owner").value || "(brak osoby kontaktowej)";
   const phone = document.getElementById("phone").value || "(brak telefonu)";
   const region = document.getElementById("region").value;
   const county = document.getElementById("county").value;
+  const interestVal = document.getElementById("interest").value;
 
   const payload = {
     _subject: `Advisor EU — wynik kalkulatora: ${farm} (${owner})`,
+    "── DANE GOSPODARSTWA": "──────────",
     "Gospodarstwo": farm,
     "Osoba kontaktowa": owner,
     "Telefon": phone,
     "Województwo / powiat": `${region} / ${county}`,
-    "Zainteresowanie": INTEREST_LABELS[document.getElementById("interest").value],
+    "Zainteresowanie": INTEREST_LABELS[interestVal],
     "Liczba krów": document.getElementById("cows").value,
     "Wydajność l/krowę/dzień": document.getElementById("yield").value,
     "Powierzchnia ha": document.getElementById("ha").value,
+
+    "── WYNIK INWESTYCJI": "──────────",
     "Potencjał projektu": document.getElementById("scoreTxt").innerText,
     "ROI bez dotacji (lata)": document.getElementById("roiTxt").innerText,
     "ROI z dotacją (lata)": document.getElementById("roiEuTxt").innerText,
     "Dodatkowy zysk roczny": document.getElementById("profitYearTxt").innerText,
-    "Koszt inwestycji": document.getElementById("investment").value + " zł",
-    "Dodatkowe uwagi": document.getElementById("notes").value || "(brak)"
   };
+
+  // --- Pełny audyt: pytanie + odpowiedź, tylko widoczne dla wybranego zakresu ---
+  payload["── AUDYT PROJEKTU"] = "──────────";
+  getVisibleQuestions(interestVal).forEach(q=>{
+    const sel = document.getElementById(q[0]);
+    if(sel) payload[q[1]] = sel.options[sel.selectedIndex].text;
+  });
+
+  // --- Ekonomia i finansowanie ---
+  payload["── EKONOMIA I FINANSOWANIE"] = "──────────";
+  payload["Cena mleka w skupie PLN/l"] = document.getElementById("priceDairy").value;
+  payload["Cena sprzedaży bezpośredniej PLN/l"] = document.getElementById("priceDirect").value;
+  payload["Sprzedaż przez mlekomat l/dzień"] = document.getElementById("litersDirect").value;
+  payload["Koszt inwestycji PLN"] = document.getElementById("investment").value;
+  payload["Dni sprzedaży w roku"] = document.getElementById("days").value;
+  payload["Wkład własny %"] = document.getElementById("down").value;
+  payload["Okres finansowania (lata)"] = document.getElementById("years").value;
+  payload["Oprocentowanie roczne %"] = document.getElementById("rate").value;
+  payload["Szczegóły finansowe (wyliczone)"] = document.getElementById("financeResult").innerText;
+
+  // --- Moduł dotacji UE ---
+  const euEnabled = document.getElementById("euEnable").value === "1";
+  payload["── MODUŁ DOTACJI UE"] = "──────────";
+  payload["Czy analizować dotację UE"] = euEnabled ? "TAK" : "NIE";
+  if(euEnabled){
+    payload["Zakładany poziom dofinansowania %"] = document.getElementById("euPercent").value;
+    payload["Maksymalna kwota dotacji PLN"] = document.getElementById("euLimit").value;
+    payload["Koszty kwalifikowalne PLN"] = document.getElementById("eligibleCost").value;
+    payload["Koszty niekwalifikowalne PLN"] = document.getElementById("nonEligibleCost").value;
+    payload["Ryzyko / status naboru"] = document.getElementById("euRisk").selectedOptions[0].text;
+    payload["Szczegóły dotacji (wyliczone)"] = document.getElementById("euResult").innerText;
+  }
+
+  // --- Rekomendacja i harmonogram ---
+  payload["── REKOMENDACJA I HARMONOGRAM"] = "──────────";
+  payload["Rekomendowane rozwiązanie"] = document.getElementById("solutionNarrative").innerText + " " + document.getElementById("solution").innerText;
+  payload["Harmonogram wdrożenia"] = document.getElementById("timelineTable").innerText;
+  payload["Dokumenty do przygotowania"] = document.getElementById("documentsTable").innerText;
+
+  payload["── DODATKOWE UWAGI"] = "──────────";
+  payload["Dodatkowe uwagi klienta"] = document.getElementById("notes").value || "(brak)";
 
   statusEl.textContent = "Wysyłanie...";
   statusEl.style.color = "#666";
