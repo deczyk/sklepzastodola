@@ -1,16 +1,18 @@
 const JSONBIN_API_KEY = process.env.JSONBIN_API_KEY;
 const JSONBIN_BIN_ID = process.env.JSONBIN_BIN_ID;
 const PANEL_PASSWORD = process.env.PANEL_PASSWORD;
+const PANEL_BASIC_PASSWORD = process.env.PANEL_BASIC_PASSWORD;
 
 function isAuthorized(req) {
   const password = req.headers["x-panel-password"];
-  return Boolean(PANEL_PASSWORD && password && password === PANEL_PASSWORD);
+  const allowed = [PANEL_PASSWORD, PANEL_BASIC_PASSWORD].filter(Boolean);
+  return Boolean(password && allowed.includes(password));
 }
 
 module.exports = async function handler(req, res) {
   res.setHeader("Cache-Control", "no-store");
 
-  if (!JSONBIN_API_KEY || !JSONBIN_BIN_ID || !PANEL_PASSWORD) {
+  if (!JSONBIN_API_KEY || !JSONBIN_BIN_ID || (!PANEL_PASSWORD && !PANEL_BASIC_PASSWORD)) {
     return res.status(500).json({ error: "Panel server configuration is missing." });
   }
 
