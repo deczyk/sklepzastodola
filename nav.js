@@ -60,6 +60,14 @@
     }
   });
 
+  // ── STICKY MOBILE CTA (widoczny tylko na mobile, dodawany przez JS na każdej stronie) ──
+  document.body.insertAdjacentHTML('beforeend',
+    '<div class="sticky-mobile-cta" id="sticky-mobile-cta">' +
+      '<a href="tel:735115427" class="smc-call">📞 Zadzwoń</a>' +
+      '<a href="index.html#kalkulator" class="smc-calc">📊 Policz opłacalność</a>' +
+    '</div>'
+  );
+
   // ── NAV SCROLL ──
   const nav = document.getElementById('nav');
   if(nav) window.addEventListener('scroll', ()=> nav.classList.toggle('scrolled', scrollY > 55), {passive:true});
