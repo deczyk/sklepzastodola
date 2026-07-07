@@ -4,7 +4,15 @@
 
 Zawsze najpierw przeczytaj plik `AI_CONTEXT.md` w głównym katalogu repozytorium. Ten plik zawiera aktualny kontekst firmy Sklep za Stodołą, model sprzedaży, dokumenty, strukturę panelu i zasady pracy.
 
-Projekt dotyczy strony i panelu prywatnego firmy Sklep za Stodołą Sp. z o.o., sprzedającej i wdrażającej mlekomaty BRUNIMAT w Polsce.
+Projekt dotyczy strony i panelu prywatnego firmy Sklep za Stodołą Sp. z o.o. Firma pomaga rolnikom uruchamiać sprzedaż bezpośrednią z gospodarstwa: mlekomaty BRUNIMAT, pawilony, punkty sprzedaży, finansowanie, dokumenty, marketing lokalny i wdrożenie. Mlekomaty są ważnym produktem, ale nie opisuj firmy wyłącznie jako sprzedawcy mlekomatów.
+
+## Stały tryb pracy AI
+
+Traktuj poniższe zasady tak, jakby użytkownik dopisał je przed każdą wiadomością:
+
+> Pracuj oszczędnie. Nie czytaj całego repozytorium ani całego `panel.html`, jeśli nie jest to konieczne. Najpierw użyj `AI_CONTEXT.md`, `AGENTS.md` i tylko plików bezpośrednio związanych z zadaniem. Jeśli użytkownik nie prosi wyraźnie o edycję, nie zmieniaj plików. Jeśli trzeba edytować, zrób minimalną zmianę i pokaż diff oraz listę zmienionych plików.
+
+Nie proś użytkownika, żeby powtarzał te zasady w promptach. Są domyślne dla każdej rozmowy w tym repozytorium.
 
 ## Zasady bezpieczeństwa
 
@@ -14,6 +22,7 @@ Projekt dotyczy strony i panelu prywatnego firmy Sklep za Stodołą Sp. z o.o., 
 - Nie twórz publicznej strony cennika bez wyraźnej zgody użytkownika.
 - Dokumenty wewnętrzne mają być dostępne tylko w prywatnym `panel.html`.
 - Nie dodawaj duplikatów dokumentów do `_pliki-0xyqdz4t`.
+- Nie publikuj na stronie publicznej kosztów, marż, cenników partnerskich ani dokumentów formalnych.
 
 ## Styl pracy
 
@@ -23,6 +32,7 @@ Projekt dotyczy strony i panelu prywatnego firmy Sklep za Stodołą Sp. z o.o., 
 - Nie przebudowuj całego panelu, jeśli wystarczy dodać lub poprawić jedną sekcję.
 - Nie mieszaj treści publicznych ze sprawami wewnętrznymi.
 - Gdy dodajesz dokument, przypisz go do właściwej kategorii i upewnij się, że link działa z folderu `_pliki-0xyqdz4t`.
+- W treściach publicznych pokazuj firmę jako partnera rolnika w uruchamianiu sprzedaży bezpośredniej, nie tylko jako sprzedawcę urządzenia.
 
 ## Obowiązkowy workflow przed zmianą
 
@@ -32,6 +42,16 @@ Przed edycją:
 2. Sprawdź strukturę plików.
 3. Ustal, które pliki naprawdę trzeba zmienić.
 4. Jeśli zadanie jest większe, najpierw podaj krótki plan.
+
+## Oszczędzanie limitu i zakresu pracy
+
+- Jeśli użytkownik pyta ogólnie lub strategicznie, nie czytaj całego repozytorium bez potrzeby.
+- Najpierw sprawdzaj tylko `AI_CONTEXT.md`, `AGENTS.md` i pliki bezpośrednio związane z zadaniem.
+- Nie analizuj dużego `panel.html` w całości, jeśli wystarczy wyszukać konkretną zakładkę, funkcję albo tekst.
+- Do prostych odpowiedzi nie uruchamiaj testów, serwera ani szerokich skanów projektu.
+- Przy pracy technicznej rób minimalny diff i unikaj przebudowy niezwiązanych sekcji.
+- Jeśli użytkownik pisze "nie edytuj", odpowiadaj tylko poradą i nie zmieniaj plików.
+- Jeśli użytkownik prosi o plan, nie wdrażaj zmian przed akceptacją.
 
 Po edycji:
 
@@ -88,8 +108,9 @@ Nie dodawaj na publiczną stronę:
 
 Na publiczną stronę można przygotowywać tylko:
 
-- ofertę ogólną,
+- ofertę ogólną sprzedaży bezpośredniej dla rolników,
 - opisy mlekomatów,
+- opisy pawilonów i punktów sprzedaży,
 - CTA do rozmowy,
 - kalkulator opłacalności,
 - poradniki,
@@ -109,7 +130,7 @@ Aktualne założenia budżetowe:
 - cena referencyjna: 13 500 EUR,
 - cena standardowa: 13 900 EUR,
 - cena katalogowa: 14 500 EUR,
-- roboczy kurs: 4,25 zł/EUR.
+- roboczy kurs: 4,30 zł/EUR.
 
 ## Jak odpowiadać użytkownikowi po zmianach
 

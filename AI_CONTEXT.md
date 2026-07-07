@@ -1,7 +1,20 @@
 # AI_CONTEXT — Sklep za Stodołą
 
 ## Projekt
-Sklep za Stodołą Sp. z o.o. rozwija sprzedaż mlekomatów BRUNIMAT w Polsce. Celem jest sprzedaż i wdrażanie automatów do sprzedaży świeżego mleka bezpośrednio u gospodarstw mlecznych.
+Sklep za Stodołą Sp. z o.o. pomaga rolnikom uruchamiać sprzedaż bezpośrednią z gospodarstwa. Firma nie jest tylko sprzedawcą mlekomatów — buduje dla rolnika praktyczny system sprzedaży bezpośredniej: urządzenia, pawilon, punkt sprzedaży, dokumenty, finansowanie, marketing lokalny i wdrożenie.
+
+BRUNIMAT i mlekomaty są jednym z głównych produktów, ale szersza misja firmy to: pomóc rolnikowi sprzedawać produkty bezpośrednio klientom końcowym, z pominięciem pośredników, w profesjonalny i opłacalny sposób.
+
+## Oferta firmy
+Firma może obejmować ofertą:
+- mlekomaty BRUNIMAT,
+- pawilony / punkty sprzedaży przy gospodarstwie,
+- przygotowanie miejsca sprzedaży,
+- dokumenty i materiały dla klienta,
+- wsparcie przy finansowaniu, leasingu, ARiMR i dotacjach,
+- marketing lokalny, OLX, grafiki, treści i komunikaty,
+- wdrożenie i start sprzedaży,
+- analizę opłacalności i pomoc w ustawieniu modelu sprzedaży.
 
 ## Strona i repo
 Główna strona: https://www.sklepzastodola.pl
@@ -14,11 +27,14 @@ Jakub: prowadzenie projektu, sprzedaż, strona, panel, kontakty z klientami.
 Jarosław Deczyński: Prezes Zarządu.
 
 ## Ważne zasady dla AI
-- Nie ruszać publicznej strony cennika; cenniki mają być tylko w panelu.
+- Patrzeć na projekt szeroko: celem nie jest sprzedać samo urządzenie, tylko pomóc rolnikowi zbudować działający kanał sprzedaży bezpośredniej.
+- Nie pozycjonować firmy wyłącznie jako sprzedawcy mlekomatów.
+- Nie ruszać publicznej strony cennika; cenniki mają być tylko w panelu, chyba że użytkownik wyraźnie zdecyduje inaczej.
 - Nie usuwać CRM, JSONBin, hasła, danych klientów ani istniejących funkcji panelu bez wyraźnej zgody.
 - Przy zmianach w panel.html pokazywać listę zmian i diff.
 - Nie dublować dokumentów. Panel ma mieć jeden aktualny plik dla każdej ważnej rzeczy.
 - Dokumenty podpisane i formalne mają być w panelu, żeby nic nie zginęło.
+- Cenniki od Alfreda Bruni, cenniki partnerskie, marże, podpisane dokumenty KRS i umowy są wewnętrzne — nie publikować ich na stronie publicznej.
 
 ## Aktualne liczby robocze
 Kurs planistyczny: 1 EUR = 4,30 zł.
@@ -32,6 +48,7 @@ Instalację robimy sami; elektryk i przyłącze wody nie są wymagane w aktualny
 
 ## Priorytety
 1. Uporządkowany panel prywatny z dokumentami, cennikami, budżetem, klientami i zadaniami.
-2. Sprzedaż do pierwszych gospodarstw po gotowości polskiego systemu płatności/PLN.
+2. Przygotowanie sprzedaży bezpośredniej dla pierwszych gospodarstw po gotowości polskiego systemu płatności/PLN.
 3. Niski budżet marketingowy: telefony, baza kontaktów, OLX, follow-upy, materiały PDF.
-4. Unikać wielkich przebudów i niepotrzebnego komplikowania strony.
+4. Budowanie oferty jako kompletnego systemu sprzedaży bezpośredniej: mlekomat + pawilon + dokumenty + finansowanie + marketing + wdrożenie.
+5. Unikać wielkich przebudów i niepotrzebnego komplikowania strony.
