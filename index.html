@@ -418,6 +418,10 @@
         <label for="s4">Wartość inwestycji<span class="v" id="v4">120 000 zł</span></label>
         <input type="range" id="s4" min="30000" max="300000" step="5000" value="120000" aria-label="Wartość inwestycji">
       </div>
+      <div class="sl-group">
+        <label for="s9">Koszty eksploatacyjne / mies.<span class="v" id="v9">1 000 zł</span></label>
+        <input type="range" id="s9" min="0" max="4000" step="100" value="1000" aria-label="Koszty eksploatacyjne miesięcznie">
+      </div>
       <button class="toggle-row" id="tog" type="button" aria-pressed="false">
         <span class="tog"></span>
         <div>
@@ -428,24 +432,34 @@
     </div>
     <div class="roi-results" data-r data-d="2" aria-live="polite">
       <div class="roi-card">
-        <p class="roi-card-lbl">Przez skup — miesięcznie</p>
+        <p class="roi-card-lbl">Przychód przez skup — miesięcznie</p>
         <p class="roi-card-val neu" id="r1">7 200 zł</p>
         <p class="roi-card-sub" id="r1s">240 zł/dzień</p>
       </div>
       <div class="roi-card">
-        <p class="roi-card-lbl">Przez mlekomat — miesięcznie</p>
+        <p class="roi-card-lbl">Przychód przez mlekomat — miesięcznie</p>
         <p class="roi-card-val neu" id="r2">15 000 zł</p>
         <p class="roi-card-sub" id="r2s">500 zł/dzień</p>
       </div>
-      <div class="roi-card hi">
+      <div class="roi-card">
         <p class="roi-card-lbl">Dodatkowa marża z mleka</p>
         <p class="roi-card-val pos" id="r3">+7 800 zł/mies.</p>
         <p class="roi-card-sub" id="r3s">+93 600 zł rocznie · +108%</p>
       </div>
       <div class="roi-card">
+        <p class="roi-card-lbl">Koszty eksploatacyjne (szacunek)</p>
+        <p class="roi-card-val dim" id="r3b">−1 000 zł/mies.</p>
+        <p class="roi-card-sub">energia, mycie, serwis, opakowania</p>
+      </div>
+      <div class="roi-card hi">
+        <p class="roi-card-lbl">Szacowany zysk netto</p>
+        <p class="roi-card-val pos" id="r3c">+6 800 zł/mies.</p>
+        <p class="roi-card-sub" id="r3cs">+81 600 zł rocznie</p>
+      </div>
+      <div class="roi-card">
         <p class="roi-card-lbl" id="r4l">Zwrot inwestycji</p>
-        <p class="roi-card-val dim" id="r4">~15 mies.</p>
-        <p class="roi-card-sub" id="r4s">przy 120 000 zł</p>
+        <p class="roi-card-val dim" id="r4">~18 mies.</p>
+        <p class="roi-card-sub" id="r4s">przy 120 000 zł, liczony od zysku netto</p>
       </div>
     </div>
   </div>
@@ -622,23 +636,29 @@ var _arimr = false;
 function calc(){
   var s1=document.getElementById('s1'); if(!s1) return;
   var prod=+s1.value, skup=+document.getElementById('s2').value,
-      ml=+document.getElementById('s3').value, inv=+document.getElementById('s4').value;
-  var sm=prod*30*skup, mm=prod*30*ml, zysk=mm-sm, zyskR=zysk*12;
+      ml=+document.getElementById('s3').value, inv=+document.getElementById('s4').value,
+      opCost=+document.getElementById('s9').value;
+  var sm=prod*30*skup, mm=prod*30*ml, marza=mm-sm, marzaR=marza*12;
+  var net=marza-opCost, netR=net*12;
   var w=sm>0?Math.round((mm/sm-1)*100):0;
   var effInv=_arimr?inv*0.5:inv;
-  var zwrot=zysk>0?Math.ceil(effInv/zysk):999;
+  var zwrot=net>0?Math.ceil(effInv/net):999;
   document.getElementById('v1').textContent=prod+' L';
   document.getElementById('v2').textContent=skup.toFixed(2).replace('.',',')+' zł/L';
   document.getElementById('v3').textContent=ml.toFixed(2).replace('.',',')+' zł/L';
   document.getElementById('v4').textContent=inv.toLocaleString('pl-PL')+' zł';
+  document.getElementById('v9').textContent=opCost.toLocaleString('pl-PL')+' zł';
   document.getElementById('r1').textContent=fmt(sm);
   document.getElementById('r1s').textContent=fmt(Math.round(sm/30))+'/dzień';
   document.getElementById('r2').textContent=fmt(mm);
   document.getElementById('r2s').textContent=fmt(Math.round(mm/30))+'/dzień';
-  document.getElementById('r3').textContent=(zysk>=0?'+':'')+fmt(zysk)+'/mies.';
-  document.getElementById('r3s').textContent=(zyskR>=0?'+':'')+fmt(zyskR)+' rocznie · +'+w+'%';
+  document.getElementById('r3').textContent=(marza>=0?'+':'')+fmt(marza)+'/mies.';
+  document.getElementById('r3s').textContent=(marzaR>=0?'+':'')+fmt(marzaR)+' rocznie · +'+w+'%';
+  document.getElementById('r3b').textContent='−'+fmt(opCost)+'/mies.';
+  document.getElementById('r3c').textContent=(net>=0?'+':'')+fmt(net)+'/mies.';
+  document.getElementById('r3cs').textContent=(netR>=0?'+':'')+fmt(netR)+' rocznie';
   document.getElementById('r4').textContent=zwrot<200?'~'+zwrot+' mies.':'powyżej 16 lat';
-  document.getElementById('r4s').textContent='przy '+effInv.toLocaleString('pl-PL')+' zł'+(_arimr?' (po dofinansowaniu)':'');
+  document.getElementById('r4s').textContent='przy '+effInv.toLocaleString('pl-PL')+' zł'+(_arimr?' (po dofinansowaniu)':'')+', liczony od zysku netto';
   document.getElementById('r4l').textContent=_arimr?'Zwrot z dofinansowaniem':'Zwrot inwestycji';
 }
 
@@ -716,7 +736,7 @@ document.addEventListener('DOMContentLoaded', function(){
     _arimr=!_arimr; tog.classList.toggle('on',_arimr);
     tog.setAttribute('aria-pressed',_arimr); calc();
   });
-  ['s1','s2','s3','s4'].forEach(function(id){
+  ['s1','s2','s3','s4','s9'].forEach(function(id){
     var el=document.getElementById(id); if(el) el.addEventListener('input',calc);
   });
   ['s5','s6','s7','s8'].forEach(function(id){
