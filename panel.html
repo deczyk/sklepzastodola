@@ -310,6 +310,21 @@
   .salesWarn{background:#fff8e1;border-left:4px solid var(--accent);border-radius:8px;padding:10px 12px;font-size:12.5px;color:#5d4b16;margin-bottom:14px}
   @media(max-width:850px){.salesLayout{grid-template-columns:1fr}.salesMenu{position:static}.salesMenu{display:flex;overflow-x:auto}.salesMenu button{min-width:210px;margin:0 8px 0 0}}
 
+
+  /* --- Prywatne cenniki i archiwum dokumentów --- */
+  .privateNotice{background:#fff8e1;border:1px solid #ead99a;border-left:4px solid var(--accent);border-radius:10px;padding:12px 14px;color:#6d5516;font-size:12.5px;line-height:1.45;margin-bottom:14px}
+  .priceGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px;margin-bottom:16px}
+  .priceCard{border:1px solid var(--line);border-radius:14px;background:#fbfcfb;padding:16px 18px;box-shadow:0 2px 8px #00000008}
+  .priceCard h3{margin:0 0 8px;color:var(--green);font-size:15px}
+  .priceCard p{margin:0 0 10px;color:var(--muted);font-size:12.5px;line-height:1.45}
+  .priceActions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+  .priceBtn{display:inline-flex;align-items:center;gap:6px;background:var(--green);color:white;text-decoration:none;border:none;border-radius:8px;padding:8px 12px;font-size:12px;font-weight:bold;cursor:pointer}
+  .priceBtn.secondary{background:var(--light);color:var(--green);border:1px solid var(--line)}
+  .priceBtn:hover{opacity:.92}
+  .pricePreview{border:1px solid var(--line);border-radius:12px;background:white;padding:10px;margin-top:12px;overflow:auto;max-height:76vh}
+  .pricePreview img{width:100%;height:auto;display:block;border-radius:8px;min-width:860px}
+  .quickDocsGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px;margin-top:12px}
+
 </style>
 </head>
 <body>
@@ -362,6 +377,7 @@
       <button class="tabBtn" data-tab="zadania" onclick="switchTab('zadania')">✅ Do zrobienia</button>
       <button class="tabBtn" data-tab="klienci" onclick="switchTab('klienci')">👥 Baza klientów</button>
       <button class="tabBtn" data-tab="dokumenty" onclick="switchTab('dokumenty')">📄 Dokumenty i oferty</button>
+      <button class="tabBtn" data-tab="cenniki" onclick="switchTab('cenniki')">💶 Cenniki</button>
       <button class="tabBtn" data-tab="sprawy" onclick="switchTab('sprawy')">📋 Sprawy i aktywność</button>
       <button class="tabBtn" data-tab="terminy" onclick="switchTab('terminy')">📅 Terminy</button>
       <button class="tabBtn" data-tab="instalacje" onclick="switchTab('instalacje')">🥛 Instalacje</button>
@@ -447,6 +463,36 @@
       <input type="text" id="searchDokumenty" class="docSearch" placeholder="🔍 Szukaj dokumentu (nazwa, opis, kategoria)..." oninput="render()">
       <div id="list-dokumenty"></div>
     </div>
+    </div>
+
+
+
+    <div class="tabPane" id="tabpane-cenniki">
+      <div class="section">
+        <h2>💶 Cenniki BRUNIMAT</h2>
+        <div class="privateNotice"><b>Prywatnie:</b> ta zakładka jest tylko w panelu. Nie dodałem publicznej strony cennika. Cennik katalogowy możesz pokazywać klientowi podczas rozmowy, ale cenniki od Alfreda Bruni i partnerskie traktuj jako wewnętrzne.</div>
+
+        <div class="priceGrid">
+          <div class="priceCard">
+            <h3>Cennik katalogowy — obraz PNG</h3>
+            <p>Najważniejszy cennik graficzny. Jest duży i od razu widoczny w panelu, żeby nie trzeba było szukać go w folderach.</p>
+            <div class="priceActions">
+              <a class="priceBtn" href="_pliki-0xyqdz4t/cennik_katalogowy_2026.png" download>Pobierz PNG</a>
+              <a class="priceBtn secondary" href="javascript:void(0)" onclick="openPreview('_pliki-0xyqdz4t/cennik_katalogowy_2026.png')">Podejrzyj</a>
+            </div>
+            <div class="pricePreview"><img src="_pliki-0xyqdz4t/cennik_katalogowy_2026.png" alt="Cennik katalogowy BRUNIMAT"></div>
+          </div>
+
+          <div class="priceCard">
+            <h3>Cenniki wewnętrzne</h3>
+            <p>Cenniki dostawcy i partnerskie. Nie wysyłać klientowi końcowemu bez świadomej decyzji.</p>
+            <div class="quickDocsGrid">
+              <a class="fileCard" href="javascript:void(0)" onclick="openPreview('_pliki-0xyqdz4t/cennik_alfred_bruni.pdf')" title="Kliknij, aby podejrzeć"><div class="fileThumb"><span class="bigIcon icon-pdf">📄</span></div><div class="fileCardInfo"><div class="fileCardTitle">Cennik Alfred Bruni — wewnętrzny</div><span class="ext">PDF</span></div></a>
+              <a class="fileCard" href="javascript:void(0)" onclick="openPreview('_pliki-0xyqdz4t/cennik_partnerski_eur_2026.pdf')" title="Kliknij, aby podejrzeć"><div class="fileThumb"><span class="bigIcon icon-pdf">📄</span></div><div class="fileCardInfo"><div class="fileCardTitle">Cennik partnerski EUR 2026</div><span class="ext">PDF</span></div></a>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
     <div class="tabPane" id="tabpane-klienci">
@@ -567,19 +613,19 @@
     <div class="tabPane" id="tabpane-budzet">
     <div class="section">
       <h2>📊 Budżet startowy <span style="font-weight:normal;font-size:11px;color:var(--muted)">(pełna wersja z budzet.html · aktualizacja lipiec 2026)</span></h2>
-      <div class="budgetNote">Kurs planistyczny: 1 EUR = 4,30 zł. Wnioskowana pożyczka: 20 000 EUR (~86 000 zł). Koszt zakupu maszyny: 9 750 EUR. Pozycje oznaczone jako X wymagają lokalnej wyceny.</div>
+      <div class="budgetNote">Kurs planistyczny: 1 EUR = 4,30 zł. Wnioskowana pożyczka: 20 000 EUR (~86 000 zł). Koszt zakupu maszyny: 9 750 EUR. Budżet uwzględnia aktualizacje: wirtualne biuro 600 zł za cały rok, pawilon drewniany ok. 15–25 tys. zł, instalację wykonujemy sami, bez elektryka i bez przyłącza wody.</div>
 
       <div class="budgetSubTitle">1️⃣ Rejestracja spółki z o.o. — jednorazowo</div>
       <div class="tableWrap"><table class="planTable"><thead><tr><th>Pozycja</th><th>Opis</th><th>Koszt</th></tr></thead><tbody>
         <tr><td>Opłata KRS przez S24</td><td>Sąd + MSiG, płatne kartą w systemie S24</td><td>350 zł</td></tr>
         <tr><td>Kapitał zakładowy</td><td>Minimalny kapitał spółki — majątek spółki, nie przepada</td><td>5 000 zł</td></tr>
-        <tr><td>Wirtualne biuro / siedziba</td><td>Biuro29 Katowice — adres do KRS, US, GUS</td><td>X zł</td></tr>
+        <tr><td>Wirtualne biuro / siedziba</td><td>Biuro29 Katowice — adres do KRS, US, GUS; opłata jednorazowa za cały rok</td><td>600 zł</td></tr>
         <tr><td>VAT-R</td><td>Rejestracja online przez podatki.gov.pl — obowiązkowa dla importera</td><td>0 zł</td></tr>
         <tr><td>EORI</td><td>Numer do odpraw celnych</td><td>0 zł</td></tr>
         <tr><td>CRBR</td><td>Obowiązek zgłoszenia po KRS</td><td>0 zł</td></tr>
         <tr><td>Konto bankowe PLN</td><td>mBank / PKO lub inne konto firmowe</td><td>0 zł</td></tr>
         <tr><td>Revolut Business EUR/CHF</td><td>Do płatności za maszyny i obsługi walut</td><td>0–50 zł/mies.</td></tr>
-        <tr class="totalRow"><td>Suma rejestracji</td><td></td><td>~5 350 zł + X</td></tr>
+        <tr class="totalRow"><td>Suma rejestracji</td><td></td><td>~5 950 zł</td></tr>
       </tbody></table></div>
 
       <div class="budgetSubTitle">2️⃣ Pierwsza maszyna BRUNIMAT — jednorazowo</div>
@@ -612,13 +658,13 @@
 
       <div class="budgetSubTitle">4️⃣ Instalacja i uruchomienie u klienta — per instalacja</div>
       <div class="tableWrap"><table class="planTable"><thead><tr><th>Pozycja</th><th>Opis</th><th>Koszt / przychód</th></tr></thead><tbody>
-        <tr><td>Pawilon drewniany</td><td>Wycena indywidualna; ok. 50% klientów może zamawiać przez nas</td><td>X zł</td></tr>
+        <tr><td>Pawilon drewniany</td><td>Opcjonalny pawilon pod mlekomat; realna wycena orientacyjna</td><td>~15 000–25 000 zł</td></tr>
         <tr><td>Transport do klienta</td><td>Lokalnie Śląsk / okolice</td><td>~800 zł</td></tr>
-        <tr><td>Instalacja elektryczna</td><td>Podłączenie 230V — elektryk z uprawnieniami</td><td>X zł</td></tr>
-        <tr><td>Przyłącze wodne</td><td>Jeśli wymagane</td><td>X zł</td></tr>
-        <tr><td>Dokumentacja Sanepid / HACCP</td><td>Przy sprzedaży mleka surowego</td><td>X zł</td></tr>
-        <tr><td>Szkolenie klienta</td><td>Obsługa, czyszczenie, wymiana kann</td><td>0 zł / wliczone</td></tr>
-        <tr class="totalRow"><td>Przychód spółki z instalacji</td><td>Instalacja, uruchomienie i szkolenie</td><td class="posNum">1 500 zł</td></tr>
+        <tr><td>Montaż i ustawienie mlekomatu</td><td>Robimy we własnym zakresie — bez zewnętrznego elektryka</td><td>0 zł / wliczone</td></tr>
+        <tr><td>Przyłącze wodne</td><td>Niepotrzebne przy tej konfiguracji wdrożenia</td><td>0 zł</td></tr>
+        <tr><td>Dokumentacja Sanepid / HACCP</td><td>Po stronie klienta; możemy pomóc jako wsparcie wdrożeniowe</td><td>X zł / opcjonalnie</td></tr>
+        <tr><td>Szkolenie klienta</td><td>Obsługa, czyszczenie, wymiana kann — wliczone w wdrożenie</td><td>0 zł / wliczone</td></tr>
+        <tr class="totalRow"><td>Przychód spółki z wdrożenia</td><td>Uruchomienie, instruktaż i koordynacja startu</td><td class="posNum">1 500 zł</td></tr>
       </tbody></table></div>
 
       <div class="budgetSubTitle">5️⃣ Koszty stałe działalności — rocznie</div>
@@ -643,9 +689,9 @@
         <tr><td>Transport krajowy</td><td>800 zł</td></tr>
         <tr><td>Bufor na VAT importowy</td><td>8 500 zł</td></tr>
         <tr><td>Łączne koszty znane przed pawilonem</td><td>54 435 zł</td></tr>
-        <tr class="totalRow"><td>Pozostaje na pawilon, dostosowanie i rezerwę</td><td>~31 565 zł</td></tr>
+        <tr class="totalRow"><td>Pozostaje po znanych kosztach</td><td>~31 565 zł</td></tr>
       </tbody></table></div>
-      <div class="budgetNote">Środki z pożyczki: pierwszy zakup maszyny, różnica między zaliczką klienta 50% a płatnością dla producenta, VAT importowy, pierwszy pawilon/transport i płynność.</div>
+      <div class="budgetNote">Środki z pożyczki: pierwszy zakup maszyny, różnica między zaliczką klienta 50% a płatnością dla producenta, VAT importowy, transport i płynność. Jeśli finansujemy pawilon 15–25 tys. zł, po pawilonie zostaje orientacyjnie ~6 565–16 565 zł rezerwy.</div>
 
       <div class="budgetSubTitle">7️⃣ Model cenowy i rentowność jednej sprzedaży</div>
       <div class="tableWrap"><table class="planTable"><tbody>
@@ -653,11 +699,11 @@
         <tr><td>Cena pierwszych dwóch urządzeń referencyjnych</td><td>13 500 EUR</td></tr>
         <tr><td>Standardowa cena sprzedaży od 3. urządzenia</td><td>13 900 EUR</td></tr>
         <tr><td>Cena katalogowa</td><td>14 500 EUR</td></tr>
-        <tr><td>Instalacja, uruchomienie i szkolenie</td><td>1 500 zł</td></tr>
+        <tr><td>Wdrożenie, uruchomienie i szkolenie</td><td>1 500 zł</td></tr>
         <tr><td>Obsługa importu i koordynacja</td><td>900 zł</td></tr>
         <tr><td>Marża na urządzeniu referencyjnym</td><td class="posNum">3 750 EUR / ~16 125 zł</td></tr>
         <tr><td>Marża na urządzeniu standardowym</td><td class="posNum">4 150 EUR / ~17 845 zł</td></tr>
-        <tr><td>Średnia marża na pawilonie na 1 urządzenie</td><td>750 zł</td></tr>
+        <tr><td>Marża na pawilonie</td><td>do ustalenia; pawilon orientacyjnie 15–25 tys. zł</td></tr>
         <tr class="totalRow"><td>Łączna marża przed rezerwą gwarancyjną</td><td class="posNum">~20 995 zł</td></tr>
         <tr class="totalRow"><td>Wkład po rezerwie gwarancyjnej</td><td class="posNum">~19 800 zł</td></tr>
       </tbody></table></div>
@@ -698,10 +744,12 @@
       <div class="tableWrap"><table class="planTable"><tbody>
         <tr><td>Pożyczka wnioskowana</td><td class="posNum">86 000 zł</td></tr>
         <tr><td>Znane koszty przed pawilonem</td><td class="negNum">54 435 zł</td></tr>
-        <tr><td>Zostaje na pawilon i rezerwę</td><td class="posNum">~31 565 zł</td></tr>
+        <tr><td>Zostaje po znanych kosztach przed pawilonem</td><td class="posNum">~31 565 zł</td></tr>
+        <tr><td>Pawilon drewniany, jeśli finansujemy go z tej puli</td><td class="negNum">~15 000–25 000 zł</td></tr>
+        <tr><td>Rezerwa po pawilonie</td><td class="posNum">~6 565–16 565 zł</td></tr>
         <tr><td>Marża na jednej sprzedaży</td><td class="posNum">~20 995 zł</td></tr>
       </tbody></table></div>
-      <div class="budgetNote">Kwota 20 000 EUR powinna umożliwić zakup pierwszego urządzenia, transport, czasowe sfinansowanie VAT i przygotowanie pierwszej realizacji — pod warunkiem kontroli wydatków i wykorzystania zaliczki klienta 50%.</div>
+      <div class="budgetNote">Kwota 20 000 EUR powinna umożliwić zakup pierwszego urządzenia, transport, czasowe sfinansowanie VAT i przygotowanie pierwszej realizacji. Pawilon 15–25 tys. zł mocno zmniejsza rezerwę, więc trzeba pilnować zaliczki klienta i nie finansować zbędnych kosztów z własnej kieszeni.</div>
     </div>
     </div>
 
@@ -961,15 +1009,39 @@ function switchTab(name){
 function defaultData(){
   return {
     dokumenty: [
-      {id:"d1", title:"Oferta BRUNIMAT PREMIUM 650 DUO z instalacją", link:"_pliki-0xyqdz4t/Oferta_BRUNIMAT_PREMIUM_650_DUO_z_instalacja.pdf", desc:"Oferta handlowa dla klienta", kategoria:"Cennik dla Komornicki (10 000 EUR)", status:"todo", notes:""},
-      {id:"d2", title:"Cennik partnerski EUR 2026", link:"_pliki-0xyqdz4t/Sklep_za_Stodola_Cennik_Partnerski_EUR_2026.pdf", desc:"Ceny dla partnerów", kategoria:"Cennik partnerski", status:"todo", notes:""},
-      {id:"d3", title:"Cennik (obraz)", link:"_pliki-0xyqdz4t/cennik.png", desc:"Cennik w formie grafiki", kategoria:"Cennik katalogowy", status:"todo", notes:""},
-      {id:"d4", title:"Umowa sprzedaży mlekomatu", link:"_pliki-0xyqdz4t/umowa-sprzedazy-mlekomatu.docx", desc:"Wzór umowy z klientem końcowym", kategoria:"Inne dokumenty", status:"todo", notes:""},
-      {id:"d5", title:"Biznesplan ARiMR", link:"_pliki-0xyqdz4t/Sklep_za_Stodola_Biznesplan_ARiMR.docx", desc:"Pełny biznesplan pod dotację ARiMR", kategoria:"Inne dokumenty", status:"todo", notes:""},
-      {id:"d6", title:"Biznesplan skrócony", link:"_pliki-0xyqdz4t/Sklep_za_Stodola_Biznesplan_skrocony.docx", desc:"Wersja skrócona dla inwestora", kategoria:"Inne dokumenty", status:"todo", notes:""},
-      {id:"d7", title:"Baza przyszłych klientów BRUNIMAT", link:"_pliki-0xyqdz4t/Baza_przyszlych_klientow_BRUNIMAT.xlsx", desc:"Arkusz CRM / lista prospektów", kategoria:"Inne dokumenty", status:"todo", notes:""},
-      {id:"d8", title:"Katalog Brunimat (PL, ze zdjęciami)", link:"_pliki-0xyqdz4t/BRUNI02072026_tylko_po_polsku_ze_zdjeciami_bez_wszystkich_pustych_stron.pdf", desc:"Materiał produktowy Brunimat", kategoria:"Inne dokumenty", status:"todo", notes:""},
-      {id:"d9", title:"Umowa dystrybucyjna Brunimat — Sklep za Stodołą", link:"_pliki-0xyqdz4t/umowabruni-sklep.pdf", desc:"Umowa wyłącznej dystrybucji (PL)", kategoria:"Inne dokumenty", status:"todo", notes:""}
+      {id:"doc_auto_001", title:"Cennik katalogowy — obraz PNG", link:"_pliki-0xyqdz4t/cennik_katalogowy_2026.png", desc:"Widoczny cennik Sklepu za Stodołą dla rozmów z klientem. Niepublikowany jako osobna strona.", kategoria:"Cenniki", status:"todo", notes:""},
+      {id:"doc_auto_002", title:"Cennik od Alfreda Bruni — wewnętrzny", link:"_pliki-0xyqdz4t/cennik_alfred_bruni.pdf", desc:"Wewnętrzny cennik dostawcy. Nie wysyłać klientowi bez decyzji.", kategoria:"Cenniki wewnętrzne", status:"todo", notes:""},
+      {id:"doc_auto_004", title:"Cennik partnerski EUR 2026", link:"_pliki-0xyqdz4t/cennik_partnerski_eur_2026.pdf", desc:"Cennik partnerski Sklepu za Stodołą. Materiał wewnętrzny.", kategoria:"Cenniki wewnętrzne", status:"todo", notes:""},
+      {id:"doc_auto_005", title:"Umowa dystrybucyjna Brunimat — Sklep za Stodołą", link:"_pliki-0xyqdz4t/umowa_dystrybucyjna_brunimat_sklep.pdf", desc:"Umowa współpracy / dystrybucji z Brunimat.", kategoria:"Umowy i formalne", status:"todo", notes:""},
+      {id:"doc_auto_006", title:"Brunimat — skan umowy / potwierdzenia", link:"_pliki-0xyqdz4t/brunimat_umowa_skan.jpeg", desc:"Skan/zdjęcie dokumentu Brunimat.", kategoria:"Umowy i formalne", status:"todo", notes:""},
+      {id:"doc_auto_007", title:"Umowa spółki z o.o. — PDF", link:"_pliki-0xyqdz4t/umowa_spolki_zoo.pdf", desc:"Dokument spółki do archiwum.", kategoria:"KRS / podpisane", status:"todo", notes:""},
+      {id:"doc_auto_008", title:"Umowa spółki z o.o. — XML", link:"_pliki-0xyqdz4t/umowa_spolki_zoo.xml", desc:"Plik XML z systemu S24/PRS.", kategoria:"KRS / podpisane", status:"todo", notes:""},
+      {id:"doc_auto_009", title:"Podpisane: oświadczenie adres doręczeń", link:"_pliki-0xyqdz4t/podpisane_1_oswiadczenie_adres_doreczen.pdf", desc:"Podpisany dokument do KRS/PRS.", kategoria:"KRS / podpisane", status:"todo", notes:""},
+      {id:"doc_auto_010", title:"Podpisane: oświadczenie cudzoziemiec", link:"_pliki-0xyqdz4t/podpisane_2_oswiadczenie_cudzoziemiec.pdf", desc:"Podpisany dokument do KRS/PRS.", kategoria:"KRS / podpisane", status:"todo", notes:""},
+      {id:"doc_auto_011", title:"Podpisane: oświadczenie wkłady wniesione", link:"_pliki-0xyqdz4t/podpisane_3_oswiadczenie_wklady_wniesione.pdf", desc:"Podpisany dokument do KRS/PRS.", kategoria:"KRS / podpisane", status:"todo", notes:""},
+      {id:"doc_auto_012", title:"Oferta BRUNIMAT PREMIUM 650 DUO z instalacją — PDF", link:"_pliki-0xyqdz4t/oferta_brunimat_premium_650_duo_instalacja.pdf", desc:"Oferta do wysyłki / archiwum rozmów z klientem.", kategoria:"Oferta / klient", status:"todo", notes:""},
+      {id:"doc_auto_013", title:"Oferta BRUNIMAT PREMIUM 650 DUO z instalacją — DOCX", link:"_pliki-0xyqdz4t/oferta_brunimat_premium_650_duo_instalacja.docx", desc:"Edytowalna wersja oferty.", kategoria:"Oferta / klient", status:"todo", notes:""},
+      {id:"doc_auto_014", title:"Umowa sprzedaży mlekomatu — wzór", link:"_pliki-0xyqdz4t/umowa_sprzedazy_mlekomatu.docx", desc:"Roboczy wzór umowy z klientem końcowym.", kategoria:"Oferta / klient", status:"todo", notes:""},
+      {id:"doc_auto_015", title:"Analiza potencjału inwestycji", link:"_pliki-0xyqdz4t/analiza_potencjalu_inwestycji.pdf", desc:"Materiał analityczny do rozmów i finansowania.", kategoria:"Finansowanie / biznesplan", status:"todo", notes:""},
+      {id:"doc_auto_016", title:"Katalog BRUNIMAT PL ze zdjęciami", link:"_pliki-0xyqdz4t/katalog_brunimat_pl_ze_zdjeciami.pdf", desc:"Najbardziej użyteczna wersja katalogu po polsku.", kategoria:"Katalogi techniczne", status:"todo", notes:""},
+      {id:"doc_auto_018", title:"Biznesplan ARiMR — PDF", link:"_pliki-0xyqdz4t/biznesplan_arimr.pdf", desc:"Wersja PDF do finansowania/dotacji.", kategoria:"Finansowanie / biznesplan", status:"todo", notes:""},
+      {id:"doc_auto_019", title:"Biznesplan ARiMR — DOCX", link:"_pliki-0xyqdz4t/biznesplan_arimr.docx", desc:"Edytowalna wersja biznesplanu ARiMR.", kategoria:"Finansowanie / biznesplan", status:"todo", notes:""},
+      {id:"doc_auto_020", title:"Biznesplan pełny — DOCX", link:"_pliki-0xyqdz4t/biznesplan_pelny.docx", desc:"Pełniejsza wersja biznesplanu.", kategoria:"Finansowanie / biznesplan", status:"todo", notes:""},
+      {id:"doc_auto_021", title:"Biznesplan skrócony — DOCX", link:"_pliki-0xyqdz4t/biznesplan_skrocony.docx", desc:"Krótka wersja dla inwestora/partnera.", kategoria:"Finansowanie / biznesplan", status:"todo", notes:""},
+      {id:"doc_auto_023", title:"Polen Marktpotenzial für Brunimat", link:"_pliki-0xyqdz4t/polen_marktpotenzial_brunimat_v.pdf", desc:"Analiza potencjału rynku PL dla Brunimat.", kategoria:"Finansowanie / biznesplan", status:"todo", notes:""},
+      {id:"doc_auto_024", title:"Budżet startowy — archiwum HTML", link:"_pliki-0xyqdz4t/budzet_startowy_archiwum.html", desc:"Źródłowa wersja budżetu startowego.", kategoria:"Finansowanie / biznesplan", status:"todo", notes:""},
+      {id:"doc_auto_025", title:"Baza przyszłych klientów BRUNIMAT", link:"_pliki-0xyqdz4t/baza_przyszlych_klientow_brunimat.xlsx", desc:"Arkusz CRM / lista prospektów.", kategoria:"CRM / baza", status:"todo", notes:""},
+      {id:"doc_auto_026", title:"Advisor / kalkulator — wersja HTML", link:"_pliki-0xyqdz4t/advisor_nowy.html", desc:"Robocza wersja kalkulatora/advisora.", kategoria:"Narzędzia / strona", status:"todo", notes:""},
+      {id:"doc_auto_027", title:"Zdjęcie mlekomatu / automat 2", link:"_pliki-0xyqdz4t/automat2.png", desc:"Materiał graficzny do strony i ofert.", kategoria:"Marketing / grafiki", status:"todo", notes:""},
+      {id:"doc_auto_028", title:"Zdjęcie mlekomatu / automat 3", link:"_pliki-0xyqdz4t/automat3.jpg", desc:"Materiał graficzny do strony i ofert.", kategoria:"Marketing / grafiki", status:"todo", notes:""},
+      {id:"doc_auto_029", title:"Pawilon — zdjęcie 1", link:"_pliki-0xyqdz4t/pawilon_1.jpg", desc:"Materiał graficzny do strony i ofert.", kategoria:"Marketing / grafiki", status:"todo", notes:""},
+      {id:"doc_auto_030", title:"Pawilony — grafika 2", link:"_pliki-0xyqdz4t/pawilony_2.png", desc:"Materiał graficzny do strony i ofert.", kategoria:"Marketing / grafiki", status:"todo", notes:""},
+      {id:"doc_auto_031", title:"Pawilon — grafika 3", link:"_pliki-0xyqdz4t/pawilon_3.webp", desc:"Materiał graficzny do strony i ofert.", kategoria:"Marketing / grafiki", status:"todo", notes:""},
+      {id:"doc_auto_032", title:"Wizytówka Jarosław Deczyński — PDF", link:"_pliki-0xyqdz4t/wizytowka_jaroslaw_deczynski.pdf", desc:"Wersja do druku / archiwum.", kategoria:"Marketing / grafiki", status:"todo", notes:""},
+      {id:"doc_auto_033", title:"Wizytówka Jakub — przód JPG", link:"_pliki-0xyqdz4t/jakub_deczynski_przod_96x56mm_spad3mm.jpg", desc:"Wizytówka JPG ze spadem do druku.", kategoria:"Marketing / grafiki", status:"todo", notes:""},
+      {id:"doc_auto_034", title:"Wizytówka Jakub — tył JPG", link:"_pliki-0xyqdz4t/jakub_deczynski_tyl_96x56mm_spad3mm.jpg", desc:"Wizytówka JPG ze spadem do druku.", kategoria:"Marketing / grafiki", status:"todo", notes:""},
+      {id:"doc_auto_035", title:"Wizytówka Jarosław — przód JPG", link:"_pliki-0xyqdz4t/jaroslaw_deczynski_przod_96x56mm_spad3mm.jpg", desc:"Wizytówka JPG ze spadem do druku.", kategoria:"Marketing / grafiki", status:"todo", notes:""},
+      {id:"doc_auto_036", title:"Wizytówka Jarosław — tył JPG", link:"_pliki-0xyqdz4t/jaroslaw_deczynski_tyl_96x56mm_spad3mm.jpg", desc:"Wizytówka JPG ze spadem do druku.", kategoria:"Marketing / grafiki", status:"todo", notes:""}
     ],
     sprawy: [
       {id:"s1", title:"Uzupełnienie braków KRS (sygn. 23137/26/118)", link:"", desc:"Lista wspólników + 3 oświadczenia, podpis Jarosława", status:"progress", notes:""}
@@ -998,7 +1070,7 @@ function defaultData(){
       {id:"z4", tekst:"Ustalić marże maszyny, dodatków do maszyny", kto:"Jakub", zrobione:false},
       {id:"z5", tekst:"Naklejki na automat, na butelki", kto:"Jakub", zrobione:false},
       {id:"z6", tekst:"Producent szklanych butelek", kto:"Jakub", zrobione:false},
-      {id:"z7", tekst:"Dowiedzieć się o instalacji, elektryk itd.", kto:"Jakub", zrobione:false},
+      {id:"z7", tekst:"Przygotować prostą instrukcję instalacji: ustawienie, podłączenie mlekomatu, test, szkolenie klienta", kto:"Jakub", zrobione:false},
       {id:"z8", tekst:"Oferta Loray Merlin", kto:"Jakub", zrobione:false},
       {id:"z9", tekst:"Badanie rynku Niemcy", kto:"Jakub", zrobione:false},
       {id:"z10", tekst:"Na stronie wszędzie gdzie dotacja — tam przekierowanie na źródło", kto:"Jakub", zrobione:false},
@@ -1083,7 +1155,16 @@ async function initApp(){
 function fillMissingDefaults(d){
   const dflt = defaultData();
   let changed = false;
-  if(!d.dokumenty || d.dokumenty.length===0){ d.dokumenty = dflt.dokumenty; changed = true; }
+  if(!d.dokumenty || d.dokumenty.length===0){
+    d.dokumenty = dflt.dokumenty;
+    changed = true;
+  } else {
+    const missingDocs = dflt.dokumenty.filter(doc => !d.dokumenty.some(existing => existing.id === doc.id || existing.link === doc.link || existing.title === doc.title));
+    if(missingDocs.length){
+      d.dokumenty = d.dokumenty.concat(missingDocs);
+      changed = true;
+    }
+  }
   if(!d.sprawy || d.sprawy.length===0){ d.sprawy = dflt.sprawy; changed = true; }
   if(!d.klienci){ d.klienci = []; changed = true; }
   if(!d.log){ d.log = []; changed = true; }
