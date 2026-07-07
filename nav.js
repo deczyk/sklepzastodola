@@ -51,11 +51,15 @@
     if(form && form.tagName === 'FORM'){
       const litry = form.querySelector('[name="litry_dziennie"]');
       const temat = form.querySelector('[name="temat"]');
+      const krowy = form.querySelector('[name="liczba_krow"]');
+      const lokalizacja = form.querySelector('[name="lokalizacja"]');
       track('form_submit', {
         form_id: form.id || 'unknown',
         page_path: location.pathname,
         litry_dziennie: litry ? litry.value : '',
-        temat: temat ? temat.value : ''
+        temat: temat ? temat.value : '',
+        liczba_krow: krowy ? krowy.value : '',
+        lokalizacja: lokalizacja ? lokalizacja.value : ''
       });
     }
   });
