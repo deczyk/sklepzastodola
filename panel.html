@@ -310,6 +310,19 @@
   .salesWarn{background:#fff8e1;border-left:4px solid var(--accent);border-radius:8px;padding:10px 12px;font-size:12.5px;color:#5d4b16;margin-bottom:14px}
   @media(max-width:850px){.salesLayout{grid-template-columns:1fr}.salesMenu{position:static}.salesMenu{display:flex;overflow-x:auto}.salesMenu button{min-width:210px;margin:0 8px 0 0}}
 
+  /* --- Podwykonawcy --- */
+  .vendorIntro{background:#fff8e1;border:1px solid #ead99a;border-left:4px solid var(--accent);border-radius:10px;padding:12px 14px;color:#6d5516;font-size:12.5px;line-height:1.45;margin-bottom:14px}
+  .vendorGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px}
+  .vendorCard{border:1px solid var(--line);border-radius:14px;background:#fbfcfb;padding:16px 18px;box-shadow:0 2px 8px #00000008}
+  .vendorCard h3{margin:0 0 6px;color:var(--green);font-size:15px}
+  .vendorMeta{font-size:12px;color:var(--muted);margin-bottom:10px}
+  .vendorList{margin:8px 0 0;padding-left:18px;font-size:12.8px;line-height:1.5;color:var(--ink)}
+  .vendorList li{margin-bottom:4px}
+  .vendorContact{background:white;border:1px solid #e8eee8;border-radius:10px;padding:10px 12px;margin-top:12px;font-size:12.5px;line-height:1.55}
+  .vendorContact a{color:var(--green);font-weight:bold;text-decoration:none}
+  .vendorContact a:hover{text-decoration:underline}
+  .vendorTodo{display:inline-block;background:#f3efe4;color:#7a5a13;border-radius:999px;padding:3px 9px;font-size:11px;font-weight:bold;margin-bottom:8px}
+
 
   /* --- Prywatne cenniki i archiwum dokumentów --- */
   .privateNotice{background:#fff8e1;border:1px solid #ead99a;border-left:4px solid var(--accent);border-radius:10px;padding:12px 14px;color:#6d5516;font-size:12.5px;line-height:1.45;margin-bottom:14px}
@@ -384,6 +397,7 @@
       <button class="tabBtn" data-tab="budzet" onclick="switchTab('budzet')">📊 Budżet startowy</button>
       <button class="tabBtn" data-tab="finanse" onclick="switchTab('finanse')">💰 Finanse</button>
       <button class="tabBtn" data-tab="linki" onclick="switchTab('linki')">🔗 Szybkie linki</button>
+      <button class="tabBtn" data-tab="podwykonawcy" onclick="switchTab('podwykonawcy')">🤝 Podwykonawcy</button>
       <button class="tabBtn" data-tab="marketing" onclick="switchTab('marketing')">📢 Marketing</button>
       <button class="tabBtn" data-tab="materialy" onclick="switchTab('materialy')">📋 Materiały sprzedażowe</button>
     </div>
@@ -809,6 +823,87 @@
     </div>
     </div>
 
+    <div class="tabPane" id="tabpane-podwykonawcy">
+    <div class="section">
+      <h2>Podwykonawcy i dostawcy</h2>
+      <div class="vendorIntro">
+        Wewnętrzna lista robocza. Nie publikować na stronie publicznej. Dane służą do ofertowania: pawilon, transport, okleiny, butelki i materiały wdrożeniowe.
+      </div>
+
+      <div class="vendorGrid">
+        <div class="vendorCard">
+          <h3>Pawilon</h3>
+          <div class="vendorMeta">Status: do uzupełnienia</div>
+          <span class="vendorTodo">brak wybranego wykonawcy</span>
+          <ul class="vendorList">
+            <li>Zakres: pawilon drewniany / punkt sprzedaży przy gospodarstwie.</li>
+            <li>Budżet roboczy: ok. 15 000-25 000 zł.</li>
+            <li>Do ustalenia: wymiary, transport, montaż, czas realizacji, fundament/podłoże, opcje ocieplenia.</li>
+          </ul>
+          <div class="vendorContact">
+            Kontakt: do dodania po wyborze wykonawcy.
+          </div>
+        </div>
+
+        <div class="vendorCard">
+          <h3>Transport</h3>
+          <div class="vendorMeta">Status: do uzupełnienia</div>
+          <span class="vendorTodo">brak wybranego przewoźnika</span>
+          <ul class="vendorList">
+            <li>Zakres: transport mlekomatu / pawilonu / elementów wyposażenia.</li>
+            <li>Do ustalenia: trasy CH/UE/PL, ubezpieczenie, rozładunek, termin, dokumenty przewozowe.</li>
+            <li>Uwaga: przy imporcie mlekomatu uwzględniać dokument T1 i odprawę.</li>
+          </ul>
+          <div class="vendorContact">
+            Kontakt: do dodania po wyborze przewoźnika.
+          </div>
+        </div>
+
+        <div class="vendorCard">
+          <h3>Naklejki / okleiny - Printario</h3>
+          <div class="vendorMeta">Damian Kucybała, Pińczów</div>
+          <ul class="vendorList">
+            <li>Projekt graficzny na podstawie logo, zdjęć i wytycznych: 350 zł netto.</li>
+            <li>Wydruk okleiny 2x bok + komora odbioru: 1 szt. 300 zł netto, 5 szt. 280 zł netto/szt.</li>
+            <li>W cenie druku: druk, laminowanie i wycięcie. Projekt rozliczany osobno.</li>
+            <li>Termin: projekt 2-3 dni robocze, wydruk 2-3 dni robocze od akceptacji.</li>
+            <li>Wysyłka gotowej okleiny do samodzielnego montażu: 20 zł.</li>
+            <li>Materiał: folia polimerowa z laminatem, odporna na warunki atmosferyczne, UV i regularne mycie.</li>
+            <li>Laminat: mat albo błysk. Standardowo 3 cm zapasu z każdej strony.</li>
+            <li>Pliki: EPS, PDF albo PNG w wysokiej rozdzielczości. Potrzebne zdjęcia urządzenia na wprost, wymiary i rozmieszczenie otworów.</li>
+          </ul>
+          <div class="vendorContact">
+            Tel.: <a href="tel:+48784424061">+48 784 424 061</a><br>
+            E-mail: <a href="mailto:kontakt@printario.pl">kontakt@printario.pl</a><br>
+            WWW: <a href="https://www.printario.pl/" target="_blank" rel="noopener">www.printario.pl</a><br>
+            Adres: Pińczów, 28-400, Polska
+          </div>
+        </div>
+
+        <div class="vendorCard">
+          <h3>Butelki szklane - BINA</h3>
+          <div class="vendorMeta">Emilia Olszewska, BINA Izabella Olszewska</div>
+          <ul class="vendorList">
+            <li>Oferta: butelki 1 l i 500 ml do mleka, jednorazowe i zwrotne.</li>
+            <li>Zakrętki wielokrotnego użytku: TO48 białe.</li>
+            <li>Do myjek i obiegu zwrotnego: modele 217 i 224.</li>
+            <li>Minimalna ilość dla indywidualnego nadruku: 5000 szt.</li>
+            <li>Rekomendowane znakowanie: nadruk ceramiczny, wypał 600-630 stopni.</li>
+            <li>Nadruk: do 4 kolorów.</li>
+            <li>Koszt projektu / matrycy / formy: do potwierdzenia.</li>
+            <li>Produkcja: butelki są w regularnej produkcji; kluczowe jest opracowanie oprzyrządowania do dekoracji.</li>
+            <li>Pakowanie: paleta 120x100 cm, luzem, na przekładkach plastikowych lub papierowych.</li>
+            <li>Próbki: możliwe przed większym zamówieniem.</li>
+          </ul>
+          <div class="vendorContact">
+            Tel.: <a href="tel:+48666828990">+48 666 828 990</a><br>
+            WWW: <a href="https://www.bina.com.pl/" target="_blank" rel="noopener">www.bina.com.pl</a>
+          </div>
+        </div>
+      </div>
+    </div>
+    </div>
+
     <div class="tabPane" id="tabpane-marketing">
     <div class="section">
       <h2>📢 Gotowe teksty reklam</h2>
@@ -973,29 +1068,37 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script>
-const PASSWORD = "Mlekodobremleczko123!"; // zmień na własne hasło w kodzie strony
 const STORAGE_KEY = "panel_items_v2";
+const PANEL_SESSION_KEY = "panel_session_password";
+const SYNC_ENABLED = true;
 
-// ==== Wspólny magazyn danych (jsonbin.io) — uzupełnij po założeniu konta ====
-const JSONBIN_API_KEY = "$2a$10$C/bp91tzVg.vkmR8ijQQQ.sQw//hz0FdV23nPQpt.X1kAhHu06YcG";  // Twój X-Master-Key z jsonbin.io
-const JSONBIN_BIN_ID  = "6a4b837eda38895dfe3466b9";  // ID binu utworzonego na jsonbin.io
-const SYNC_ENABLED = !!(JSONBIN_API_KEY && JSONBIN_BIN_ID);
+function getPanelPassword(){
+  return sessionStorage.getItem(PANEL_SESSION_KEY) || "";
+}
 
-function tryUnlock(){
+async function tryUnlock(){
   const val = document.getElementById("pwInput").value;
-  if(val === PASSWORD){
+  const err = document.getElementById("gateErr");
+  err.textContent = "Sprawdzam dostęp...";
+  try{
+    initialRemoteData = await fetchRemote(val);
+    sessionStorage.setItem(PANEL_SESSION_KEY, val);
     sessionStorage.setItem("panel_unlocked","1");
     document.getElementById("gate").style.display="none";
     document.getElementById("app").style.display="block";
+    err.textContent = "";
     initApp();
-  } else {
-    document.getElementById("gateErr").textContent = "Złe hasło, spróbuj ponownie.";
+  }catch(e){
+    sessionStorage.removeItem(PANEL_SESSION_KEY);
+    sessionStorage.removeItem("panel_unlocked");
+    err.textContent = e && e.message === "AUTH" ? "Złe hasło, spróbuj ponownie." : "Nie udało się połączyć z panelem.";
   }
 }
 document.getElementById("pwInput").addEventListener("keydown", e=>{ if(e.key==="Enter") tryUnlock(); });
 
 function lock(){
   sessionStorage.removeItem("panel_unlocked");
+  sessionStorage.removeItem(PANEL_SESSION_KEY);
   document.getElementById("app").style.display="none";
   document.getElementById("gate").style.display="flex";
   document.getElementById("pwInput").value="";
@@ -1090,6 +1193,7 @@ function defaultData(){
 
 let data = null;
 let saveTimer = null;
+let initialRemoteData = null;
 
 function loadLocalCache(){
   try{
@@ -1099,16 +1203,18 @@ function loadLocalCache(){
   return null;
 }
 
-async function fetchRemote(){
+async function fetchRemote(password = getPanelPassword()){
   if(!SYNC_ENABLED) return null;
   try{
-    const res = await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}/latest`, {
-      headers: { "X-Master-Key": JSONBIN_API_KEY }
+    const res = await fetch("/api/panel-data", {
+      headers: { "X-Panel-Password": password }
     });
+    if(res.status === 401) throw new Error("AUTH");
     if(!res.ok) throw new Error("HTTP "+res.status);
     const json = await res.json();
     return json.record;
   }catch(e){
+    if(e && e.message === "AUTH") throw e;
     console.warn("Nie udało się pobrać danych ze wspólnego magazynu:", e);
     return null;
   }
@@ -1117,19 +1223,20 @@ async function fetchRemote(){
 async function pushRemote(payload){
   if(!SYNC_ENABLED) return;
   try{
-    await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}`, {
+    const res = await fetch("/api/panel-data", {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
-        "X-Master-Key": JSONBIN_API_KEY,
-        "X-Bin-Versioning": "false"
+        "X-Panel-Password": getPanelPassword()
       },
       body: JSON.stringify(payload)
     });
+    if(res.status === 401) throw new Error("AUTH");
+    if(!res.ok) throw new Error("HTTP "+res.status);
     setSyncStatus("Zsynchronizowano ✓", false);
   }catch(e){
     console.warn("Nie udało się zapisać do wspólnego magazynu:", e);
-    setSyncStatus("Zapisano tylko lokalnie (brak sieci) ⚠", true);
+    setSyncStatus(e && e.message === "AUTH" ? "Sesja wygasła - zablokuj i zaloguj ponownie" : "Zapisano tylko lokalnie (brak sieci) ⚠", true);
   }
 }
 
@@ -1140,7 +1247,17 @@ function setSyncStatus(text, warn){
 
 async function initApp(){
   setSyncStatus(SYNC_ENABLED ? "Wczytywanie danych..." : "Tryb lokalny (bez synchronizacji)", !SYNC_ENABLED);
-  const remote = await fetchRemote();
+  let remote = initialRemoteData;
+  initialRemoteData = null;
+  if(!remote){
+    try{
+      remote = await fetchRemote();
+    }catch(e){
+      lock();
+      document.getElementById("gateErr").textContent = "Sesja wygasła. Zaloguj się ponownie.";
+      return;
+    }
+  }
   const local = loadLocalCache();
   data = remote || local || defaultData();
   const wasIncomplete = fillMissingDefaults(data);
@@ -1186,9 +1303,15 @@ function fillMissingDefaults(d){
 }
 
 async function refreshFromRemote(){
-  if(!SYNC_ENABLED){ setSyncStatus("Synchronizacja wyłączona — uzupełnij klucz jsonbin.io w kodzie", true); return; }
+  if(!SYNC_ENABLED){ setSyncStatus("Synchronizacja wyłączona", true); return; }
   setSyncStatus("Odświeżanie...", false);
-  const remote = await fetchRemote();
+  let remote = null;
+  try{
+    remote = await fetchRemote();
+  }catch(e){
+    setSyncStatus("Sesja wygasła - zablokuj i zaloguj ponownie", true);
+    return;
+  }
   if(remote){
     data = remote;
     fillMissingDefaults(data);
@@ -1208,7 +1331,7 @@ function saveData(){
   saveTimer = setTimeout(()=>pushRemote(data), 500); // debounce
 }
 
-if(sessionStorage.getItem("panel_unlocked")==="1"){
+if(sessionStorage.getItem("panel_unlocked")==="1" && getPanelPassword()){
   document.getElementById("gate").style.display="none";
   document.getElementById("app").style.display="block";
   initApp();

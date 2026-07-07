@@ -14,6 +14,18 @@ Traktuj poniższe zasady tak, jakby użytkownik dopisał je przed każdą wiadom
 
 Nie proś użytkownika, żeby powtarzał te zasady w promptach. Są domyślne dla każdej rozmowy w tym repozytorium.
 
+## Automatyczna publikacja
+
+Traktuj poniższe jako stałą zgodę użytkownika dla tego repozytorium:
+
+- Po zakończonej, sprawdzonej i bezpiecznej edycji automatycznie zrób `git add`, `git commit` i `git push` do właściwego repozytorium.
+- Nie pytaj za każdym razem "czy wrzucić na GitHub", chyba że zmiana jest ryzykowna, dotyczy sekretów, wymaga konfiguracji Vercel/JSONBin albo może ujawnić dane wewnętrzne.
+- Nie publikuj zmian, jeśli panel może przestać działać bez ręcznej konfiguracji po stronie Vercel lub innego serwisu.
+- Jeśli automatyczna publikacja jest zablokowana, powiedz krótko dokładnie co blokuje push i co użytkownik ma kliknąć/ustawić.
+- Commit ma być mały i opisowy. Nie łącz przypadkowo niezwiązanych zmian.
+
+Domyślny remote do publikacji: `upstream main`, jeśli `origin` nie ma uprawnień.
+
 ## Zasady bezpieczeństwa
 
 - Nie zmieniaj hasła do panelu, JSONBin, synchronizacji ani logiki zapisu danych, chyba że użytkownik wyraźnie o to poprosi.

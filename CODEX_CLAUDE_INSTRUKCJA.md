@@ -14,6 +14,27 @@ Pracuj oszczędnie. Nie czytaj całego repozytorium, jeśli nie jest to konieczn
 
 W Claude ustaw to w instrukcji projektu. W Codex trzymaj to w `AGENTS.md`, żeby działało jako stała instrukcja repozytorium.
 
+## Automatyczna publikacja Codex
+
+Domyślnie Codex ma po zakończonej bezpiecznej zmianie zrobić:
+
+1. minimalną edycję,
+2. krótkie sprawdzenie,
+3. commit,
+4. push na GitHub,
+5. krótkie podsumowanie.
+
+Nie trzeba pisać za każdym razem "wrzuć na GitHub".
+
+Wyjątki:
+
+- nie publikować, jeśli brakuje sekretów w Vercel,
+- nie publikować, jeśli zmiana może ujawnić dane wewnętrzne,
+- nie publikować, jeśli użytkownik napisał "nie wrzucaj" albo "tylko lokalnie",
+- nie mieszać w jednym commicie niezwiązanych zmian.
+
+Jeśli Vercel jest podłączony do GitHub, strona aktualizuje się automatycznie po pushu.
+
 ## Panel prywatny
 
 Panel traktuj jako centrum operacyjne firmy. W panelu trzymaj rzeczy, które są potrzebne codziennie przy sprzedaży i wdrożeniu:
@@ -88,6 +109,90 @@ Gdy zadanie jest większe, najpierw poproś:
 Najpierw przeczytaj kontekst i daj krótki plan. Nie edytuj plików, dopóki nie potwierdzę.
 ```
 
+## Najtańszy workflow: Gemini -> Claude -> Codex
+
+Cel: zużywać najmniej płatnych limitów.
+
+### 1. Gemini jako darmowy szkicownik
+
+Używaj Gemini do tanich, wstępnych rzeczy:
+
+- układ promptu,
+- lista pytań,
+- pierwsza wersja planu,
+- warianty postów,
+- uporządkowanie chaotycznych notatek.
+
+Prompt do Gemini:
+
+```text
+Pomóż mi przygotować krótki prompt do Claude. Projekt: Sklep za Stodołą pomaga rolnikom uruchamiać sprzedaż bezpośrednią z gospodarstwa: mlekomaty BRUNIMAT, pawilony, dokumenty, finansowanie, marketing lokalny i wdrożenie.
+
+Chcę, żeby Claude przygotował [tu wpisz temat].
+
+Prompt ma być krótki, konkretny i oszczędzać limit. Ma zakazać analizowania całego projektu i ma poprosić o gotowy wynik oraz krótkie zadanie dla Codexa, jeśli trzeba coś wdrożyć w panel.html.
+```
+
+### 2. Claude jako strateg i copywriter
+
+Do Claude wklejaj tylko dopracowany prompt z Gemini oraz `AI_CONTEXT.md`, jeśli projekt Claude go jeszcze nie ma.
+
+Claude ma przygotować:
+
+- plan,
+- teksty,
+- ofertę,
+- zadanie dla Codexa.
+
+Claude nie ma pisać kodu i nie ma analizować `panel.html`, jeśli nie musi.
+
+Prompt bazowy do Claude:
+
+```text
+Pracuj oszczędnie. Na podstawie AI_CONTEXT.md przygotuj gotowy wynik dla tematu: [temat].
+
+Nie analizuj całego projektu. Nie pisz kodu. Nie ujawniaj cenników wewnętrznych, marż, dokumentów KRS ani umów.
+
+Na końcu daj krótkie zadanie dla Codexa: co zmienić w panel.html, w której zakładce, czego nie usuwać i jak sprawdzić efekt.
+```
+
+### 3. Codex tylko do wdrożenia
+
+Do Codexa wklejaj tylko końcowe zadanie od Claude, nie całą rozmowę.
+
+Najlepszy prompt do Codexa:
+
+```text
+Wdróż poniższe zadanie. Pracuj oszczędnie. Zmień tylko wskazane pliki. Nie czytaj całego repo, jeśli nie musisz. Po bezpiecznej zmianie zrób commit i push, chyba że zmiana wymaga ustawienia sekretów w Vercel.
+
+[wklej zadanie od Claude]
+```
+
+### 4. Kiedy nie używać Claude
+
+Jeśli chodzi tylko o:
+
+- literówkę,
+- dopisanie kontaktu,
+- drobną zmianę w panelu,
+- commit/push,
+- plik na GitHub,
+
+pisz od razu do Codexa. Claude nie jest wtedy potrzebny.
+
+### 5. Kiedy nie używać Codexa
+
+Jeśli chodzi tylko o:
+
+- pomysł,
+- tekst posta,
+- SMS,
+- mail,
+- rozmowę sprzedażową,
+- strategię,
+
+użyj Gemini albo Claude. Codex nie jest wtedy potrzebny.
+
 ## Claude
 
 Używaj do: strategii, tekstów, ofert, maili, umów roboczych, analizy sprzedaży, planowania, uproszczenia decyzji.
@@ -152,3 +257,114 @@ Cenniki od Alfreda Bruni, cenniki partnerskie, marże, dokumenty KRS i podpisane
 
 Patrz na projekt szeroko: celem nie jest sprzedać samo urządzenie, tylko pomóc rolnikowi zbudować działający kanał sprzedaży bezpośredniej.
 ```
+
+## Pakiet startowy Claude po odnowieniu limitu
+
+Cel: po odnowieniu limitu Claude nie tracić wiadomości na tłumaczenie projektu od zera. Najpierw ustaw projekt, potem pracuj krótkimi zadaniami.
+
+### 1. Utwórz projekt Claude
+
+1. Wejdź do Claude.
+2. Otwórz sekcję Projects / Projekty.
+3. Kliknij New project / Nowy projekt.
+4. Nazwij projekt: `Sklep za Stodołą`.
+5. W opisie wpisz krótko:
+
+```text
+Firma pomaga rolnikom uruchamiać sprzedaż bezpośrednią z gospodarstwa: mlekomaty BRUNIMAT, pawilony, dokumenty, finansowanie, marketing lokalny i wdrożenie.
+```
+
+### 2. Wklej instrukcję projektu
+
+W ustawieniach projektu Claude wklej całą sekcję z tego pliku: `Instrukcja projektu Claude`.
+
+Jeśli Claude ma mało miejsca na instrukcje, użyj krótszej wersji:
+
+```text
+Jesteś doradcą biznesowym, copywriterem i analitykiem dla projektu Sklep za Stodołą.
+
+Firma pomaga rolnikom uruchamiać sprzedaż bezpośrednią z gospodarstwa: mlekomaty BRUNIMAT, pawilony, punkt sprzedaży, dokumenty, finansowanie, marketing lokalny i wdrożenie.
+
+Pracuj oszczędnie. Odpowiadaj krótko, konkretnie i po polsku. Nie analizuj całego projektu, jeśli wystarczy AI_CONTEXT.md i treść od użytkownika.
+
+Nie publikuj na stronie publicznej cenników od Alfreda Bruni, cenników partnerskich, marż, kosztów wewnętrznych, dokumentów KRS, podpisanych dokumentów ani umów.
+
+Claude służy do strategii, ofert, maili, SMS-ów, skryptów rozmów, treści OLX/Facebook, analizy sprzedaży i porządkowania decyzji. Jeśli trzeba zmienić stronę lub panel, przygotuj jasne zadanie dla Codexa, zamiast wdrażać technicznie.
+```
+
+### 3. Dodaj tylko najważniejszy plik
+
+Na start dodaj do projektu Claude tylko:
+
+- `AI_CONTEXT.md`
+
+Nie dodawaj od razu całego repozytorium, `panel.html`, wszystkich PDF-ów ani całego folderu dokumentów. To szybciej zużywa limit.
+
+### 4. Pierwsze 10 zadań dla Claude
+
+Wykonuj jedno zadanie na osobnej rozmowie albo w krótkich blokach. Nie każ Claude analizować wszystkiego naraz.
+
+1. Przygotuj krótki opis firmy w 3 wariantach: na stronę, do maila i do rozmowy telefonicznej.
+2. Napisz skrypt pierwszej rozmowy telefonicznej z gospodarstwem mlecznym.
+3. Przygotuj SMS po nieodebranym telefonie.
+4. Przygotuj mail po rozmowie z rolnikiem zainteresowanym mlekomatem.
+5. Przygotuj tekst ogłoszenia OLX bez cenników wewnętrznych.
+6. Przygotuj krótką ofertę: mlekomat + pawilon + wdrożenie, bez ujawniania marży.
+7. Wypisz 20 pytań kwalifikujących klienta przed ofertą.
+8. Przygotuj listę argumentów: mlekomat vs sprzedaż do skupu.
+9. Przygotuj prosty plan follow-upów na 30 dni.
+10. Przygotuj zadanie dla Codexa: co zmienić na stronie lub w panelu.
+
+### 5. Gotowe krótkie prompty
+
+Do tekstu dla klienta:
+
+```text
+Na podstawie AI_CONTEXT.md przygotuj gotowy tekst do wysłania klientowi. Krótko, po polsku, bez lania wody. Nie ujawniaj cenników wewnętrznych, marż ani dokumentów formalnych.
+```
+
+Do rozmowy telefonicznej:
+
+```text
+Przygotuj krótki skrypt rozmowy telefonicznej z rolnikiem. Cel: sprawdzić, czy gospodarstwo nadaje się do sprzedaży bezpośredniej mleka przez mlekomat. Daj wersję naturalną, nie korporacyjną.
+```
+
+Do OLX:
+
+```text
+Przygotuj ogłoszenie OLX dla rolników zainteresowanych sprzedażą mleka bezpośrednio z gospodarstwa. Bez cenników wewnętrznych. Ma zachęcać do kontaktu i rozmowy.
+```
+
+Do oferty:
+
+```text
+Przygotuj krótką ofertę opisową dla klienta: mlekomat BRUNIMAT, pawilon, wdrożenie, dokumenty i pomoc w starcie sprzedaży. Nie pokazuj marży ani cennika dostawcy.
+```
+
+Do decyzji biznesowej:
+
+```text
+Pomóż mi podjąć decyzję. Daj: 3 opcje, plusy, minusy, ryzyka i rekomendację. Odpowiedz krótko.
+```
+
+Do zadania dla Codexa:
+
+```text
+Przygotuj gotowe zadanie dla Codexa. Ma zawierać: które pliki zmienić, czego nie ruszać, jaki ma być efekt i jak sprawdzić zmianę.
+```
+
+### 6. Czego nie robić w Claude, żeby nie tracić limitu
+
+- Nie wrzucaj całego `panel.html`, jeśli pytanie dotyczy tekstu sprzedażowego.
+- Nie dodawaj wszystkich PDF-ów naraz.
+- Nie prowadź jednej rozmowy przez wiele dni z różnymi tematami.
+- Nie pytaj o stronę, panel, CRM, strategię, OLX i finanse w jednej wiadomości.
+- Nie używaj najmocniejszego modelu do prostych SMS-ów i maili.
+
+### 7. Najlepszy rytm pracy
+
+1. Claude wymyśla treść, strategię albo zadanie.
+2. Ty wybierasz wariant.
+3. Jeśli trzeba coś wdrożyć, wklejasz zadanie tutaj do Codexa.
+4. Codex zmienia pliki, pokazuje diff, robi commit i push.
+5. Decyzje stałe trafiają do `AI_CONTEXT.md`.
