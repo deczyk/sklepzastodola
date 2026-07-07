@@ -132,6 +132,21 @@
           </select>
         </div>
         <div class="ff">
+          <label for="floc">Lokalizacja gospodarstwa</label>
+          <input type="text" id="floc" name="lokalizacja" placeholder="Miejscowość, województwo" autocomplete="address-level2">
+        </div>
+        <div class="ff">
+          <label for="fcows">Liczba krów mlecznych</label>
+          <select id="fcows" name="liczba_krow">
+            <option value="">Wybierz zakres</option>
+            <option value="ponizej-20">poniżej 20</option>
+            <option value="20-50">20–50</option>
+            <option value="50-100">50–100</option>
+            <option value="powyzej-100">powyżej 100</option>
+            <option value="brak-jeszcze">nie mam jeszcze / dopiero planuję</option>
+          </select>
+        </div>
+        <div class="ff">
           <label for="fl">Ile litrów mleka dziennie? (orientacyjnie)</label>
           <select id="fl" name="litry_dziennie">
             <option value="">Wybierz zakres</option>
