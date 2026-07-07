@@ -43,6 +43,14 @@ function isAuthorized(req) {
   );
 }
 
+function jsonBinAuthHeaders() {
+  const keyHeader = JSONBIN_API_KEY && JSONBIN_API_KEY.startsWith("sk_")
+    ? "X-Access-Key"
+    : "X-Master-Key";
+
+  return { [keyHeader]: JSONBIN_API_KEY };
+}
+
 module.exports = async function handler(req, res) {
   res.setHeader("Cache-Control", "no-store");
 
@@ -56,10 +64,14 @@ module.exports = async function handler(req, res) {
 
   if (req.method === "GET") {
     const upstream = await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}/latest`, {
-      headers: { "X-Master-Key": JSONBIN_API_KEY }
+      headers: jsonBinAuthHeaders()
     });
 
     const body = await upstream.text();
+    if (upstream.status === 401 || upstream.status === 403) {
+      return res.status(502).json({ error: "JSONBin authorization failed." });
+    }
+
     res.status(upstream.status);
     res.setHeader("Content-Type", upstream.headers.get("content-type") || "application/json");
     return res.send(body);
@@ -71,13 +83,17 @@ module.exports = async function handler(req, res) {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
-        "X-Master-Key": JSONBIN_API_KEY,
+        ...jsonBinAuthHeaders(),
         "X-Bin-Versioning": "false"
       },
       body: payload
     });
 
     const body = await upstream.text();
+    if (upstream.status === 401 || upstream.status === 403) {
+      return res.status(502).json({ error: "JSONBin authorization failed." });
+    }
+
     res.status(upstream.status);
     res.setHeader("Content-Type", upstream.headers.get("content-type") || "application/json");
     return res.send(body);
