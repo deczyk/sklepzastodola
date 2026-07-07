@@ -53,7 +53,7 @@
 
 <div class="wrap">
   <div class="intro">
-    <p><strong>Do czego służy to narzędzie?</strong> To kalkulator doradczy przygotowany przez Sklep za Stodołą, który pomaga oszacować opłacalność postawienia mlekomatu i sklepu farmerskiego na Twoim gospodarstwie — zwrot z inwestycji, dodatkowy zysk roczny oraz możliwości dofinansowania z UE.</p>
+    <p><strong>Do czego służy to narzędzie?</strong> To kalkulator doradczy przygotowany przez Sklep za Stodołą, który pomaga oszacować opłacalność postawienia mlekomatu i sklepu farmerskiego na Twoim gospodarstwie — zwrot z inwestycji, dodatkową marżę i szacowany wynik po kosztach eksploatacyjnych oraz możliwości dofinansowania z UE.</p>
     <p>Wypełnij dane w polach poniżej (albo zostaw podpowiedzi jako orientacyjny przykład) i kliknij <strong>„Przelicz i wyślij wynik do Sklep za Stodołą”</strong> — zobaczysz wynik na ekranie, a my dostaniemy komplet danych do dopasowania oferty. Wynik możesz też zapisać jako PDF.</p>
   </div>
   <div class="card noPrint">
@@ -85,8 +85,9 @@
         <div class="kpi"><b id="scoreTxt">0%</b><span>potencjał projektu</span></div>
         <div class="kpi"><b id="roiTxt">0</b><span>ROI bez dotacji / lata</span></div>
         <div class="kpi"><b id="roiEuTxt">0</b><span>ROI z dotacją / lata</span></div>
-        <div class="kpi"><b id="profitYearTxt">0 zł</b><span>dodatkowy zysk roczny</span></div>
+        <div class="kpi"><b id="profitYearTxt">0 zł</b><span>dodatkowa marża przed kosztami</span></div>
       </div>
+      <div style="margin-top:6px;font-size:12px;color:#888">"Dodatkowa marża przed kosztami" to różnica względem ceny skupu — nie jest to zysk netto. Realny wynik po kosztach eksploatacyjnych zobaczysz w sekcji 4.</div>
       <label>Ocena potencjału</label><div class="score"><div id="scoreBar"></div></div>
       <div id="advice" style="margin-top:14px" class="warn">Uzupełnij dane i kliknij „Przelicz i wyślij wynik do Sklep za Stodołą”.</div>
     </section>
@@ -101,7 +102,8 @@
     <section class="card">
       <h2>4. Ekonomia i finansowanie</h2>
       <div class="row"><div><label>Cena mleka w skupie PLN/l</label><input type="number" step="0.01" id="priceDairy" value="1.90"></div><div><label>Cena sprzedaży bezpośredniej PLN/l</label><input type="number" step="0.01" id="priceDirect" value="5.50"></div></div>
-      <div class="row"><div><label>Sprzedaż przez mlekomat l/dzień</label><input type="number" id="litersDirect" value="100"></div><div><label>Koszt inwestycji PLN</label><input type="number" id="investment" value="70000"></div></div>
+      <div class="row"><div><label>Sprzedaż przez mlekomat l/dzień (cel / plan)</label><input type="number" id="litersDirect" value="100"></div><div><label>Koszt inwestycji PLN</label><input type="number" id="investment" value="70000"></div></div>
+      <div class="row"><div><label>Realny % sprzedaży zakładanej produkcji</label><input type="number" id="sellThrough" value="70"><p style="font-size:11px;color:#888;margin:4px 0 0">Uwzględnia zasuszenie, wahania popytu, choroby, mleko na potrzeby własne. 100% zakłada sprzedaż całej produkcji bez przerw — rzadko realne.</p></div><div><label>Roczne koszty eksploatacyjne PLN</label><input type="number" id="opCosts" value="12000"><p style="font-size:11px;color:#888;margin:4px 0 0">Energia, mycie/dezynfekcja, serwis i części, transport mleka, straty, obsługa płatności, opakowania.</p></div></div>
       <div class="row"><div><label>Dni sprzedaży w roku</label><input type="number" id="days" value="365"></div></div>
       <h3>Leasing / kredyt</h3>
       <div class="row3"><div><label>Wkład własny %</label><input type="number" id="down" value="20"></div><div><label>Okres finansowania lata</label><input type="number" id="years" value="5"></div><div><label>Oprocentowanie roczne %</label><input type="number" step="0.1" id="rate" value="8"></div></div>
@@ -249,36 +251,59 @@ function calculate(){
   const interest = document.getElementById("interest").value;
   const visibleQ = getVisibleQuestions(interest);
   let max=0,pts=0;visibleQ.forEach(q=>{max+=q[2];pts+=(parseFloat(document.getElementById(q[0]).value)||0)*q[2];});
-  const score=Math.round(pts/max*100), prod=v("cows")*v("yield"), liters=Math.min(v("litersDirect"),prod||v("litersDirect"));
+  let score=Math.round(pts/max*100);
+
+  // Lokalizacja to czynnik krytyczny dla sprzedaży bezpośredniej — jeśli nieznana/negatywna, ograniczamy wynik,
+  // żeby nie sugerować wysokiego potencjału zanim popyt zostanie realnie zweryfikowany.
+  const locEl = document.getElementById("location");
+  const locVal = locEl ? parseFloat(locEl.value) : 1;
+  let scoreCapped = false;
+  if(locVal===0){ score = Math.min(score,70); scoreCapped = true; }
+  else if(locVal===0.5){ score = Math.min(score,80); scoreCapped = true; }
+
+  const prod=v("cows")*v("yield"), targetLiters=Math.min(v("litersDirect"),prod||v("litersDirect"));
+  const sellThrough=Math.min(100,Math.max(0,v("sellThrough")||100))/100;
+  const liters=targetLiters*sellThrough;
+  const fullProductionAssumed = sellThrough>=0.95 && v("litersDirect")>=prod;
+
   const extraMargin=v("priceDirect")-v("priceDairy");
-  const profitDay=extraMargin*liters, profitYear=profitDay*v("days"), inv=v("investment"), roi=profitYear>0?inv/profitYear:0;
+  const marginDay=extraMargin*liters, marginYear=marginDay*v("days");
+  const opCosts=Math.max(0,v("opCosts"));
+  const netYear=marginYear-opCosts;
+  const inv=v("investment");
+  const roi=netYear>0?inv/netYear:0;
+
   const euEnabled=v("euEnable")===1, euGrantRaw=v("eligibleCost")*v("euPercent")/100, euGrant=euEnabled?Math.min(euGrantRaw,v("euLimit")):0;
-  const ownAfterEu=Math.max(0,inv+v("nonEligibleCost")-euGrant), roiEu=profitYear>0?ownAfterEu/profitYear:0;
+  const ownAfterEu=Math.max(0,inv+v("nonEligibleCost")-euGrant), roiEu=netYear>0?ownAfterEu/netYear:0;
   const principal=ownAfterEu*(1-v("down")/100), months=v("years")*12, mr=v("rate")/100/12;
   const payment=mr>0?principal*(mr*Math.pow(1+mr,months))/(Math.pow(1+mr,months)-1):principal/months;
-  const cashAfterFinance=profitYear-payment*12;
+  const cashAfterFinance=netYear-payment*12;
   const farmName = document.getElementById("farm").value.trim() || "Twoje gospodarstwo";
 
   document.getElementById("scoreTxt").innerText=score+"%";document.getElementById("scoreBar").style.width=score+"%";
-  document.getElementById("roiTxt").innerText=roi.toFixed(1);document.getElementById("roiEuTxt").innerText=roiEu.toFixed(1);document.getElementById("profitYearTxt").innerText=money(profitYear);
+  document.getElementById("roiTxt").innerText=roi.toFixed(1);document.getElementById("roiEuTxt").innerText=roiEu.toFixed(1);document.getElementById("profitYearTxt").innerText=money(marginYear);
   const advice=document.getElementById("advice"); advice.className=score>=80?"ok":score>=60?"warn":"bad";
-  advice.innerText=score>=80?`${farmName} ma wysoki potencjał dla tego projektu. Warto od razu przygotować konkretną ofertę, dokładny ROI i sprawdzić aktualny nabór UE.`:score>=60?`${farmName} ma realny potencjał, ale zanim przygotujemy ofertę, warto doprecyzować lokalizację, sposób finansowania i kwalifikowalność kosztów.`:`Na tym etapie ${farmName} wymaga dokładniejszej analizy, zanim przygotujemy konkretną ofertę i wniosek o finansowanie.`;
+  let adviceTxt = score>=80?`${farmName} ma wysoki potencjał dla tego projektu. Warto od razu przygotować konkretną ofertę, dokładny ROI i sprawdzić aktualny nabór UE.`:score>=60?`${farmName} ma realny potencjał, ale zanim przygotujemy ofertę, warto doprecyzować lokalizację, sposób finansowania i kwalifikowalność kosztów.`:`Na tym etapie ${farmName} wymaga dokładniejszej analizy, zanim przygotujemy konkretną ofertę i wniosek o finansowanie.`;
+  if(scoreCapped) adviceTxt += ` ⚠ Wynik ograniczony — lokalizacja (bliskość miasta/osiedla/ruchliwej drogi) nie jest potwierdzona, a to jeden z najważniejszych czynników przy sprzedaży bezpośredniej. Zanim wyślemy standardową ofertę, zadzwoń i ustal: dokładną lokalizację, liczbę potencjalnych klientów dziennie i czy popyt na ${Math.round(targetLiters).toLocaleString("pl-PL")} l/dzień jest realny.`;
+  if(fullProductionAssumed) adviceTxt += ` ⚠ Kalkulacja zakłada sprzedaż praktycznie całej bieżącej produkcji mleka bez przerw przez cały rok — to optymistyczne założenie (zasuszenie, choroby, wahania popytu). Warto ustalić z klientem plan uzupełnienia mleka z innego zatwierdzonego gospodarstwa albo powiększenia stada.`;
+  advice.innerText = adviceTxt;
 
-  document.getElementById("financeResult").innerHTML=`<b>Produkcja mleka:</b> ${Math.round(prod).toLocaleString("pl-PL")} l/dzień<br><b>Sprzedaż przez mlekomat:</b> ${Math.round(liters).toLocaleString("pl-PL")} l/dzień<br><b>Dodatkowy zysk roczny:</b> ${money(profitYear)}<br><b>Inwestycja brutto:</b> ${money(inv)}<br><b>Zwrot bez dotacji:</b> ${roi.toFixed(1)} lat<br><b>Rata po uwzględnieniu dotacji:</b> ${money(payment)}/mies.<br><b>Cashflow roczny po finansowaniu:</b> ${money(cashAfterFinance)}`;
+  const financeLabel = euEnabled ? "Rata po uwzględnieniu dotacji" : `Szacowana rata finansowania (wkład własny ${v("down")}%)`;
+  document.getElementById("financeResult").innerHTML=`<b>Produkcja mleka:</b> ${Math.round(prod).toLocaleString("pl-PL")} l/dzień<br><b>Sprzedaż przez mlekomat (cel):</b> ${Math.round(targetLiters).toLocaleString("pl-PL")} l/dzień<br><b>Realna sprzedaż przy ${Math.round(sellThrough*100)}% wykorzystania:</b> ${Math.round(liters).toLocaleString("pl-PL")} l/dzień<br><b>Dodatkowa marża przed kosztami eksploatacyjnymi:</b> ${money(marginYear)}<br><b>Roczne koszty eksploatacyjne:</b> −${money(opCosts)}<br><b>Szacowany wynik po kosztach eksploatacyjnych:</b> ${money(netYear)}<br><b>Inwestycja brutto:</b> ${money(inv)}<br><b>Zwrot bez dotacji (liczony od wyniku po kosztach):</b> ${roi.toFixed(1)} lat<br><b>${financeLabel}:</b> ${money(payment)}/mies.<br><b>Cashflow roczny po finansowaniu:</b> ${money(cashAfterFinance)}`;
   let risk=document.getElementById("euRisk").value, riskTxt=risk==="high"?"wysokie szanse – przygotować dokumenty i sprawdzić nabór":risk==="low"?"niskie szanse lub brak aktywnego naboru – rozważyć leasing/kredyt":"do sprawdzenia – konieczna weryfikacja aktualnego programu";
-  document.getElementById("euResult").innerHTML=`<b>Szacowana dotacja UE:</b> ${money(euGrant)}<br><b>Inwestycja po dotacji / do sfinansowania:</b> ${money(ownAfterEu)}<br><b>Wkład własny przy finansowaniu:</b> ${money(ownAfterEu*v("down")/100)}<br><b>Zwrot z dotacją:</b> ${roiEu.toFixed(1)} lat<br><b>Status:</b> ${riskTxt}`;
+  document.getElementById("euResult").innerHTML=`<b>Szacowana dotacja UE:</b> ${money(euGrant)}<br><b>Inwestycja po dotacji / do sfinansowania:</b> ${money(ownAfterEu)}<br><b>Wkład własny przy finansowaniu:</b> ${money(ownAfterEu*v("down")/100)}<br><b>Zwrot z dotacją (liczony od wyniku po kosztach):</b> ${roiEu.toFixed(1)} lat<br><b>Status:</b> ${riskTxt}`;
 
   // --- Narracja i rekomendacja dopasowana do wybranego zakresu ---
   const showPawilon = interest==="pakiet"||interest==="pawilon"||interest==="niezdecydowany";
   const showMlekomat = interest==="pakiet"||interest==="mlekomat"||interest==="niezdecydowany";
   let narrative = `<p><strong>${farmName}</strong> jest zainteresowane opcją: <em>${INTEREST_LABELS[interest]}</em>. `;
   if(showMlekomat){
-    narrative += `Przy ${v("cows")} krowach i wydajności ${v("yield")} l/krowę/dzień, gospodarstwo produkuje ok. ${Math.round(prod).toLocaleString("pl-PL")} l mleka dziennie — planowana sprzedaż przez mlekomat na poziomie ${Math.round(liters).toLocaleString("pl-PL")} l/dzień jest ${liters<=prod?"w pełni pokryta bieżącą produkcją":"wyższa niż obecna produkcja, więc warto zweryfikować możliwości zwiększenia stada lub skupu uzupełniającego"}. `;
+    narrative += `Przy ${v("cows")} krowach i wydajności ${v("yield")} l/krowę/dzień, gospodarstwo produkuje ok. ${Math.round(prod).toLocaleString("pl-PL")} l mleka dziennie — planowana sprzedaż przez mlekomat na poziomie ${Math.round(targetLiters).toLocaleString("pl-PL")} l/dzień jest ${targetLiters<=prod?"w pełni pokryta bieżącą produkcją":"wyższa niż obecna produkcja, więc warto zweryfikować możliwości zwiększenia stada lub skupu uzupełniającego"}. `;
   }
   if(showPawilon && !showMlekomat){
     narrative += `Sam pawilon farmerski, bez mlekomatu, sprawdzi się jako rozszerzenie istniejącej sprzedaży bezpośredniej (jaja, sery, miód, warzywa) o całodobowy punkt bez obsługi. `;
   }
-  narrative += `Przy tych założeniach dodatkowy zysk roczny szacujemy na <strong>${money(profitYear)}</strong>, a zwrot z inwestycji na ${roi>0?roi.toFixed(1)+" lat bez dotacji":"trudny do oszacowania bez kompletu danych"}${euEnabled?` (${roiEu.toFixed(1)} lat z uwzględnieniem dotacji UE)`:""}.</p>`;
+  narrative += `Przy tych założeniach dodatkową marżę przed kosztami eksploatacyjnymi szacujemy na <strong>${money(marginYear)}</strong> rocznie, a po odjęciu szacowanych kosztów eksploatacyjnych (${money(opCosts)}) na <strong>${money(netYear)}</strong>. Zwrot z inwestycji, liczony od wyniku po kosztach, to ${roi>0?roi.toFixed(1)+" lat bez dotacji":"trudny do oszacowania bez kompletu danych"}${euEnabled?` (${roiEu.toFixed(1)} lat z uwzględnieniem dotacji UE)`:""}.</p>`;
   document.getElementById("solutionNarrative").innerHTML = narrative;
 
   let sol=[];
@@ -324,7 +349,7 @@ async function sendToUs(){
     "Potencjał projektu": document.getElementById("scoreTxt").innerText,
     "ROI bez dotacji (lata)": document.getElementById("roiTxt").innerText,
     "ROI z dotacją (lata)": document.getElementById("roiEuTxt").innerText,
-    "Dodatkowy zysk roczny": document.getElementById("profitYearTxt").innerText,
+    "Dodatkowa marża przed kosztami eksploatacyjnymi": document.getElementById("profitYearTxt").innerText,
   };
 
   // --- Pełny audyt: pytanie + odpowiedź, tylko widoczne dla wybranego zakresu ---
@@ -338,7 +363,9 @@ async function sendToUs(){
   payload["── EKONOMIA I FINANSOWANIE"] = "──────────";
   payload["Cena mleka w skupie PLN/l"] = document.getElementById("priceDairy").value;
   payload["Cena sprzedaży bezpośredniej PLN/l"] = document.getElementById("priceDirect").value;
-  payload["Sprzedaż przez mlekomat l/dzień"] = document.getElementById("litersDirect").value;
+  payload["Sprzedaż przez mlekomat l/dzień (cel)"] = document.getElementById("litersDirect").value;
+  payload["Realny % sprzedaży zakładanej produkcji"] = document.getElementById("sellThrough").value;
+  payload["Roczne koszty eksploatacyjne PLN"] = document.getElementById("opCosts").value;
   payload["Koszt inwestycji PLN"] = document.getElementById("investment").value;
   payload["Dni sprzedaży w roku"] = document.getElementById("days").value;
   payload["Wkład własny %"] = document.getElementById("down").value;
