@@ -1,12 +1,46 @@
 const JSONBIN_API_KEY = process.env.JSONBIN_API_KEY;
 const JSONBIN_BIN_ID = process.env.JSONBIN_BIN_ID;
 const PANEL_PASSWORD = process.env.PANEL_PASSWORD;
+const PANEL_BASIC_USER = process.env.PANEL_BASIC_USER;
 const PANEL_BASIC_PASSWORD = process.env.PANEL_BASIC_PASSWORD;
+
+function getBasicAuth(req) {
+  const header = req.headers.authorization || "";
+  const [scheme, encoded] = header.split(" ");
+
+  if (scheme !== "Basic" || !encoded) {
+    return null;
+  }
+
+  const decoded = Buffer.from(encoded, "base64").toString("utf8");
+  const separator = decoded.indexOf(":");
+
+  if (separator === -1) {
+    return null;
+  }
+
+  return {
+    user: decoded.slice(0, separator),
+    password: decoded.slice(separator + 1)
+  };
+}
 
 function isAuthorized(req) {
   const password = req.headers["x-panel-password"];
   const allowed = [PANEL_PASSWORD, PANEL_BASIC_PASSWORD].filter(Boolean);
-  return Boolean(password && allowed.includes(password));
+
+  if (password && allowed.includes(password)) {
+    return true;
+  }
+
+  const basic = getBasicAuth(req);
+  return Boolean(
+    basic &&
+    PANEL_BASIC_USER &&
+    PANEL_BASIC_PASSWORD &&
+    basic.user === PANEL_BASIC_USER &&
+    basic.password === PANEL_BASIC_PASSWORD
+  );
 }
 
 module.exports = async function handler(req, res) {
