@@ -51,6 +51,12 @@
   .item textarea{width:100%;margin-top:10px;border:1px solid var(--line);border-radius:8px;padding:8px 10px;
                   font-family:inherit;font-size:13px;resize:vertical;min-height:44px;color:#333}
   .item .desc{color:var(--muted);font-size:12.5px;margin-top:2px}
+  .docBadges{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0 4px}
+  .docBadge{font-size:11px;font-weight:bold;border-radius:999px;padding:4px 9px;background:#f3f8f4;color:#2d5a27;border:1px solid #d8e7db}
+  .docBadge.confidential{background:#fff8e1;color:#6d5516;border-color:#ead99a}
+  .docBadge.strict{background:#fff1f1;color:#9b2c2c;border-color:#f2c0c0}
+  .docMeta{font-size:12px;color:var(--muted);display:flex;gap:10px;flex-wrap:wrap;margin-top:6px}
+  .docWarning{font-size:12px;color:#8a5b00;background:#fff8e1;border-left:4px solid var(--accent);border-radius:8px;padding:8px 10px;margin-top:8px}
   .delBtn{background:none;border:none;color:#c0392b;cursor:pointer;font-size:12px;opacity:0.55}
   .delBtn:hover{opacity:1}
 
@@ -643,11 +649,46 @@
       <div class="newItemForm" id="form-dokumenty">
         <div class="row">
           <input type="text" id="title-dokumenty" placeholder="Nazwa dokumentu">
-          <input type="text" id="link-dokumenty" placeholder="Link do PDF (adres URL)">
+          <select id="typ-dokumenty">
+            <option>Dokument firmowy</option>
+            <option>Dokument klienta</option>
+            <option>Oferta wysłana</option>
+            <option>Cennik klienta</option>
+            <option>Cennik wewnętrzny</option>
+            <option>Cennik zakupowy / partnerski</option>
+            <option>Materiał sprzedażowy</option>
+            <option>Umowa</option>
+            <option>KRS / formalne</option>
+            <option>Inne</option>
+          </select>
         </div>
         <div class="row">
-          <input type="text" id="desc-dokumenty" placeholder="Krótki opis (opcjonalnie)">
           <input type="text" id="kategoria-dokumenty" placeholder="Kategoria (np. Cennik partnerski)" list="kategorieList">
+          <select id="poufnosc-dokumenty">
+            <option>Wewnętrzne</option>
+            <option>Publiczne</option>
+            <option>Poufne</option>
+            <option>Ściśle poufne</option>
+          </select>
+          <select id="statusDokumentu-dokumenty">
+            <option>Roboczy</option>
+            <option>Aktualny</option>
+            <option>Wysłany</option>
+            <option>Do podpisu</option>
+            <option>Podpisany</option>
+            <option>Archiwalny</option>
+          </select>
+        </div>
+        <div class="row">
+          <input type="date" id="dataDokumentu-dokumenty">
+          <input type="text" id="link-dokumenty" placeholder="Link http/https (opcjonalnie)">
+          <input type="text" id="nazwaPliku-dokumenty" placeholder="Nazwa pliku (bez uploadu)">
+        </div>
+        <div class="row">
+          <select id="klientId-dokumenty">
+            <option value="">Brak powiązanego klienta</option>
+          </select>
+          <input type="text" id="desc-dokumenty" placeholder="Notatka / krótki opis (opcjonalnie)">
         </div>
         <datalist id="kategorieList"></datalist>
         <div class="actions">
@@ -1172,8 +1213,19 @@ function renderActivityLog(){
 }
 
 // ================= Podgląd dokumentów =================
+function safeDocumentHref(link){
+  const value = (link || "").trim();
+  if(!value) return "";
+  try{
+    const url = new URL(value);
+    return ["http:","https:"].includes(url.protocol) ? value : "";
+  }catch(e){
+    return "";
+  }
+}
+
 function isPreviewable(link){
-  return /\.(pdf|png|jpg|jpeg)$/i.test(link||"");
+  return !!safeDocumentHref(link) && /\.(pdf|png|jpg|jpeg)$/i.test(link||"");
 }
 
 function fileTypeInfo(link){
@@ -1186,18 +1238,21 @@ function fileTypeInfo(link){
 }
 
 function fileChip(link, title){
-  const info = fileTypeInfo(link);
-  const ext = (link.match(/\.(\w+)$/)||[,""])[1].toLowerCase();
-  const clickAttr = isPreviewable(link)
-    ? `href="javascript:void(0)" onclick="openPreview('${link}')"`
-    : `href="${link}" target="_blank" rel="noopener"`;
+  const safeLink = safeDocumentHref(link);
+  const safeTitle = crmEsc(title || "Dokument");
+  if(!safeLink) return `<span>${safeTitle}</span> <span class="noLinkText">(brak bezpiecznego linku)</span>`;
+  const info = fileTypeInfo(safeLink);
+  const ext = (safeLink.match(/\.(\w+)$/)||[,""])[1].toLowerCase();
+  const clickAttr = isPreviewable(safeLink)
+    ? `href="javascript:void(0)" data-href="${crmEsc(safeLink)}" onclick="openPreview(this.dataset.href)"`
+    : `href="${crmEsc(safeLink)}" target="_blank" rel="noopener"`;
   const hint = isPreviewable(link) ? "Kliknij, aby podejrzeć" : "Kliknij, aby otworzyć / pobrać";
 
   let thumb;
   if(["png","jpg","jpeg"].includes(ext)){
-    thumb = `<img src="${link}" loading="lazy" alt="">`;
+    thumb = `<img src="${crmEsc(safeLink)}" loading="lazy" alt="">`;
   } else if(ext==="pdf"){
-    thumb = `<iframe src="${link}#page=1&toolbar=0&navpanes=0&scrollbar=0" loading="lazy"></iframe>`;
+    thumb = `<iframe src="${crmEsc(safeLink)}#page=1&toolbar=0&navpanes=0&scrollbar=0" loading="lazy"></iframe>`;
   } else {
     thumb = `<span class="bigIcon ${info.cls}">${info.icon}</span>`;
   }
@@ -1205,13 +1260,15 @@ function fileChip(link, title){
   return `<a class="fileCard" ${clickAttr} title="${hint}">
     <div class="fileThumb">${thumb}</div>
     <div class="fileCardInfo">
-      <div class="fileCardTitle">${title}</div>
+      <div class="fileCardTitle">${safeTitle}</div>
       <span class="ext">${info.label}</span>
     </div>
   </a>`;
 }
 function openPreview(link){
-  document.getElementById("previewFrame").src = link;
+  const safeLink = safeDocumentHref(link);
+  if(!safeLink) return;
+  document.getElementById("previewFrame").src = safeLink;
   document.getElementById("previewModal").classList.add("open");
 }
 function closePreview(){
@@ -1289,17 +1346,60 @@ function renderStatsBar(){
 
 function statusLabel(s){ return s==="done"?"Gotowe":s==="progress"?"W trakcie":"Do zrobienia"; }
 
+function docName(item){ return item.title || item.nazwa || ""; }
+function docNote(item){ return item.desc || item.notatka || item.notes || ""; }
+function docStatus(item){ return item.statusDokumentu || item.status || ""; }
+function docLink(item){ return item.link || ""; }
+function docFileName(item){ return item.nazwaPliku || ""; }
+function docType(item){ return item.typ || ""; }
+function docConfidentiality(item){ return item.poufnosc || ""; }
+function docClientName(item){
+  if(!item.klientId || !data || !data.klienci) return "";
+  const c = data.klienci.find(client => client.id === item.klientId);
+  return c ? clientName(c) : "";
+}
+
+function docBadgeClass(value){
+  if(value === "Ściśle poufne") return "docBadge strict";
+  if(value === "Poufne") return "docBadge confidential";
+  return "docBadge";
+}
+
+function isPriceDocument(item){
+  const text = `${docName(item)} ${docNote(item)} ${item.kategoria || ""} ${docType(item)}`.toLowerCase();
+  return (docType(item) || "").includes("Cennik") || text.includes("cennik");
+}
+
+function priceGroup(item){
+  const type = docType(item);
+  if(type === "Cennik klienta") return "Cenniki klienta";
+  if(type === "Cennik zakupowy / partnerski") return "Cenniki zakupowe / partnerskie";
+  if(type === "Cennik wewnętrzny") return "Cenniki wewnętrzne";
+  return "Pozostałe cenniki";
+}
+
 function renderItemCard(item, cat){
   const div = document.createElement("div");
   div.className = "item";
   if(item.utworzono){
     div.title = `Dodano: ${formatDT(item.utworzono)} | Zaktualizowano: ${item.zaktualizowano?formatDT(item.zaktualizowano):"—"}`;
   }
+  const title = docName(item) || "Bez nazwy";
+  const note = cat==="dokumenty" ? docNote(item) : (item.desc || "");
+  const statusValue = docStatus(item);
+  const type = docType(item);
+  const confidentiality = docConfidentiality(item);
+  const safeLink = safeDocumentHref(docLink(item));
+  const fileName = docFileName(item);
+  const client = docClientName(item);
+  const documentDate = item.dataDokumentu || "";
   let linkHtml;
-  if(item.link){
-    linkHtml = fileChip(item.link, item.title);
+  if(safeLink){
+    linkHtml = fileChip(safeLink, title);
+  } else if(fileName){
+    linkHtml = `<span>${crmEsc(title)}</span> <span class="noLinkText">(${crmEsc(fileName)})</span>`;
   } else {
-    linkHtml = `<span>${item.title}</span> <span class="noLinkText">(brak linku)</span>`;
+    linkHtml = `<span>${crmEsc(title)}</span> <span class="noLinkText">(brak linku)</span>`;
   }
   const statusHtml = cat==="sprawy" ? `
         <span class="statusPill status-${item.status}">${statusLabel(item.status)}</span>` : "";
@@ -1309,6 +1409,21 @@ function renderItemCard(item, cat){
           <option value="progress" ${item.status==="progress"?"selected":""}>W trakcie</option>
           <option value="done" ${item.status==="done"?"selected":""}>Gotowe</option>
         </select>` : "";
+  const docBadges = cat==="dokumenty" ? `
+    <div class="docBadges">
+      ${type ? `<span class="docBadge">${crmEsc(type)}</span>` : ""}
+      ${confidentiality ? `<span class="${docBadgeClass(confidentiality)}">${crmEsc(confidentiality)}</span>` : ""}
+      ${statusValue ? `<span class="docBadge">${crmEsc(statusValue)}</span>` : ""}
+    </div>` : "";
+  const docMeta = cat==="dokumenty" ? [
+    documentDate ? `Data: ${crmEsc(documentDate)}` : "",
+    item.kategoria ? `Kategoria: ${crmEsc(item.kategoria)}` : "",
+    fileName ? `Plik: ${crmEsc(fileName)}` : "",
+    client ? `Klient: ${crmEsc(client)}` : ""
+  ].filter(Boolean) : [];
+  const docMetaHtml = docMeta.length ? `<div class="docMeta">${docMeta.map(v=>`<span>${v}</span>`).join("")}</div>` : "";
+  const warningHtml = cat==="dokumenty" && type === "Cennik zakupowy / partnerski"
+    ? '<div class="docWarning">Poufne — nie wysyłać klientowi</div>' : "";
   const dateCaption = (cat==="dokumenty" && item.utworzono)
     ? `<div class="dateCaption">Dodano ${formatDT(item.utworzono)}</div>` : "";
   div.innerHTML = `
@@ -1320,9 +1435,12 @@ function renderItemCard(item, cat){
         <button class="delBtn" onclick="deleteItem('${cat}','${item.id}')">Usuń</button>
       </div>
     </div>
-    ${item.desc ? `<div class="desc">${item.desc}</div>` : ""}
+    ${docBadges}
+    ${note ? `<div class="desc">${crmEsc(note)}</div>` : ""}
+    ${docMetaHtml}
+    ${warningHtml}
     ${dateCaption}
-    <textarea placeholder="Notatki..." data-cat="${cat}" data-id="${item.id}" onblur="updateNotes(this)">${item.notes||""}</textarea>
+    <textarea placeholder="Notatki..." data-cat="${cat}" data-id="${item.id}" onblur="updateNotes(this)">${crmEsc(item.notes||"")}</textarea>
   `;
   return div;
 }
@@ -1336,8 +1454,8 @@ function renderPriceDocuments(){
   const searchEl = document.getElementById("searchCenniki");
   const searchQ = searchEl ? searchEl.value.trim().toLowerCase() : "";
   const docs = (data.dokumenty || []).filter(item => {
-    const text = `${item.title || ""} ${item.desc || ""} ${item.kategoria || ""}`.toLowerCase();
-    return text.includes("cennik") && (!searchQ || text.includes(searchQ));
+    const text = `${docName(item)} ${docNote(item)} ${item.kategoria || ""} ${docType(item)} ${docConfidentiality(item)} ${docStatus(item)}`.toLowerCase();
+    return isPriceDocument(item) && (!searchQ || text.includes(searchQ));
   });
 
   list.innerHTML = "";
@@ -1346,7 +1464,29 @@ function renderPriceDocuments(){
     return;
   }
 
-  docs.forEach(item => list.appendChild(renderItemCard(item, "dokumenty")));
+  const groups = {};
+  docs.forEach(item => {
+    const group = priceGroup(item);
+    if(!groups[group]) groups[group] = [];
+    groups[group].push(item);
+  });
+  ["Cenniki klienta","Cenniki wewnętrzne","Cenniki zakupowe / partnerskie","Pozostałe cenniki"].forEach(group => {
+    if(!groups[group]) return;
+    const header = document.createElement("div");
+    header.className = "kategoriaHeader";
+    header.textContent = group;
+    list.appendChild(header);
+    groups[group].forEach(item => list.appendChild(renderItemCard(item, "dokumenty")));
+  });
+}
+
+function fillDocumentClientOptions(){
+  const select = document.getElementById("klientId-dokumenty");
+  if(!select || !data) return;
+  const current = select.value;
+  select.innerHTML = '<option value="">Brak powiązanego klienta</option>' +
+    (data.klienci || []).map(c => `<option value="${crmEsc(c.id)}">${crmEsc(clientName(c))}</option>`).join("");
+  select.value = current;
 }
 
 function render(){
@@ -1354,6 +1494,7 @@ function render(){
   renderStatsBar();
   renderActivityLog();
   renderClients();
+  fillDocumentClientOptions();
 
   // --- Dokumenty: grupowane wg kategorii, z wyszukiwarką ---
   const dokList = document.getElementById("list-dokumenty");
@@ -1363,9 +1504,13 @@ function render(){
   let dokFiltered = data.dokumenty || [];
   if(searchQ){
     dokFiltered = dokFiltered.filter(item =>
-      (item.title||"").toLowerCase().includes(searchQ) ||
-      (item.desc||"").toLowerCase().includes(searchQ) ||
-      (item.kategoria||"").toLowerCase().includes(searchQ)
+      (docName(item)||"").toLowerCase().includes(searchQ) ||
+      (docNote(item)||"").toLowerCase().includes(searchQ) ||
+      (item.kategoria||"").toLowerCase().includes(searchQ) ||
+      (docType(item)||"").toLowerCase().includes(searchQ) ||
+      (docConfidentiality(item)||"").toLowerCase().includes(searchQ) ||
+      (docStatus(item)||"").toLowerCase().includes(searchQ) ||
+      (docFileName(item)||"").toLowerCase().includes(searchQ)
     );
   }
   if(dokFiltered.length===0){
@@ -1385,7 +1530,7 @@ function render(){
     const dl = document.getElementById("kategorieList");
     if(dl){
       const allCats = [...new Set((data.dokumenty||[]).map(d=>d.kategoria||"Inne dokumenty"))];
-      dl.innerHTML = allCats.map(k=>`<option value="${k}">`).join("");
+      dl.innerHTML = allCats.map(k=>`<option value="${crmEsc(k)}">`).join("");
     }
 
     orderedKeys.forEach(kategoria=>{
@@ -1423,19 +1568,54 @@ function toggleForm(cat){
 
 function addItem(cat){
   const title = document.getElementById("title-"+cat).value.trim();
-  const link = document.getElementById("link-"+cat).value.trim();
+  const linkRaw = document.getElementById("link-"+cat).value.trim();
+  const link = cat==="dokumenty" ? safeDocumentHref(linkRaw) : linkRaw;
   const desc = document.getElementById("desc-"+cat).value.trim();
   const kategoriaEl = document.getElementById("kategoria-"+cat);
   const kategoria = kategoriaEl ? kategoriaEl.value.trim() : "";
   if(!title) return;
   const nowTs = new Date().toISOString();
-  data[cat].push({id:"item_"+Date.now(), title, link, desc, kategoria: kategoria || "Inne dokumenty", status:"todo", notes:"", utworzono: nowTs, zaktualizowano: nowTs});
+  if(cat==="dokumenty"){
+    const typ = document.getElementById("typ-dokumenty").value;
+    const poufnosc = document.getElementById("poufnosc-dokumenty").value;
+    const statusDokumentu = document.getElementById("statusDokumentu-dokumenty").value;
+    const nazwaPliku = document.getElementById("nazwaPliku-dokumenty").value.trim();
+    const klientId = document.getElementById("klientId-dokumenty").value;
+    const dataDokumentu = document.getElementById("dataDokumentu-dokumenty").value;
+    data.dokumenty.push({
+      id:"item_"+Date.now(),
+      title,
+      link,
+      desc,
+      kategoria: kategoria || "Inne dokumenty",
+      status:"todo",
+      notes:"",
+      typ,
+      poufnosc,
+      statusDokumentu,
+      nazwaPliku,
+      klientId,
+      dataDokumentu,
+      utworzono: nowTs,
+      zaktualizowano: nowTs
+    });
+  } else {
+    data[cat].push({id:"item_"+Date.now(), title, link, desc, kategoria: kategoria || "Inne dokumenty", status:"todo", notes:"", utworzono: nowTs, zaktualizowano: nowTs});
+  }
   logActivity(`dodał(a) pozycję „${title}” (${cat})`);
   saveData();
   document.getElementById("title-"+cat).value="";
   document.getElementById("link-"+cat).value="";
   document.getElementById("desc-"+cat).value="";
   if(kategoriaEl) kategoriaEl.value="";
+  if(cat==="dokumenty"){
+    document.getElementById("typ-dokumenty").value = "Dokument firmowy";
+    document.getElementById("poufnosc-dokumenty").value = "Wewnętrzne";
+    document.getElementById("statusDokumentu-dokumenty").value = "Roboczy";
+    document.getElementById("nazwaPliku-dokumenty").value = "";
+    document.getElementById("klientId-dokumenty").value = "";
+    document.getElementById("dataDokumentu-dokumenty").value = "";
+  }
   toggleForm(cat);
   render();
 }
@@ -1443,7 +1623,7 @@ function addItem(cat){
 function deleteItem(cat, id){
   const item = data[cat].find(i=>i.id===id);
   data[cat] = data[cat].filter(i=>i.id!==id);
-  if(item) logActivity(`usunął(-ęła) pozycję „${item.title}” (${cat})`);
+  if(item) logActivity(`usunął(-ęła) pozycję „${docName(item) || item.title}” (${cat})`);
   saveData();
   render();
 }
@@ -2573,8 +2753,18 @@ function renderSalesMaterials(){
   const title = document.getElementById("salesTitle");
   const text = document.getElementById("salesText");
   if(!menu || !title || !text) return;
+  const docs = (data && data.dokumenty ? data.dokumenty : []).filter(item => docType(item) === "Materiał sprzedażowy");
+  if(docs.length){
+    menu.style.display = "none";
+    title.textContent = "Materiały sprzedażowe";
+    text.className = "";
+    text.innerHTML = "";
+    docs.forEach(item => text.appendChild(renderItemCard(item, "dokumenty")));
+    return;
+  }
   if(!SALES_MATERIALS.length){
     title.textContent = "Materiały sprzedażowe";
+    text.className = "empty";
     text.textContent = "Materiały zostaną odtworzone jako widok ładowany po zalogowaniu.";
     return;
   }
