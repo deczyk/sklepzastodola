@@ -458,6 +458,22 @@
   .clientCardField textarea{min-height:82px;resize:vertical}
   .clientCardNotes,.clientCardHistory{border:1px solid var(--line);border-radius:10px;padding:12px;margin-top:12px;background:#fff}
   .clientCardHistory .historyEntry{box-shadow:none}
+  .clientOffers{border:1px solid #ead99a;border-radius:10px;padding:12px;margin-top:12px;background:#fffdf4}
+  .clientOffersHead{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:10px}
+  .clientOffersHead b{color:#755c15}
+  .offerList{display:grid;gap:8px}
+  .offerCard{background:white;border:1px solid #ead99a;border-radius:10px;padding:10px}
+  .offerTop{display:flex;justify-content:space-between;gap:8px;align-items:flex-start;margin-bottom:6px}
+  .offerTitle{font-weight:bold;color:#263b2b}
+  .offerMeta{display:flex;gap:6px;flex-wrap:wrap;font-size:12px;color:#647066}
+  .offerBadge{font-size:11px;font-weight:bold;border-radius:999px;padding:3px 8px;background:#f3f8f4;color:#2d5a27;border:1px solid #d8e7db}
+  .offerForm{display:none;background:#f8fbf8;border:1px solid #e4eee6;border-radius:10px;padding:10px;margin:10px 0}
+  .offerForm.open{display:block}
+  .offerFormGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+  .offerForm label{font-size:11px;color:#6b766f;text-transform:uppercase;letter-spacing:.05em;font-weight:bold}
+  .offerForm input,.offerForm select,.offerForm textarea{width:100%;box-sizing:border-box;border:1px solid #d8e7db;border-radius:8px;background:white;padding:7px 9px;font:inherit;margin-top:4px}
+  .offerForm textarea{min-height:70px;resize:vertical}
+  .offerActions{display:flex;gap:8px;justify-content:flex-end;margin-top:10px}
 
   .statusPill,.prio,.dashPill,.terminBadge,.ktoBadge{letter-spacing:.01em}
   .statusPill{padding:4px 10px}
@@ -475,7 +491,7 @@
     .tabBtn{width:100%;text-align:left}
     .whoRow{width:100%}
     .followItem{grid-template-columns:1fr}
-    .clientCardGrid{grid-template-columns:1fr}
+    .clientCardGrid,.offerFormGrid{grid-template-columns:1fr}
   }
 
 </style>
@@ -1418,6 +1434,9 @@ const ZAIN_OPTS = ["Mlekomat","Sklep gospodarczy","Pakiet: sklep + mlekomat","Se
 const LEAD_SOURCE_OPTS = ["OLX","Facebook / grupy rolnicze","Polecenie","Zadzwonił sam","Strona internetowa","ODR / gmina / doradca rolniczy","Targi / wydarzenie","Inne"];
 const PRODUCT_OPTS = ["Cały system","BRUNIMAT / mlekomat","Pawilon / punkt sprzedaży","Finansowanie / leasing / dotacja","Marketing lokalny","Serwis / wsparcie","Jeszcze nie wie","Inne"];
 const OBJECTION_OPTS = ["Cena","Niepewność co do popytu","Obawa o serwis / awarie","Brak miejsca / lokalizacji","Chce zobaczyć przykład / referencje","Czeka na kredyt / dotację","Musi skonsultować z rodziną / wspólnikiem","Brak formalności","Inne"];
+const OFFER_VARIANT_OPTS = ["Premium","Standard","Podstawowy","BRUNIMAT 650 Premium DUO","Pawilon / punkt sprzedaży","Pełny punkt sprzedaży","Inne"];
+const OFFER_STATUS_OPTS = ["Robocza","Wysłana","Czeka na decyzję","Do poprawy","Zaakceptowana","Odrzucona","Archiwalna"];
+const OFFER_CURRENCY_OPTS = ["EUR","PLN"];
 
 function clientField(c, field, type){
   if(type==="status"){
@@ -1544,6 +1563,80 @@ function objectionPrompt(objection){
     "Inne":"Zapytać, co konkretnie blokuje decyzję i zapisać następną akcję."
   };
   return prompts[objection] || "Zapytać, co dziś najbardziej blokuje decyzję i ustalić następny konkretny krok.";
+}
+
+function clientOffers(c){
+  return Array.isArray(c.oferty) ? c.oferty : [];
+}
+
+function safeOfferHref(link){
+  const value = (link || "").trim();
+  if(!value) return "";
+  try{
+    const url = new URL(value);
+    return ["http:","https:"].includes(url.protocol) ? value : "";
+  }catch(e){
+    return "";
+  }
+}
+
+function renderOfferOptions(options, selected){
+  return options.map(v=>`<option value="${crmEsc(v)}" ${selected===v?"selected":""}>${crmEsc(v)}</option>`).join("");
+}
+
+function renderClientOffers(c){
+  const offers = clientOffers(c);
+  return `
+    <div class="clientOffers">
+      <div class="clientOffersHead">
+        <b>Oferty (${offers.length})</b>
+        <button class="histBtn" onclick="toggleOfferForm('${crmEsc(c.id)}')">+ Dodaj ofertę</button>
+      </div>
+      <div class="offerForm" data-offer-form-for="${crmEsc(c.id)}">
+        <div class="offerFormGrid">
+          <label>Data wysłania<input type="date" data-offer-field="dataWyslania"></label>
+          <label>Wariant<select data-offer-field="wariant"><option value="">—</option>${renderOfferOptions(OFFER_VARIANT_OPTS,"")}</select></label>
+          <label>Kwota<input type="text" data-offer-field="kwota" placeholder="np. 14500"></label>
+          <label>Waluta<select data-offer-field="waluta">${renderOfferOptions(OFFER_CURRENCY_OPTS,"EUR")}</select></label>
+          <label>Status<select data-offer-field="status">${renderOfferOptions(OFFER_STATUS_OPTS,"Robocza")}</select></label>
+          <label>Następny kontakt<input type="date" data-offer-field="nastepnyFollowup"></label>
+          <label>Link do oferty<input type="text" data-offer-field="linkOferta" placeholder="https://..."></label>
+          <label>Nazwa pliku<input type="text" data-offer-field="nazwaPliku" placeholder="np. oferta_premium.pdf"></label>
+        </div>
+        <label>Notatka<textarea data-offer-field="notatka" placeholder="Krótka notatka o ofercie, bez marż i kosztów zakupowych."></textarea></label>
+        <div class="offerActions">
+          <button class="cancel" onclick="toggleOfferForm('${crmEsc(c.id)}')">Anuluj</button>
+          <button class="save" onclick="addClientOffer('${crmEsc(c.id)}')">Zapisz ofertę</button>
+        </div>
+      </div>
+      <div class="offerList">
+        ${offers.length ? [...offers].reverse().map(renderOfferCard).join("") : '<div class="empty">Brak zapisanych ofert dla tego klienta.</div>'}
+      </div>
+    </div>
+  `;
+}
+
+function renderOfferCard(o){
+  const amount = [o.kwota, o.waluta].filter(Boolean).join(" ");
+  const href = safeOfferHref(o.linkOferta);
+  const linkText = o.nazwaPliku || o.linkOferta || "";
+  return `
+    <div class="offerCard">
+      <div class="offerTop">
+        <div>
+          <div class="offerTitle">${crmEsc(o.wariant || "Oferta bez wariantu")}</div>
+          <div class="offerMeta">
+            <span>Data wysłania: ${crmEsc(o.dataWyslania || "brak")}</span>
+            ${amount ? `<span>Kwota: ${crmEsc(amount)}</span>` : ""}
+            <span>Następny kontakt: ${crmEsc(o.nastepnyFollowup || "brak")}</span>
+          </div>
+        </div>
+        <span class="offerBadge">${crmEsc(o.status || "Robocza")}</span>
+      </div>
+      ${linkText ? `<div class="kanbanNote">${href ? `<a href="${crmEsc(href)}" target="_blank" rel="noopener">${crmEsc(linkText)}</a>` : crmEsc(linkText)}</div>` : ""}
+      ${o.notatka ? `<div class="kanbanNote">${crmEsc(o.notatka)}</div>` : ""}
+    </div>
+  `;
 }
 
 function setClientsView(view){
@@ -1676,6 +1769,7 @@ function openClientCard(clientId){
       <div class="clientCardField"><b>Co go powstrzymuje</b>${clientField(c,null,"objection")}</div>
     </div>
     <div class="clientCardNotes"><b>Notatki</b><br>${crmEsc(c.notatki || "Brak notatek.")}</div>
+    ${renderClientOffers(c)}
     <div class="clientCardHistory">
       <b>Historia kontaktu (${hist.length})</b>
       ${hist.length ? [...hist].reverse().map(h=>`
@@ -1694,6 +1788,42 @@ function closeClientCard(){
   document.getElementById("clientCardModal").classList.remove("open");
   document.getElementById("clientCardContent").innerHTML = "";
   currentClientCardId = null;
+}
+
+function toggleOfferForm(clientId){
+  const form = document.querySelector(`.offerForm[data-offer-form-for="${clientId}"]`);
+  if(form) form.classList.toggle("open");
+}
+
+function addClientOffer(clientId){
+  const c = data.klienci.find(x=>x.id===clientId);
+  const form = document.querySelector(`.offerForm[data-offer-form-for="${clientId}"]`);
+  if(!c || !form) return;
+  const get = field => (form.querySelector(`[data-offer-field="${field}"]`)?.value || "").trim();
+  const now = new Date().toISOString();
+  const offer = {
+    id:"o_"+Date.now(),
+    dataWyslania:get("dataWyslania"),
+    wariant:get("wariant"),
+    kwota:get("kwota"),
+    waluta:get("waluta") || "EUR",
+    status:get("status") || "Robocza",
+    linkOferta:get("linkOferta"),
+    nazwaPliku:get("nazwaPliku"),
+    nastepnyFollowup:get("nastepnyFollowup"),
+    notatka:get("notatka"),
+    dataUtworzenia:now,
+    dataAktualizacji:now
+  };
+  if(!offer.dataWyslania && !offer.wariant && !offer.kwota && !offer.linkOferta && !offer.nazwaPliku && !offer.notatka) return;
+  if(!Array.isArray(c.oferty)) c.oferty = [];
+  c.oferty.push(offer);
+  if(offer.nastepnyFollowup) c.nastepnyFollowup = offer.nastepnyFollowup;
+  c.zaktualizowano = now;
+  logActivity(`dodał(a) ofertę dla klienta „${c.firma||c.osoba||'bez nazwy'}”`);
+  saveData();
+  renderClients();
+  openClientCard(clientId);
 }
 
 function renderClients(){
@@ -1774,7 +1904,7 @@ function addClient(){
   data.klienci.push({id:"c_"+Date.now(), firma:"", osoba:"", wojewodztwo:"", miejscowosc:"", ulica:"",
                       telefon:"", email:"", zainteresowanie:"", priorytet:"B", status:"nowy", notatki:"",
                       nastepnyFollowup:"", zrodloLeada:"", produkt:"", obiekcje:"",
-                      utworzono: now, zaktualizowano: now, historia: []});
+                      utworzono: now, zaktualizowano: now, historia: [], oferty: []});
   logActivity("dodał(a) nowego klienta");
   saveData(); renderClients(); renderStatsBar();
 }
@@ -1898,7 +2028,7 @@ async function importClientsFromXlsx(){
         priorytet: PRIO_MAP[(r["Priorytet"]||"").toString()] || "B",
         status: STATUS_MAP[(r["Status"]||"").toString()] || "nowy",
         notatki: (r["Notatki"]||"").toString(),
-        utworzono: nowImp, zaktualizowano: nowImp, historia: []
+        utworzono: nowImp, zaktualizowano: nowImp, historia: [], oferty: []
       });
       added++;
     });
