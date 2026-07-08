@@ -252,3 +252,29 @@ Do przetestowania:
 - Czy argument „gotowy punkt sprzedaży” działa lepiej niż „mlekomat”.
 - Czy dotacja / leasing realnie obniżają opór cenowy.
 - Jak rolnicy reagują na różnicę między wariantami pokazywaną jako „co odpada”.
+
+## 2026-07-07 — rejestracja Sklep za Stodołą Sp. z o.o. w KRS
+
+Status: potwierdzone dokumentem sądowym.
+
+Decyzja / fakt:
+- Spółka Sklep za Stodołą Sp. z o.o. została wpisana do rejestru przedsiębiorców KRS pod numerem 0001251447.
+
+Znaczenie:
+- Od tego momentu projekt działa jako zarejestrowana spółka.
+- Dokument KRS nie jest materiałem marketingowym.
+- Dane rejestrowe można używać w dokumentach firmowych, ofertach, umowach, banku i formalnościach.
+- Postanowienia sądu nie publikować na stronie publicznej.
+- Miejsce dokumentu: panel prywatny / dokumenty firmowe.
+
+Uzupełnione:
+- NIP: 9542911300.
+- REGON: 545191268.
+
+Do dopilnowania:
+- CRBR do 21.07.2026.
+- NIP-8 do 28.07.2026, chyba że powstanie krótszy termin związany ze składkami ZUS.
+- rachunek bankowy.
+- status VAT / VAT-R.
+- księgowość.
+- e-Doręczenia, jeśli wymagane / nieaktywne.

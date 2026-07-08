@@ -26,6 +26,26 @@ Folder dokumentów panelu: _pliki-0xyqdz4t/
 Jakub: prowadzenie projektu, sprzedaż, strona, panel, kontakty z klientami.
 Jarosław Deczyński: Prezes Zarządu.
 
+## Dane rejestrowe spółki
+
+Spółka Sklep za Stodołą Sp. z o.o. została wpisana do rejestru przedsiębiorców KRS.
+KRS: 0001251447.
+Data wpisu: 07.07.2026.
+Umowa spółki: 29.06.2026.
+Siedziba: Katowice.
+Kapitał zakładowy: 5 000 zł.
+Pierwszy rok obrotowy kończy się 31.12.2026.
+NIP: 9542911300.
+REGON: 545191268.
+Uwaga robocza: jeśli wyszukiwarka KRS pokazuje wariant 14-cyfrowy REGON, sprawdzić w GUS, czy jest to numer jednostki lokalnej. Do codziennej pracy używać 9-cyfrowego REGON 545191268, dopóki GUS nie potwierdzi inaczej.
+
+## Najbliższe formalności po wpisie
+
+- CRBR: dopilnować do 21.07.2026.
+- NIP-8: dopilnować do 28.07.2026, chyba że spółka wcześniej zacznie być płatnikiem składek ZUS — wtedy termin może być krótszy.
+- Konto firmowe, VAT-R i księgowość: do załatwienia przed aktywną sprzedażą i fakturowaniem.
+Dokument KRS traktować jako poufny i przechowywać wyłącznie prywatnie.
+
 ## Ważne zasady dla AI
 - Patrzeć na projekt szeroko: celem nie jest sprzedać samo urządzenie, tylko pomóc rolnikowi zbudować działający kanał sprzedaży bezpośredniej.
 - Nie pozycjonować firmy wyłącznie jako sprzedawcy mlekomatów.
