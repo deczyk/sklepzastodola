@@ -728,6 +728,20 @@
         </div>
         <input type="file" id="importPackagePreviewFile" accept=".json,application/json" onchange="previewImportPackageJsonFile(this)">
         <div id="importPackagePreviewResult" class="backupPreviewResult"></div>
+        <div class="backupPreview">
+          <h3>Import dokumentów i cenników</h3>
+          <div class="privateNotice"><b>Bezpieczny import:</b> Import dopisuje wyłącznie dokumenty, cenniki i materiały sprzedażowe do prywatnej listy dokumentów. Nie importuje klientów, ofert, notatek, budżetu, finansów ani checklist.</div>
+          <div class="backupActions">
+            <label><input type="checkbox" id="importDocsSection" onchange="updateDocumentImportButton()"> Importuj dokumenty</label>
+            <label><input type="checkbox" id="importPriceDocsSection" onchange="updateDocumentImportButton()"> Importuj cenniki</label>
+            <label><input type="checkbox" id="importSalesMaterialsSection" onchange="updateDocumentImportButton()"> Importuj materiały sprzedażowe</label>
+          </div>
+          <div class="backupActions">
+            <input type="text" id="documentImportConfirm" placeholder="Wpisz IMPORTUJ, aby dopisać dane" oninput="updateDocumentImportButton()">
+            <button class="importBtn" id="documentImportBtn" onclick="importSelectedDocumentSections()" disabled>Importuj wybrane sekcje</button>
+          </div>
+          <div id="documentImportResult" class="backupPreviewResult"></div>
+        </div>
       </div>
     </div>
     </div>
@@ -3157,6 +3171,8 @@ const IMPORT_PACKAGE_SECTIONS = [
   ["notatki", "Notatki", "klient.historia albo data.dokumenty"]
 ];
 
+let currentImportPackagePreview = null;
+
 function importPackageCount(pkg, key){
   return Array.isArray(pkg && pkg[key]) ? pkg[key].length : 0;
 }
@@ -3242,6 +3258,8 @@ function renderImportPackagePreview(pkg, fileName){
 function previewImportPackageJsonFile(input){
   const result = document.getElementById("importPackagePreviewResult");
   const file = input && input.files && input.files[0];
+  currentImportPackagePreview = null;
+  updateDocumentImportButton();
   if(!result) return;
   if(!file){
     result.innerHTML = "";
@@ -3252,15 +3270,183 @@ function previewImportPackageJsonFile(input){
   reader.onload = () => {
     try{
       const parsed = JSON.parse(reader.result);
+      currentImportPackagePreview = parsed;
       renderImportPackagePreview(parsed, file.name);
+      updateDocumentImportButton();
     }catch(e){
+      currentImportPackagePreview = null;
+      updateDocumentImportButton();
       result.innerHTML = `<div class="backupPreviewStatus error"><b>Niepoprawny JSON.</b><br>${crmEsc(e.message || "Nie udało się odczytać pliku.")}</div>`;
     }
   };
   reader.onerror = () => {
+    currentImportPackagePreview = null;
+    updateDocumentImportButton();
     result.innerHTML = '<div class="backupPreviewStatus error"><b>Nie udało się odczytać pliku.</b></div>';
   };
   reader.readAsText(file);
+}
+
+function selectedDocumentImportSections(){
+  return [
+    ["dokumenty", document.getElementById("importDocsSection")?.checked],
+    ["cenniki", document.getElementById("importPriceDocsSection")?.checked],
+    ["materialySprzedazowe", document.getElementById("importSalesMaterialsSection")?.checked]
+  ].filter(([, checked]) => checked).map(([key]) => key);
+}
+
+function updateDocumentImportButton(){
+  const btn = document.getElementById("documentImportBtn");
+  const confirm = document.getElementById("documentImportConfirm");
+  if(!btn) return;
+  const hasPackage = !!currentImportPackagePreview && typeof currentImportPackagePreview === "object" && !Array.isArray(currentImportPackagePreview);
+  const hasSection = selectedDocumentImportSections().length > 0;
+  const confirmed = (confirm && confirm.value.trim()) === "IMPORTUJ";
+  btn.disabled = !(hasPackage && hasSection && confirmed);
+}
+
+function importValue(value){
+  return (value || "").toString().trim();
+}
+
+function importNow(){
+  return new Date().toISOString();
+}
+
+function importPackageDocumentBase(item, fallback){
+  const nowTs = importNow();
+  return {
+    id: `item_${Date.now()}_${Math.random().toString(36).slice(2,8)}`,
+    title: importValue(item.title || item.nazwa || fallback.title),
+    link: safeDocumentHref(importValue(item.link)),
+    desc: importValue(item.desc || item.notatka || item.notes || ""),
+    kategoria: importValue(item.kategoria || fallback.kategoria),
+    status: importValue(item.status || "todo"),
+    notes: importValue(item.notes || ""),
+    typ: importValue(item.typ || fallback.typ),
+    poufnosc: importValue(item.poufnosc || fallback.poufnosc),
+    statusDokumentu: importValue(item.statusDokumentu || fallback.statusDokumentu),
+    nazwaPliku: importValue(item.nazwaPliku || ""),
+    klientId: importValue(item.klientId || ""),
+    dataDokumentu: importValue(item.dataDokumentu || item.data || ""),
+    utworzono: importValue(item.utworzono || nowTs),
+    zaktualizowano: importValue(item.zaktualizowano || nowTs)
+  };
+}
+
+function normalizeImportDocument(item){
+  return importPackageDocumentBase(item || {}, {
+    title: "Dokument bez nazwy",
+    typ: "Dokument firmowy",
+    kategoria: "Inne dokumenty",
+    poufnosc: "Wewnętrzne",
+    statusDokumentu: "Roboczy"
+  });
+}
+
+function importPriceConfidentiality(item){
+  const text = `${item.typ || ""} ${item.title || ""} ${item.nazwa || ""} ${item.desc || ""} ${item.notatka || ""} ${item.notes || ""}`.toLowerCase();
+  if(text.includes("zakupowy") || text.includes("partnerski")) return "Ściśle poufne";
+  if(text.includes("wewnętrzny") || text.includes("brunimat") || text.includes("alfred") || text.includes("bruni")) return "Poufne";
+  return importValue(item.poufnosc || "Wewnętrzne");
+}
+
+function normalizeImportPriceDocument(item){
+  const source = item || {};
+  const mappedSource = {...source, poufnosc: importPriceConfidentiality(source)};
+  return importPackageDocumentBase(mappedSource, {
+    title: "Cennik bez nazwy",
+    typ: "Cennik wewnętrzny",
+    kategoria: "Cenniki",
+    poufnosc: mappedSource.poufnosc,
+    statusDokumentu: "Roboczy"
+  });
+}
+
+function normalizeImportSalesMaterial(item){
+  const source = item || {};
+  const explicitConfidentiality = importValue(source.poufnosc);
+  const mappedSource = {...source, poufnosc: explicitConfidentiality === "Publiczne" ? "Publiczne" : "Wewnętrzne"};
+  return importPackageDocumentBase(mappedSource, {
+    title: "Materiał sprzedażowy bez nazwy",
+    typ: "Materiał sprzedażowy",
+    kategoria: "Materiały sprzedażowe",
+    poufnosc: mappedSource.poufnosc,
+    statusDokumentu: "Roboczy"
+  });
+}
+
+function importDocDuplicate(doc, existingDocs){
+  const link = importTextKey(doc.link);
+  const fileName = importTextKey(doc.nazwaPliku);
+  const title = importTextKey(doc.title);
+  const combo = [doc.title, doc.typ, doc.kategoria].map(importTextKey).join("|");
+  return (existingDocs || []).some(existing => {
+    const existingLink = importTextKey(docLink(existing));
+    const existingFile = importTextKey(docFileName(existing));
+    const existingTitle = importTextKey(docName(existing));
+    const existingCombo = [docName(existing), docType(existing), existing.kategoria || ""].map(importTextKey).join("|");
+    return (link && link === existingLink) ||
+      (fileName && fileName === existingFile) ||
+      (title && title === existingTitle) ||
+      (title && combo === existingCombo);
+  });
+}
+
+function normalizeSelectedImportDocs(pkg, sections){
+  const rows = [];
+  if(sections.includes("dokumenty")){
+    (Array.isArray(pkg.dokumenty) ? pkg.dokumenty : []).forEach(item => rows.push(normalizeImportDocument(item)));
+  }
+  if(sections.includes("cenniki")){
+    (Array.isArray(pkg.cenniki) ? pkg.cenniki : []).forEach(item => rows.push(normalizeImportPriceDocument(item)));
+  }
+  if(sections.includes("materialySprzedazowe")){
+    (Array.isArray(pkg.materialySprzedazowe) ? pkg.materialySprzedazowe : []).forEach(item => rows.push(normalizeImportSalesMaterial(item)));
+  }
+  return rows;
+}
+
+function importSelectedDocumentSections(){
+  const result = document.getElementById("documentImportResult");
+  const sections = selectedDocumentImportSections();
+  if(!currentImportPackagePreview || typeof currentImportPackagePreview !== "object" || Array.isArray(currentImportPackagePreview)){
+    if(result) result.innerHTML = '<div class="backupPreviewStatus error"><b>Najpierw wczytaj poprawną paczkę JSON.</b></div>';
+    return;
+  }
+  if(!sections.length){
+    if(result) result.innerHTML = '<div class="backupPreviewStatus error"><b>Zaznacz przynajmniej jedną sekcję do importu.</b></div>';
+    return;
+  }
+  const confirm = document.getElementById("documentImportConfirm");
+  if(!confirm || confirm.value.trim() !== "IMPORTUJ"){
+    if(result) result.innerHTML = '<div class="backupPreviewStatus error"><b>Wpisz IMPORTUJ, aby dopisać dane.</b></div>';
+    return;
+  }
+
+  exportPanelBackupJson();
+
+  if(!data.dokumenty) data.dokumenty = [];
+  const incomingDocs = normalizeSelectedImportDocs(currentImportPackagePreview, sections);
+  const docsToAdd = [];
+  let skippedDuplicates = 0;
+  incomingDocs.forEach(doc => {
+    if(importDocDuplicate(doc, data.dokumenty.concat(docsToAdd))){
+      skippedDuplicates++;
+    } else {
+      docsToAdd.push(doc);
+    }
+  });
+
+  if(docsToAdd.length){
+    data.dokumenty.push(...docsToAdd);
+  }
+  saveData();
+  render();
+  updateDocumentImportButton();
+  if(result){
+    result.innerHTML = `<div class="backupPreviewStatus"><b>Import zakończony.</b><br>Dodano rekordów: ${docsToAdd.length}<br>Pominięto duplikatów: ${skippedDuplicates}</div>`;
+  }
 }
 
 // ================= Do zrobienia =================
