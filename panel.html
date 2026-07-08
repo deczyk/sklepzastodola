@@ -719,6 +719,12 @@
         <input type="file" id="backupPreviewFile" accept=".json,application/json" onchange="previewBackupJsonFile(this)">
         <div id="backupPreviewResult" class="backupPreviewResult"></div>
       </div>
+      <div class="backupPreview">
+        <h3>Podgląd paczki importu danych</h3>
+        <div class="privateNotice"><b>Uwaga:</b> To jest tylko podgląd paczki importu. Dane nie są zapisywane ani dopisywane do panelu.</div>
+        <input type="file" id="importPackagePreviewFile" accept=".json,application/json" onchange="previewImportPackageJsonFile(this)">
+        <div id="importPackagePreviewResult" class="backupPreviewResult"></div>
+      </div>
     </div>
     </div>
 
@@ -3100,6 +3106,122 @@ function previewBackupJsonFile(input){
     try{
       const parsed = JSON.parse(reader.result);
       renderBackupPreviewStats(parsed, file.name);
+    }catch(e){
+      result.innerHTML = `<div class="backupPreviewStatus error"><b>Niepoprawny JSON.</b><br>${crmEsc(e.message || "Nie udało się odczytać pliku.")}</div>`;
+    }
+  };
+  reader.onerror = () => {
+    result.innerHTML = '<div class="backupPreviewStatus error"><b>Nie udało się odczytać pliku.</b></div>';
+  };
+  reader.readAsText(file);
+}
+
+const IMPORT_PACKAGE_SECTIONS = [
+  ["dokumenty", "Dokumenty", "data.dokumenty"],
+  ["cenniki", "Cenniki", "data.dokumenty"],
+  ["materialySprzedazowe", "Materiały sprzedażowe", "data.dokumenty"],
+  ["budzetStartowy", "Budżet startowy", "data.budzetStartowy"],
+  ["klienci", "Klienci", "data.klienci"],
+  ["oferty", "Oferty", "klient.oferty"],
+  ["notatki", "Notatki", "klient.historia albo data.dokumenty"]
+];
+
+function importPackageCount(pkg, key){
+  return Array.isArray(pkg && pkg[key]) ? pkg[key].length : 0;
+}
+
+function importTextKey(value){
+  return (value || "").toString().trim().toLowerCase();
+}
+
+function importDocDuplicateCount(items){
+  const existing = new Set();
+  (data.dokumenty || []).forEach(d => {
+    [d.link, d.nazwaPliku, d.title, d.nazwa].filter(Boolean).forEach(v => existing.add(importTextKey(v)));
+  });
+  return (items || []).filter(item =>
+    [item.link, item.nazwaPliku, item.title, item.nazwa].filter(Boolean).some(v => existing.has(importTextKey(v)))
+  ).length;
+}
+
+function importBudgetDuplicateCount(items){
+  const existing = new Set((data.budzetStartowy || []).map(b =>
+    [b.nazwa, b.kategoria, b.kwota, b.waluta].map(importTextKey).join("|")
+  ));
+  return (items || []).filter(item =>
+    existing.has([item.nazwa, item.kategoria, item.kwota, item.waluta].map(importTextKey).join("|"))
+  ).length;
+}
+
+function importClientDuplicateCount(items){
+  const existing = new Set((data.klienci || []).map(c =>
+    [c.firma, c.osoba, (c.telefon || "").replace(/\D/g, ""), c.email].map(importTextKey).join("|")
+  ));
+  return (items || []).filter(item =>
+    existing.has([item.firma, item.osoba, (item.telefon || "").replace(/\D/g, ""), item.email].map(importTextKey).join("|"))
+  ).length;
+}
+
+function renderImportPackagePreview(pkg, fileName){
+  const result = document.getElementById("importPackagePreviewResult");
+  if(!result) return;
+  const isObject = !!pkg && typeof pkg === "object" && !Array.isArray(pkg);
+  const source = isObject ? pkg : {};
+  const allowedKeys = ["wersja","zrodlo","tryb", ...IMPORT_PACKAGE_SECTIONS.map(([key]) => key)];
+  const keys = Object.keys(source);
+  const unknownKeys = keys.filter(key => !allowedKeys.includes(key));
+  const invalidSections = IMPORT_PACKAGE_SECTIONS
+    .filter(([key]) => source[key] !== undefined && !Array.isArray(source[key]))
+    .map(([, label]) => label);
+  const knownArrays = IMPORT_PACKAGE_SECTIONS.filter(([key]) => Array.isArray(source[key]));
+  const looksLikeImportPackage = isObject && knownArrays.length > 0;
+  const duplicateRows = [
+    ["Dokumenty", importDocDuplicateCount(source.dokumenty || [])],
+    ["Cenniki", importDocDuplicateCount(source.cenniki || [])],
+    ["Materiały sprzedażowe", importDocDuplicateCount(source.materialySprzedazowe || [])],
+    ["Budżet startowy", importBudgetDuplicateCount(source.budzetStartowy || [])],
+    ["Klienci", importClientDuplicateCount(source.klienci || [])]
+  ];
+
+  result.innerHTML = `
+    <div class="backupPreviewStatus ${looksLikeImportPackage ? "" : "warn"}">
+      <b>${looksLikeImportPackage ? "Plik wygląda jak paczka importu panelu." : "Plik jest poprawnym JSON, ale nie wygląda jednoznacznie jak paczka importu panelu."}</b><br>
+      Plik: ${crmEsc(fileName || "bez nazwy")}<br>
+      Wersja: ${crmEsc(source.wersja || "brak")}<br>
+      Źródło: ${crmEsc(source.zrodlo || "brak")}<br>
+      Tryb: ${crmEsc(source.tryb || "brak")}<br>
+      Obiekt JSON: ${isObject ? "tak" : "nie"}<br>
+      ${invalidSections.length ? `Sekcje niebędące tablicami: ${crmEsc(invalidSections.join(", "))}<br>` : ""}
+      ${unknownKeys.length ? `Nieznane sekcje: ${crmEsc(unknownKeys.join(", "))}` : "Nieznane sekcje: brak"}
+    </div>
+    <div class="backupStats">
+      ${IMPORT_PACKAGE_SECTIONS.map(([key, label]) => `<div class="statCard"><div class="num">${importPackageCount(source, key)}</div><div class="lbl">${crmEsc(label)}</div></div>`).join("")}
+    </div>
+    <h3>Mapowanie docelowe</h3>
+    <ul class="aiWorkflowList">
+      ${IMPORT_PACKAGE_SECTIONS.map(([key, label, target]) => `<li>${crmEsc(label)} → ${crmEsc(target)}</li>`).join("")}
+    </ul>
+    <h3>Potencjalne duplikaty</h3>
+    <div class="backupStats">
+      ${duplicateRows.map(([label, count]) => `<div class="statCard"><div class="num">${count}</div><div class="lbl">${crmEsc(label)}</div></div>`).join("")}
+    </div>
+  `;
+}
+
+function previewImportPackageJsonFile(input){
+  const result = document.getElementById("importPackagePreviewResult");
+  const file = input && input.files && input.files[0];
+  if(!result) return;
+  if(!file){
+    result.innerHTML = "";
+    return;
+  }
+  result.innerHTML = '<div class="backupPreviewStatus">Wczytywanie paczki importu...</div>';
+  const reader = new FileReader();
+  reader.onload = () => {
+    try{
+      const parsed = JSON.parse(reader.result);
+      renderImportPackagePreview(parsed, file.name);
     }catch(e){
       result.innerHTML = `<div class="backupPreviewStatus error"><b>Niepoprawny JSON.</b><br>${crmEsc(e.message || "Nie udało się odczytać pliku.")}</div>`;
     }
