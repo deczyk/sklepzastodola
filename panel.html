@@ -236,6 +236,14 @@
   table.planTable .posNum{color:var(--done);font-weight:bold}
   table.planTable .negNum{color:var(--todo)}
   .budgetNote{font-size:11.5px;color:var(--muted);font-style:italic;margin:-2px 0 4px}
+  .budgetSummary{display:flex;gap:10px;margin:14px 0 16px;flex-wrap:wrap}
+  .budgetList{display:grid;gap:10px}
+  .budgetItem{display:flex;justify-content:space-between;gap:14px;align-items:flex-start;background:white;border:1px solid var(--line);border-radius:12px;padding:12px 14px;box-shadow:0 6px 14px #1d3b2408}
+  .budgetItem strong{color:#263b2b}
+  .budgetMeta{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px;font-size:12px;color:var(--muted)}
+  .budgetPill{font-size:11px;font-weight:bold;color:#2d5a27;background:#f3f8f4;border:1px solid #d8e7db;border-radius:999px;padding:3px 8px}
+  .budgetAmount{text-align:right;font-weight:bold;color:var(--green)}
+  .budgetNoteText{font-size:12px;color:#647066;margin-top:6px;line-height:1.4}
 
   .loanCalcInputs{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:14px}
   .loanCalcInputs label{display:block;font-size:11px;color:var(--muted);margin-bottom:4px}
@@ -789,9 +797,44 @@
     
     <div class="tabPane" id="tabpane-budzet">
       <div class="section">
-        <h2>Budzet startowy</h2>
-        <div class="privateNotice"><b>Prywatnie:</b> szczegolowe liczby budzetu nie sa juz zapisane w zrodle HTML. Przeniesiemy je do prywatnego magazynu/panelu przy przebudowie dashboardu.</div>
-        <div class="empty">Budzet zostanie odtworzony jako widok ladowany z danych prywatnych.</div>
+        <h2>Budżet startowy <button class="addBtn" onclick="toggleForm('budzetStartowy')">+ Dodaj pozycję</button></h2>
+        <div class="privateNotice"><b>Prywatnie:</b> liczby budżetu są zapisywane wyłącznie w danych prywatnego panelu po zalogowaniu.</div>
+        <div class="budgetSummary" id="budzetStartowySummary"></div>
+        <div class="newItemForm" id="form-budzetStartowy">
+          <div class="row">
+            <input type="text" id="nazwa-budzetStartowy" placeholder="Nazwa pozycji">
+            <select id="kategoria-budzetStartowy">
+              <option>Formalności</option>
+              <option>Sprzęt</option>
+              <option>Pawilon / punkt sprzedaży</option>
+              <option>Marketing</option>
+              <option>Dokumenty / księgowość</option>
+              <option>Transport / montaż</option>
+              <option>Rezerwa</option>
+              <option>Inne</option>
+            </select>
+          </div>
+          <div class="row">
+            <input type="number" id="kwota-budzetStartowy" placeholder="Kwota" step="0.01">
+            <select id="waluta-budzetStartowy">
+              <option>PLN</option>
+              <option>EUR</option>
+            </select>
+            <select id="status-budzetStartowy">
+              <option>Robocze</option>
+              <option>Do potwierdzenia</option>
+              <option>Potwierdzone</option>
+              <option>Zapłacone</option>
+              <option>Odłożone</option>
+            </select>
+          </div>
+          <input type="text" id="notatka-budzetStartowy" placeholder="Notatka (opcjonalnie)">
+          <div class="actions">
+            <button class="cancel" onclick="toggleForm('budzetStartowy')">Anuluj</button>
+            <button class="save" onclick="addBudzetStartowy()">Zapisz</button>
+          </div>
+        </div>
+        <div id="list-budzetStartowy" class="budgetList"></div>
       </div>
     </div>
     <div class="tabPane" id="tabpane-finanse">
@@ -953,6 +996,7 @@ function defaultData(){
     terminy: [],
     instalacje: [],
     finanse: [],
+    budzetStartowy: [],
     linki: [],
     zadania: []
   };
@@ -1054,6 +1098,7 @@ function fillMissingDefaults(d){
   if(!d.terminy || d.terminy.length===0){ d.terminy = dflt.terminy; changed = true; }
   if(!d.instalacje){ d.instalacje = []; changed = true; }
   if(!d.finanse){ d.finanse = []; changed = true; }
+  if(!d.budzetStartowy){ d.budzetStartowy = []; changed = true; }
   if(!d.linki || d.linki.length===0){ d.linki = dflt.linki; changed = true; }
   if(!d.zadania || d.zadania.length===0){
     d.zadania = dflt.zadania;
@@ -1364,6 +1409,7 @@ function render(){
   renderTerminy();
   renderInstalacje();
   renderFinanse();
+  renderBudzetStartowy();
   renderLinki();
   renderZadania();
   renderPriceDocuments();
@@ -2211,6 +2257,103 @@ function addFinanse(){
 function deleteFinanse(id){
   data.finanse = data.finanse.filter(f=>f.id!==id);
   saveData(); renderFinanse();
+}
+
+// ================= Budżet startowy =================
+function budzetAmount(item){
+  const amount = parseFloat(item && item.kwota);
+  return Number.isFinite(amount) ? amount : 0;
+}
+
+function formatBudgetAmount(item){
+  const amount = parseFloat(item && item.kwota);
+  if(!Number.isFinite(amount)) return "brak kwoty";
+  return `${amount.toFixed(2)} ${crmEsc((item && item.waluta) || "PLN")}`;
+}
+
+function renderBudzetStartowy(){
+  const list = document.getElementById("list-budzetStartowy");
+  const summary = document.getElementById("budzetStartowySummary");
+  if(!list) return;
+
+  const items = data.budzetStartowy || [];
+  const sumByCurrency = (currency, filtered = items) => filtered
+    .filter(item => (item.waluta || "PLN") === currency)
+    .reduce((sum, item) => sum + budzetAmount(item), 0);
+  const toConfirm = items.filter(item => item.status === "Do potwierdzenia");
+
+  if(summary){
+    summary.innerHTML = `
+      <div class="statCard"><div class="num">${sumByCurrency("PLN").toFixed(2)} PLN</div><div class="lbl">Suma PLN</div></div>
+      <div class="statCard"><div class="num">${sumByCurrency("EUR").toFixed(2)} EUR</div><div class="lbl">Suma EUR</div></div>
+      <div class="statCard"><div class="num">${toConfirm.length}</div><div class="lbl">Do potwierdzenia</div></div>
+      <div class="statCard"><div class="num">${sumByCurrency("PLN", toConfirm).toFixed(2)} PLN</div><div class="lbl">Do potw. PLN</div></div>
+      <div class="statCard"><div class="num">${sumByCurrency("EUR", toConfirm).toFixed(2)} EUR</div><div class="lbl">Do potw. EUR</div></div>
+    `;
+  }
+
+  if(items.length === 0){
+    list.innerHTML = '<div class="empty">Brak pozycji budżetu — dodaj pierwszą po zalogowaniu do prywatnego panelu.</div>';
+    return;
+  }
+
+  list.innerHTML = items.map(item => `
+    <div class="budgetItem">
+      <div>
+        <strong>${crmEsc(item.nazwa || "Bez nazwy")}</strong>
+        <div class="budgetMeta">
+          <span class="budgetPill">${crmEsc(item.kategoria || "Inne")}</span>
+          <span class="budgetPill">${crmEsc(item.status || "Robocze")}</span>
+        </div>
+        ${item.notatka ? `<div class="budgetNoteText">${crmEsc(item.notatka)}</div>` : ""}
+      </div>
+      <div class="budgetAmount">
+        <div>${formatBudgetAmount(item)}</div>
+        <button class="delBtn" onclick="deleteBudzetStartowy('${crmEsc(item.id)}')">Usuń</button>
+      </div>
+    </div>
+  `).join("");
+}
+
+function addBudzetStartowy(){
+  const nazwa = document.getElementById("nazwa-budzetStartowy").value.trim();
+  const kategoria = document.getElementById("kategoria-budzetStartowy").value;
+  const kwota = document.getElementById("kwota-budzetStartowy").value;
+  const waluta = document.getElementById("waluta-budzetStartowy").value;
+  const status = document.getElementById("status-budzetStartowy").value;
+  const notatka = document.getElementById("notatka-budzetStartowy").value.trim();
+  if(!nazwa) return;
+
+  const now = new Date().toISOString();
+  if(!Array.isArray(data.budzetStartowy)) data.budzetStartowy = [];
+  data.budzetStartowy.push({
+    id: "b_"+Date.now(),
+    nazwa,
+    kategoria,
+    kwota,
+    waluta,
+    status,
+    notatka,
+    dataUtworzenia: now,
+    dataAktualizacji: now
+  });
+  logActivity(`dodał(a) pozycję budżetu startowego „${nazwa}”`);
+  saveData();
+
+  document.getElementById("nazwa-budzetStartowy").value = "";
+  document.getElementById("kwota-budzetStartowy").value = "";
+  document.getElementById("notatka-budzetStartowy").value = "";
+  document.getElementById("kategoria-budzetStartowy").value = "Formalności";
+  document.getElementById("waluta-budzetStartowy").value = "PLN";
+  document.getElementById("status-budzetStartowy").value = "Robocze";
+  toggleForm("budzetStartowy");
+  renderBudzetStartowy();
+}
+
+function deleteBudzetStartowy(id){
+  data.budzetStartowy = (data.budzetStartowy || []).filter(item => item.id !== id);
+  saveData();
+  renderBudzetStartowy();
 }
 
 // ================= Szybkie linki =================
