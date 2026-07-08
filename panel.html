@@ -276,6 +276,19 @@
                  border-top:1px solid var(--line);margin-top:6px;user-select:none}
   .archiveToggle:hover{color:var(--green)}
   .archiveBox{margin-top:6px}
+  .checkGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px;margin-bottom:18px}
+  .checkCard{background:white;border:1px solid var(--line);border-radius:12px;padding:14px;box-shadow:0 6px 16px #1d3b2408}
+  .checkCard h3{margin:0 0 6px;color:var(--green);font-size:15px}
+  .checkMeta{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}
+  .checkBadge{font-size:11px;font-weight:bold;color:#2d5a27;background:#f3f8f4;border:1px solid #d8e7db;border-radius:999px;padding:3px 8px}
+  .checkDesc{font-size:12.5px;color:var(--muted);line-height:1.45}
+  .checkProgress{height:8px;background:#eef4ef;border-radius:999px;overflow:hidden;margin:10px 0}
+  .checkProgress span{display:block;height:100%;background:linear-gradient(90deg,var(--green),var(--green2));border-radius:999px}
+  .checkSteps{display:grid;gap:7px;margin-top:10px}
+  .checkStep{display:grid;grid-template-columns:auto 1fr;gap:8px;align-items:start;font-size:13px;color:#2d332e}
+  .checkStep.done{color:var(--muted);text-decoration:line-through}
+  .checkStep input{margin-top:2px}
+  .checkActions{display:flex;gap:8px;justify-content:space-between;align-items:center;margin-top:10px}
 
   /* --- Dashboard --- */
   .dashGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px}
@@ -558,6 +571,7 @@
     <div class="tabNav">
       <button class="tabBtn active" data-tab="dashboard" onclick="switchTab('dashboard')">✨ Dashboard</button>
       <button class="tabBtn" data-tab="zadania" onclick="switchTab('zadania')">✅ Do zrobienia</button>
+      <button class="tabBtn" data-tab="checklisty" onclick="switchTab('checklisty')">☑️ Checklisty</button>
       <button class="tabBtn" data-tab="klienci" onclick="switchTab('klienci')">👥 Baza klientów</button>
       <button class="tabBtn" data-tab="dokumenty" onclick="switchTab('dokumenty')">📄 Dokumenty i oferty</button>
       <button class="tabBtn" data-tab="cenniki" onclick="switchTab('cenniki')">💶 Cenniki</button>
@@ -640,6 +654,17 @@
         </div>
       </div>
       <div id="list-zadania"></div>
+    </div>
+    </div>
+
+    <div class="tabPane" id="tabpane-checklisty">
+    <div class="section">
+      <h2>Checklisty i procedury</h2>
+      <div class="privateNotice"><b>Prywatnie:</b> checklisty zapisują postęp w danych panelu. Szablony są ogólne i nie zawierają kosztów, marż ani danych klientów.</div>
+      <h3>Szablony procedur</h3>
+      <div id="checklistTemplates" class="checkGrid"></div>
+      <h3>Aktywne checklisty</h3>
+      <div id="activeChecklisty"></div>
     </div>
     </div>
 
@@ -1039,7 +1064,8 @@ function defaultData(){
     finanse: [],
     budzetStartowy: [],
     linki: [],
-    zadania: []
+    zadania: [],
+    checklisty: []
   };
 }
 let data = null;
@@ -1141,6 +1167,7 @@ function fillMissingDefaults(d){
   if(!d.finanse){ d.finanse = []; changed = true; }
   if(!d.budzetStartowy){ d.budzetStartowy = []; changed = true; }
   if(!d.linki || d.linki.length===0){ d.linki = dflt.linki; changed = true; }
+  if(!d.checklisty){ d.checklisty = []; changed = true; }
   if(!d.zadania || d.zadania.length===0){
     d.zadania = dflt.zadania;
     changed = true;
@@ -1557,6 +1584,7 @@ function render(){
   renderBudzetStartowy();
   renderLinki();
   renderZadania();
+  renderChecklisty();
   renderPriceDocuments();
   renderLoanCalc();
   renderDashboard();
@@ -2569,6 +2597,242 @@ function addLink(){
 function deleteLink(id){
   data.linki = data.linki.filter(l=>l.id!==id);
   saveData(); renderLinki();
+}
+
+// ================= Checklisty i procedury =================
+const CHECKLIST_TEMPLATES = [
+  {
+    key:"nowy-lead",
+    nazwa:"Nowy lead",
+    kategoria:"Sprzedaż",
+    opis:"Pierwsze uporządkowanie nowego kontaktu sprzedażowego.",
+    kroki:[
+      "Zapisać źródło leada",
+      "Zapisać dane kontaktowe",
+      "Ustalić produkt zainteresowania",
+      "Ocenić priorytet A/B/C",
+      "Ustawić następny kontakt",
+      "Dodać pierwszą notatkę"
+    ]
+  },
+  {
+    key:"pierwsza-rozmowa",
+    nazwa:"Pierwsza rozmowa z klientem",
+    kategoria:"Sprzedaż",
+    opis:"Pytania i informacje potrzebne po pierwszej rozmowie.",
+    kroki:[
+      "Ustalić lokalizację gospodarstwa / punktu sprzedaży",
+      "Ustalić obecny sposób sprzedaży",
+      "Ustalić liczbę obecnych klientów",
+      "Ustalić ilość produktu do sprzedaży",
+      "Zapytać o sezonowość sprzedaży",
+      "Zapytać o finansowanie",
+      "Zapisać główne obiekcje",
+      "Ustawić follow-up"
+    ]
+  },
+  {
+    key:"wyslanie-oferty",
+    nazwa:"Wysłanie oferty",
+    kategoria:"Sprzedaż",
+    opis:"Kontrola przed wysłaniem i po wysłaniu oferty.",
+    kroki:[
+      "Wybrać wariant oferty",
+      "Sprawdzić dane klienta",
+      "Przygotować PDF / link do oferty",
+      "Zapisać ofertę w karcie klienta",
+      "Wysłać ofertę",
+      "Ustawić follow-up po ofercie"
+    ]
+  },
+  {
+    key:"follow-up-po-ofercie",
+    nazwa:"Follow-up po ofercie",
+    kategoria:"Sprzedaż",
+    opis:"Rozmowa po wysłaniu oferty i ustalenie kolejnego kroku.",
+    kroki:[
+      "Sprawdzić, czy klient widział ofertę",
+      "Zapytać, co jest niejasne",
+      "Zapytać, co blokuje decyzję",
+      "Ustalić kolejny krok",
+      "Zapisać notatkę po rozmowie",
+      "Ustawić następną datę kontaktu"
+    ]
+  },
+  {
+    key:"przyjecie-zaliczki",
+    nazwa:"Przyjęcie zaliczki",
+    kategoria:"Formalności",
+    opis:"Kroki po decyzji klienta i przed przekazaniem tematu do wdrożenia.",
+    kroki:[
+      "Potwierdzić wariant zamówienia",
+      "Potwierdzić dane do faktury",
+      "Przygotować dokument / umowę",
+      "Wysłać dane do płatności",
+      "Zapisać status płatności",
+      "Przekazać temat do wdrożenia"
+    ]
+  },
+  {
+    key:"przygotowanie-wdrozenia",
+    nazwa:"Przygotowanie wdrożenia",
+    kategoria:"Wdrożenie",
+    opis:"Ustalenia techniczne i organizacyjne przed montażem.",
+    kroki:[
+      "Zebrać zdjęcia miejsca",
+      "Sprawdzić dostęp do prądu",
+      "Sprawdzić dostęp do wody, jeśli wymagany",
+      "Ustalić miejsce ustawienia urządzenia",
+      "Ustalić transport",
+      "Ustalić termin montażu",
+      "Przygotować checklistę uruchomienia"
+    ]
+  },
+  {
+    key:"montaz-i-uruchomienie",
+    nazwa:"Montaż i uruchomienie",
+    kategoria:"Wdrożenie",
+    opis:"Kontrola uruchomienia punktu sprzedaży u klienta.",
+    kroki:[
+      "Potwierdzić obecność klienta na miejscu",
+      "Sprawdzić ustawienie urządzenia",
+      "Sprawdzić zasilanie",
+      "Sprawdzić działanie płatności",
+      "Sprawdzić wydawanie produktu",
+      "Przeszkolić klienta",
+      "Zrobić zdjęcia po uruchomieniu",
+      "Ustalić pierwszy kontakt serwisowy"
+    ]
+  },
+  {
+    key:"formalnosci-spolki",
+    nazwa:"Formalności spółki",
+    kategoria:"Spółka",
+    opis:"Robocza lista formalności organizacyjnych spółki.",
+    kroki:[
+      "Dopilnować CRBR",
+      "Dopilnować NIP-8",
+      "Ustalić księgowość",
+      "Ustalić konto firmowe",
+      "Ustalić VAT / VAT-R",
+      "Ustalić e-Doręczenia",
+      "Zapisać terminy w panelu"
+    ]
+  }
+];
+
+function checklistClientName(clientId){
+  if(!clientId || !data || !data.klienci) return "";
+  const c = data.klienci.find(x => x.id === clientId);
+  return c ? clientName(c) : "";
+}
+
+function checklistProgress(checklist){
+  const steps = Array.isArray(checklist.kroki) ? checklist.kroki : [];
+  const done = steps.filter(k => k.wykonane).length;
+  const total = steps.length;
+  return {done, total, pct: total ? Math.round(done / total * 100) : 0};
+}
+
+function renderChecklisty(){
+  const templatesEl = document.getElementById("checklistTemplates");
+  const activeEl = document.getElementById("activeChecklisty");
+  if(!templatesEl || !activeEl || !data) return;
+
+  const clientOptions = '<option value="">Bez klienta</option>' +
+    (data.klienci || []).map(c => `<option value="${crmEsc(c.id)}">${crmEsc(clientName(c))}</option>`).join("");
+
+  templatesEl.innerHTML = CHECKLIST_TEMPLATES.map(t => `
+    <div class="checkCard">
+      <h3>${crmEsc(t.nazwa)}</h3>
+      <div class="checkMeta"><span class="checkBadge">${crmEsc(t.kategoria)}</span><span class="checkBadge">${t.kroki.length} kroków</span></div>
+      <div class="checkDesc">${crmEsc(t.opis)}</div>
+      <div class="checkActions">
+        <select id="checkClient-${crmEsc(t.key)}">${clientOptions}</select>
+        <button class="doneBtn" onclick="createChecklistFromTemplate('${crmEsc(t.key)}')">Utwórz checklistę</button>
+      </div>
+    </div>
+  `).join("");
+
+  const active = data.checklisty || [];
+  if(!active.length){
+    activeEl.innerHTML = '<div class="empty">Brak aktywnych checklist — utwórz pierwszą z szablonu.</div>';
+    return;
+  }
+
+  activeEl.innerHTML = active.map(ch => {
+    const progress = checklistProgress(ch);
+    const client = checklistClientName(ch.klientId);
+    const steps = Array.isArray(ch.kroki) ? ch.kroki : [];
+    return `
+      <div class="checkCard">
+        <div class="topRow">
+          <div>
+            <h3>${crmEsc(ch.nazwa || "Checklista")}</h3>
+            <div class="checkMeta">
+              <span class="checkBadge">${crmEsc(ch.kategoria || "Procedura")}</span>
+              <span class="checkBadge">${crmEsc(ch.status || "W toku")}</span>
+              ${client ? `<span class="checkBadge">${crmEsc(client)}</span>` : ""}
+            </div>
+          </div>
+          <button class="delBtn" onclick="deleteChecklist('${crmEsc(ch.id)}')">Usuń</button>
+        </div>
+        ${ch.opis ? `<div class="checkDesc">${crmEsc(ch.opis)}</div>` : ""}
+        <div class="checkProgress"><span style="width:${progress.pct}%"></span></div>
+        <div class="checkDesc">${progress.done}/${progress.total} kroków (${progress.pct}%)</div>
+        <div class="checkSteps">
+          ${steps.map((step, idx) => `
+            <label class="checkStep ${step.wykonane ? "done" : ""}">
+              <input type="checkbox" ${step.wykonane ? "checked" : ""} onchange="toggleChecklistStep('${crmEsc(ch.id)}',${idx})">
+              <span>${crmEsc(step.tekst || "")}</span>
+            </label>
+          `).join("")}
+        </div>
+      </div>
+    `;
+  }).join("");
+}
+
+function createChecklistFromTemplate(templateKey){
+  const template = CHECKLIST_TEMPLATES.find(t => t.key === templateKey);
+  if(!template) return;
+  const clientSelect = document.getElementById("checkClient-"+templateKey);
+  const clientId = clientSelect ? clientSelect.value : "";
+  const now = new Date().toISOString();
+  if(!Array.isArray(data.checklisty)) data.checklisty = [];
+  data.checklisty.push({
+    id:"chk_"+Date.now(),
+    nazwa:template.nazwa,
+    kategoria:template.kategoria,
+    opis:template.opis,
+    kroki:template.kroki.map(tekst => ({tekst, wykonane:false, notatka:""})),
+    status:"W toku",
+    klientId,
+    dataUtworzenia:now,
+    dataAktualizacji:now
+  });
+  logActivity(`utworzył(a) checklistę „${template.nazwa}”`);
+  saveData();
+  renderChecklisty();
+}
+
+function toggleChecklistStep(checklistId, stepIndex){
+  const checklist = (data.checklisty || []).find(ch => ch.id === checklistId);
+  if(!checklist || !Array.isArray(checklist.kroki) || !checklist.kroki[stepIndex]) return;
+  checklist.kroki[stepIndex].wykonane = !checklist.kroki[stepIndex].wykonane;
+  checklist.dataAktualizacji = new Date().toISOString();
+  const progress = checklistProgress(checklist);
+  checklist.status = progress.total && progress.done === progress.total ? "Zrobiona" : (checklist.status === "Zrobiona" ? "W toku" : checklist.status || "W toku");
+  saveData();
+  renderChecklisty();
+}
+
+function deleteChecklist(checklistId){
+  const checklist = (data.checklisty || []).find(ch => ch.id === checklistId);
+  data.checklisty = (data.checklisty || []).filter(ch => ch.id !== checklistId);
+  if(checklist) logActivity(`usunął(-ęła) checklistę „${checklist.nazwa}”`);
+  saveData();
+  renderChecklisty();
 }
 
 // ================= Do zrobienia =================
