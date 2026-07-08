@@ -41,9 +41,10 @@ Uwaga robocza: jeśli wyszukiwarka KRS pokazuje wariant 14-cyfrowy REGON, sprawd
 
 ## Najbliższe formalności po wpisie
 
-- CRBR: dopilnować do 21.07.2026.
+- CRBR: dopilnować do 21.07.2026. Zgłoszenia CRBR dokonuje osoba uprawniona do reprezentacji spółki ujawniona w KRS; pełnomocnik nie może dokonać zgłoszenia. Obecnie do reprezentacji wpisany jest Jarosław Leszek Deczyński jako Prezes Zarządu z reprezentacją samodzielną.
 - NIP-8: dopilnować do 28.07.2026, chyba że spółka wcześniej zacznie być płatnikiem składek ZUS — wtedy termin może być krótszy.
 - Konto firmowe, VAT-R i księgowość: do załatwienia przed aktywną sprzedażą i fakturowaniem.
+- Sprawy podatkowe / pełnomocnictwo: rozważyć PPO-1 od Jarosława na Jakuba albo obsługę przez księgową, ale szczegóły potwierdzić z księgową przed złożeniem VAT-R / NIP-8.
 Dokument KRS traktować jako poufny i przechowywać wyłącznie prywatnie.
 
 ## Ważne zasady dla AI
