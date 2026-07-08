@@ -431,6 +431,16 @@
   .dashAiTags{display:flex;gap:6px;flex-wrap:wrap;margin-top:12px}
   .dashAiTags span{font-size:11px;font-weight:bold;color:#6a5314;background:#fff8df;border:1px solid #ead99a;
                    border-radius:999px;padding:4px 8px}
+  .aiWorkflowGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;margin:12px 0 18px}
+  .aiWorkflowCard{background:white;border:1px solid var(--line);border-radius:12px;padding:14px;box-shadow:0 6px 16px #1d3b2408}
+  .aiWorkflowCard h3{margin:0 0 7px;color:var(--green);font-size:15px}
+  .aiWorkflowCard p{margin:0;color:var(--muted);font-size:12.5px;line-height:1.45}
+  .aiWorkflowList{display:grid;gap:7px;margin:10px 0 0;padding:0;list-style:none}
+  .aiWorkflowList li{font-size:13px;color:#2d332e;background:#f8fbf8;border:1px solid #e7efe8;border-radius:8px;padding:8px 10px}
+  .aiPromptCard{display:grid;gap:9px}
+  .aiPromptHead{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+  .aiPromptBadge{font-size:11px;font-weight:bold;color:#6a5314;background:#fff8df;border:1px solid #ead99a;border-radius:999px;padding:4px 8px;white-space:nowrap}
+  .aiPromptText{font-size:12.5px;color:#3f4b42;line-height:1.45;background:#fbfcfb;border:1px solid #e7efe8;border-radius:8px;padding:9px 10px}
   .dashFunnelBarWrap{height:18px;background:#edf4ee}
   .dashFunnelBar{background:linear-gradient(90deg,#2d5a27,#2f7a45)}
   .dashFinance{gap:10px;justify-content:stretch}
@@ -572,6 +582,7 @@
       <button class="tabBtn active" data-tab="dashboard" onclick="switchTab('dashboard')">✨ Dashboard</button>
       <button class="tabBtn" data-tab="zadania" onclick="switchTab('zadania')">✅ Do zrobienia</button>
       <button class="tabBtn" data-tab="checklisty" onclick="switchTab('checklisty')">☑️ Checklisty</button>
+      <button class="tabBtn" data-tab="aiworkflow" onclick="switchTab('aiworkflow')">🤖 AI Workflow</button>
       <button class="tabBtn" data-tab="klienci" onclick="switchTab('klienci')">👥 Baza klientów</button>
       <button class="tabBtn" data-tab="dokumenty" onclick="switchTab('dokumenty')">📄 Dokumenty i oferty</button>
       <button class="tabBtn" data-tab="cenniki" onclick="switchTab('cenniki')">💶 Cenniki</button>
@@ -608,6 +619,7 @@
           <div class="dashAiTags">
             <span>Gemini</span><span>Claude</span><span>Codex</span>
           </div>
+          <button class="doneBtn" onclick="switchTab('aiworkflow')" style="margin-top:12px">Otwórz AI Workflow</button>
         </div>
 
         <div class="dashCard">
@@ -665,6 +677,21 @@
       <div id="checklistTemplates" class="checkGrid"></div>
       <h3>Aktywne checklisty</h3>
       <div id="activeChecklisty"></div>
+    </div>
+    </div>
+
+    <div class="tabPane" id="tabpane-aiworkflow">
+    <div class="section">
+      <h2>AI Workflow</h2>
+      <div class="privateNotice"><b>Statycznie:</b> ten moduł nie zapisuje danych — prompty są zapisane w kodzie panelu i służą tylko do kopiowania.</div>
+      <h3>Którego AI użyć?</h3>
+      <div id="aiTools" class="aiWorkflowGrid"></div>
+      <h3>Oszczędzanie limitów</h3>
+      <ul id="aiLimitRules" class="aiWorkflowList"></ul>
+      <h3>Czego nie wrzucać do AI</h3>
+      <ul id="aiSafetyRules" class="aiWorkflowList"></ul>
+      <h3>Gotowe prompty</h3>
+      <div id="aiPromptList" class="aiWorkflowGrid"></div>
     </div>
     </div>
 
@@ -1585,6 +1612,7 @@ function render(){
   renderLinki();
   renderZadania();
   renderChecklisty();
+  renderAIWorkflow();
   renderPriceDocuments();
   renderLoanCalc();
   renderDashboard();
@@ -2833,6 +2861,127 @@ function deleteChecklist(checklistId){
   if(checklist) logActivity(`usunął(-ęła) checklistę „${checklist.nazwa}”`);
   saveData();
   renderChecklisty();
+}
+
+// ================= AI Workflow =================
+const AI_TOOLS = [
+  {nazwa:"ChatGPT", opis:"Porządkowanie, decyzje, analiza, kontrola odpowiedzi i przygotowanie promptów."},
+  {nazwa:"Claude", opis:"Strategia, sprzedaż, copywriting, maile, SMS-y, skrypty rozmów i analiza klienta."},
+  {nazwa:"Codex", opis:"Repo, panel, HTML/CSS/JS, diff, testy, commit i push."},
+  {nazwa:"Gemini", opis:"Tanie szkice, szybkie warianty, listy pytań i wstępne pomysły."}
+];
+
+const AI_LIMIT_RULES = [
+  "Nie wysyłać dużych zadań od razu do Codexa.",
+  "Najpierw plan, potem wdrożenie, potem commit.",
+  "Claude/Gemini do szkicu, ChatGPT do kontroli, Codex do kodu.",
+  "Do Codexa dawać krótkie, konkretne zadania techniczne.",
+  "Nie robić wielu etapów naraz."
+];
+
+const AI_SAFETY_RULES = [
+  "Haseł.",
+  "Kluczy API.",
+  "Danych JSONBin.",
+  "Prywatnych danych klientów.",
+  "Cenników zakupowych bez potrzeby.",
+  "Marż i kosztów zakupu.",
+  "Dokumentów KRS / formalnych bez potrzeby.",
+  "Danych logowania.",
+  "Plików z repo, których nie trzeba analizować."
+];
+
+const AI_PROMPTS = [
+  {
+    tytul:"Analiza klienta",
+    kategoria:"Sprzedaż",
+    opis:"Ocena potencjału, ryzyk i następnego kroku w rozmowie.",
+    tresc:"Przeanalizuj tego klienta pod kątem sprzedaży bezpośredniej z gospodarstwa. Oceń: potencjał, potrzeby, ryzyka, obiekcje, następny krok i najlepszy sposób rozmowy. Nie wymyślaj faktów. Oddziel fakty od założeń."
+  },
+  {
+    tytul:"Follow-up po ofercie",
+    kategoria:"Sprzedaż",
+    opis:"Krótka wiadomość po wysłanej ofercie.",
+    tresc:"Przygotuj krótki follow-up do klienta po wysłaniu oferty. Ton: profesjonalny, spokojny, bez nacisku. Cel: sprawdzić, czy klient widział ofertę, zebrać obiekcje i ustalić kolejny krok."
+  },
+  {
+    tytul:"Codex — najpierw plan",
+    kategoria:"Techniczne",
+    opis:"Plan techniczny bez edycji plików.",
+    tresc:"Przeanalizuj repo i przygotuj plan wdrożenia. Na razie nic nie zmieniaj. Nie rób commit. Nie rób push. Pokaż, które pliki trzeba zmienić, jakie są ryzyka, jak to przetestować i jaki wariant minimalny rekomendujesz."
+  },
+  {
+    tytul:"Codex — wdrożenie ostrożne",
+    kategoria:"Techniczne",
+    opis:"Bezpieczne wdrożenie w ustalonym zakresie.",
+    tresc:"Wdróż zmianę ostrożnie tylko w ustalonych plikach. Nie rób commit. Nie rób push. Nie ruszaj API, haseł, logowania ani danych prywatnych. Po zmianach pokaż git status, git diff --stat, najważniejsze fragmenty zmian, ocenę ryzyka i listę testów."
+  },
+  {
+    tytul:"Kontrola bezpieczeństwa",
+    kategoria:"Bezpieczeństwo",
+    opis:"Sprawdzenie, czy zmiana nadaje się do commita.",
+    tresc:"Sprawdź, czy w zmianach nie ma haseł, kluczy API, danych JSONBin, prywatnych cenników, marż, kosztów zakupu, danych klientów ani plików, które nie powinny trafić do repo. Wypisz ryzyka i powiedz, czy można robić commit."
+  },
+  {
+    tytul:"Decyzja biznesowa",
+    kategoria:"Strategia",
+    opis:"Porównanie wariantów i jedna rekomendacja.",
+    tresc:"Pomóż mi podjąć decyzję biznesową. Podaj wariant bezpieczny, wariant szybki i wariant ambitny. Oceń ryzyko, koszt, czas i wpływ na sprzedaż. Na końcu wskaż jedną rekomendację."
+  },
+  {
+    tytul:"Oferta dla klienta",
+    kategoria:"Sprzedaż",
+    opis:"Tekst oferty bez przesadnego marketingu.",
+    tresc:"Przygotuj tekst oferty dla klienta. Ton: konkretny, rolniczy, zrozumiały, bez przesadnego marketingu. Pokaż wartość rozwiązania, etapy wdrożenia, co jest w pakiecie i co trzeba doprecyzować przed ofertą końcową."
+  },
+  {
+    tytul:"Notatka do panelu",
+    kategoria:"CRM",
+    opis:"Zamiana rozmowy na wpis do CRM.",
+    tresc:"Zamień tę rozmowę lub notatkę na krótki wpis do CRM. Podziel na: fakty o kliencie, zainteresowanie, obiekcje, następny krok, termin follow-upu i krótką notatkę do panelu."
+  }
+];
+
+function renderAIWorkflow(){
+  const toolsEl = document.getElementById("aiTools");
+  const limitsEl = document.getElementById("aiLimitRules");
+  const safetyEl = document.getElementById("aiSafetyRules");
+  const promptsEl = document.getElementById("aiPromptList");
+  if(!toolsEl || !limitsEl || !safetyEl || !promptsEl) return;
+
+  toolsEl.innerHTML = AI_TOOLS.map(tool => `
+    <div class="aiWorkflowCard">
+      <h3>${crmEsc(tool.nazwa)}</h3>
+      <p>${crmEsc(tool.opis)}</p>
+    </div>
+  `).join("");
+
+  limitsEl.innerHTML = AI_LIMIT_RULES.map(rule => `<li>${crmEsc(rule)}</li>`).join("");
+  safetyEl.innerHTML = AI_SAFETY_RULES.map(rule => `<li>${crmEsc(rule)}</li>`).join("");
+
+  promptsEl.innerHTML = AI_PROMPTS.map((prompt, idx) => `
+    <div class="aiWorkflowCard aiPromptCard">
+      <div class="aiPromptHead">
+        <h3>${crmEsc(prompt.tytul)}</h3>
+        <span class="aiPromptBadge">${crmEsc(prompt.kategoria)}</span>
+      </div>
+      <p>${crmEsc(prompt.opis)}</p>
+      <div class="aiPromptText">${crmEsc(prompt.tresc)}</div>
+      <button class="doneBtn" onclick="copyAiPrompt(${idx})">Kopiuj prompt</button>
+    </div>
+  `).join("");
+}
+
+function copyAiPrompt(index){
+  const prompt = AI_PROMPTS[index];
+  if(!prompt) return;
+  if(!navigator.clipboard || !navigator.clipboard.writeText){
+    alert("Kopiowanie nie jest dostępne w tej przeglądarce. Zaznacz tekst ręcznie.");
+    return;
+  }
+  navigator.clipboard.writeText(prompt.tresc)
+    .then(()=>alert("Skopiowano prompt: " + prompt.tytul))
+    .catch(()=>alert("Nie udało się skopiować promptu. Zaznacz tekst ręcznie."));
 }
 
 // ================= Do zrobienia =================
