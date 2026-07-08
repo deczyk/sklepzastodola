@@ -754,6 +754,18 @@
           </div>
           <div id="budgetImportResult" class="backupPreviewResult"></div>
         </div>
+        <div class="backupPreview">
+          <h3>Import klientów</h3>
+          <div class="privateNotice"><b>Bezpieczny import:</b> Import dopisuje wyłącznie klientów do CRM. Nie importuje ofert, historii, notatek, dokumentów, cenników, budżetu, finansów ani checklist.</div>
+          <div class="backupActions">
+            <label><input type="checkbox" id="importClientsSection" onchange="updateClientImportButton()"> Importuj klientów</label>
+          </div>
+          <div class="backupActions">
+            <input type="text" id="clientImportConfirm" placeholder="Wpisz IMPORTUJ, aby dopisać klientów" oninput="updateClientImportButton()">
+            <button class="importBtn" id="clientImportBtn" onclick="importClientsSectionFromPackage()" disabled>Importuj klientów</button>
+          </div>
+          <div id="clientImportResult" class="backupPreviewResult"></div>
+        </div>
       </div>
     </div>
     </div>
@@ -3273,6 +3285,7 @@ function previewImportPackageJsonFile(input){
   currentImportPackagePreview = null;
   updateDocumentImportButton();
   updateBudgetImportButton();
+  updateClientImportButton();
   if(!result) return;
   if(!file){
     result.innerHTML = "";
@@ -3287,10 +3300,12 @@ function previewImportPackageJsonFile(input){
       renderImportPackagePreview(parsed, file.name);
       updateDocumentImportButton();
       updateBudgetImportButton();
+      updateClientImportButton();
     }catch(e){
       currentImportPackagePreview = null;
       updateDocumentImportButton();
       updateBudgetImportButton();
+      updateClientImportButton();
       result.innerHTML = `<div class="backupPreviewStatus error"><b>Niepoprawny JSON.</b><br>${crmEsc(e.message || "Nie udało się odczytać pliku.")}</div>`;
     }
   };
@@ -3298,6 +3313,7 @@ function previewImportPackageJsonFile(input){
     currentImportPackagePreview = null;
     updateDocumentImportButton();
     updateBudgetImportButton();
+    updateClientImportButton();
     result.innerHTML = '<div class="backupPreviewStatus error"><b>Nie udało się odczytać pliku.</b></div>';
   };
   reader.readAsText(file);
@@ -3565,6 +3581,146 @@ function importStartupBudgetSection(){
   updateBudgetImportButton();
   if(result){
     result.innerHTML = `<div class="backupPreviewStatus"><b>Import budżetu zakończony.</b><br>Dodano pozycji: ${itemsToAdd.length}<br>Pominięto duplikatów: ${skippedDuplicates}<br>Odrzucono rekordów: ${rejected}</div>`;
+  }
+}
+
+function updateClientImportButton(){
+  const btn = document.getElementById("clientImportBtn");
+  const checkbox = document.getElementById("importClientsSection");
+  const confirm = document.getElementById("clientImportConfirm");
+  if(!btn) return;
+  const hasPackage = !!currentImportPackagePreview && typeof currentImportPackagePreview === "object" && !Array.isArray(currentImportPackagePreview);
+  const hasClientsArray = hasPackage && Array.isArray(currentImportPackagePreview.klienci);
+  const checked = !!(checkbox && checkbox.checked);
+  const confirmed = (confirm && confirm.value.trim()) === "IMPORTUJ";
+  btn.disabled = !(hasClientsArray && checked && confirmed);
+}
+
+function normalizeClientPhone(value){
+  return importValue(value);
+}
+
+function normalizeClientPhoneKey(value){
+  return importValue(value).replace(/\D/g, "");
+}
+
+function normalizeClientEmail(value){
+  return importValue(value).toLowerCase();
+}
+
+function normalizeImportClientStatus(value){
+  const raw = importValue(value);
+  if(!raw) return "nowy";
+  if(STATUS_OPTS.some(([status]) => status === raw)) return raw;
+  return STATUS_MAP[raw] || "nowy";
+}
+
+function normalizeImportClientPriority(value){
+  const raw = importValue(value);
+  if(!raw) return "B";
+  if(PRIO_OPTS.some(([prio]) => prio === raw)) return raw;
+  return PRIO_MAP[raw] || "B";
+}
+
+function normalizeImportClientFollowup(value){
+  const raw = importValue(value);
+  return /^\d{4}-\d{2}-\d{2}$/.test(raw) ? raw : "";
+}
+
+function normalizeImportClient(item){
+  const source = item || {};
+  const firma = importValue(source.firma || source.nazwa || source.gospodarstwo || "");
+  const osoba = importValue(source.osoba || source.kontakt || source.imieNazwisko || "");
+  const telefon = normalizeClientPhone(source.telefon);
+  const email = normalizeClientEmail(source.email);
+  if(!firma && !osoba && !telefon && !email) return null;
+  const nowTs = importNow();
+  return {
+    id: `c_${Date.now()}_${Math.random().toString(36).slice(2,8)}`,
+    firma,
+    osoba,
+    wojewodztwo: importValue(source.wojewodztwo || ""),
+    miejscowosc: importValue(source.miejscowosc || source.lokalizacja || ""),
+    ulica: importValue(source.ulica || ""),
+    telefon,
+    email,
+    zainteresowanie: importValue(source.zainteresowanie || source.produkt || ""),
+    priorytet: normalizeImportClientPriority(source.priorytet),
+    status: normalizeImportClientStatus(source.status),
+    notatki: importValue(source.notatki || source.notes || source.notatka || ""),
+    nastepnyFollowup: normalizeImportClientFollowup(source.nastepnyFollowup),
+    zrodloLeada: importValue(source.zrodloLeada || source.zrodlo || source.skadTrafil || ""),
+    produkt: importValue(source.produkt || source.zainteresowanie || ""),
+    obiekcje: importValue(source.obiekcje || ""),
+    utworzono: importValue(source.utworzono || nowTs),
+    zaktualizowano: importValue(source.zaktualizowano || nowTs),
+    historia: [],
+    oferty: []
+  };
+}
+
+function importClientDuplicate(client, existingClients){
+  const email = normalizeClientEmail(client.email);
+  const phone = normalizeClientPhoneKey(client.telefon);
+  const combo = [client.firma, client.osoba, phone].map(importTextKey).join("|");
+  return (existingClients || []).some(existing => {
+    const existingEmail = normalizeClientEmail(existing.email);
+    const existingPhone = normalizeClientPhoneKey(existing.telefon);
+    const existingCombo = [existing.firma, existing.osoba, existingPhone].map(importTextKey).join("|");
+    return (email && email === existingEmail) ||
+      (phone && phone === existingPhone) ||
+      (phone && combo === existingCombo);
+  });
+}
+
+function importClientsSectionFromPackage(){
+  const result = document.getElementById("clientImportResult");
+  const checkbox = document.getElementById("importClientsSection");
+  const confirm = document.getElementById("clientImportConfirm");
+  if(!currentImportPackagePreview || typeof currentImportPackagePreview !== "object" || Array.isArray(currentImportPackagePreview)){
+    if(result) result.innerHTML = '<div class="backupPreviewStatus error"><b>Najpierw wczytaj poprawną paczkę JSON.</b></div>';
+    return;
+  }
+  if(!Array.isArray(currentImportPackagePreview.klienci)){
+    if(result) result.innerHTML = '<div class="backupPreviewStatus error"><b>Paczka nie zawiera sekcji klienci jako tablicy.</b></div>';
+    return;
+  }
+  if(!checkbox || !checkbox.checked){
+    if(result) result.innerHTML = '<div class="backupPreviewStatus error"><b>Zaznacz import klientów.</b></div>';
+    return;
+  }
+  if(!confirm || confirm.value.trim() !== "IMPORTUJ"){
+    if(result) result.innerHTML = '<div class="backupPreviewStatus error"><b>Wpisz IMPORTUJ, aby dopisać klientów.</b></div>';
+    return;
+  }
+
+  exportPanelBackupJson();
+
+  if(!Array.isArray(data.klienci)) data.klienci = [];
+  const clientsToAdd = [];
+  let skippedDuplicates = 0;
+  let rejected = 0;
+  currentImportPackagePreview.klienci.forEach(item => {
+    const normalized = normalizeImportClient(item);
+    if(!normalized){
+      rejected++;
+      return;
+    }
+    if(importClientDuplicate(normalized, data.klienci.concat(clientsToAdd))){
+      skippedDuplicates++;
+    } else {
+      clientsToAdd.push(normalized);
+    }
+  });
+
+  if(clientsToAdd.length){
+    data.klienci.push(...clientsToAdd);
+  }
+  saveData();
+  render();
+  updateClientImportButton();
+  if(result){
+    result.innerHTML = `<div class="backupPreviewStatus"><b>Import klientów zakończony.</b><br>Dodano klientów: ${clientsToAdd.length}<br>Pominięto duplikatów: ${skippedDuplicates}<br>Odrzucono rekordów: ${rejected}</div>`;
   }
 }
 
