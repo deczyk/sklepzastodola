@@ -766,6 +766,18 @@
           </div>
           <div id="clientImportResult" class="backupPreviewResult"></div>
         </div>
+        <div class="backupPreview">
+          <h3>Import ofert</h3>
+          <div class="privateNotice"><b>Bezpieczny import:</b> Import dopisuje wyłącznie oferty do istniejących klientów. Nie tworzy klientów i nie importuje notatek, dokumentów, cenników, budżetu, finansów ani checklist.</div>
+          <div class="backupActions">
+            <label><input type="checkbox" id="importOffersSection" onchange="updateOfferImportButton()"> Importuj oferty</label>
+          </div>
+          <div class="backupActions">
+            <input type="text" id="offerImportConfirm" placeholder="Wpisz IMPORTUJ, aby dopisać oferty" oninput="updateOfferImportButton()">
+            <button class="importBtn" id="offerImportBtn" onclick="importOffersSectionFromPackage()" disabled>Importuj oferty</button>
+          </div>
+          <div id="offerImportResult" class="backupPreviewResult"></div>
+        </div>
       </div>
     </div>
     </div>
@@ -3286,6 +3298,7 @@ function previewImportPackageJsonFile(input){
   updateDocumentImportButton();
   updateBudgetImportButton();
   updateClientImportButton();
+  updateOfferImportButton();
   if(!result) return;
   if(!file){
     result.innerHTML = "";
@@ -3301,11 +3314,13 @@ function previewImportPackageJsonFile(input){
       updateDocumentImportButton();
       updateBudgetImportButton();
       updateClientImportButton();
+      updateOfferImportButton();
     }catch(e){
       currentImportPackagePreview = null;
       updateDocumentImportButton();
       updateBudgetImportButton();
       updateClientImportButton();
+      updateOfferImportButton();
       result.innerHTML = `<div class="backupPreviewStatus error"><b>Niepoprawny JSON.</b><br>${crmEsc(e.message || "Nie udało się odczytać pliku.")}</div>`;
     }
   };
@@ -3314,6 +3329,7 @@ function previewImportPackageJsonFile(input){
     updateDocumentImportButton();
     updateBudgetImportButton();
     updateClientImportButton();
+    updateOfferImportButton();
     result.innerHTML = '<div class="backupPreviewStatus error"><b>Nie udało się odczytać pliku.</b></div>';
   };
   reader.readAsText(file);
@@ -3721,6 +3737,166 @@ function importClientsSectionFromPackage(){
   updateClientImportButton();
   if(result){
     result.innerHTML = `<div class="backupPreviewStatus"><b>Import klientów zakończony.</b><br>Dodano klientów: ${clientsToAdd.length}<br>Pominięto duplikatów: ${skippedDuplicates}<br>Odrzucono rekordów: ${rejected}</div>`;
+  }
+}
+
+function updateOfferImportButton(){
+  const btn = document.getElementById("offerImportBtn");
+  const checkbox = document.getElementById("importOffersSection");
+  const confirm = document.getElementById("offerImportConfirm");
+  if(!btn) return;
+  const hasPackage = !!currentImportPackagePreview && typeof currentImportPackagePreview === "object" && !Array.isArray(currentImportPackagePreview);
+  const hasOffersArray = hasPackage && Array.isArray(currentImportPackagePreview.oferty);
+  const checked = !!(checkbox && checkbox.checked);
+  const confirmed = (confirm && confirm.value.trim()) === "IMPORTUJ";
+  btn.disabled = !(hasOffersArray && checked && confirmed);
+}
+
+function findClientForImportOffer(item){
+  const source = item || {};
+  const clients = data.klienci || [];
+  const clientId = importValue(source.clientId || source.klientId);
+  if(clientId){
+    const byId = clients.find(c => c.id === clientId);
+    if(byId) return byId;
+  }
+  const email = normalizeClientEmail(source.email);
+  if(email){
+    const byEmail = clients.find(c => normalizeClientEmail(c.email) === email);
+    if(byEmail) return byEmail;
+  }
+  const phone = normalizeClientPhoneKey(source.telefon);
+  if(phone){
+    const byPhone = clients.find(c => normalizeClientPhoneKey(c.telefon) === phone);
+    if(byPhone) return byPhone;
+  }
+  const firma = importTextKey(source.firma || source.nazwa || source.gospodarstwo);
+  const osoba = importTextKey(source.osoba || source.kontakt || source.imieNazwisko);
+  if(firma && osoba){
+    return clients.find(c => importTextKey(c.firma) === firma && importTextKey(c.osoba) === osoba) || null;
+  }
+  return null;
+}
+
+function normalizeImportOfferDate(value){
+  const raw = importValue(value);
+  return /^\d{4}-\d{2}-\d{2}$/.test(raw) ? raw : "";
+}
+
+function validateImportOfferAmount(value){
+  const raw = (value === null || value === undefined) ? "" : value.toString().trim();
+  if(!raw) return {ok:true, value:""};
+  const normalized = raw.replace(",", ".");
+  if(!/^\d+(\.\d+)?$/.test(normalized)) return {ok:false};
+  const amount = Number(normalized);
+  return Number.isFinite(amount) && amount >= 0 ? {ok:true, value:normalized} : {ok:false};
+}
+
+function validateImportOfferCurrency(value){
+  const currency = (value || "EUR").toString().trim().toUpperCase();
+  return OFFER_CURRENCY_OPTS.includes(currency) ? {ok:true, value:currency} : {ok:false};
+}
+
+function normalizeImportOfferStatus(value){
+  const status = importValue(value);
+  return OFFER_STATUS_OPTS.includes(status) ? status : "Robocza";
+}
+
+function normalizeImportOffer(item){
+  const source = item || {};
+  const amount = validateImportOfferAmount(source.kwota);
+  const currency = validateImportOfferCurrency(source.waluta);
+  if(!amount.ok || !currency.ok) return null;
+  const nowTs = importNow();
+  return {
+    id: `o_${Date.now()}_${Math.random().toString(36).slice(2,8)}`,
+    dataWyslania: normalizeImportOfferDate(source.dataWyslania || source.data),
+    wariant: importValue(source.wariant || source.produkt || "Inne"),
+    kwota: amount.value,
+    waluta: currency.value,
+    status: normalizeImportOfferStatus(source.status),
+    linkOferta: safeOfferHref(importValue(source.linkOferta || source.link)),
+    nazwaPliku: importValue(source.nazwaPliku || ""),
+    nastepnyFollowup: normalizeImportOfferDate(source.nastepnyFollowup),
+    notatka: importValue(source.notatka || source.desc || source.notes || ""),
+    dataUtworzenia: importValue(source.dataUtworzenia || nowTs),
+    dataAktualizacji: importValue(source.dataAktualizacji || nowTs)
+  };
+}
+
+function importOfferDuplicate(client, offer, pendingByClient){
+  const key = [client.id, offer.wariant, offer.dataWyslania, offer.kwota, offer.nazwaPliku].map(importTextKey).join("|");
+  const existing = Array.isArray(client.oferty) ? client.oferty : [];
+  const pending = pendingByClient.get(client.id) || [];
+  return existing.concat(pending).some(existingOffer =>
+    key === [client.id, existingOffer.wariant, existingOffer.dataWyslania, existingOffer.kwota, existingOffer.nazwaPliku].map(importTextKey).join("|")
+  );
+}
+
+function importOffersSectionFromPackage(){
+  const result = document.getElementById("offerImportResult");
+  const checkbox = document.getElementById("importOffersSection");
+  const confirm = document.getElementById("offerImportConfirm");
+  if(!currentImportPackagePreview || typeof currentImportPackagePreview !== "object" || Array.isArray(currentImportPackagePreview)){
+    if(result) result.innerHTML = '<div class="backupPreviewStatus error"><b>Najpierw wczytaj poprawną paczkę JSON.</b></div>';
+    return;
+  }
+  if(!Array.isArray(currentImportPackagePreview.oferty)){
+    if(result) result.innerHTML = '<div class="backupPreviewStatus error"><b>Paczka nie zawiera sekcji oferty jako tablicy.</b></div>';
+    return;
+  }
+  if(!checkbox || !checkbox.checked){
+    if(result) result.innerHTML = '<div class="backupPreviewStatus error"><b>Zaznacz import ofert.</b></div>';
+    return;
+  }
+  if(!confirm || confirm.value.trim() !== "IMPORTUJ"){
+    if(result) result.innerHTML = '<div class="backupPreviewStatus error"><b>Wpisz IMPORTUJ, aby dopisać oferty.</b></div>';
+    return;
+  }
+
+  exportPanelBackupJson();
+
+  const pendingByClient = new Map();
+  let added = 0;
+  let skippedDuplicates = 0;
+  let rejected = 0;
+  let missingClient = 0;
+  currentImportPackagePreview.oferty.forEach(item => {
+    const client = findClientForImportOffer(item);
+    if(!client){
+      missingClient++;
+      rejected++;
+      return;
+    }
+    const offer = normalizeImportOffer(item);
+    if(!offer){
+      rejected++;
+      return;
+    }
+    if(importOfferDuplicate(client, offer, pendingByClient)){
+      skippedDuplicates++;
+      return;
+    }
+    if(!pendingByClient.has(client.id)) pendingByClient.set(client.id, []);
+    pendingByClient.get(client.id).push(offer);
+    added++;
+  });
+
+  pendingByClient.forEach((offers, clientId) => {
+    const client = (data.klienci || []).find(c => c.id === clientId);
+    if(!client) return;
+    if(!Array.isArray(client.oferty)) client.oferty = [];
+    client.oferty.push(...offers);
+    const followups = offers.map(o => o.nastepnyFollowup).filter(Boolean);
+    if(followups.length) client.nastepnyFollowup = followups[followups.length - 1];
+    client.zaktualizowano = new Date().toISOString();
+  });
+
+  saveData();
+  render();
+  updateOfferImportButton();
+  if(result){
+    result.innerHTML = `<div class="backupPreviewStatus"><b>Import ofert zakończony.</b><br>Dodano ofert: ${added}<br>Pominięto duplikatów: ${skippedDuplicates}<br>Odrzucono ofert: ${rejected}<br>Odrzucono przez brak klienta: ${missingClient}</div>`;
   }
 }
 
