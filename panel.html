@@ -524,6 +524,8 @@
   .offerTitle{font-weight:bold;color:#263b2b}
   .offerMeta{display:flex;gap:6px;flex-wrap:wrap;font-size:12px;color:#647066}
   .offerBadge{font-size:11px;font-weight:bold;border-radius:999px;padding:3px 8px;background:#f3f8f4;color:#2d5a27;border:1px solid #d8e7db}
+  .offerCardActions{display:flex;gap:6px;justify-content:flex-end;margin-top:8px;flex-wrap:wrap}
+  .offerEditInline{display:block;margin:4px 0 0}
   .offerForm{display:none;background:#f8fbf8;border:1px solid #e4eee6;border-radius:10px;padding:10px;margin:10px 0}
   .offerForm.open{display:block}
   .offerFormGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
@@ -2000,6 +2002,7 @@ function populateFilterOptions(){
 
 let currentClientsView = "table";
 let currentClientCardId = null;
+let currentOfferEdit = null;
 
 function crmEsc(value){
   return (value ?? "").toString().replace(/[&<>"']/g, ch => ({
@@ -2087,6 +2090,12 @@ function renderOfferOptions(options, selected){
   return options.map(v=>`<option value="${crmEsc(v)}" ${selected===v?"selected":""}>${crmEsc(v)}</option>`).join("");
 }
 
+function renderOfferOptionsWithCurrent(options, selected){
+  const value = selected || "";
+  const opts = value && !options.includes(value) ? [value, ...options] : options;
+  return renderOfferOptions(opts, value);
+}
+
 function renderClientOffers(c){
   const offers = clientOffers(c);
   return `
@@ -2113,13 +2122,43 @@ function renderClientOffers(c){
         </div>
       </div>
       <div class="offerList">
-        ${offers.length ? [...offers].reverse().map(renderOfferCard).join("") : '<div class="empty">Brak zapisanych ofert dla tego klienta.</div>'}
+        ${offers.length ? offers.map((offer,index)=>({offer,index})).reverse().map(({offer,index})=>renderOfferCard(offer, c.id, index)).join("") : '<div class="empty">Brak zapisanych ofert dla tego klienta.</div>'}
       </div>
     </div>
   `;
 }
 
-function renderOfferCard(o){
+function renderOfferCard(o, clientId, offerIndex){
+  if(currentOfferEdit && currentOfferEdit.clientId === clientId && currentOfferEdit.index === offerIndex){
+    return `
+      <div class="offerCard">
+        <div class="offerTop">
+          <div>
+            <div class="offerTitle">Edycja oferty</div>
+            <div class="offerMeta"><span>Zmieniasz tylko zapis w karcie klienta</span></div>
+          </div>
+          <span class="offerBadge">${crmEsc(o.status || "Robocza")}</span>
+        </div>
+        <div class="offerForm offerEditInline open" data-offer-edit-for="${crmEsc(clientId)}" data-offer-index="${offerIndex}">
+          <div class="offerFormGrid">
+            <label>Data wysłania<input type="date" data-offer-edit-field="dataWyslania" value="${crmEsc(o.dataWyslania || "")}"></label>
+            <label>Wariant<select data-offer-edit-field="wariant"><option value="">—</option>${renderOfferOptionsWithCurrent(OFFER_VARIANT_OPTS,o.wariant || "")}</select></label>
+            <label>Kwota<input type="text" data-offer-edit-field="kwota" value="${crmEsc(o.kwota || "")}"></label>
+            <label>Waluta<select data-offer-edit-field="waluta">${renderOfferOptions(OFFER_CURRENCY_OPTS,o.waluta || "EUR")}</select></label>
+            <label>Status<select data-offer-edit-field="status">${renderOfferOptions(OFFER_STATUS_OPTS,normalizeImportOfferStatus(o.status))}</select></label>
+            <label>Następny kontakt<input type="date" data-offer-edit-field="nastepnyFollowup" value="${crmEsc(o.nastepnyFollowup || "")}"></label>
+            <label>Link do oferty<input type="text" data-offer-edit-field="linkOferta" value="${crmEsc(o.linkOferta || "")}" placeholder="https://..."></label>
+            <label>Nazwa pliku<input type="text" data-offer-edit-field="nazwaPliku" value="${crmEsc(o.nazwaPliku || "")}"></label>
+          </div>
+          <label>Notatka<textarea data-offer-edit-field="notatka">${crmEsc(o.notatka || "")}</textarea></label>
+          <div class="offerActions">
+            <button class="cancel" onclick="cancelClientOfferEdit('${crmEsc(clientId)}')">Anuluj</button>
+            <button class="save" onclick="saveClientOfferEdit('${crmEsc(clientId)}', ${offerIndex})">Zapisz zmiany</button>
+          </div>
+        </div>
+      </div>
+    `;
+  }
   const amount = [o.kwota, o.waluta].filter(Boolean).join(" ");
   const href = safeOfferHref(o.linkOferta);
   const linkText = o.nazwaPliku || o.linkOferta || "";
@@ -2138,6 +2177,10 @@ function renderOfferCard(o){
       </div>
       ${linkText ? `<div class="kanbanNote">${href ? `<a href="${crmEsc(href)}" target="_blank" rel="noopener">${crmEsc(linkText)}</a>` : crmEsc(linkText)}</div>` : ""}
       ${o.notatka ? `<div class="kanbanNote">${crmEsc(o.notatka)}</div>` : ""}
+      <div class="offerCardActions">
+        <button class="histBtn" onclick="editClientOffer('${crmEsc(clientId)}', ${offerIndex})">Edytuj</button>
+        <button class="cancel" onclick="deleteClientOffer('${crmEsc(clientId)}', ${offerIndex})">Usuń</button>
+      </div>
     </div>
   `;
 }
@@ -2288,6 +2331,7 @@ function closeClientCard(){
   document.getElementById("clientCardModal").classList.remove("open");
   document.getElementById("clientCardContent").innerHTML = "";
   currentClientCardId = null;
+  currentOfferEdit = null;
 }
 
 function toggleOfferForm(clientId){
@@ -2321,6 +2365,90 @@ function addClientOffer(clientId){
   if(offer.nastepnyFollowup) c.nastepnyFollowup = offer.nastepnyFollowup;
   c.zaktualizowano = now;
   logActivity(`dodał(a) ofertę dla klienta „${c.firma||c.osoba||'bez nazwy'}”`);
+  saveData();
+  renderClients();
+  openClientCard(clientId);
+}
+
+function editClientOffer(clientId, offerIndex){
+  const c = data.klienci.find(x=>x.id===clientId);
+  const offers = c ? clientOffers(c) : [];
+  if(!c || !offers[offerIndex]) return;
+  currentOfferEdit = {clientId, index:offerIndex};
+  openClientCard(clientId);
+}
+
+function cancelClientOfferEdit(clientId){
+  currentOfferEdit = null;
+  openClientCard(clientId);
+}
+
+function readOfferEditForm(clientId, offerIndex){
+  const form = document.querySelector(`.offerForm[data-offer-edit-for="${clientId}"][data-offer-index="${offerIndex}"]`);
+  if(!form) return null;
+  const get = field => (form.querySelector(`[data-offer-edit-field="${field}"]`)?.value || "").trim();
+  return {
+    dataWyslania: normalizeImportOfferDate(get("dataWyslania")),
+    wariant: get("wariant"),
+    kwota: get("kwota"),
+    waluta: get("waluta"),
+    status: get("status"),
+    linkOferta: get("linkOferta"),
+    nazwaPliku: get("nazwaPliku"),
+    nastepnyFollowup: normalizeImportOfferDate(get("nastepnyFollowup")),
+    notatka: get("notatka")
+  };
+}
+
+function saveClientOfferEdit(clientId, offerIndex){
+  const c = data.klienci.find(x=>x.id===clientId);
+  if(!c || !Array.isArray(c.oferty) || !c.oferty[offerIndex]) return;
+  const values = readOfferEditForm(clientId, offerIndex);
+  if(!values) return;
+  const amount = validateImportOfferAmount(values.kwota);
+  if(!amount.ok){
+    alert("Kwota oferty musi być pusta albo dodatnią liczbą.");
+    return;
+  }
+  const currency = validateImportOfferCurrency(values.waluta);
+  if(!currency.ok){
+    alert("Waluta oferty musi być EUR albo PLN.");
+    return;
+  }
+  const now = new Date().toISOString();
+  const existing = c.oferty[offerIndex];
+  const updated = {
+    id: existing.id || `o_${Date.now()}`,
+    dataWyslania: values.dataWyslania,
+    wariant: values.wariant,
+    kwota: amount.value,
+    waluta: currency.value,
+    status: normalizeImportOfferStatus(values.status),
+    linkOferta: safeOfferHref(values.linkOferta),
+    nazwaPliku: values.nazwaPliku,
+    nastepnyFollowup: values.nastepnyFollowup,
+    notatka: values.notatka,
+    dataUtworzenia: existing.dataUtworzenia || now,
+    dataAktualizacji: now
+  };
+  c.oferty[offerIndex] = updated;
+  if(updated.nastepnyFollowup) c.nastepnyFollowup = updated.nastepnyFollowup;
+  c.zaktualizowano = now;
+  currentOfferEdit = null;
+  logActivity(`zaktualizował(a) ofertę klienta „${c.firma||c.osoba||'bez nazwy'}”`);
+  saveData();
+  renderClients();
+  openClientCard(clientId);
+}
+
+function deleteClientOffer(clientId, offerIndex){
+  const c = data.klienci.find(x=>x.id===clientId);
+  if(!c || !Array.isArray(c.oferty) || !c.oferty[offerIndex]) return;
+  if(!confirm("Usunąć tę ofertę?")) return;
+  c.oferty.splice(offerIndex, 1);
+  c.zaktualizowano = new Date().toISOString();
+  currentOfferEdit = null;
+  logActivity(`usunął/ęła ofertę klienta „${c.firma||c.osoba||'bez nazwy'}”`);
   saveData();
   renderClients();
   openClientCard(clientId);
