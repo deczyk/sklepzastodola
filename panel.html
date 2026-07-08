@@ -778,6 +778,18 @@
           </div>
           <div id="offerImportResult" class="backupPreviewResult"></div>
         </div>
+        <div class="backupPreview">
+          <h3>Import historii / notatek</h3>
+          <div class="privateNotice"><b>Bezpieczny import:</b> Import dopisuje wyłącznie wpisy historii do istniejących klientów. Nie tworzy klientów i nie importuje ofert, dokumentów, cenników, budżetu, finansów ani checklist.</div>
+          <div class="backupActions">
+            <label><input type="checkbox" id="importNotesSection" onchange="updateNotesImportButton()"> Importuj historię / notatki</label>
+          </div>
+          <div class="backupActions">
+            <input type="text" id="notesImportConfirm" placeholder="Wpisz IMPORTUJ, aby dopisać notatki" oninput="updateNotesImportButton()">
+            <button class="importBtn" id="notesImportBtn" onclick="importNotesSectionFromPackage()" disabled>Importuj notatki</button>
+          </div>
+          <div id="notesImportResult" class="backupPreviewResult"></div>
+        </div>
       </div>
     </div>
     </div>
@@ -1444,8 +1456,8 @@ function renderHistoryEntries(c){
   }
   el.innerHTML = [...hist].reverse().map(h => `
     <div class="historyEntry">
-      <span class="who">${h.kto}</span><span class="when">${formatDT(h.data)}</span>
-      <div class="txt">${h.tekst}</div>
+      <span class="who">${crmEsc(h.kto)}</span><span class="when">${crmEsc(formatDT(h.data))}</span>
+      <div class="txt">${crmEsc(h.tekst)}</div>
     </div>
   `).join("");
 }
@@ -3299,6 +3311,7 @@ function previewImportPackageJsonFile(input){
   updateBudgetImportButton();
   updateClientImportButton();
   updateOfferImportButton();
+  updateNotesImportButton();
   if(!result) return;
   if(!file){
     result.innerHTML = "";
@@ -3315,12 +3328,14 @@ function previewImportPackageJsonFile(input){
       updateBudgetImportButton();
       updateClientImportButton();
       updateOfferImportButton();
+      updateNotesImportButton();
     }catch(e){
       currentImportPackagePreview = null;
       updateDocumentImportButton();
       updateBudgetImportButton();
       updateClientImportButton();
       updateOfferImportButton();
+      updateNotesImportButton();
       result.innerHTML = `<div class="backupPreviewStatus error"><b>Niepoprawny JSON.</b><br>${crmEsc(e.message || "Nie udało się odczytać pliku.")}</div>`;
     }
   };
@@ -3330,6 +3345,7 @@ function previewImportPackageJsonFile(input){
     updateBudgetImportButton();
     updateClientImportButton();
     updateOfferImportButton();
+    updateNotesImportButton();
     result.innerHTML = '<div class="backupPreviewStatus error"><b>Nie udało się odczytać pliku.</b></div>';
   };
   reader.readAsText(file);
@@ -3897,6 +3913,130 @@ function importOffersSectionFromPackage(){
   updateOfferImportButton();
   if(result){
     result.innerHTML = `<div class="backupPreviewStatus"><b>Import ofert zakończony.</b><br>Dodano ofert: ${added}<br>Pominięto duplikatów: ${skippedDuplicates}<br>Odrzucono ofert: ${rejected}<br>Odrzucono przez brak klienta: ${missingClient}</div>`;
+  }
+}
+
+function updateNotesImportButton(){
+  const btn = document.getElementById("notesImportBtn");
+  const checkbox = document.getElementById("importNotesSection");
+  const confirm = document.getElementById("notesImportConfirm");
+  if(!btn) return;
+  const hasPackage = !!currentImportPackagePreview && typeof currentImportPackagePreview === "object" && !Array.isArray(currentImportPackagePreview);
+  const hasNotesArray = hasPackage && Array.isArray(currentImportPackagePreview.notatki);
+  const checked = !!(checkbox && checkbox.checked);
+  const confirmed = (confirm && confirm.value.trim()) === "IMPORTUJ";
+  btn.disabled = !(hasNotesArray && checked && confirmed);
+}
+
+function findClientForImportNote(item){
+  const source = item || {};
+  const clients = data.klienci || [];
+  const clientId = importValue(source.clientId || source.klientId);
+  if(clientId){
+    const byId = clients.find(c => c.id === clientId);
+    if(byId) return byId;
+  }
+  const email = normalizeClientEmail(source.email);
+  if(email){
+    const byEmail = clients.find(c => normalizeClientEmail(c.email) === email);
+    if(byEmail) return byEmail;
+  }
+  const phone = normalizeClientPhoneKey(source.telefon);
+  if(phone){
+    const byPhone = clients.find(c => normalizeClientPhoneKey(c.telefon) === phone);
+    if(byPhone) return byPhone;
+  }
+  const firma = importTextKey(source.firma || source.nazwa || source.gospodarstwo);
+  const osoba = importTextKey(source.osoba || source.kontakt || source.imieNazwisko);
+  if(firma && osoba){
+    return clients.find(c => importTextKey(c.firma) === firma && importTextKey(c.osoba) === osoba) || null;
+  }
+  return null;
+}
+
+function normalizeImportHistoryEntry(item){
+  const source = item || {};
+  const baseText = importValue(source.tekst || source.notatka || source.notes || source.desc || "");
+  if(!baseText) return null;
+  const type = importValue(source.typ);
+  return {
+    tekst: type ? `[${type}] ${baseText}` : baseText,
+    kto: importValue(source.kto || source.autor || "Import"),
+    data: importValue(source.data || source.dataKontaktu || source.utworzono || importNow())
+  };
+}
+
+function importHistoryDuplicate(client, entry, pendingByClient){
+  const key = [client.id, entry.data, entry.tekst].map(importTextKey).join("|");
+  const existing = Array.isArray(client.historia) ? client.historia : [];
+  const pending = pendingByClient.get(client.id) || [];
+  return existing.concat(pending).some(existingEntry =>
+    key === [client.id, existingEntry.data, existingEntry.tekst].map(importTextKey).join("|")
+  );
+}
+
+function importNotesSectionFromPackage(){
+  const result = document.getElementById("notesImportResult");
+  const checkbox = document.getElementById("importNotesSection");
+  const confirm = document.getElementById("notesImportConfirm");
+  if(!currentImportPackagePreview || typeof currentImportPackagePreview !== "object" || Array.isArray(currentImportPackagePreview)){
+    if(result) result.innerHTML = '<div class="backupPreviewStatus error"><b>Najpierw wczytaj poprawną paczkę JSON.</b></div>';
+    return;
+  }
+  if(!Array.isArray(currentImportPackagePreview.notatki)){
+    if(result) result.innerHTML = '<div class="backupPreviewStatus error"><b>Paczka nie zawiera sekcji notatki jako tablicy.</b></div>';
+    return;
+  }
+  if(!checkbox || !checkbox.checked){
+    if(result) result.innerHTML = '<div class="backupPreviewStatus error"><b>Zaznacz import historii / notatek.</b></div>';
+    return;
+  }
+  if(!confirm || confirm.value.trim() !== "IMPORTUJ"){
+    if(result) result.innerHTML = '<div class="backupPreviewStatus error"><b>Wpisz IMPORTUJ, aby dopisać notatki.</b></div>';
+    return;
+  }
+
+  exportPanelBackupJson();
+
+  const pendingByClient = new Map();
+  let added = 0;
+  let skippedDuplicates = 0;
+  let rejected = 0;
+  let missingClient = 0;
+  currentImportPackagePreview.notatki.forEach(item => {
+    const client = findClientForImportNote(item);
+    if(!client){
+      missingClient++;
+      rejected++;
+      return;
+    }
+    const entry = normalizeImportHistoryEntry(item);
+    if(!entry){
+      rejected++;
+      return;
+    }
+    if(importHistoryDuplicate(client, entry, pendingByClient)){
+      skippedDuplicates++;
+      return;
+    }
+    if(!pendingByClient.has(client.id)) pendingByClient.set(client.id, []);
+    pendingByClient.get(client.id).push(entry);
+    added++;
+  });
+
+  pendingByClient.forEach((entries, clientId) => {
+    const client = (data.klienci || []).find(c => c.id === clientId);
+    if(!client) return;
+    if(!Array.isArray(client.historia)) client.historia = [];
+    client.historia.push(...entries);
+    client.zaktualizowano = new Date().toISOString();
+  });
+
+  saveData();
+  render();
+  updateNotesImportButton();
+  if(result){
+    result.innerHTML = `<div class="backupPreviewStatus"><b>Import notatek zakończony.</b><br>Dodano notatek: ${added}<br>Pominięto duplikatów: ${skippedDuplicates}<br>Odrzucono notatek: ${rejected}<br>Odrzucono przez brak klienta: ${missingClient}</div>`;
   }
 }
 
