@@ -178,16 +178,27 @@
   .histBtn{background:var(--light);border:1px solid var(--line);border-radius:8px;padding:5px 8px;
            font-size:12px;cursor:pointer;color:var(--green);font-weight:bold}
   .histBtn:hover{background:#dcebe0}
-  .historyBox{background:white;border-radius:12px;width:520px;max-width:92vw;max-height:80vh;
+  .historyBox{background:white;border-radius:12px;width:720px;max-width:92vw;max-height:84vh;
               padding:22px 24px;position:relative;overflow-y:auto}
   .historyBox h3{margin:0 0 14px;color:var(--green)}
-  .historyEntry{border-bottom:1px solid #eee;padding:10px 0;font-size:13px}
-  .historyEntry .who{font-weight:bold;color:var(--green)}
-  .historyEntry .when{color:#aaa;font-size:11px;margin-left:6px}
-  .historyEntry .txt{margin-top:4px;color:#333}
-  .historyAdd{margin-top:16px;display:flex;flex-direction:column;gap:8px}
-  .historyAdd textarea{border:1px solid var(--line);border-radius:8px;padding:8px 10px;font-family:inherit;
-                        font-size:13px;min-height:60px;resize:vertical}
+  .historyTimeline{display:grid;gap:10px;margin-top:10px}
+  .historyEntry{position:relative;border:1px solid #dfece2;border-radius:12px;padding:12px 14px 12px 18px;
+                font-size:13px;background:#fbfcfb;box-shadow:0 8px 22px rgba(45,90,39,.06)}
+  .historyEntry:before{content:"";position:absolute;left:0;top:12px;bottom:12px;width:4px;border-radius:999px;background:var(--green)}
+  .historyEntry .who{font-weight:800;color:var(--green)}
+  .historyEntry .when{color:#7a867f;font-size:12px;margin-left:6px}
+  .historyEntry .txt{margin-top:8px;color:#263b2b;line-height:1.48;white-space:normal}
+  .historyMeta{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+  .historyTypeBadge{display:inline-flex;align-items:center;border:1px solid #ead99a;background:#fff8dc;color:#755c15;
+                    border-radius:999px;padding:2px 7px;font-size:11px;font-weight:800}
+  .historyActions{display:flex;gap:6px;justify-content:flex-end;margin-top:10px;flex-wrap:wrap}
+  .historyEditForm{display:grid;gap:8px;margin-top:8px}
+  .historyEditGrid,.historyAddGrid{display:grid;grid-template-columns:160px 1fr;gap:8px}
+  .historyEditForm input,.historyEditForm textarea,.historyAdd input,.historyAdd textarea{
+    border:1px solid var(--line);border-radius:8px;padding:8px 10px;font-family:inherit;font-size:13px;background:white;box-sizing:border-box;width:100%
+  }
+  .historyEditForm textarea,.historyAdd textarea{min-height:96px;resize:vertical}
+  .historyAdd{margin-top:16px;display:flex;flex-direction:column;gap:8px;border-top:1px solid var(--line);padding-top:14px}
   .historyAdd button{align-self:flex-end}
 
   .docSearch{width:100%;border:1px solid var(--line);border-radius:8px;padding:9px 12px;font-size:13px;
@@ -502,7 +513,8 @@
       border-radius:8px;background:white;padding:7px 9px;font:inherit}
   .clientCardField textarea{min-height:82px;resize:vertical}
   .clientCardNotes,.clientCardHistory{border:1px solid var(--line);border-radius:10px;padding:12px;margin-top:12px;background:#fff}
-  .clientCardHistory .historyEntry{box-shadow:none}
+  .clientCardHistoryHead{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:10px}
+  .clientCardHistoryHead b{color:#263b2b}
   .clientOffers{border:1px solid #ead99a;border-radius:10px;padding:12px;margin-top:12px;background:#fffdf4}
   .clientOffersHead{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:10px}
   .clientOffersHead b{color:#755c15}
@@ -1121,8 +1133,12 @@
       <h3 id="historyClientName">Historia kontaktu</h3>
       <div id="historyEntries"></div>
       <div class="historyAdd">
-        <textarea id="historyNewEntry" placeholder="Np. Dzwoniłem, zainteresowany, oddzwaniam za tydzień..."></textarea>
-        <button class="save" onclick="addHistoryEntry()">+ Dodaj wpis</button>
+        <div class="historyAddGrid">
+          <input type="date" id="historyNewDate">
+          <input type="text" id="historyNewWho" placeholder="Autor / kto">
+        </div>
+        <textarea id="historyNewEntry" placeholder="Np. [kontakt] Dzwoniłem, zainteresowany, oddzwaniam za tydzień..."></textarea>
+        <button class="save" onclick="addHistoryEntry()">Dodaj notatkę</button>
       </div>
     </div>
   </div>
@@ -1431,12 +1447,16 @@ function closePreview(){
 
 // ================= Historia kontaktu =================
 let currentHistoryClientId = null;
+let currentHistoryEditIndex = null;
 
 function openHistoryModal(clientId){
   currentHistoryClientId = clientId;
+  currentHistoryEditIndex = null;
   const c = data.klienci.find(x=>x.id===clientId);
   if(!c) return;
   document.getElementById("historyClientName").textContent = `Historia kontaktu — ${c.firma || c.osoba || "bez nazwy"}`;
+  document.getElementById("historyNewDate").value = new Date().toISOString().slice(0,10);
+  document.getElementById("historyNewWho").value = getWhoAmI();
   renderHistoryEntries(c);
   document.getElementById("historyModal").classList.add("open");
 }
@@ -1444,38 +1464,139 @@ function openHistoryModal(clientId){
 function closeHistoryModal(){
   document.getElementById("historyModal").classList.remove("open");
   document.getElementById("historyNewEntry").value = "";
+  document.getElementById("historyNewDate").value = "";
+  document.getElementById("historyNewWho").value = "";
+  currentHistoryEditIndex = null;
   currentHistoryClientId = null;
+}
+
+function historyDateValue(value){
+  const raw = (value || "").toString().trim();
+  if(!raw) return new Date().toISOString();
+  return /^\d{4}-\d{2}-\d{2}$/.test(raw) ? `${raw}T00:00:00.000Z` : raw;
+}
+
+function historyDateInputValue(value){
+  const raw = (value || "").toString();
+  return /^\d{4}-\d{2}-\d{2}/.test(raw) ? raw.slice(0,10) : "";
+}
+
+function parseHistoryText(value){
+  const text = (value || "").toString();
+  const match = text.match(/^\[([^\]]{1,32})\]\s*([\s\S]*)$/);
+  return match ? {type:match[1].trim(), text:match[2]} : {type:"", text};
+}
+
+function historyTextHtml(value){
+  return crmEsc(value).replace(/\r?\n/g, "<br>");
+}
+
+function renderHistoryTimeline(c, editable=false){
+  const hist = Array.isArray(c.historia) ? c.historia : [];
+  if(hist.length===0){
+    return '<div class="empty">Brak notatek dla tego klienta</div>';
+  }
+  return `<div class="historyTimeline">${hist.map((h,index)=>({h,index})).reverse().map(({h,index}) => {
+    const parsed = parseHistoryText(h.tekst);
+    if(editable && currentHistoryEditIndex === index){
+      return `
+        <div class="historyEntry">
+          <div class="historyEditForm">
+            <div class="historyEditGrid">
+              <input type="date" id="historyEditDate-${index}" value="${crmEsc(historyDateInputValue(h.data))}">
+              <input type="text" id="historyEditWho-${index}" value="${crmEsc(h.kto || "")}" placeholder="Autor / kto">
+            </div>
+            <textarea id="historyEditText-${index}" placeholder="Treść notatki">${crmEsc(h.tekst || "")}</textarea>
+            <div class="historyActions">
+              <button class="cancel" onclick="cancelEditHistoryEntry()">Anuluj</button>
+              <button class="save" onclick="saveHistoryEntryEdit(${index})">Zapisz</button>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+    return `
+      <div class="historyEntry">
+        <div class="historyMeta">
+          ${parsed.type ? `<span class="historyTypeBadge">${crmEsc(parsed.type)}</span>` : ""}
+          <span class="who">${crmEsc(h.kto || "brak autora")}</span>
+          <span class="when">${crmEsc(formatDT(h.data))}</span>
+        </div>
+        <div class="txt">${historyTextHtml(parsed.text || "")}</div>
+        ${editable ? `<div class="historyActions">
+          <button class="histBtn" onclick="editHistoryEntry(${index})">Edytuj</button>
+          <button class="delBtn" onclick="deleteHistoryEntry(${index})">Usuń</button>
+        </div>` : ""}
+      </div>
+    `;
+  }).join("")}</div>`;
 }
 
 function renderHistoryEntries(c){
   const el = document.getElementById("historyEntries");
-  const hist = c.historia || [];
-  if(hist.length===0){
-    el.innerHTML = '<div class="empty">Brak wpisów — dodaj pierwszy poniżej.</div>';
-    return;
-  }
-  el.innerHTML = [...hist].reverse().map(h => `
-    <div class="historyEntry">
-      <span class="who">${crmEsc(h.kto)}</span><span class="when">${crmEsc(formatDT(h.data))}</span>
-      <div class="txt">${crmEsc(h.tekst)}</div>
-    </div>
-  `).join("");
+  el.innerHTML = renderHistoryTimeline(c, true);
 }
 
 function addHistoryEntry(){
   const ta = document.getElementById("historyNewEntry");
+  const whoEl = document.getElementById("historyNewWho");
+  const dateEl = document.getElementById("historyNewDate");
   const tekst = ta.value.trim();
   if(!tekst || !currentHistoryClientId) return;
   const c = data.klienci.find(x=>x.id===currentHistoryClientId);
   if(!c) return;
   if(!c.historia) c.historia = [];
-  c.historia.push({tekst, kto: getWhoAmI(), data: new Date().toISOString()});
+  c.historia.push({tekst, kto: (whoEl.value || getWhoAmI()).trim(), data: historyDateValue(dateEl.value)});
   c.zaktualizowano = new Date().toISOString();
-  logActivity(`dodał(a) wpis w historii kontaktu klienta „${c.firma||c.osoba||'bez nazwy'}”`);
+  logActivity(`dodał(a) notatkę w historii kontaktu klienta „${c.firma||c.osoba||'bez nazwy'}”`);
   saveData();
   ta.value = "";
+  dateEl.value = new Date().toISOString().slice(0,10);
+  whoEl.value = getWhoAmI();
   renderHistoryEntries(c);
-  renderClients(); // odśwież licznik na przycisku
+  renderClients();
+  if(currentClientCardId === c.id) openClientCard(c.id);
+}
+
+function editHistoryEntry(index){
+  currentHistoryEditIndex = index;
+  const c = data.klienci.find(x=>x.id===currentHistoryClientId);
+  if(c) renderHistoryEntries(c);
+}
+
+function cancelEditHistoryEntry(){
+  currentHistoryEditIndex = null;
+  const c = data.klienci.find(x=>x.id===currentHistoryClientId);
+  if(c) renderHistoryEntries(c);
+}
+
+function saveHistoryEntryEdit(index){
+  const c = data.klienci.find(x=>x.id===currentHistoryClientId);
+  if(!c || !Array.isArray(c.historia) || !c.historia[index]) return;
+  const text = document.getElementById(`historyEditText-${index}`).value.trim();
+  const who = document.getElementById(`historyEditWho-${index}`).value.trim();
+  const date = document.getElementById(`historyEditDate-${index}`).value;
+  if(!text) return;
+  c.historia[index] = {tekst:text, kto:who || "Import", data:historyDateValue(date)};
+  c.zaktualizowano = new Date().toISOString();
+  currentHistoryEditIndex = null;
+  saveData();
+  renderHistoryEntries(c);
+  renderClients();
+  if(currentClientCardId === c.id) openClientCard(c.id);
+}
+
+function deleteHistoryEntry(index){
+  const c = data.klienci.find(x=>x.id===currentHistoryClientId);
+  if(!c || !Array.isArray(c.historia) || !c.historia[index]) return;
+  if(!confirm("Usunąć tę notatkę z historii klienta?")) return;
+  c.historia.splice(index, 1);
+  c.zaktualizowano = new Date().toISOString();
+  currentHistoryEditIndex = null;
+  saveData();
+  renderHistoryEntries(c);
+  renderClients();
+  if(currentClientCardId === c.id) openClientCard(c.id);
 }
 
 // ================= Podsumowanie u góry =================
@@ -2153,14 +2274,11 @@ function openClientCard(clientId){
     <div class="clientCardNotes"><b>Notatki</b><br>${crmEsc(c.notatki || "Brak notatek.")}</div>
     ${renderClientOffers(c)}
     <div class="clientCardHistory">
-      <b>Historia kontaktu (${hist.length})</b>
-      ${hist.length ? [...hist].reverse().map(h=>`
-        <div class="historyEntry">
-          <span class="who">${crmEsc(h.kto)}</span><span class="when">${crmEsc(formatDT(h.data))}</span>
-          <div class="txt">${crmEsc(h.tekst)}</div>
-        </div>
-      `).join("") : '<div class="empty">Brak wpisow w historii.</div>'}
-      <button class="histBtn" onclick="openHistoryModal(currentClientCardId)">Otworz historie kontaktu</button>
+      <div class="clientCardHistoryHead">
+        <b>Historia kontaktu (${hist.length})</b>
+        <button class="histBtn" onclick="openHistoryModal(currentClientCardId)">Zarządzaj notatkami</button>
+      </div>
+      ${renderHistoryTimeline(c, false)}
     </div>
   `;
   document.getElementById("clientCardModal").classList.add("open");
