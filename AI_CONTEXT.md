@@ -38,7 +38,7 @@ Jarosław Deczyński: Prezes Zarządu.
 
 ## Aktualne liczby robocze
 Kurs planistyczny: 1 EUR = 4,30 zł.
-Koszt zakupu BRUNIMAT 650 Premium DUO: 9 750 EUR.
+Roboczy koszt pełnego pakietu BRUNIMAT 650 Premium DUO: ok. 9 750-9 950 EUR, do potwierdzenia u BRUNIMAT lub na fakturze. Kwota 9 490 EUR była wcześniejszym odtworzeniem z opcji, prawdopodobnie bez 2 x pojemnik 50 l. Nie traktować jednej kwoty jako pewnej.
 Cena referencyjna: 13 500 EUR.
 Cena standardowa: 13 900 EUR.
 Cena katalogowa: 14 500 EUR.
@@ -52,3 +52,33 @@ Instalację robimy sami; elektryk i przyłącze wody nie są wymagane w aktualny
 3. Niski budżet marketingowy: telefony, baza kontaktów, OLX, follow-upy, materiały PDF.
 4. Budowanie oferty jako kompletnego systemu sprzedaży bezpośredniej: mlekomat + pawilon + dokumenty + finansowanie + marketing + wdrożenie.
 5. Unikać wielkich przebudów i niepotrzebnego komplikowania strony.
+
+## Workflow AI
+
+Projekt korzysta z podziału ról między narzędziami:
+
+- Gemini: tani szkicownik do pierwszych pomysłów, promptów, list pytań i porządkowania notatek.
+- Claude: strateg, copywriter, analityk sprzedaży i doradca biznesowy. Przygotowuje treści, oferty, maile, SMS-y, skrypty rozmów, analizy i decyzje.
+- Codex: narzędzie techniczne do repozytorium, `panel.html`, HTML/CSS/JS, API, GitHub, diffów, commitów i pushy.
+
+AI ma oszczędzać limity: używać tylko potrzebnego kontekstu, nie analizować całego repozytorium bez potrzeby, nie czytać całego `panel.html`, jeśli wystarczy konkretna sekcja, i upominać użytkownika, gdy zadanie trafia do złego narzędzia.
+
+Claude nie powinien automatycznie dodawać sekcji „Zadanie dla Codexa”, jeśli użytkownik prosi tylko o opinię, analizę, ocenę wiadomości, strategię albo komentarz biznesowy. Taką sekcję dodawać tylko wtedy, gdy jest realne wdrożenie techniczne albo użytkownik o to prosi.
+
+## Instrukcje i rejestr decyzji
+
+Role plików:
+
+- `CLAUDE.md`: główna instrukcja dla Claude.
+- `CODEX_CLAUDE_INSTRUKCJA.md`: wspólny workflow Claude/Codex.
+- `AGENTS.md`: instrukcja dla narzędzi technicznych i Codexa.
+- `AI_CONTEXT.md`: kontekst biznesowy projektu.
+- `DECYZJE_BIZNESOWE.md`: rejestr decyzji biznesowych.
+
+Ważne decyzje biznesowe, nowe założenia, zmiany strategii, ceny, marże, modele finansowania, priorytety panelu i zmiany workflow AI mają trafiać do `DECYZJE_BIZNESOWE.md` albo być wyraźnie proponowane do zapisania.
+
+Jeśli ważny temat został porzucony bez decyzji, AI może krótko przypomnieć o nim w rozmowie, bez odciągania od głównego zadania.
+
+## Kierunek panelu
+
+Panel prywatny ma docelowo działać jako centrum firmy: CRM, dokumenty, cenniki, budżet, finanse, zadania, follow-upy, materiały sprzedażowe i szybkie linki. W przyszłości panel ma mieć moduł AI Workflow do porządkowania pracy Gemini / Claude / Codex, oszczędzania limitów i zbierania decyzji do rejestru.

@@ -368,3 +368,69 @@ Przygotuj gotowe zadanie dla Codexa. Ma zawierać: które pliki zmienić, czego 
 3. Jeśli trzeba coś wdrożyć, wklejasz zadanie tutaj do Codexa.
 4. Codex zmienia pliki, pokazuje diff, robi commit i push.
 5. Decyzje stałe trafiają do `AI_CONTEXT.md`.
+
+## Docelowy podział plików instrukcyjnych
+
+- `CLAUDE.md` — główna instrukcja dla Claude: rola stratega, copywritera, analityka i doradcy biznesowego.
+- `CODEX_CLAUDE_INSTRUKCJA.md` — wspólna instrukcja workflow Claude/Codex: jak dzielić pracę, oszczędzać limit i przekazywać zadania.
+- `AGENTS.md` — instrukcja dla narzędzi technicznych i Codexa: jak pracować w repozytorium, czego nie ruszać i kiedy robić commit/push.
+- `AI_CONTEXT.md` — kontekst biznesowy projektu Sklep za Stodołą.
+- `DECYZJE_BIZNESOWE.md` — rejestr decyzji biznesowych, założeń roboczych i zmian strategii.
+
+Nie usuwać treści z tych plików bez potrzeby. Jeśli pojawia się duplikat, najpierw uporządkować role plików, a dopiero potem ewentualnie skracać po akceptacji użytkownika.
+
+## Gemini / Claude / Codex
+
+Najtańszy workflow:
+
+1. Gemini — darmowy lub tani szkicownik: pomysły, porządkowanie notatek, warianty promptów, pierwsze listy pytań.
+2. Claude — strateg i copywriter: treści, oferty, maile, SMS-y, skrypty rozmów, analiza sprzedaży, decyzje i zadania dla Codexa.
+3. Codex — wykonawca techniczny: repozytorium, `panel.html`, HTML/CSS/JS, API, GitHub, diff, commit i push.
+
+Jeśli zadanie trafia do złego narzędzia, AI ma krótko upomnieć użytkownika i wskazać właściwe narzędzie. Nie robić z tego długiej analizy.
+
+## Zasady oszczędzania limitów
+
+- Nie wklejać i nie analizować całego repozytorium, jeśli wystarczy `AI_CONTEXT.md` albo jeden plik.
+- Nie wrzucać całego `panel.html` do Claude, jeśli pytanie dotyczy strategii, tekstu lub oferty.
+- Nie używać Claude do typowo technicznego wdrożenia, jeśli ma to zrobić Codex.
+- Nie używać Codexa do luźnych pomysłów, jeśli wystarczy Gemini lub Claude.
+- Zaczynać nowe rozmowy dla nowych tematów, żeby nie mieszać kontekstu.
+- Odpowiadać krótko, jeśli użytkownik prosi tylko o opinię, ocenę wiadomości, strategię albo komentarz biznesowy.
+
+## Zadanie dla Codexa tylko wtedy, gdy potrzebne
+
+Claude nie ma automatycznie dodawać sekcji „Zadanie dla Codexa”, jeśli użytkownik prosi tylko o:
+
+- opinię,
+- analizę,
+- ocenę wiadomości,
+- strategię,
+- komentarz biznesowy,
+- uporządkowanie myśli,
+- decyzję, czy coś ma sens.
+
+Sekcję „Zadanie dla Codexa” dodawać tylko wtedy, gdy jest konkretna zmiana techniczna do wdrożenia albo użytkownik wyraźnie o to prosi.
+
+## Synchronizacja i porzucone tematy
+
+Jeśli użytkownik zmienia zasady pracy AI, workflow, instrukcje projektu albo sposób współpracy, trzeba uwzględnić to równolegle dla Claude, Codexa, `AI_CONTEXT.md`, `AGENTS.md` i przyszłego modułu AI Workflow w panelu.
+
+Jeśli ważny temat został porzucony bez decyzji, można krótko przypomnieć: „Przypomnienie: wcześniej omawialiśmy [temat], ale nie ma decyzji. Chcesz do tego wrócić?”.
+
+## Rejestr decyzji biznesowych
+
+Ważne decyzje i założenia zapisywać albo proponować do zapisania w `DECYZJE_BIZNESOWE.md`. Dotyczy to szczególnie:
+
+- cen, marż i wariantów oferty,
+- modeli finansowania,
+- priorytetów panelu,
+- strategii sprzedaży,
+- workflow AI,
+- stałych ustaleń dotyczących firmy.
+
+Decyzje robocze oznaczać jako robocze, a nie jako potwierdzone fakty.
+
+## Panel jako centrum firmy
+
+Panel prywatny ma docelowo być centrum operacyjnym firmy: CRM, dokumenty, cenniki, budżet, finanse, zadania, follow-upy, materiały sprzedażowe i szybkie linki. W przyszłości panel powinien mieć moduł AI Workflow, który pomaga wybrać Gemini / Claude / Codex, przypomina zasady oszczędzania limitów i kieruje decyzje do rejestru.

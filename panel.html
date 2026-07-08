@@ -338,6 +338,105 @@
   .pricePreview img{width:100%;height:auto;display:block;border-radius:8px;min-width:860px}
   .quickDocsGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px;margin-top:12px}
 
+  /* --- Visual refresh Etap 1: SaaS/CRM polish --- */
+  :root{
+    --green:#2d5a27;--green2:#2f7a45;--light:#f1f7f2;--accent:#c9a24a;--accent2:#ead99a;
+    --ink:#172018;--muted:#657168;--line:#dde7df;--paper:#ffffff;--bg:#fbfcfb;
+    --done:#2f7a45;--progress:#c9a24a;--todo:#b5493f;--shadow:0 16px 38px #1d3b2412
+  }
+  body{background:
+      radial-gradient(circle at top left,#eef7ef 0,#eef7ef 280px,transparent 560px),
+      linear-gradient(180deg,#fbfcfb 0,#f5f8f5 100%);
+      color:var(--ink)}
+  header{background:linear-gradient(135deg,#2d5a27 0%,#1f3e24 58%,#18331d 100%);
+         padding:20px 32px;box-shadow:0 14px 34px #1b351f26;position:sticky;top:0;z-index:20}
+  header h1{font-size:21px;letter-spacing:.01em}
+  header p{color:#dcebdd}
+  header .logo{filter:drop-shadow(0 8px 16px #1025134d)}
+  .wrap{max-width:1240px;padding-top:22px}
+  .section,.dashCard,.statCard,.item,.instItem,.terminItem,.finItem,.linkCard,.priceCard,.vendorCard,.loanScenario,.zadanieItem{
+    border-color:var(--line);box-shadow:var(--shadow)
+  }
+  .section,.dashCard{border-radius:12px;background:rgba(255,255,255,.94)}
+  .section h2,.dashCardTitle{letter-spacing:.01em}
+  .addBtn,.histBtn,.doneBtn,.priceBtn,.salesActions button,.importBtn{
+    border-radius:9px;transition:transform .12s ease,box-shadow .12s ease,background .12s ease,border-color .12s ease
+  }
+  .addBtn:hover,.histBtn:hover,.doneBtn:hover,.priceBtn:hover,.salesActions button:hover,.importBtn:hover{
+    transform:translateY(-1px);box-shadow:0 8px 18px #1d3b2414
+  }
+  input,select,textarea,.docSearch{outline-color:#b9d5bf}
+
+  .statsBar{gap:12px;margin-bottom:16px}
+  .statCard{border-radius:12px;min-width:132px;background:linear-gradient(180deg,#fff,#f9fbf9);padding:12px 16px}
+  .statCard .num{color:var(--green2)}
+  .statCard .lbl{letter-spacing:.06em}
+  .whoRow{background:white;border:1px solid var(--line);border-radius:12px;padding:10px 12px;width:max-content;
+          box-shadow:0 8px 20px #1d3b240d}
+
+  .tabNav{gap:8px;border:1px solid var(--line);border-radius:14px;background:white;padding:8px;margin-bottom:18px;
+          box-shadow:0 12px 28px #1d3b240f}
+  .tabBtn{border:1px solid transparent;border-radius:10px;margin-bottom:0;padding:9px 12px;color:#5d6a60}
+  .tabBtn:hover{background:#f4f8f5;border-color:#dce8df;color:var(--green)}
+  .tabBtn.active{background:linear-gradient(135deg,#2d5a27,#2f7a45);color:white;border-color:#2d5a27;
+                 box-shadow:0 8px 18px #2d5a2726}
+
+  .dashGrid{grid-template-columns:repeat(12,1fr);gap:14px}
+  .dashCard{grid-column:span 4;min-height:150px;position:relative;overflow:hidden}
+  .dashCardTitle{font-size:12px;color:#355b3a}
+  .dashHero{grid-column:1/-1;min-height:126px;background:
+      linear-gradient(135deg,rgba(45,90,39,.96),rgba(47,122,69,.9)),
+      linear-gradient(90deg,transparent,rgba(234,217,154,.18));border:none}
+  .dashHero:after{content:"";position:absolute;right:28px;top:24px;width:132px;height:132px;border-radius:50%;
+                  border:1px solid rgba(234,217,154,.38)}
+  .dashHeroTitle{font-size:27px}
+  .dashHeroSub{color:#eaf4eb}
+  .dashKpiRow{grid-column:1/-1;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+  .dashKpiCard{background:white;border:1px solid var(--line);border-radius:12px;padding:16px 18px;
+               box-shadow:var(--shadow);min-height:96px}
+  .dashKpiCard .num{font-size:26px;font-weight:bold;color:var(--green2)}
+  .dashKpiCard .lbl{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-top:4px}
+  .dashKpiCard .hint{font-size:12px;color:#7a847c;margin-top:8px;line-height:1.35}
+  .dashToday{grid-column:span 8}
+  .dashAi{grid-column:span 4;background:linear-gradient(180deg,#fffdf4,#ffffff);border-color:#ead99a}
+  .dashAi .dashCardTitle{color:#755c15}
+  .dashAiText{font-size:13px;line-height:1.5;color:#4d563f}
+  .dashAiTags{display:flex;gap:6px;flex-wrap:wrap;margin-top:12px}
+  .dashAiTags span{font-size:11px;font-weight:bold;color:#6a5314;background:#fff8df;border:1px solid #ead99a;
+                   border-radius:999px;padding:4px 8px}
+  .dashFunnelBarWrap{height:18px;background:#edf4ee}
+  .dashFunnelBar{background:linear-gradient(90deg,#2d5a27,#2f7a45)}
+  .dashFinance{gap:10px;justify-content:stretch}
+  .dashFinance>div{flex:1;background:#f8fbf8;border:1px solid #e6eee8;border-radius:12px;padding:12px 8px}
+  .dashFinance .big{font-size:20px}
+  .dashListRow{padding:8px 0}
+
+  table.clients{border-spacing:0}
+  table.clients th{background:#f6faf7;color:#506156;border-bottom:1px solid var(--line);padding:9px 8px}
+  table.clients td{border-bottom:1px solid #eef3ef}
+  table.clients tbody tr:hover{background:#fbfdfb}
+  table.clients input:hover, table.clients select:hover, table.clients textarea:hover,
+  table.clients input:focus, table.clients select:focus, table.clients textarea:focus{
+      border-color:#bfd9c4;background:white;box-shadow:0 0 0 3px #2f7a4512}
+  select.statCell{background:#f3f8f4;border:1px solid #cfe2d2;color:#2d5a27;font-weight:bold;border-radius:999px}
+
+  .statusPill,.prio,.dashPill,.terminBadge,.ktoBadge{letter-spacing:.01em}
+  .statusPill{padding:4px 10px}
+  .privateNotice,.vendorIntro,.salesWarn{box-shadow:0 8px 18px #c9a24a12}
+
+  @media(max-width:980px){
+    header{position:static;padding:18px 18px}
+    .wrap{padding:18px 14px 44px}
+    .dashGrid{grid-template-columns:1fr}
+    .dashCard,.dashToday,.dashAi{grid-column:1/-1}
+    .dashKpiRow{grid-template-columns:1fr 1fr}
+  }
+  @media(max-width:620px){
+    .dashKpiRow{grid-template-columns:1fr}
+    .tabBtn{width:100%;text-align:left}
+    .whoRow{width:100%}
+  }
+
 </style>
 </head>
 <body>
@@ -407,6 +506,23 @@
         <div class="dashCard dashHero">
           <div class="dashHeroTitle">Cześć, <span id="dashWho">Jakub</span> 👋</div>
           <div class="dashHeroSub" id="dashDate"></div>
+        </div>
+
+        <div class="dashKpiRow" id="dashKpi"></div>
+
+        <div class="dashCard dashToday">
+          <div class="dashCardTitle">Dzisiaj do ogarnięcia</div>
+          <div id="dashToday"></div>
+        </div>
+
+        <div class="dashCard dashAi">
+          <div class="dashCardTitle">AI Workflow</div>
+          <div class="dashAiText">
+            Placeholder roboczy: Gemini do szkiców, Claude do strategii i treści, Codex do technicznego wdrożenia w repo.
+          </div>
+          <div class="dashAiTags">
+            <span>Gemini</span><span>Claude</span><span>Codex</span>
+          </div>
         </div>
 
         <div class="dashCard">
@@ -1465,6 +1581,11 @@ function daysUntil(dateStr){
   return Math.round((d - today) / 86400000);
 }
 
+function safeDaysUntil(dateStr){
+  const dni = daysUntil(dateStr);
+  return Number.isFinite(dni) ? dni : null;
+}
+
 function renderTerminy(){
   const list = document.getElementById("list-terminy");
   if(!list) return;
@@ -1750,6 +1871,35 @@ function renderDashboard(){
 
   // Lejek sprzedażowy
   const klienci = data.klienci || [];
+  const zadaniaOtwarte = (data.zadania||[]).filter(z=>!z.zrobione);
+  const terminyPilne = (data.terminy||[]).filter(t=>{
+    const dni = safeDaysUntil(t.data);
+    return dni !== null && dni <= 14;
+  }).length;
+  const sprawyOpen = (data.sprawy||[]).filter(s=>s.status!=="done").length;
+  const dashKpiEl = document.getElementById("dashKpi");
+  if(dashKpiEl){
+    dashKpiEl.innerHTML = `
+      <div class="dashKpiCard"><div class="num">${klienci.length}</div><div class="lbl">Klienci</div><div class="hint">Baza CRM</div></div>
+      <div class="dashKpiCard"><div class="num">${zadaniaOtwarte.length}</div><div class="lbl">Otwarte zadania</div><div class="hint">Do domknięcia</div></div>
+      <div class="dashKpiCard"><div class="num">${terminyPilne}</div><div class="lbl">Pilne terminy</div><div class="hint">Do 14 dni lub po terminie</div></div>
+      <div class="dashKpiCard"><div class="num">${sprawyOpen}</div><div class="lbl">Sprawy</div><div class="hint">W toku</div></div>
+    `;
+  }
+  const todayItems = [
+    ...zadaniaOtwarte.slice(0,3).map(z=>({label:z.tekst, meta:z.kto || "Zadanie"})),
+    ...(data.terminy||[]).slice().sort((a,b)=>new Date(a.data)-new Date(b.data)).slice(0,2).map(t=>{
+      const dni = safeDaysUntil(t.data);
+      return {label:t.nazwa, meta:dni === null ? "brak daty" : (dni<0 ? "po terminie" : "za "+dni+" dni")};
+    }),
+    ...(data.sprawy||[]).filter(s=>s.status!=="done").slice(0,2).map(s=>({label:s.title, meta:statusLabel(s.status)}))
+  ].slice(0,6);
+  const dashTodayEl = document.getElementById("dashToday");
+  if(dashTodayEl){
+    dashTodayEl.innerHTML = todayItems.length ? todayItems.map(i=>
+      `<div class="dashListRow"><span>${i.label}</span><span style="color:var(--muted);font-weight:bold">${i.meta}</span></div>`
+    ).join("") : '<div class="dashEmpty">Na dziś nie ma pilnych rzeczy w panelu.</div>';
+  }
   const funnelStages = [
     ["nowy","Nowy lead"],["zglosil_sie","Zgłosił się sam"],["kontakt","Do kontaktu"],
     ["rozmowa","Rozmowa odbyta"],["oferta","Oferta wysłana"],["negocjacje","Negocjacje"],["wygrany","Wygrany"]

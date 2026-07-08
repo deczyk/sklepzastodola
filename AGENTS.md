@@ -138,7 +138,7 @@ Aktualne założenia budżetowe:
 - elektryk nie jest wymaganym kosztem,
 - woda nie jest potrzebna,
 - szkolenie jest wliczone,
-- koszt zakupu konfiguracji BRUNIMAT 650 Premium DUO z dodatkami: 9 750 EUR,
+- roboczy koszt pełnego pakietu BRUNIMAT 650 Premium DUO z dodatkami: ok. 9 750-9 950 EUR, do weryfikacji u BRUNIMAT lub na fakturze,
 - cena referencyjna: 13 500 EUR,
 - cena standardowa: 13 900 EUR,
 - cena katalogowa: 14 500 EUR,
@@ -157,3 +157,43 @@ Najlepszy format odpowiedzi:
 - na co uważać.
 
 Nie używaj długich technicznych wyjaśnień, jeśli użytkownik nie pyta.
+
+## Workflow AI i podział ról
+
+W projekcie obowiązuje podział ról między narzędziami:
+
+- Gemini: tani szkicownik do wstępnych pomysłów, układania promptów, porządkowania notatek i prostych wariantów treści.
+- Claude: strateg, copywriter, analityk sprzedaży i doradca biznesowy. Przygotowuje treści, oferty, maile, SMS-y, skrypty rozmów, analizy i zadania dla Codexa, ale nie wdraża kodu.
+- Codex: narzędzie techniczne do repozytorium, plików, HTML/CSS/JS, panelu, API, diffów, commitów i pushy.
+
+Jeśli użytkownik daje zadanie do złego narzędzia, krótko go upomnij i zaproponuj właściwy kierunek. Przykład: strategia i teksty powinny trafić do Claude/Gemini, a edycja `panel.html`, API lub GitHub do Codexa.
+
+## Oszczędzanie limitów AI
+
+- Nie czytaj całego repozytorium, jeśli wystarczy `AI_CONTEXT.md`, `AGENTS.md` i konkretny plik.
+- Nie analizuj całego `panel.html`, jeśli wystarczy konkretna sekcja, funkcja albo tekst.
+- Do prostych tekstów i szkiców używać tańszego narzędzia lub krótszej odpowiedzi.
+- Nie generować dużych bloków kodu ani długich analiz, jeśli użytkownik prosi tylko o opinię, ocenę wiadomości, strategię albo komentarz biznesowy.
+- Claude nie ma automatycznie dodawać sekcji „Zadanie dla Codexa”, jeśli użytkownik prosi tylko o opinię, analizę, ocenę wiadomości, strategię albo komentarz biznesowy.
+
+## Synchronizacja instrukcji
+
+Pliki instrukcyjne mają mieć jasne role:
+
+- `CLAUDE.md` — główna instrukcja dla Claude.
+- `CODEX_CLAUDE_INSTRUKCJA.md` — wspólny workflow Claude/Codex.
+- `AGENTS.md` — instrukcja dla narzędzi technicznych i Codexa.
+- `AI_CONTEXT.md` — kontekst biznesowy projektu.
+- `DECYZJE_BIZNESOWE.md` — rejestr decyzji biznesowych.
+
+Jeśli użytkownik zmienia zasady pracy AI, workflow, instrukcje projektu albo sposób współpracy, uwzględnij to także w odpowiednim pliku instrukcyjnym. Nie nadpisuj istniejących treści bez potrzeby.
+
+## Porzucone tematy i decyzje
+
+Jeśli w rozmowie pojawił się ważny temat, ale użytkownik zmienił temat bez decyzji, można krótko przypomnieć o nim na końcu odpowiedzi. Przypomnienie ma być krótkie i nie może przeszkadzać w głównym zadaniu.
+
+Ważne decyzje biznesowe zapisuj lub proponuj do zapisania w `DECYZJE_BIZNESOWE.md`: nowe ceny, marże, model oferty, finansowanie, strategia sprzedaży, workflow AI, priorytety panelu i inne ustalenia stałe.
+
+## Kierunek panelu
+
+Panel prywatny ma docelowo być centrum firmy: CRM, dokumenty, budżet, finanse, zadania, materiały sprzedażowe, follow-upy i szybkie linki. W przyszłości może mieć moduł AI Workflow, który porządkuje pracę Gemini / Claude / Codex, przypomina właściwe narzędzie i zbiera decyzje do rejestru.
