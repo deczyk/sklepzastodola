@@ -441,6 +441,9 @@
   .aiPromptHead{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
   .aiPromptBadge{font-size:11px;font-weight:bold;color:#6a5314;background:#fff8df;border:1px solid #ead99a;border-radius:999px;padding:4px 8px;white-space:nowrap}
   .aiPromptText{font-size:12.5px;color:#3f4b42;line-height:1.45;background:#fbfcfb;border:1px solid #e7efe8;border-radius:8px;padding:9px 10px}
+  .backupStats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:14px 0}
+  .backupActions{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:12px}
+  .backupHint{font-size:12.5px;color:var(--muted);line-height:1.45}
   .dashFunnelBarWrap{height:18px;background:#edf4ee}
   .dashFunnelBar{background:linear-gradient(90deg,#2d5a27,#2f7a45)}
   .dashFinance{gap:10px;justify-content:stretch}
@@ -583,6 +586,7 @@
       <button class="tabBtn" data-tab="zadania" onclick="switchTab('zadania')">✅ Do zrobienia</button>
       <button class="tabBtn" data-tab="checklisty" onclick="switchTab('checklisty')">☑️ Checklisty</button>
       <button class="tabBtn" data-tab="aiworkflow" onclick="switchTab('aiworkflow')">🤖 AI Workflow</button>
+      <button class="tabBtn" data-tab="backup" onclick="switchTab('backup')">💾 Backup</button>
       <button class="tabBtn" data-tab="klienci" onclick="switchTab('klienci')">👥 Baza klientów</button>
       <button class="tabBtn" data-tab="dokumenty" onclick="switchTab('dokumenty')">📄 Dokumenty i oferty</button>
       <button class="tabBtn" data-tab="cenniki" onclick="switchTab('cenniki')">💶 Cenniki</button>
@@ -692,6 +696,18 @@
       <ul id="aiSafetyRules" class="aiWorkflowList"></ul>
       <h3>Gotowe prompty</h3>
       <div id="aiPromptList" class="aiWorkflowGrid"></div>
+    </div>
+    </div>
+
+    <div class="tabPane" id="tabpane-backup">
+    <div class="section">
+      <h2>Backup danych panelu</h2>
+      <div class="privateNotice"><b>Prywatnie:</b> Backup pobiera lokalną kopię danych panelu. Plik jest prywatny — nie wrzucaj go do repo ani nie wysyłaj osobom trzecim.</div>
+      <div id="backupStats" class="backupStats"></div>
+      <div class="backupActions">
+        <button class="importBtn" onclick="exportPanelBackupJson()">Pobierz backup JSON</button>
+        <span class="backupHint">Eksport nie zmienia danych i nie wysyła nic do JSONBin.</span>
+      </div>
     </div>
     </div>
 
@@ -1613,6 +1629,7 @@ function render(){
   renderZadania();
   renderChecklisty();
   renderAIWorkflow();
+  renderBackupStats();
   renderPriceDocuments();
   renderLoanCalc();
   renderDashboard();
@@ -2982,6 +2999,45 @@ function copyAiPrompt(index){
   navigator.clipboard.writeText(prompt.tresc)
     .then(()=>alert("Skopiowano prompt: " + prompt.tytul))
     .catch(()=>alert("Nie udało się skopiować promptu. Zaznacz tekst ręcznie."));
+}
+
+// ================= Backup danych =================
+function renderBackupStats(){
+  const el = document.getElementById("backupStats");
+  if(!el || !data) return;
+  const stats = [
+    [(data.klienci || []).length, "Klienci"],
+    [(data.dokumenty || []).length, "Dokumenty"],
+    [(data.budzetStartowy || []).length, "Budżet"],
+    [(data.checklisty || []).length, "Checklisty"],
+    [(data.zadania || []).length, "Zadania"]
+  ];
+  el.innerHTML = stats.map(([count, label]) => `
+    <div class="statCard"><div class="num">${count}</div><div class="lbl">${crmEsc(label)}</div></div>
+  `).join("");
+}
+
+function backupTimestamp(){
+  const d = new Date();
+  const pad = n => n.toString().padStart(2, "0");
+  return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}-${pad(d.getHours())}${pad(d.getMinutes())}`;
+}
+
+function exportPanelBackupJson(){
+  if(!data){
+    alert("Brak danych panelu do eksportu.");
+    return;
+  }
+  const json = JSON.stringify(data, null, 2);
+  const blob = new Blob([json], {type:"application/json"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `sklepzastodola-panel-backup-${backupTimestamp()}.json`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
 }
 
 // ================= Do zrobienia =================
