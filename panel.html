@@ -444,6 +444,11 @@
   .backupStats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:14px 0}
   .backupActions{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:12px}
   .backupHint{font-size:12.5px;color:var(--muted);line-height:1.45}
+  .backupPreview{margin-top:18px;border-top:1px solid var(--line);padding-top:16px}
+  .backupPreviewResult{margin-top:12px}
+  .backupPreviewStatus{font-size:13px;line-height:1.45;border-radius:10px;padding:10px 12px;margin-bottom:10px;background:#f8fbf8;border:1px solid #dbe9de;color:#2d5a27}
+  .backupPreviewStatus.warn{background:#fff8e1;border-color:#ead99a;color:#6d5516}
+  .backupPreviewStatus.error{background:#fff1f1;border-color:#f2c0c0;color:#9b2c2c}
   .dashFunnelBarWrap{height:18px;background:#edf4ee}
   .dashFunnelBar{background:linear-gradient(90deg,#2d5a27,#2f7a45)}
   .dashFinance{gap:10px;justify-content:stretch}
@@ -707,6 +712,12 @@
       <div class="backupActions">
         <button class="importBtn" onclick="exportPanelBackupJson()">Pobierz backup JSON</button>
         <span class="backupHint">Eksport nie zmienia danych i nie wysyła nic do JSONBin.</span>
+      </div>
+      <div class="backupPreview">
+        <h3>Podgląd backupu JSON</h3>
+        <div class="privateNotice"><b>Uwaga:</b> To jest tylko podgląd. Ten etap nie przywraca ani nie nadpisuje danych.</div>
+        <input type="file" id="backupPreviewFile" accept=".json,application/json" onchange="previewBackupJsonFile(this)">
+        <div id="backupPreviewResult" class="backupPreviewResult"></div>
       </div>
     </div>
     </div>
@@ -3038,6 +3049,65 @@ function exportPanelBackupJson(){
   a.click();
   a.remove();
   URL.revokeObjectURL(url);
+}
+
+function backupPreviewCount(obj, key){
+  return Array.isArray(obj && obj[key]) ? obj[key].length : 0;
+}
+
+function renderBackupPreviewStats(parsed, fileName){
+  const result = document.getElementById("backupPreviewResult");
+  if(!result) return;
+  const isObject = !!parsed && typeof parsed === "object" && !Array.isArray(parsed);
+  const knownSections = ["klienci","dokumenty","zadania","checklisty"].filter(key => Array.isArray(parsed && parsed[key]));
+  const looksLikePanelBackup = isObject && knownSections.length > 0;
+  const stats = [
+    ["Klienci", backupPreviewCount(parsed, "klienci")],
+    ["Dokumenty", backupPreviewCount(parsed, "dokumenty")],
+    ["Sprawy", backupPreviewCount(parsed, "sprawy")],
+    ["Terminy", backupPreviewCount(parsed, "terminy")],
+    ["Instalacje", backupPreviewCount(parsed, "instalacje")],
+    ["Finanse", backupPreviewCount(parsed, "finanse")],
+    ["Budżet startowy", backupPreviewCount(parsed, "budzetStartowy")],
+    ["Linki", backupPreviewCount(parsed, "linki")],
+    ["Zadania", backupPreviewCount(parsed, "zadania")],
+    ["Checklisty", backupPreviewCount(parsed, "checklisty")]
+  ];
+  result.innerHTML = `
+    <div class="backupPreviewStatus ${looksLikePanelBackup ? "" : "warn"}">
+      <b>${looksLikePanelBackup ? "Plik wygląda jak backup panelu." : "Plik jest poprawnym JSON, ale nie wygląda jednoznacznie jak backup panelu."}</b><br>
+      Plik: ${crmEsc(fileName || "bez nazwy")}<br>
+      Obiekt JSON: ${isObject ? "tak" : "nie"}<br>
+      Znane sekcje: ${knownSections.length ? crmEsc(knownSections.join(", ")) : "brak"}
+    </div>
+    <div class="backupStats">
+      ${stats.map(([label, count]) => `<div class="statCard"><div class="num">${count}</div><div class="lbl">${crmEsc(label)}</div></div>`).join("")}
+    </div>
+  `;
+}
+
+function previewBackupJsonFile(input){
+  const result = document.getElementById("backupPreviewResult");
+  const file = input && input.files && input.files[0];
+  if(!result) return;
+  if(!file){
+    result.innerHTML = "";
+    return;
+  }
+  result.innerHTML = '<div class="backupPreviewStatus">Wczytywanie pliku...</div>';
+  const reader = new FileReader();
+  reader.onload = () => {
+    try{
+      const parsed = JSON.parse(reader.result);
+      renderBackupPreviewStats(parsed, file.name);
+    }catch(e){
+      result.innerHTML = `<div class="backupPreviewStatus error"><b>Niepoprawny JSON.</b><br>${crmEsc(e.message || "Nie udało się odczytać pliku.")}</div>`;
+    }
+  };
+  reader.onerror = () => {
+    result.innerHTML = '<div class="backupPreviewStatus error"><b>Nie udało się odczytać pliku.</b></div>';
+  };
+  reader.readAsText(file);
 }
 
 // ================= Do zrobienia =================
