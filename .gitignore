@@ -1,0 +1,7 @@
+*.docx
+*.pdf
+*.xlsx
+*.zip
+_pliki-*
+backup*
+notatki*
