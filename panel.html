@@ -434,6 +434,7 @@
   .kanbanName{font-weight:bold;color:#263b2b;margin-bottom:6px}
   .kanbanMeta{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:7px}
   .kanbanPill{font-size:11px;background:#f3f8f4;color:#2d5a27;border:1px solid #d8e7db;border-radius:999px;padding:3px 7px}
+  .kanbanPill.gold{background:#fff8df;color:#755c15;border-color:#ead99a}
   .kanbanContact,.kanbanNote{font-size:12px;color:#647066;line-height:1.35}
   .clientsFollowups{display:none}
   .followGroup{background:white;border:1px solid var(--line);border-radius:12px;margin-bottom:12px;padding:12px}
@@ -445,9 +446,16 @@
   .followAction{white-space:nowrap}
   .clientCardBox{background:white;border-radius:14px;max-width:780px;width:calc(100vw - 36px);max-height:88vh;overflow:auto;padding:22px;
                  box-shadow:0 24px 70px #10201833}
+  .clientCardTop{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;border-bottom:1px solid var(--line);
+                 padding-bottom:14px;margin-bottom:14px}
+  .clientCardTop h2{margin:0 0 4px;color:#263b2b}
+  .clientCardBadges{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
   .clientCardGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:14px 0}
   .clientCardField{background:#f8fbf8;border:1px solid #e4eee6;border-radius:10px;padding:10px}
   .clientCardField b{display:block;font-size:11px;color:#6b766f;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px}
+  .clientCardField select,.clientCardField input,.clientCardField textarea{width:100%;box-sizing:border-box;border:1px solid #d8e7db;
+      border-radius:8px;background:white;padding:7px 9px;font:inherit}
+  .clientCardField textarea{min-height:82px;resize:vertical}
   .clientCardNotes,.clientCardHistory{border:1px solid var(--line);border-radius:10px;padding:12px;margin-top:12px;background:#fff}
   .clientCardHistory .historyEntry{box-shadow:none}
 
@@ -674,13 +682,13 @@
         <table class="clients">
           <colgroup>
             <col class="firma"><col class="osoba"><col class="woj"><col class="miejsc">
-            <col class="ulica"><col class="tel"><col class="email"><col class="zain">
+            <col class="ulica"><col class="tel"><col class="email"><col class="zain"><col class="follow">
             <col class="prio"><col class="status"><col class="notatki"><col class="hist"><col class="usun">
           </colgroup>
           <thead>
             <tr>
               <th>Firma / gospodarstwo</th><th>Imię i nazwisko</th><th>Województwo</th><th>Miejscowość</th>
-              <th>Ulica</th><th>Telefon</th><th>E-mail</th><th>Co zamówił / zainteresowanie</th>
+              <th>Ulica</th><th>Telefon</th><th>E-mail</th><th>Czym zainteresowany</th><th>Następny kontakt</th>
               <th>Priorytet</th><th>Status</th>
               <th>Notatki</th><th>Historia</th><th></th>
             </tr>
@@ -1407,6 +1415,9 @@ const STATUS_MAP = {
 const PRIO_OPTS = [["A","A – wysoki"],["B","B – średni"],["C","C – niski"]];
 const PRIO_MAP = {"A – wysoki":"A","B – średni":"B","C – niski":"C"};
 const ZAIN_OPTS = ["Mlekomat","Sklep gospodarczy","Pakiet: sklep + mlekomat","Serwis","Inne urządzenie","Inne"];
+const LEAD_SOURCE_OPTS = ["OLX","Facebook / grupy rolnicze","Polecenie","Zadzwonił sam","Strona internetowa","ODR / gmina / doradca rolniczy","Targi / wydarzenie","Inne"];
+const PRODUCT_OPTS = ["Cały system","BRUNIMAT / mlekomat","Pawilon / punkt sprzedaży","Finansowanie / leasing / dotacja","Marketing lokalny","Serwis / wsparcie","Jeszcze nie wie","Inne"];
+const OBJECTION_OPTS = ["Cena","Niepewność co do popytu","Obawa o serwis / awarie","Brak miejsca / lokalizacji","Chce zobaczyć przykład / referencje","Czeka na kredyt / dotację","Musi skonsultować z rodziną / wspólnikiem","Brak formalności","Inne"];
 
 function clientField(c, field, type){
   if(type==="status"){
@@ -1424,6 +1435,33 @@ function clientField(c, field, type){
       <option value="">—</option>
       ${ZAIN_OPTS.map(v=>`<option value="${v}" ${c.zainteresowanie===v?"selected":""}>${v}</option>`).join("")}
     </select>`;
+  }
+  if(type==="product"){
+    const value = c.produkt || c.zainteresowanie || "";
+    const opts = value && !PRODUCT_OPTS.includes(value) ? [value, ...PRODUCT_OPTS] : PRODUCT_OPTS;
+    return `<select data-field="produkt" data-id="${c.id}" onchange="updateClient(this)">
+      <option value="">—</option>
+      ${opts.map(v=>`<option value="${crmEsc(v)}" ${value===v?"selected":""}>${crmEsc(v)}</option>`).join("")}
+    </select>`;
+  }
+  if(type==="source"){
+    const value = c.zrodloLeada || "";
+    const opts = value && !LEAD_SOURCE_OPTS.includes(value) ? [value, ...LEAD_SOURCE_OPTS] : LEAD_SOURCE_OPTS;
+    return `<select data-field="zrodloLeada" data-id="${c.id}" onchange="updateClient(this)">
+      <option value="">—</option>
+      ${opts.map(v=>`<option value="${crmEsc(v)}" ${value===v?"selected":""}>${crmEsc(v)}</option>`).join("")}
+    </select>`;
+  }
+  if(type==="objection"){
+    const value = c.obiekcje || "";
+    const opts = value && !OBJECTION_OPTS.includes(value) ? [value, ...OBJECTION_OPTS] : OBJECTION_OPTS;
+    return `<select data-field="obiekcje" data-id="${c.id}" onchange="updateClient(this)">
+      <option value="">—</option>
+      ${opts.map(v=>`<option value="${crmEsc(v)}" ${value===v?"selected":""}>${crmEsc(v)}</option>`).join("")}
+    </select>`;
+  }
+  if(type==="date"){
+    return `<input type="date" value="${c[field]||""}" data-field="${field}" data-id="${c.id}" onblur="updateClient(this)" onchange="updateClient(this)">`;
   }
   if(type==="textarea"){
     return `<textarea data-field="${field}" data-id="${c.id}" onblur="updateClient(this)">${c[field]||""}</textarea>`;
@@ -1468,6 +1506,46 @@ function clientContact(c){
   return [c.telefon, c.email].filter(Boolean).join(" | ");
 }
 
+function clientProduct(c){
+  return c.produkt || c.zainteresowanie || "";
+}
+
+function clientFollowup(c){
+  return c.nastepnyFollowup || "";
+}
+
+function clientLeadSource(c){
+  return c.zrodloLeada || "";
+}
+
+function clientObjections(c){
+  return c.obiekcje || "";
+}
+
+function followupInfo(dateStr){
+  if(!dateStr) return {label:"brak follow-upu", group:"none", days:null};
+  const days = safeDaysUntil(dateStr);
+  if(days === null) return {label:"brak follow-upu", group:"none", days:null};
+  if(days <= 0) return {label:days < 0 ? "po terminie" : "dzisiaj", group:"today", days};
+  if(days <= 7) return {label:`za ${days} dni`, group:"soon", days};
+  return {label:`za ${days} dni`, group:"later", days};
+}
+
+function objectionPrompt(objection){
+  const prompts = {
+    "Cena":"Wrócić do wartości: gotowy punkt sprzedaży, mniej pilnowania i możliwość finansowania.",
+    "Niepewność co do popytu":"Zapytać o lokalizację, ruch przy gospodarstwie i pomysł na lokalną promocję.",
+    "Obawa o serwis / awarie":"Podkreślić wsparcie, wdrożenie i to, że nie zostaje sam z urządzeniem.",
+    "Brak miejsca / lokalizacji":"Porozmawiać o pawilonie albo prostszym punkcie sprzedaży przy gospodarstwie.",
+    "Chce zobaczyć przykład / referencje":"Zaproponować pokazanie przykładu, zdjęć albo rozmowę po pierwszych realizacjach.",
+    "Czeka na kredyt / dotację":"Dopytać o termin decyzji i przypomnieć o finansowaniu bez obiecywania dotacji.",
+    "Musi skonsultować z rodziną / wspólnikiem":"Zaproponować krótkie podsumowanie argumentów do przekazania dalej.",
+    "Brak formalności":"Wyjaśnić, że pomagamy uporządkować dokumenty i start sprzedaży krok po kroku.",
+    "Inne":"Zapytać, co konkretnie blokuje decyzję i zapisać następną akcję."
+  };
+  return prompts[objection] || "Zapytać, co dziś najbardziej blokuje decyzję i ustalić następny konkretny krok.";
+}
+
 function setClientsView(view){
   currentClientsView = view;
   document.querySelectorAll(".crmViewBtn").forEach(btn=>btn.classList.toggle("active", btn.id === `clientsView${view==="followups"?"Follow":view==="kanban"?"Kanban":"Table"}Btn`));
@@ -1504,16 +1582,20 @@ function renderClientsKanban(list){
 
 function renderClientKanbanCard(c){
   const contact = clientContact(c);
-  const note = crmShort(c.notatki, 105);
+  const product = clientProduct(c);
+  const followup = followupInfo(clientFollowup(c));
+  const objection = crmShort(clientObjections(c), 90);
   return `
     <div class="kanbanCard" onclick="openClientCard('${crmEsc(c.id)}')">
       <div class="kanbanName">${crmEsc(clientName(c))}</div>
       <div class="kanbanMeta">
         <span class="kanbanPill">${crmEsc(labelFrom(PRIO_OPTS, c.priorytet))}</span>
-        ${c.zainteresowanie ? `<span class="kanbanPill">${crmEsc(c.zainteresowanie)}</span>` : ""}
+        <span class="kanbanPill">${crmEsc(labelFrom(STATUS_OPTS, c.status))}</span>
+        ${product ? `<span class="kanbanPill">${crmEsc(product)}</span>` : ""}
+        <span class="kanbanPill gold">${crmEsc(followup.label)}</span>
       </div>
       ${contact ? `<div class="kanbanContact">${crmEsc(contact)}</div>` : ""}
-      ${note ? `<div class="kanbanNote">${crmEsc(note)}</div>` : ""}
+      ${objection ? `<div class="kanbanNote">Obiekcja: ${crmEsc(objection)}</div>` : ""}
     </div>
   `;
 }
@@ -1525,16 +1607,16 @@ function renderClientsFollowups(list){
     el.innerHTML = '<div class="empty">Brak klientow pasujacych do filtrow.</div>';
     return;
   }
-  const used = new Set();
-  const group = predicate => list.filter(c=>{
-    if(used.has(c.id) || !predicate(c)) return false;
-    used.add(c.id);
-    return true;
+  const sorted = [...list].sort((a,b)=>{
+    const ad = clientFollowup(a) || "9999-12-31";
+    const bd = clientFollowup(b) || "9999-12-31";
+    return ad.localeCompare(bd);
   });
   const sections = [
-    ["Wysoki priorytet", group(c=>c.priorytet==="A")],
-    ["Aktywne rozmowy i oferty", group(c=>["kontakt","rozmowa","oferta","negocjacje","zglosil_sie"].includes(c.status))],
-    ["Brak historii lub notatki", group(c=>!(c.historia||[]).length || !String(c.notatki||"").trim())]
+    ["Dzisiaj / po terminie", sorted.filter(c=>followupInfo(clientFollowup(c)).group==="today")],
+    ["Najbliższe 7 dni", sorted.filter(c=>followupInfo(clientFollowup(c)).group==="soon")],
+    ["Wysoki priorytet bez terminu", sorted.filter(c=>!clientFollowup(c) && c.priorytet==="A")],
+    ["Bez ustawionego follow-upu", sorted.filter(c=>!clientFollowup(c) && c.priorytet!=="A")]
   ];
   el.innerHTML = sections.map(([title,items])=>`
     <div class="followGroup">
@@ -1547,16 +1629,19 @@ function renderClientsFollowups(list){
 }
 
 function renderFollowupItem(c){
-  const hist = c.historia || [];
-  const lastHistoryText = hist.length ? hist[hist.length - 1].tekst : "";
-  const note = crmShort(c.notatki || lastHistoryText, 90);
+  const followup = followupInfo(clientFollowup(c));
+  const reason = clientObjections(c) || c.notatki || (c.historia || []).slice(-1)[0]?.tekst || "";
+  const note = crmShort(reason, 110);
+  const product = clientProduct(c);
+  const prompt = objectionPrompt(clientObjections(c));
   return `
     <div class="followItem">
       <div><b>${crmEsc(clientName(c))}</b><br><span class="kanbanContact">${crmEsc(clientContact(c) || clientLocation(c) || "brak kontaktu")}</span></div>
-      <div>${crmEsc(labelFrom(STATUS_OPTS, c.status))}</div>
-      <div>${crmEsc(labelFrom(PRIO_OPTS, c.priorytet))}</div>
+      <div>${crmEsc(product || labelFrom(STATUS_OPTS, c.status))}</div>
+      <div>${crmEsc(clientFollowup(c) ? `${clientFollowup(c)} (${followup.label})` : "brak follow-upu")}</div>
       <div class="followAction"><button class="histBtn" onclick="openClientCard('${crmEsc(c.id)}')">Karta klienta</button></div>
       ${note ? `<div class="kanbanNote" style="grid-column:1/-1">${crmEsc(note)}</div>` : ""}
+      <div class="kanbanNote" style="grid-column:1/-1"><b>Co powiedzieć:</b> ${crmEsc(prompt)}</div>
     </div>
   `;
 }
@@ -1567,16 +1652,28 @@ function openClientCard(clientId){
   const box = document.getElementById("clientCardContent");
   if(!c || !box) return;
   const hist = c.historia || [];
+  const followup = followupInfo(clientFollowup(c));
   box.innerHTML = `
-    <h2>Karta klienta</h2>
-    <h3>${crmEsc(clientName(c))}</h3>
+    <div class="clientCardTop">
+      <div>
+        <h2>${crmEsc(clientName(c))}</h2>
+        <div class="kanbanContact">${crmEsc(clientContact(c) || clientLocation(c) || "brak kontaktu")}</div>
+      </div>
+      <div class="clientCardBadges">
+        <span class="kanbanPill">${crmEsc(labelFrom(STATUS_OPTS, c.status))}</span>
+        <span class="kanbanPill">${crmEsc(labelFrom(PRIO_OPTS, c.priorytet))}</span>
+        <span class="kanbanPill gold">${crmEsc(followup.label)}</span>
+      </div>
+    </div>
     <div class="clientCardGrid">
       <div class="clientCardField"><b>Telefon</b>${crmEsc(c.telefon || "brak")}</div>
       <div class="clientCardField"><b>E-mail</b>${crmEsc(c.email || "brak")}</div>
       <div class="clientCardField"><b>Lokalizacja</b>${crmEsc(clientLocation(c) || c.ulica || "brak")}</div>
-      <div class="clientCardField"><b>Status</b>${crmEsc(labelFrom(STATUS_OPTS, c.status))}</div>
-      <div class="clientCardField"><b>Priorytet</b>${crmEsc(labelFrom(PRIO_OPTS, c.priorytet))}</div>
+      <div class="clientCardField"><b>Skąd trafił</b>${clientField(c,null,"source")}</div>
+      <div class="clientCardField"><b>Czym zainteresowany</b>${clientField(c,null,"product")}</div>
+      <div class="clientCardField"><b>Następny kontakt</b>${clientField(c,"nastepnyFollowup","date")}</div>
       <div class="clientCardField"><b>Zainteresowanie</b>${crmEsc(c.zainteresowanie || "brak")}</div>
+      <div class="clientCardField"><b>Co go powstrzymuje</b>${clientField(c,null,"objection")}</div>
     </div>
     <div class="clientCardNotes"><b>Notatki</b><br>${crmEsc(c.notatki || "Brak notatek.")}</div>
     <div class="clientCardHistory">
@@ -1613,7 +1710,7 @@ function renderClients(){
   if(fStatus) list = list.filter(c=>c.status===fStatus);
   if(fPrio) list = list.filter(c=>c.priorytet===fPrio);
   if(fText){
-    list = list.filter(c => ["firma","osoba","miejscowosc","telefon","email","wojewodztwo","zainteresowanie"]
+    list = list.filter(c => ["firma","osoba","miejscowosc","telefon","email","wojewodztwo","zainteresowanie","produkt","zrodloLeada","obiekcje"]
       .some(f => (c[f]||"").toLowerCase().includes(fText)));
   }
   if(sortBy==="priorytet") list.sort((a,b)=>(a.priorytet||"Z").localeCompare(b.priorytet||"Z"));
@@ -1631,7 +1728,7 @@ function renderClients(){
   }
 
   if(list.length===0){
-    body.innerHTML = `<tr><td colspan="13" class="empty">Brak klientów pasujących do filtrów.</td></tr>`;
+    body.innerHTML = `<tr><td colspan="14" class="empty">Brak klientów pasujących do filtrów.</td></tr>`;
     return;
   }
   const phoneCounts = {};
@@ -1655,7 +1752,8 @@ function renderClients(){
       <td>${clientField(c,"ulica")}</td>
       <td>${clientField(c,"telefon")}</td>
       <td>${clientField(c,"email")}</td>
-      <td>${clientField(c,null,"zain")}</td>
+      <td>${clientField(c,null,"product")}</td>
+      <td>${clientField(c,"nastepnyFollowup","date")}</td>
       <td>${clientField(c,null,"prio")}</td>
       <td>${clientField(c,null,"status")}</td>
       <td>${clientField(c,"notatki","textarea")}</td>
@@ -1675,6 +1773,7 @@ function addClient(){
   const now = new Date().toISOString();
   data.klienci.push({id:"c_"+Date.now(), firma:"", osoba:"", wojewodztwo:"", miejscowosc:"", ulica:"",
                       telefon:"", email:"", zainteresowanie:"", priorytet:"B", status:"nowy", notatki:"",
+                      nastepnyFollowup:"", zrodloLeada:"", produkt:"", obiekcje:"",
                       utworzono: now, zaktualizowano: now, historia: []});
   logActivity("dodał(a) nowego klienta");
   saveData(); renderClients(); renderStatsBar();
@@ -1699,6 +1798,10 @@ function updateClient(el){
     }
     saveData();
     if(field==="status" || field==="priorytet") renderStatsBar();
+    if(["produkt","nastepnyFollowup","zrodloLeada","obiekcje"].includes(field)){
+      renderClients();
+      if(currentClientCardId===id) openClientCard(id);
+    }
   }
 }
 
@@ -1730,6 +1833,10 @@ function exportClientsToXlsx(){
     "Firma / gospodarstwo": c.firma, "Imię i nazwisko": c.osoba, "Województwo": c.wojewodztwo,
     "Miejscowość": c.miejscowosc, "Ulica": c.ulica, "Telefon": c.telefon, "E-mail": c.email,
     "Zainteresowanie": c.zainteresowanie,
+    "Skąd trafił": clientLeadSource(c),
+    "Czym zainteresowany": clientProduct(c),
+    "Następny kontakt": clientFollowup(c),
+    "Co go powstrzymuje": clientObjections(c),
     "Priorytet": PRIO_OPTS.find(p=>p[0]===c.priorytet)?.[1] || c.priorytet,
     "Status": STATUS_OPTS.find(s=>s[0]===c.status)?.[1] || c.status,
     "Notatki": c.notatki
@@ -1740,6 +1847,13 @@ function exportClientsToXlsx(){
   const dateStr = new Date().toISOString().slice(0,10);
   XLSX.writeFile(wb, `Baza_klientow_${dateStr}.xlsx`);
   logActivity("wyeksportował(a) bazę klientów do XLSX");
+}
+
+function xlsxVal(row, names){
+  for(const name of names){
+    if(row[name] !== undefined && row[name] !== null) return row[name].toString();
+  }
+  return "";
 }
 
 async function importClientsFromXlsx(){
@@ -1777,6 +1891,10 @@ async function importClientsFromXlsx(){
         telefon: telefon,
         email: (r["E-mail"]||"").toString(),
         zainteresowanie: (r["Zainteresowanie"]||"").toString(),
+        nastepnyFollowup: xlsxVal(r, ["Następny kontakt","Nastepny kontakt","Następny follow-up","Nastepny follow-up","nastepnyFollowup"]).trim(),
+        zrodloLeada: xlsxVal(r, ["Skąd trafił","Skad trafil","Źródło leada","Zrodlo leada","zrodloLeada"]).trim(),
+        produkt: xlsxVal(r, ["Czym zainteresowany","Produkt","produkt"]).trim(),
+        obiekcje: xlsxVal(r, ["Co go powstrzymuje","Obiekcje","obiekcje"]).trim(),
         priorytet: PRIO_MAP[(r["Priorytet"]||"").toString()] || "B",
         status: STATUS_MAP[(r["Status"]||"").toString()] || "nowy",
         notatki: (r["Notatki"]||"").toString(),
