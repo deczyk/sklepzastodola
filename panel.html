@@ -419,6 +419,37 @@
   table.clients input:focus, table.clients select:focus, table.clients textarea:focus{
       border-color:#bfd9c4;background:white;box-shadow:0 0 0 3px #2f7a4512}
   select.statCell{background:#f3f8f4;border:1px solid #cfe2d2;color:#2d5a27;font-weight:bold;border-radius:999px}
+  .crmViewBar{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:14px 0 12px;flex-wrap:wrap}
+  .crmViewToggle{display:flex;gap:6px;background:#f4f8f5;border:1px solid var(--line);border-radius:12px;padding:5px}
+  .crmViewBtn{border:0;background:transparent;color:#506156;border-radius:8px;padding:8px 12px;font-weight:bold;cursor:pointer}
+  .crmViewBtn.active{background:white;color:var(--green);box-shadow:0 6px 16px #1d3b2412}
+  .crmHint{font-size:12px;color:var(--muted)}
+  .clientsKanban{display:none;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;align-items:start}
+  .kanbanColumn{background:#f8fbf8;border:1px solid var(--line);border-radius:12px;padding:10px;min-height:120px}
+  .kanbanHead{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:10px;font-weight:bold;color:#355b3a}
+  .kanbanCount{font-size:12px;color:#6c7a70;background:white;border:1px solid #e0ebe3;border-radius:999px;padding:2px 8px}
+  .kanbanCard{background:white;border:1px solid #e5eee7;border-radius:10px;padding:10px;margin-bottom:8px;cursor:pointer;
+              box-shadow:0 6px 14px #1d3b240a}
+  .kanbanCard:hover{border-color:#bfd9c4;box-shadow:0 10px 20px #1d3b2412;transform:translateY(-1px)}
+  .kanbanName{font-weight:bold;color:#263b2b;margin-bottom:6px}
+  .kanbanMeta{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:7px}
+  .kanbanPill{font-size:11px;background:#f3f8f4;color:#2d5a27;border:1px solid #d8e7db;border-radius:999px;padding:3px 7px}
+  .kanbanContact,.kanbanNote{font-size:12px;color:#647066;line-height:1.35}
+  .clientsFollowups{display:none}
+  .followGroup{background:white;border:1px solid var(--line);border-radius:12px;margin-bottom:12px;padding:12px}
+  .followGroup h3{margin:0 0 8px;font-size:14px;color:#355b3a}
+  .followList{display:grid;gap:8px}
+  .followItem{display:grid;grid-template-columns:minmax(160px,1.2fr) minmax(150px,1fr) minmax(120px,.8fr) auto;
+              gap:10px;align-items:center;border-top:1px solid #eef3ef;padding-top:8px;font-size:13px}
+  .followItem:first-child{border-top:0;padding-top:0}
+  .followAction{white-space:nowrap}
+  .clientCardBox{background:white;border-radius:14px;max-width:780px;width:calc(100vw - 36px);max-height:88vh;overflow:auto;padding:22px;
+                 box-shadow:0 24px 70px #10201833}
+  .clientCardGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:14px 0}
+  .clientCardField{background:#f8fbf8;border:1px solid #e4eee6;border-radius:10px;padding:10px}
+  .clientCardField b{display:block;font-size:11px;color:#6b766f;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px}
+  .clientCardNotes,.clientCardHistory{border:1px solid var(--line);border-radius:10px;padding:12px;margin-top:12px;background:#fff}
+  .clientCardHistory .historyEntry{box-shadow:none}
 
   .statusPill,.prio,.dashPill,.terminBadge,.ktoBadge{letter-spacing:.01em}
   .statusPill{padding:4px 10px}
@@ -435,6 +466,8 @@
     .dashKpiRow{grid-template-columns:1fr}
     .tabBtn{width:100%;text-align:left}
     .whoRow{width:100%}
+    .followItem{grid-template-columns:1fr}
+    .clientCardGrid{grid-template-columns:1fr}
   }
 
 </style>
@@ -614,6 +647,14 @@
         <button class="importBtn" style="background:#a34747" onclick="removeDuplicateClients()">🗑 Usuń duplikaty</button>
         <span id="importMsg"></span>
       </div>
+      <div class="crmViewBar">
+        <div class="crmViewToggle" aria-label="Widok klientow">
+          <button class="crmViewBtn active" id="clientsViewTableBtn" onclick="setClientsView('table')">Tabela</button>
+          <button class="crmViewBtn" id="clientsViewKanbanBtn" onclick="setClientsView('kanban')">Kanban</button>
+          <button class="crmViewBtn" id="clientsViewFollowBtn" onclick="setClientsView('followups')">Do kontaktu</button>
+        </div>
+        <div class="crmHint">Widoki robocze korzystaja tylko z obecnych danych klientow.</div>
+      </div>
       <div class="filterRow">
         <select id="filterStatus" onchange="renderClients()">
           <option value="">Wszystkie statusy</option>
@@ -647,6 +688,8 @@
           <tbody id="clientsBody"></tbody>
         </table>
       </div>
+      <div id="clientsKanban" class="clientsKanban"></div>
+      <div id="clientsFollowups" class="clientsFollowups"></div>
     </div>
     </div>
 
@@ -822,6 +865,13 @@
         <textarea id="historyNewEntry" placeholder="Np. Dzwoniłem, zainteresowany, oddzwaniam za tydzień..."></textarea>
         <button class="save" onclick="addHistoryEntry()">+ Dodaj wpis</button>
       </div>
+    </div>
+  </div>
+
+  <div id="clientCardModal" class="previewModal" onclick="if(event.target===this) closeClientCard()">
+    <div class="clientCardBox">
+      <button class="previewClose" onclick="closeClientCard()">Zamknij</button>
+      <div id="clientCardContent"></div>
     </div>
   </div>
 </div>
@@ -1388,6 +1438,167 @@ function populateFilterOptions(){
   if(fp && fp.options.length===1) PRIO_OPTS.forEach(([v,l])=>fp.add(new Option(l,v)));
 }
 
+let currentClientsView = "table";
+let currentClientCardId = null;
+
+function crmEsc(value){
+  return (value ?? "").toString().replace(/[&<>"']/g, ch => ({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+  }[ch]));
+}
+
+function crmShort(value, limit=120){
+  const txt = (value || "").toString().trim();
+  return txt.length > limit ? txt.slice(0, limit - 1) + "..." : txt;
+}
+
+function clientName(c){
+  return c.firma || c.osoba || "Bez nazwy";
+}
+
+function labelFrom(opts, value){
+  return opts.find(x=>x[0]===value)?.[1] || value || "brak";
+}
+
+function clientLocation(c){
+  return [c.miejscowosc, c.wojewodztwo].filter(Boolean).join(", ");
+}
+
+function clientContact(c){
+  return [c.telefon, c.email].filter(Boolean).join(" | ");
+}
+
+function setClientsView(view){
+  currentClientsView = view;
+  document.querySelectorAll(".crmViewBtn").forEach(btn=>btn.classList.toggle("active", btn.id === `clientsView${view==="followups"?"Follow":view==="kanban"?"Kanban":"Table"}Btn`));
+  renderClients();
+}
+
+function setClientsViewContainers(){
+  const section = document.getElementById("section-klienci");
+  const tableWrap = section?.querySelector(".tableWrap");
+  const kanban = document.getElementById("clientsKanban");
+  const followups = document.getElementById("clientsFollowups");
+  if(tableWrap) tableWrap.style.display = currentClientsView === "table" ? "" : "none";
+  if(kanban) kanban.style.display = currentClientsView === "kanban" ? "grid" : "none";
+  if(followups) followups.style.display = currentClientsView === "followups" ? "block" : "none";
+}
+
+function renderClientsKanban(list){
+  const el = document.getElementById("clientsKanban");
+  if(!el) return;
+  if(list.length===0){
+    el.innerHTML = '<div class="empty">Brak klientow pasujacych do filtrow.</div>';
+    return;
+  }
+  el.innerHTML = STATUS_OPTS.map(([status,label])=>{
+    const items = list.filter(c=>c.status===status);
+    return `
+      <div class="kanbanColumn">
+        <div class="kanbanHead"><span>${crmEsc(label)}</span><span class="kanbanCount">${items.length}</span></div>
+        ${items.length ? items.map(c=>renderClientKanbanCard(c)).join("") : '<div class="empty">Brak klientow.</div>'}
+      </div>
+    `;
+  }).join("");
+}
+
+function renderClientKanbanCard(c){
+  const contact = clientContact(c);
+  const note = crmShort(c.notatki, 105);
+  return `
+    <div class="kanbanCard" onclick="openClientCard('${crmEsc(c.id)}')">
+      <div class="kanbanName">${crmEsc(clientName(c))}</div>
+      <div class="kanbanMeta">
+        <span class="kanbanPill">${crmEsc(labelFrom(PRIO_OPTS, c.priorytet))}</span>
+        ${c.zainteresowanie ? `<span class="kanbanPill">${crmEsc(c.zainteresowanie)}</span>` : ""}
+      </div>
+      ${contact ? `<div class="kanbanContact">${crmEsc(contact)}</div>` : ""}
+      ${note ? `<div class="kanbanNote">${crmEsc(note)}</div>` : ""}
+    </div>
+  `;
+}
+
+function renderClientsFollowups(list){
+  const el = document.getElementById("clientsFollowups");
+  if(!el) return;
+  if(list.length===0){
+    el.innerHTML = '<div class="empty">Brak klientow pasujacych do filtrow.</div>';
+    return;
+  }
+  const used = new Set();
+  const group = predicate => list.filter(c=>{
+    if(used.has(c.id) || !predicate(c)) return false;
+    used.add(c.id);
+    return true;
+  });
+  const sections = [
+    ["Wysoki priorytet", group(c=>c.priorytet==="A")],
+    ["Aktywne rozmowy i oferty", group(c=>["kontakt","rozmowa","oferta","negocjacje","zglosil_sie"].includes(c.status))],
+    ["Brak historii lub notatki", group(c=>!(c.historia||[]).length || !String(c.notatki||"").trim())]
+  ];
+  el.innerHTML = sections.map(([title,items])=>`
+    <div class="followGroup">
+      <h3>${crmEsc(title)} (${items.length})</h3>
+      <div class="followList">
+        ${items.length ? items.map(c=>renderFollowupItem(c)).join("") : '<div class="empty">Brak pozycji w tej grupie.</div>'}
+      </div>
+    </div>
+  `).join("");
+}
+
+function renderFollowupItem(c){
+  const hist = c.historia || [];
+  const lastHistoryText = hist.length ? hist[hist.length - 1].tekst : "";
+  const note = crmShort(c.notatki || lastHistoryText, 90);
+  return `
+    <div class="followItem">
+      <div><b>${crmEsc(clientName(c))}</b><br><span class="kanbanContact">${crmEsc(clientContact(c) || clientLocation(c) || "brak kontaktu")}</span></div>
+      <div>${crmEsc(labelFrom(STATUS_OPTS, c.status))}</div>
+      <div>${crmEsc(labelFrom(PRIO_OPTS, c.priorytet))}</div>
+      <div class="followAction"><button class="histBtn" onclick="openClientCard('${crmEsc(c.id)}')">Karta klienta</button></div>
+      ${note ? `<div class="kanbanNote" style="grid-column:1/-1">${crmEsc(note)}</div>` : ""}
+    </div>
+  `;
+}
+
+function openClientCard(clientId){
+  currentClientCardId = clientId;
+  const c = data.klienci.find(x=>x.id===clientId);
+  const box = document.getElementById("clientCardContent");
+  if(!c || !box) return;
+  const hist = c.historia || [];
+  box.innerHTML = `
+    <h2>Karta klienta</h2>
+    <h3>${crmEsc(clientName(c))}</h3>
+    <div class="clientCardGrid">
+      <div class="clientCardField"><b>Telefon</b>${crmEsc(c.telefon || "brak")}</div>
+      <div class="clientCardField"><b>E-mail</b>${crmEsc(c.email || "brak")}</div>
+      <div class="clientCardField"><b>Lokalizacja</b>${crmEsc(clientLocation(c) || c.ulica || "brak")}</div>
+      <div class="clientCardField"><b>Status</b>${crmEsc(labelFrom(STATUS_OPTS, c.status))}</div>
+      <div class="clientCardField"><b>Priorytet</b>${crmEsc(labelFrom(PRIO_OPTS, c.priorytet))}</div>
+      <div class="clientCardField"><b>Zainteresowanie</b>${crmEsc(c.zainteresowanie || "brak")}</div>
+    </div>
+    <div class="clientCardNotes"><b>Notatki</b><br>${crmEsc(c.notatki || "Brak notatek.")}</div>
+    <div class="clientCardHistory">
+      <b>Historia kontaktu (${hist.length})</b>
+      ${hist.length ? [...hist].reverse().map(h=>`
+        <div class="historyEntry">
+          <span class="who">${crmEsc(h.kto)}</span><span class="when">${crmEsc(formatDT(h.data))}</span>
+          <div class="txt">${crmEsc(h.tekst)}</div>
+        </div>
+      `).join("") : '<div class="empty">Brak wpisow w historii.</div>'}
+      <button class="histBtn" onclick="openHistoryModal(currentClientCardId)">Otworz historie kontaktu</button>
+    </div>
+  `;
+  document.getElementById("clientCardModal").classList.add("open");
+}
+
+function closeClientCard(){
+  document.getElementById("clientCardModal").classList.remove("open");
+  document.getElementById("clientCardContent").innerHTML = "";
+  currentClientCardId = null;
+}
+
 function renderClients(){
   populateFilterOptions();
   const body = document.getElementById("clientsBody");
@@ -1408,6 +1619,16 @@ function renderClients(){
   if(sortBy==="priorytet") list.sort((a,b)=>(a.priorytet||"Z").localeCompare(b.priorytet||"Z"));
   if(sortBy==="status") list.sort((a,b)=>(a.status||"").localeCompare(b.status||""));
   if(sortBy==="miejscowosc") list.sort((a,b)=>(a.miejscowosc||"").localeCompare(b.miejscowosc||""));
+
+  setClientsViewContainers();
+  if(currentClientsView==="kanban"){
+    renderClientsKanban(list);
+    return;
+  }
+  if(currentClientsView==="followups"){
+    renderClientsFollowups(list);
+    return;
+  }
 
   if(list.length===0){
     body.innerHTML = `<tr><td colspan="13" class="empty">Brak klientów pasujących do filtrów.</td></tr>`;
