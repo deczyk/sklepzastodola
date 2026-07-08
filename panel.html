@@ -722,6 +722,10 @@
       <div class="backupPreview">
         <h3>Podgląd paczki importu danych</h3>
         <div class="privateNotice"><b>Uwaga:</b> To jest tylko podgląd paczki importu. Dane nie są zapisywane ani dopisywane do panelu.</div>
+        <div class="backupActions">
+          <button class="importBtn" onclick="downloadImportPackageTemplate()">Pobierz szablon paczki importu JSON</button>
+          <span class="backupHint">Ten szablon służy do przygotowania paczki danych do późniejszego podglądu/importu. Samo pobranie szablonu niczego nie zmienia w panelu.</span>
+        </div>
         <input type="file" id="importPackagePreviewFile" accept=".json,application/json" onchange="previewImportPackageJsonFile(this)">
         <div id="importPackagePreviewResult" class="backupPreviewResult"></div>
       </div>
@@ -3051,6 +3055,33 @@ function exportPanelBackupJson(){
   const a = document.createElement("a");
   a.href = url;
   a.download = `sklepzastodola-panel-backup-${backupTimestamp()}.json`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}
+
+function downloadImportPackageTemplate(){
+  const d = new Date();
+  const pad = n => n.toString().padStart(2, "0");
+  const template = {
+    wersja: "1.0",
+    zrodlo: "import-reczny",
+    tryb: "podglad",
+    dokumenty: [],
+    cenniki: [],
+    materialySprzedazowe: [],
+    budzetStartowy: [],
+    klienci: [],
+    oferty: [],
+    notatki: []
+  };
+  const json = JSON.stringify(template, null, 2);
+  const blob = new Blob([json], {type:"application/json"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `sklepzastodola-import-template-${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}.json`;
   document.body.appendChild(a);
   a.click();
   a.remove();
