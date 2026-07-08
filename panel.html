@@ -742,6 +742,18 @@
           </div>
           <div id="documentImportResult" class="backupPreviewResult"></div>
         </div>
+        <div class="backupPreview">
+          <h3>Import budżetu startowego</h3>
+          <div class="privateNotice"><b>Bezpieczny import:</b> Import dopisuje wyłącznie pozycje budżetu startowego. Nie importuje klientów, ofert, notatek, dokumentów, cenników, finansów ani checklist.</div>
+          <div class="backupActions">
+            <label><input type="checkbox" id="importStartupBudgetSection" onchange="updateBudgetImportButton()"> Importuj budżet startowy</label>
+          </div>
+          <div class="backupActions">
+            <input type="text" id="budgetImportConfirm" placeholder="Wpisz IMPORTUJ, aby dopisać budżet" oninput="updateBudgetImportButton()">
+            <button class="importBtn" id="budgetImportBtn" onclick="importStartupBudgetSection()" disabled>Importuj budżet startowy</button>
+          </div>
+          <div id="budgetImportResult" class="backupPreviewResult"></div>
+        </div>
       </div>
     </div>
     </div>
@@ -3260,6 +3272,7 @@ function previewImportPackageJsonFile(input){
   const file = input && input.files && input.files[0];
   currentImportPackagePreview = null;
   updateDocumentImportButton();
+  updateBudgetImportButton();
   if(!result) return;
   if(!file){
     result.innerHTML = "";
@@ -3273,15 +3286,18 @@ function previewImportPackageJsonFile(input){
       currentImportPackagePreview = parsed;
       renderImportPackagePreview(parsed, file.name);
       updateDocumentImportButton();
+      updateBudgetImportButton();
     }catch(e){
       currentImportPackagePreview = null;
       updateDocumentImportButton();
+      updateBudgetImportButton();
       result.innerHTML = `<div class="backupPreviewStatus error"><b>Niepoprawny JSON.</b><br>${crmEsc(e.message || "Nie udało się odczytać pliku.")}</div>`;
     }
   };
   reader.onerror = () => {
     currentImportPackagePreview = null;
     updateDocumentImportButton();
+    updateBudgetImportButton();
     result.innerHTML = '<div class="backupPreviewStatus error"><b>Nie udało się odczytać pliku.</b></div>';
   };
   reader.readAsText(file);
@@ -3446,6 +3462,109 @@ function importSelectedDocumentSections(){
   updateDocumentImportButton();
   if(result){
     result.innerHTML = `<div class="backupPreviewStatus"><b>Import zakończony.</b><br>Dodano rekordów: ${docsToAdd.length}<br>Pominięto duplikatów: ${skippedDuplicates}</div>`;
+  }
+}
+
+function updateBudgetImportButton(){
+  const btn = document.getElementById("budgetImportBtn");
+  const checkbox = document.getElementById("importStartupBudgetSection");
+  const confirm = document.getElementById("budgetImportConfirm");
+  if(!btn) return;
+  const hasPackage = !!currentImportPackagePreview && typeof currentImportPackagePreview === "object" && !Array.isArray(currentImportPackagePreview);
+  const hasBudgetArray = hasPackage && Array.isArray(currentImportPackagePreview.budzetStartowy);
+  const checked = !!(checkbox && checkbox.checked);
+  const confirmed = (confirm && confirm.value.trim()) === "IMPORTUJ";
+  btn.disabled = !(hasBudgetArray && checked && confirmed);
+}
+
+function validateImportBudgetAmount(value){
+  const raw = (value === null || value === undefined) ? "" : value.toString().trim();
+  if(!raw) return {ok:true, value:0};
+  const normalized = raw.replace(",", ".");
+  if(!/^\d+(\.\d+)?$/.test(normalized)) return {ok:false};
+  const amount = Number(normalized);
+  return Number.isFinite(amount) && amount >= 0 ? {ok:true, value:amount} : {ok:false};
+}
+
+function validateImportBudgetCurrency(value){
+  const currency = (value || "PLN").toString().trim().toUpperCase();
+  return ["PLN","EUR"].includes(currency) ? {ok:true, value:currency} : {ok:false};
+}
+
+function normalizeImportBudgetItem(item){
+  const source = item || {};
+  const amount = validateImportBudgetAmount(source.kwota);
+  const currency = validateImportBudgetCurrency(source.waluta);
+  if(!amount.ok || !currency.ok) return null;
+  const nowTs = importNow();
+  return {
+    id: `b_${Date.now()}_${Math.random().toString(36).slice(2,8)}`,
+    nazwa: importValue(source.nazwa || source.title || "Pozycja budżetu bez nazwy"),
+    kategoria: importValue(source.kategoria || "Inne"),
+    kwota: amount.value,
+    waluta: currency.value,
+    status: importValue(source.status || "Robocze"),
+    notatka: importValue(source.notatka || source.desc || source.notes || ""),
+    dataUtworzenia: importValue(source.dataUtworzenia || nowTs),
+    dataAktualizacji: importValue(source.dataAktualizacji || nowTs)
+  };
+}
+
+function importBudgetDuplicate(item, existingItems){
+  const key = [item.nazwa, item.kategoria, item.kwota, item.waluta].map(importTextKey).join("|");
+  return (existingItems || []).some(existing =>
+    key === [existing.nazwa, existing.kategoria, existing.kwota, existing.waluta].map(importTextKey).join("|")
+  );
+}
+
+function importStartupBudgetSection(){
+  const result = document.getElementById("budgetImportResult");
+  const checkbox = document.getElementById("importStartupBudgetSection");
+  const confirm = document.getElementById("budgetImportConfirm");
+  if(!currentImportPackagePreview || typeof currentImportPackagePreview !== "object" || Array.isArray(currentImportPackagePreview)){
+    if(result) result.innerHTML = '<div class="backupPreviewStatus error"><b>Najpierw wczytaj poprawną paczkę JSON.</b></div>';
+    return;
+  }
+  if(!Array.isArray(currentImportPackagePreview.budzetStartowy)){
+    if(result) result.innerHTML = '<div class="backupPreviewStatus error"><b>Paczka nie zawiera sekcji budzetStartowy jako tablicy.</b></div>';
+    return;
+  }
+  if(!checkbox || !checkbox.checked){
+    if(result) result.innerHTML = '<div class="backupPreviewStatus error"><b>Zaznacz import budżetu startowego.</b></div>';
+    return;
+  }
+  if(!confirm || confirm.value.trim() !== "IMPORTUJ"){
+    if(result) result.innerHTML = '<div class="backupPreviewStatus error"><b>Wpisz IMPORTUJ, aby dopisać budżet.</b></div>';
+    return;
+  }
+
+  exportPanelBackupJson();
+
+  if(!Array.isArray(data.budzetStartowy)) data.budzetStartowy = [];
+  const itemsToAdd = [];
+  let skippedDuplicates = 0;
+  let rejected = 0;
+  currentImportPackagePreview.budzetStartowy.forEach(item => {
+    const normalized = normalizeImportBudgetItem(item);
+    if(!normalized){
+      rejected++;
+      return;
+    }
+    if(importBudgetDuplicate(normalized, data.budzetStartowy.concat(itemsToAdd))){
+      skippedDuplicates++;
+    } else {
+      itemsToAdd.push(normalized);
+    }
+  });
+
+  if(itemsToAdd.length){
+    data.budzetStartowy.push(...itemsToAdd);
+  }
+  saveData();
+  render();
+  updateBudgetImportButton();
+  if(result){
+    result.innerHTML = `<div class="backupPreviewStatus"><b>Import budżetu zakończony.</b><br>Dodano pozycji: ${itemsToAdd.length}<br>Pominięto duplikatów: ${skippedDuplicates}<br>Odrzucono rekordów: ${rejected}</div>`;
   }
 }
 
