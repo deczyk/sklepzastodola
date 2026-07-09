@@ -57,8 +57,9 @@
   .docBadge.strict{background:#fff1f1;color:#9b2c2c;border-color:#f2c0c0}
   .docMeta{font-size:12px;color:var(--muted);display:flex;gap:10px;flex-wrap:wrap;margin-top:6px}
   .docWarning{font-size:12px;color:#8a5b00;background:#fff8e1;border-left:4px solid var(--accent);border-radius:8px;padding:8px 10px;margin-top:8px}
-  .delBtn{background:none;border:none;color:#c0392b;cursor:pointer;font-size:12px;opacity:0.55}
-  .delBtn:hover{opacity:1}
+  .delBtn{background:#fff5f4;border:1px solid #e2aaa4;color:#a33b33;cursor:pointer;font-size:12px;
+      border-radius:7px;padding:5px 8px;font-weight:bold;opacity:1}
+  .delBtn:hover{background:#ffecea;border-color:#c66b62}
 
   .newItemForm{display:none;gap:8px;flex-direction:column;border:1px dashed var(--line);border-radius:10px;
                padding:14px;margin-bottom:10px;background:#fafdfb}
@@ -487,6 +488,8 @@
               box-shadow:0 6px 14px #1d3b240a}
   .kanbanCard:hover{border-color:#bfd9c4;box-shadow:0 10px 20px #1d3b2412;transform:translateY(-1px)}
   .kanbanName{font-weight:bold;color:#263b2b;margin-bottom:6px}
+  .kanbanTop{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+  .kanbanDelete{flex-shrink:0;font-size:11px;padding:3px 7px}
   .kanbanMeta{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:7px}
   .kanbanPill{font-size:11px;background:#f3f8f4;color:#2d5a27;border:1px solid #d8e7db;border-radius:999px;padding:3px 7px}
   .kanbanPill.gold{background:#fff8df;color:#755c15;border-color:#ead99a}
@@ -933,7 +936,7 @@
               <th>Firma / gospodarstwo</th><th>Imię i nazwisko</th><th>Województwo</th><th>Miejscowość</th>
               <th>Ulica</th><th>Telefon</th><th>E-mail</th><th>Czym zainteresowany</th><th>Następny kontakt</th>
               <th>Priorytet</th><th>Status</th>
-              <th>Historia</th><th></th>
+              <th>Historia</th><th>Usuń</th>
             </tr>
           </thead>
           <tbody id="clientsBody"></tbody>
@@ -2320,9 +2323,13 @@ function renderClientKanbanCard(c){
   const followup = followupInfo(clientFollowup(c));
   const objection = crmShort(clientObjections(c), 90);
   const last = clientActivitySummary(c, 90);
+  const id = crmEsc(c.id);
   return `
-    <div class="kanbanCard" onclick="openClientCard('${crmEsc(c.id)}')">
-      <div class="kanbanName">${crmEsc(clientName(c))}</div>
+    <div class="kanbanCard" onclick="openClientCard('${id}')">
+      <div class="kanbanTop">
+        <div class="kanbanName">${crmEsc(clientName(c))}</div>
+        <button class="delBtn kanbanDelete" onclick="event.stopPropagation(); deleteClient('${id}')">Usuń</button>
+      </div>
       <div class="kanbanMeta">
         <span class="kanbanPill">${crmEsc(labelFrom(PRIO_OPTS, c.priorytet))}</span>
         <span class="kanbanPill">${crmEsc(labelFrom(STATUS_OPTS, c.status))}</span>
@@ -2607,6 +2614,7 @@ function renderClients(){
     const mapsUrl = addr ? `https://www.google.com/maps/search/${encodeURIComponent(addr)}` : "";
     const rowTitle = `Dodano: ${c.utworzono?formatDT(c.utworzono):"—"} | Zaktualizowano: ${c.zaktualizowano?formatDT(c.zaktualizowano):"—"}`;
     const lastActivity = clientActivitySummary(c, 90);
+    const id = crmEsc(c.id);
     return `
     <tr title="${rowTitle}" class="${isDupe?'dupeRow':''}">
       <td>${isDupe?'<span class="dupeBadge" title="Możliwy duplikat — ten numer telefonu występuje więcej niż raz">⚠</span>':''}${clientField(c,"firma")}</td>
@@ -2620,8 +2628,8 @@ function renderClients(){
       <td>${clientField(c,"nastepnyFollowup","date")}</td>
       <td>${clientField(c,null,"prio")}</td>
       <td>${clientField(c,null,"status")}</td>
-      <td><button class="histBtn" onclick="openHistoryModal('${c.id}')">📜 ${(c.historia||[]).length}</button>${lastActivity ? `<div class="lastActivity">Ostatnie: ${crmEsc(lastActivity)}</div>` : ""}</td>
-      <td><button class="delBtn" onclick="deleteClient('${c.id}')">Usuń klienta</button></td>
+      <td><button class="histBtn" onclick="openHistoryModal('${id}')">📜 ${(c.historia||[]).length}</button>${lastActivity ? `<div class="lastActivity">Ostatnie: ${crmEsc(lastActivity)}</div>` : ""}</td>
+      <td><button class="delBtn" onclick="deleteClient('${id}')">Usuń</button></td>
     </tr>
   `;
   }).join("");
