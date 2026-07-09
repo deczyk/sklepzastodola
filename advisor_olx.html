@@ -503,7 +503,7 @@
         <p>Prosto i bez podawania danych kontaktowych na początku.</p>
         <div class="steps">
           <div class="step"><b>1</b><div><strong>Podajesz swoje liczby</strong><span>Ile mleka, jaka cena i jaki wariant inwestycji.</span></div></div>
-          <div class="step"><b>2</b><div><strong>Otrzymujesz kalkulację</strong><span>Szacunkowa marża, koszt po dotacji i czas zwrotu.</span></div></div>
+          <div class="step"><b>2</b><div><strong>Otrzymujesz kalkulację</strong><span>Szacowany potencjał, koszt po możliwym dofinansowaniu i scenariusz inwestycyjny.</span></div></div>
           <div class="step"><b>3</b><div><strong>Sam decydujesz</strong><span>Możesz wydrukować wynik albo poprosić o analizę.</span></div></div>
         </div>
       </aside>
@@ -540,7 +540,7 @@
               <div class="field">
                 <label for="package">Co Cię interesuje?</label>
                 <select id="package" name="package" required>
-                  <option value="120000">Sam mlekomat</option>
+                  <option value="120000">Mlekomat / wariant podstawowy</option>
                   <option value="150000">Mlekomat z dodatkowym wyposażeniem</option>
                   <option value="220000">Pawilon + mlekomat</option>
                   <option value="150000">Jeszcze nie wiem — wariant orientacyjny</option>
@@ -573,7 +573,7 @@
                   <b>Uwzględnij możliwe dofinansowanie</b>
                   <span>Wynik będzie orientacyjny. Każdy nabór i koszt kwalifikowalny wymaga osobnej weryfikacji.</span>
                 </div>
-                <label class="switch" aria-label="Uwzględnij dotację">
+                <label class="switch" aria-label="Uwzględnij dofinansowanie">
                   <input id="grantEnabled" type="checkbox">
                   <span class="slider"></span>
                 </label>
@@ -622,10 +622,10 @@
               <div class="score" id="score">0%</div>
             </div>
             <div class="metrics">
-              <div class="metric"><span>Dodatkowa marża miesięczna</span><strong id="monthlyMargin">0 zł</strong></div>
-              <div class="metric"><span>Dodatkowa marża roczna</span><strong id="annualMargin">0 zł</strong></div>
-              <div class="metric"><span>Koszt inwestycji po dotacji</span><strong id="netInvestment">0 zł</strong></div>
-              <div class="metric"><span>Orientacyjny czas zwrotu</span><strong id="payback">—</strong></div>
+              <div class="metric"><span>Potencjał miesięczny</span><strong id="monthlyMargin">0 zł</strong></div>
+              <div class="metric"><span>Potencjał roczny</span><strong id="annualMargin">0 zł</strong></div>
+              <div class="metric"><span>Koszt inwestycji po możliwym dofinansowaniu</span><strong id="netInvestment">0 zł</strong></div>
+              <div class="metric"><span>Orientacyjny czas odzyskania inwestycji</span><strong id="payback">—</strong></div>
             </div>
             <div class="result-bottom">
               <h4 id="recommendationTitle">Wstępna ocena</h4>
@@ -634,7 +634,7 @@
                 <a class="btn btn-secondary" href="#contact">Poproś o bezpłatną analizę</a>
                 <button class="btn btn-ghost" type="button" id="printResult">Drukuj / zapisz jako PDF</button>
               </div>
-              <div class="disclaimer">Kalkulacja ma charakter orientacyjny i nie stanowi obietnicy wyniku finansowego ani gwarancji otrzymania dotacji. „Dodatkowa marża” oznacza różnicę między sprzedażą bezpośrednią a sprzedażą do skupu, pomniejszoną o wpisany koszt sprzedaży jednego litra. Nie obejmuje podatków, kosztu własnej pracy, kosztu produkcji mleka ani wszystkich możliwych kosztów serwisowych i finansowych.</div>
+              <div class="disclaimer">To kalkulacja orientacyjna, nie gwarancja wyniku. Wynik zależy od ceny, lokalizacji, popytu, kosztów i organizacji sprzedaży. Pokazany potencjał oznacza różnicę między sprzedażą bezpośrednią a sprzedażą do skupu, pomniejszoną o wpisany koszt sprzedaży jednego litra. Nie obejmuje podatków, kosztu własnej pracy, kosztu produkcji mleka ani wszystkich możliwych kosztów serwisowych i finansowych.</div>
             </div>
           </section>
         </div>
@@ -647,7 +647,7 @@
           <div class="mini-list">
             <div class="mini-item"><span aria-hidden="true">✓</span><span>dobór mlekomatu i wyposażenia</span></div>
             <div class="mini-item"><span aria-hidden="true">✓</span><span>wstępna ocena lokalizacji i sprzedaży</span></div>
-            <div class="mini-item"><span aria-hidden="true">✓</span><span>możliwości leasingu lub dotacji</span></div>
+            <div class="mini-item"><span aria-hidden="true">✓</span><span>możliwości leasingu lub dofinansowania</span></div>
           </div>
         </div>
 
@@ -773,10 +773,10 @@
         }
 
         let recommendationTitle = "Projekt wymaga dokładniejszej analizy";
-        let recommendation = "Przy podanych wartościach dodatkowa marża jest zbyt niska lub ujemna. Sprawdź cenę sprzedaży, realny wolumen i koszt inwestycji.";
+        let recommendation = "Przy podanych wartościach potencjał sprzedaży jest zbyt niski lub ujemny. Sprawdź cenę sprzedaży, realny wolumen i koszt inwestycji.";
         if (paybackMonths <= 24) {
           recommendationTitle = "Bardzo dobry potencjał";
-          recommendation = "Podane wartości wskazują na krótki orientacyjny okres zwrotu. Warto sprawdzić lokalizację, wymagania techniczne i dobrać konkretny model mlekomatu.";
+          recommendation = "Podane wartości wskazują na krótki orientacyjny czas odzyskania inwestycji. Warto sprawdzić lokalizację, wymagania techniczne i dobrać konkretny wariant punktu sprzedaży.";
         } else if (paybackMonths <= 48) {
           recommendationTitle = "Dobry potencjał";
           recommendation = "Projekt wygląda obiecująco. Największy wpływ na wynik będą miały rzeczywisty wolumen sprzedaży, lokalizacja i końcowa konfiguracja urządzenia.";
@@ -799,7 +799,7 @@
         $("#monthlyMargin").textContent = numberPLN.format(monthlyMargin);
         $("#annualMargin").textContent = numberPLN.format(annualMargin);
         $("#netInvestment").textContent = numberPLN.format(netInvestment);
-        $("#payback").textContent = Number.isFinite(paybackMonths) ? (paybackMonths < 24 ? `${paybackMonths} mies.` : `${(paybackMonths / 12).toFixed(1).replace(".", ",")} lat`) : "brak zwrotu";
+        $("#payback").textContent = Number.isFinite(paybackMonths) ? (paybackMonths < 24 ? `${paybackMonths} mies.` : `${(paybackMonths / 12).toFixed(1).replace(".", ",")} lat`) : "brak wyniku";
         $("#score").textContent = `${score}%`;
         $("#recommendationTitle").textContent = recommendationTitle;
         $("#recommendation").textContent = recommendation;
@@ -823,7 +823,7 @@
 
       function buildMessage() {
         const c = lastCalculation;
-        const paybackText = Number.isFinite(c.paybackMonths) ? `${c.paybackMonths} miesięcy` : "brak zwrotu przy podanych założeniach";
+        const paybackText = Number.isFinite(c.paybackMonths) ? `${c.paybackMonths} miesięcy` : "brak wyniku przy podanych założeniach";
         return [
           "Proszę o kontakt w sprawie kalkulacji mlekomatu.",
           "",
@@ -838,9 +838,9 @@
           `Koszt sprzedaży: ${c.operatingCost.toFixed(2)} zł/l`,
           `Koszt inwestycji: ${numberPLN.format(c.investment)}`,
           `Dofinansowanie: ${c.grantEnabled ? `${c.grantRate}%` : "nie uwzględniono"}`,
-          `Szacunkowa dodatkowa marża roczna: ${numberPLN.format(c.annualMargin)}`,
-          `Koszt po dotacji: ${numberPLN.format(c.netInvestment)}`,
-          `Orientacyjny zwrot: ${paybackText}`,
+          `Szacowany potencjał roczny: ${numberPLN.format(c.annualMargin)}`,
+          `Koszt po możliwym dofinansowaniu: ${numberPLN.format(c.netInvestment)}`,
+          `Orientacyjny czas odzyskania inwestycji: ${paybackText}`,
           `Ocena: ${c.recommendationTitle} (${c.score}%)`,
           "",
           `Uwagi: ${$("#notes").value.trim() || "brak"}`
