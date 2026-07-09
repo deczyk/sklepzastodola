@@ -278,3 +278,85 @@ Do dopilnowania:
 - status VAT / VAT-R.
 - księgowość.
 - e-Doręczenia, jeśli wymagane / nieaktywne.
+
+## 2026-07-09 — strategia przychodów i oferty wokół sprzedaży bezpośredniej
+
+Status: robocze / kierunek strategiczny.
+
+Źródło: ustalenie użytkownika po audycie strony.
+
+Decyzja / założenie:
+- Sklep za Stodołą nie ma zarabiać wyłącznie na sprzedaży mlekomatu. Firma ma budować kilka źródeł przychodu wokół uruchamiania sprzedaży bezpośredniej dla rolnika.
+- Publiczna komunikacja ma iść w stronę: „gotowy system sprzedaży bezpośredniej”, „uruchom punkt sprzedaży przy gospodarstwie”, „mlekomat + pawilon + wdrożenie + dokumenty + marketing + opieka”.
+- Nie sprowadzać oferty do hasła „kup mlekomat”.
+
+Filary przychodów:
+- Sprzedaż i wdrożenie urządzeń BRUNIMAT.
+- Pawilon / punkt sprzedaży jako osobno wyceniony produkt, nie gratisowy dodatek.
+- Dokumentacja, konsulting ARiMR, analiza inwestycji i przygotowanie do procesu dotacyjnego jako osobna płatna usługa.
+- Wdrożenie sprzedaży bezpośredniej, prosty marketing lokalny i materiały startowe.
+- Abonament serwisowy / opieka po uruchomieniu jako możliwy przychód miesięczny.
+- Opcje dodatkowe BRUNIMAT wyceniane osobno.
+- Leady od partnerów rozliczane za skutecznie skierowanego klienta.
+
+Dokumentacja / konsulting ARiMR:
+- Pomoc w dokumentach, dotacjach, analizie inwestycji i przygotowaniu do procesu może być sprzedawana osobno, nawet zanim rolnik kupi mlekomat.
+- Publicznie nie obiecywać wygrania dotacji.
+- Bezpieczne publiczne sformułowania: „pomagamy przygotować dokumenty i przejść proces”, „decyzja zależy od programu, naboru i instytucji”, „wymaga aktualnej weryfikacji”.
+- Prywatnie traktować to jako osobne źródło przychodu za wiedzę i czas.
+
+Trzy poziomy oferty:
+- Podstawowy: sam mlekomat / minimum wdrożenia / minimum formalności. Opcja budżetowa, nie domyślna rekomendacja.
+- Standard: mlekomat + pawilon + pełne wdrożenie + pomoc w dotacji + prosty marketing lokalny. Logiczny środek oferty.
+- Premium: Standard + lepsze opcje urządzenia + rozbudowany pawilon + priorytetowa opieka/wsparcie od startu. Domyślna rekomendacja dla klienta, który chce gotowy system.
+- Trzymać się maksymalnie 3 poziomów, żeby rolnik się nie pogubił.
+
+Abonament serwisowy / opieka po uruchomieniu:
+- Osobny przychód miesięczny po sprzedaży.
+- Robocze poziomy prywatne: 299 / 449 / 649 zł miesięcznie.
+- Możliwy model: pierwszy rok opieki w cenie urządzenia/pakietu, później abonament.
+- Publicznie nie obiecywać czasów reakcji typu 12h, jeśli nie ma potwierdzonych zasobów.
+- Publicznie mówić raczej: „opieka”, „wsparcie”, „przeglądy”, „priorytet kontaktu”, „pomoc operacyjna”.
+- Konkretne ceny abonamentu zostają prywatne, dopóki nie zatwierdzimy zakresu.
+
+Cennik opcji BRUNIMAT:
+- Trzeba zdobyć pełny cennik opcji od BRUNIMAT.
+- Opcje dodatkowe mają być osobno wyceniane, szczególnie przy Standard/Premium.
+- Nie rozdawać opcji za darmo.
+- Publicznie nie pokazywać kosztów zakupu ani marż.
+
+Pawilon:
+- Pawilon nie jest gratisowym dodatkiem.
+- Trzeba zebrać 2-3 oferty od wykonawców/stolarzy.
+- Pawilon ma być osobną, wycenioną częścią pakietu.
+- Publicznie komunikować jako element gotowego punktu sprzedaży.
+- Prywatnie policzyć koszt, marżę i warianty.
+
+Leady od partnerów:
+- Możliwa współpraca z doradcami rolniczymi, firmami sprzedającymi sprzęt i osobami z dostępem do rolników.
+- Model: prowizja za skutecznie skierowanego klienta.
+- Płacić za wynik, nie za same słabe kontakty.
+- Pilnować jakości leadów.
+- Szczegóły prowizji prywatnie, nie publicznie.
+
+Klauzula kursowa EUR:
+- Oferty powinny chronić firmę przed zmianą kursu euro.
+- W ofertach dodać zastrzeżenie, że cena może zostać skorygowana przy istotnej zmianie kursu EUR/PLN.
+- To chroni marżę, ale nie jest elementem marketingowym na stronie głównej.
+
+Czego teraz nie robimy:
+- Nie budujemy własnego pełnego serwisu z magazynem części.
+- Nie inwestujemy w duże kampanie reklamowe.
+- Nie wdrażamy teraz sklepów autonomicznych 24/7.
+- Nie kupujemy urządzeń na zapas bez podpisanego klienta.
+- Nie pokazujemy prywatnych marż i kosztów na stronie publicznej.
+
+Cena 14 500 EUR:
+- Publicznie tylko ostrożnie jako Premium / pełny pakiet / BRUNIMAT 650 Premium DUO netto.
+- Nie jako „sam mlekomat”.
+- Nie jako jedyna cena dla wszystkich.
+
+Następne kroki:
+- Przy poprawkach strony używać tej strategii jako punktu odniesienia.
+- Przygotować bezpieczny publiczny język oferty bez kosztów zakupu, marż i cenników partnerskich.
+- Dopiero później zdecydować, czy i jak pokazywać publicznie pakiety Podstawowy / Standard / Premium.

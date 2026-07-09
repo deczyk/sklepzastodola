@@ -16,6 +16,64 @@ Firma może obejmować ofertą:
 - wdrożenie i start sprzedaży,
 - analizę opłacalności i pomoc w ustawieniu modelu sprzedaży.
 
+## Strategia przychodów i oferty
+
+Firma nie ma zarabiać wyłącznie na sprzedaży mlekomatu. Model biznesowy ma budować kilka źródeł przychodu wokół sprzedaży bezpośredniej dla rolnika:
+
+- sprzedaż i wdrożenie urządzeń BRUNIMAT,
+- pawilon / punkt sprzedaży jako osobno wyceniony element pakietu,
+- dokumentacja, konsulting ARiMR, analiza inwestycji i pomoc w przejściu procesu dotacyjnego jako osobna płatna usługa,
+- wdrożenie sprzedaży bezpośredniej, marketing lokalny i materiały startowe,
+- abonament serwisowy / opieka po uruchomieniu jako możliwy przychód miesięczny,
+- opcje dodatkowe BRUNIMAT wyceniane osobno,
+- leady od partnerów rozliczane za skutecznie skierowanego klienta.
+
+Publicznie komunikować przede wszystkim: „gotowy system sprzedaży bezpośredniej”, „uruchom punkt sprzedaży przy gospodarstwie”, „mlekomat + pawilon + wdrożenie + dokumenty + marketing + opieka”. Nie sprowadzać oferty do hasła „kup mlekomat”.
+
+Dokumentacja / konsulting ARiMR:
+- Może być sprzedawana osobno, jeszcze przed zakupem urządzenia.
+- Publicznie nie obiecywać uzyskania dotacji. Pisać bezpiecznie: „pomagamy przygotować dokumenty i przejść proces”, „decyzja zależy od programu, naboru i instytucji”, „wymaga aktualnej weryfikacji”.
+- Prywatnie traktować jako osobne źródło przychodu za wiedzę, czas i analizę.
+
+Trzy poziomy oferty:
+- Podstawowy: sam mlekomat / minimum wdrożenia / minimum formalności. Opcja budżetowa, nie domyślna rekomendacja.
+- Standard: mlekomat + pawilon + pełne wdrożenie + pomoc w dotacji + prosty marketing lokalny. Logiczny środek oferty.
+- Premium: Standard + lepsze opcje urządzenia + rozbudowany pawilon + priorytetowa opieka/wsparcie od startu. Domyślna rekomendacja dla klienta, który chce gotowy system.
+- Trzymać się maksymalnie 3 poziomów, żeby rolnik się nie pogubił.
+
+Abonament serwisowy / opieka:
+- Robocze poziomy prywatne: 299 / 449 / 649 zł miesięcznie.
+- Możliwy model: pierwszy rok opieki w cenie urządzenia/pakietu, później abonament.
+- Publicznie ostrożnie: nie obiecywać czasów reakcji typu 12h bez potwierdzonych zasobów. Mówić raczej o opiece, wsparciu, przeglądach, priorytecie kontaktu i pomocy operacyjnej.
+- Konkretne ceny abonamentu zostają prywatne, dopóki nie będzie zatwierdzonego zakresu.
+
+Pawilon:
+- Nie jest gratisowym dodatkiem. To osobny produkt i osobno wyceniona część pakietu.
+- Trzeba zebrać 2-3 oferty od wykonawców/stolarzy.
+- Prywatnie policzyć koszt, marżę i warianty.
+
+Cennik opcji BRUNIMAT:
+- Trzeba zdobyć pełny cennik opcji od BRUNIMAT.
+- Opcje dodatkowe wyceniać osobno, szczególnie przy Standard/Premium.
+- Nie rozdawać opcji za darmo i nie pokazywać publicznie kosztów zakupu ani marż.
+
+Leady od partnerów:
+- Możliwa współpraca z doradcami rolniczymi, firmami sprzedającymi sprzęt i osobami z dostępem do rolników.
+- Rozliczać za skutecznie skierowanego klienta, nie za słabe kontakty.
+- Szczegóły prowizji zostają prywatne.
+
+Klauzula kursowa EUR:
+- Oferty powinny chronić firmę przed istotną zmianą kursu EUR/PLN.
+- W ofertach dodać zastrzeżenie, że cena może zostać skorygowana przy istotnej zmianie kursu.
+- To chroni marżę i nie jest elementem marketingowym strony głównej.
+
+Czego teraz nie robimy:
+- Nie budujemy własnego pełnego serwisu z magazynem części.
+- Nie inwestujemy w duże kampanie reklamowe.
+- Nie wdrażamy teraz sklepów autonomicznych 24/7.
+- Nie kupujemy urządzeń na zapas bez podpisanego klienta.
+- Nie pokazujemy prywatnych marż i kosztów na stronie publicznej.
+
 ## Strona i repo
 Główna strona: https://www.sklepzastodola.pl
 Repozytorium: https://github.com/deczyk/sklepzastodola

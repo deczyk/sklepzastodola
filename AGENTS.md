@@ -6,6 +6,24 @@ Zawsze najpierw przeczytaj plik `AI_CONTEXT.md` w głównym katalogu repozytoriu
 
 Projekt dotyczy strony i panelu prywatnego firmy Sklep za Stodołą Sp. z o.o. Firma pomaga rolnikom uruchamiać sprzedaż bezpośrednią z gospodarstwa: mlekomaty BRUNIMAT, pawilony, punkty sprzedaży, finansowanie, dokumenty, marketing lokalny i wdrożenie. Mlekomaty są ważnym produktem, ale nie opisuj firmy wyłącznie jako sprzedawcy mlekomatów.
 
+## Strategia przychodów i komunikacji
+
+Przy zmianach strony, panelu i materiałów sprzedażowych traktuj Sklep za Stodołą jako firmę budującą kilka źródeł przychodu wokół sprzedaży bezpośredniej dla rolnika:
+
+- BRUNIMAT / mlekomat jako część systemu,
+- pawilon / punkt sprzedaży jako osobno wyceniony produkt,
+- dokumentacja i konsulting ARiMR jako osobna płatna usługa,
+- wdrożenie, prosty marketing lokalny i materiały startowe,
+- opieka / abonament serwisowy po uruchomieniu,
+- opcje dodatkowe BRUNIMAT wyceniane osobno,
+- leady od partnerów rozliczane za skutecznie skierowanego klienta.
+
+Publiczna komunikacja ma iść w stronę: „gotowy system sprzedaży bezpośredniej”, „uruchom punkt sprzedaży przy gospodarstwie”, „mlekomat + pawilon + wdrożenie + dokumenty + marketing + opieka”. Nie sprowadzaj oferty do hasła „kup mlekomat”.
+
+Cena 14 500 EUR może być publicznie opisywana tylko ostrożnie jako Premium / pełny pakiet / BRUNIMAT 650 Premium DUO netto. Nie opisywać jej jako „sam mlekomat” i nie sugerować, że to jedna cena dla wszystkich.
+
+Nie ujawniaj publicznie kosztów zakupu, marż, cenników partnerskich, prowizji ani prywatnych kalkulacji. Przy ARiMR nie obiecuj wygrania dotacji; bezpieczny język to: „pomagamy przygotować dokumenty i przejść proces”, „decyzja zależy od programu, naboru i instytucji”, „wymaga aktualnej weryfikacji”.
+
 ## Stały tryb pracy AI
 
 Traktuj poniższe zasady tak, jakby użytkownik dopisał je przed każdą wiadomością:
