@@ -78,7 +78,7 @@
 
   /* --- Client table --- */
   .tableWrap{overflow-x:auto}
-  table.clients{width:100%;border-collapse:collapse;font-size:12.5px;min-width:1650px;table-layout:fixed}
+  table.clients{width:100%;border-collapse:collapse;font-size:12.5px;min-width:1200px;table-layout:fixed}
   table.clients th{text-align:left;color:var(--muted);font-weight:bold;font-size:11px;text-transform:uppercase;
                     letter-spacing:.03em;padding:6px 8px;border-bottom:2px solid var(--line);white-space:nowrap;overflow:hidden}
   table.clients td{padding:5px 7px;border-bottom:1px solid #eee;vertical-align:top;overflow:hidden}
@@ -87,8 +87,7 @@
   table.clients col.ulica{width:90px} table.clients col.tel{width:120px}
   table.clients col.email{width:170px} table.clients col.zain{width:150px}
   table.clients col.prio{width:100px} table.clients col.status{width:130px}
-  table.clients col.notatki{width:450px} table.clients col.hist{width:70px}
-  table.clients col.usun{width:60px}
+  table.clients col.hist{width:80px} table.clients col.usun{width:90px}
   table.clients input, table.clients select, table.clients textarea{
       width:100%;border:1px solid transparent;background:transparent;padding:5px 6px;border-radius:6px;
       font-size:12.5px;font-family:inherit;color:var(--ink)}
@@ -523,9 +522,12 @@
   .quickUpdate input,.quickUpdate select,.quickUpdate textarea{width:100%;box-sizing:border-box;border:1px solid #d8e7db;border-radius:8px;background:white;padding:7px 9px;font:inherit;margin-top:4px}
   .quickUpdate textarea{min-height:70px;resize:vertical}
   .quickUpdateActions{display:flex;justify-content:flex-end;margin-top:10px}
-  .clientCardNotes,.clientCardHistory{border:1px solid var(--line);border-radius:10px;padding:12px;margin-top:12px;background:#fff}
+  .clientCardHistory{border:1px solid var(--line);border-radius:10px;padding:12px;margin-top:12px;background:#fff}
   .clientCardHistoryHead{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:10px}
   .clientCardHistoryHead b{color:#263b2b}
+  .clientDangerZone{display:flex;justify-content:flex-end;margin-top:12px;padding-top:12px;border-top:1px solid #f0d0cb}
+  .dangerBtn{border:1px solid #d8a19b;background:#fff5f4;color:#a33b33;border-radius:8px;padding:8px 12px;font-weight:bold;cursor:pointer}
+  .dangerBtn:hover{background:#ffecea;border-color:#c66b62}
   .clientOffers{border:1px solid #ead99a;border-radius:10px;padding:12px;margin-top:12px;background:#fffdf4}
   .clientOffersHead{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:10px}
   .clientOffersHead b{color:#755c15}
@@ -924,14 +926,14 @@
           <colgroup>
             <col class="firma"><col class="osoba"><col class="woj"><col class="miejsc">
             <col class="ulica"><col class="tel"><col class="email"><col class="zain"><col class="follow">
-            <col class="prio"><col class="status"><col class="notatki"><col class="hist"><col class="usun">
+            <col class="prio"><col class="status"><col class="hist"><col class="usun">
           </colgroup>
           <thead>
             <tr>
               <th>Firma / gospodarstwo</th><th>Imię i nazwisko</th><th>Województwo</th><th>Miejscowość</th>
               <th>Ulica</th><th>Telefon</th><th>E-mail</th><th>Czym zainteresowany</th><th>Następny kontakt</th>
               <th>Priorytet</th><th>Status</th>
-              <th>Notatki</th><th>Historia</th><th></th>
+              <th>Historia</th><th></th>
             </tr>
           </thead>
           <tbody id="clientsBody"></tbody>
@@ -1506,10 +1508,11 @@ function historyTextHtml(value){
 
 function renderHistoryTimeline(c, editable=false){
   const hist = Array.isArray(c.historia) ? c.historia : [];
-  if(hist.length===0){
-    return '<div class="empty">Brak notatek dla tego klienta</div>';
+  const legacyNote = (c.notatki || "").toString().trim();
+  if(hist.length===0 && !legacyNote){
+    return '<div class="empty">Brak historii dla tego klienta</div>';
   }
-  return `<div class="historyTimeline">${hist.map((h,index)=>({h,index})).reverse().map(({h,index}) => {
+  const entries = hist.map((h,index)=>({h,index})).reverse().map(({h,index}) => {
     const parsed = parseHistoryText(h.tekst);
     if(editable && currentHistoryEditIndex === index){
       return `
@@ -1542,7 +1545,18 @@ function renderHistoryTimeline(c, editable=false){
         </div>` : ""}
       </div>
     `;
-  }).join("")}</div>`;
+  }).join("");
+  const legacy = legacyNote ? `
+    <div class="historyEntry">
+      <div class="historyMeta">
+        <span class="historyTypeBadge">dawny wpis CRM</span>
+        <span class="who">CRM</span>
+        <span class="when">bez daty</span>
+      </div>
+      <div class="txt">${historyTextHtml(legacyNote)}</div>
+    </div>
+  ` : "";
+  return `<div class="historyTimeline">${entries}${legacy}</div>`;
 }
 
 function latestClientActivity(c){
@@ -2376,6 +2390,7 @@ function openClientCard(clientId){
   const box = document.getElementById("clientCardContent");
   if(!c || !box) return;
   const hist = c.historia || [];
+  const historyCount = hist.length + ((c.notatki || "").toString().trim() ? 1 : 0);
   const followup = followupInfo(clientFollowup(c));
   const lastActivity = clientActivitySummary(c, 150);
   box.innerHTML = `
@@ -2401,15 +2416,17 @@ function openClientCard(clientId){
       <div class="clientCardField"><b>Zainteresowanie</b>${crmEsc(c.zainteresowanie || "brak")}</div>
       <div class="clientCardField"><b>Co go powstrzymuje</b>${clientField(c,null,"objection")}</div>
     </div>
-    <div class="clientCardNotes"><b>Notatki</b><br>${crmEsc(c.notatki || "Brak notatek.")}</div>
     ${renderQuickClientUpdate(c)}
     ${renderClientOffers(c)}
     <div class="clientCardHistory">
       <div class="clientCardHistoryHead">
-        <b>Historia kontaktu (${hist.length})</b>
-        <button class="histBtn" onclick="openHistoryModal(currentClientCardId)">Zarządzaj notatkami</button>
+        <b>Historia kontaktu (${historyCount})</b>
+        <button class="histBtn" onclick="openHistoryModal(currentClientCardId)">Zarządzaj historią</button>
       </div>
       ${renderHistoryTimeline(c, false)}
+    </div>
+    <div class="clientDangerZone">
+      <button class="dangerBtn" onclick="deleteClient('${crmEsc(c.id)}')">Usuń klienta</button>
     </div>
   `;
   document.getElementById("clientCardModal").classList.add("open");
@@ -2574,7 +2591,7 @@ function renderClients(){
   }
 
   if(list.length===0){
-    body.innerHTML = `<tr><td colspan="14" class="empty">Brak klientów pasujących do filtrów.</td></tr>`;
+    body.innerHTML = `<tr><td colspan="13" class="empty">Brak klientów pasujących do filtrów.</td></tr>`;
     return;
   }
   const phoneCounts = {};
@@ -2603,9 +2620,8 @@ function renderClients(){
       <td>${clientField(c,"nastepnyFollowup","date")}</td>
       <td>${clientField(c,null,"prio")}</td>
       <td>${clientField(c,null,"status")}</td>
-      <td>${clientField(c,"notatki","textarea")}${lastActivity ? `<div class="lastActivity">Ostatnie: ${crmEsc(lastActivity)}</div>` : ""}</td>
-      <td><button class="histBtn" onclick="openHistoryModal('${c.id}')">📜 ${(c.historia||[]).length}</button></td>
-      <td><button class="delBtn" onclick="deleteClient('${c.id}')">Usuń</button></td>
+      <td><button class="histBtn" onclick="openHistoryModal('${c.id}')">📜 ${(c.historia||[]).length}</button>${lastActivity ? `<div class="lastActivity">Ostatnie: ${crmEsc(lastActivity)}</div>` : ""}</td>
+      <td><button class="delBtn" onclick="deleteClient('${c.id}')">Usuń klienta</button></td>
     </tr>
   `;
   }).join("");
@@ -2627,10 +2643,19 @@ function addClient(){
 }
 
 function deleteClient(id){
-  const c = data.klienci.find(x=>x.id===id);
-  data.klienci = data.klienci.filter(c=>c.id!==id);
-  if(c) logActivity(`usunął(-ęła) klienta „${c.firma||c.osoba||'bez nazwy'}”`);
-  saveData(); renderClients(); renderStatsBar();
+  const index = (data.klienci || []).findIndex(x=>x.id===id);
+  if(index < 0) return;
+  const c = data.klienci[index];
+  if(!confirm("Na pewno trwale usunąć tego klienta? Usunięte zostaną też jego oferty i historia.")) return;
+  const typed = prompt("To jest trwałe usunięcie klienta. Wpisz USUŃ, aby potwierdzić.");
+  if(typed !== "USUŃ") return;
+  data.klienci.splice(index, 1);
+  logActivity(`trwale usunął(-ęła) klienta „${c.firma||c.osoba||'bez nazwy'}”`);
+  if(currentClientCardId === id) closeClientCard();
+  if(currentHistoryClientId === id) closeHistoryModal();
+  saveData();
+  renderClients();
+  renderStatsBar();
 }
 
 function updateClient(el){
