@@ -435,6 +435,32 @@
   .dashKpiCard .num{font-size:26px;font-weight:bold;color:var(--green2)}
   .dashKpiCard .lbl{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-top:4px}
   .dashKpiCard .hint{font-size:12px;color:#7a847c;margin-top:8px;line-height:1.35}
+  .commandCenter{grid-column:1/-1;background:linear-gradient(180deg,#fffef8,#ffffff);border-color:#ead99a}
+  .commandHeader{display:flex;justify-content:space-between;gap:16px;align-items:flex-start;margin-bottom:14px;flex-wrap:wrap}
+  .commandHeader p{margin:6px 0 0;color:#5d675f;font-size:13px;line-height:1.45;max-width:780px}
+  .commandCounters{display:grid;grid-template-columns:repeat(5,minmax(90px,1fr));gap:8px;min-width:min(100%,520px)}
+  .commandCounter{background:white;border:1px solid #ead99a;border-radius:12px;padding:10px 12px;box-shadow:0 6px 16px #c9a24a12}
+  .commandCounterNum{font-size:22px;font-weight:bold;color:#2d5a27}
+  .commandCounterLbl{font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:#7b6a35;margin-top:4px}
+  .commandSections{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+  .commandSection{background:#fff;border:1px solid #eef1e8;border-radius:12px;padding:12px;box-shadow:0 8px 18px #1d3b2408}
+  .commandSection.priority{border-color:#ead99a;background:linear-gradient(180deg,#fffdf7,#fff)}
+  .commandSectionHead{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:10px}
+  .commandSectionHead b{color:#2d5a27;font-size:14px}
+  .commandSectionCount{font-size:11px;font-weight:bold;color:#755c15;background:#fff8df;border:1px solid #ead99a;border-radius:999px;padding:3px 8px}
+  .commandList{display:grid;gap:8px}
+  .commandClientCard{background:#f8fbf8;border:1px solid #e4eee6;border-radius:12px;padding:11px}
+  .commandClientTop{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;margin-bottom:8px}
+  .commandClientName{font-weight:bold;color:#25362a;font-size:14px}
+  .commandMeta{display:grid;gap:3px;font-size:12px;color:#5f6d64;line-height:1.35}
+  .commandBadges{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}
+  .commandReason{font-size:12px;color:#4d5b51;background:white;border:1px solid #e4eee6;border-radius:10px;padding:8px 9px;line-height:1.45}
+  .commandActions{display:flex;gap:6px;flex-wrap:wrap;margin-top:9px}
+  .commandActions .histBtn,.commandActions .doneBtn,.commandActions .dangerBtn{margin-bottom:0;padding:6px 10px;font-size:12px}
+  .commandActions .dangerBtn{padding:6px 10px}
+  .commandEmpty{font-size:13px;color:#6f7b72;background:#f8fbf8;border:1px dashed #d8e4da;border-radius:10px;padding:14px;text-align:center}
+  .commandActivityRow{display:grid;gap:7px}
+  .commandActivityMeta{font-size:12px;color:#647066;line-height:1.35}
   .dashToday{grid-column:span 8}
   .dashAi{grid-column:span 4;background:linear-gradient(180deg,#fffdf4,#ffffff);border-color:#ead99a}
   .dashAi .dashCardTitle{color:#755c15}
@@ -562,6 +588,7 @@
     .dashGrid{grid-template-columns:1fr}
     .dashCard,.dashToday,.dashAi{grid-column:1/-1}
     .dashKpiRow{grid-template-columns:1fr 1fr}
+    .commandSections,.commandCounters{grid-template-columns:1fr 1fr}
   }
   @media(max-width:620px){
     .dashKpiRow{grid-template-columns:1fr}
@@ -569,6 +596,8 @@
     .whoRow{width:100%}
     .followItem{grid-template-columns:1fr}
     .clientCardGrid,.offerFormGrid{grid-template-columns:1fr}
+    .commandSections,.commandCounters{grid-template-columns:1fr}
+    .commandHeader{flex-direction:column}
   }
 
 </style>
@@ -646,6 +675,17 @@
         </div>
 
         <div class="dashKpiRow" id="dashKpi"></div>
+
+        <div class="dashCard commandCenter">
+          <div class="commandHeader">
+            <div>
+              <div class="dashCardTitle">Centrum dnia</div>
+              <p>Najpilniejsze follow-upy, nowe leady, oferty bez odpowiedzi i ostatnie działania w CRM.</p>
+            </div>
+            <div class="commandCounters" id="dailyCommandCounters"></div>
+          </div>
+          <div id="dailyCommandCenter"></div>
+        </div>
 
         <div class="dashCard dashToday">
           <div class="dashCardTitle">Dzisiaj do ogarnięcia</div>
@@ -2210,6 +2250,257 @@ function clientLeadSource(c){
 
 function clientObjections(c){
   return c.obiekcje || "";
+}
+
+function dateOnlyLocal(value){
+  const raw = (value || "").toString().trim();
+  if(!raw) return null;
+  const match = raw.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  let dt = null;
+  if(match){
+    dt = new Date(Number(match[1]), Number(match[2]) - 1, Number(match[3]));
+  }else{
+    const parsed = new Date(raw);
+    if(!isNaN(parsed)) dt = new Date(parsed.getFullYear(), parsed.getMonth(), parsed.getDate());
+  }
+  return dt && !isNaN(dt) ? dt : null;
+}
+
+function startOfToday(){
+  const now = new Date();
+  return new Date(now.getFullYear(), now.getMonth(), now.getDate());
+}
+
+function formatDateOnly(date){
+  return `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,"0")}-${String(date.getDate()).padStart(2,"0")}`;
+}
+
+function addDaysDate(baseDate, days){
+  const next = new Date(baseDate.getTime());
+  next.setDate(next.getDate() + days);
+  return next;
+}
+
+function normalizeClientActor(value){
+  return (value || "").toString().trim().toLowerCase();
+}
+
+function getClientDisplayName(c){
+  return clientName(c);
+}
+
+function getLastClientActivity(c){
+  return latestClientActivity(c);
+}
+
+function isOverdueFollowup(c){
+  const followup = dateOnlyLocal(c.nastepnyFollowup);
+  return !!followup && followup.getTime() < startOfToday().getTime();
+}
+
+function isTodayFollowup(c){
+  const followup = dateOnlyLocal(c.nastepnyFollowup);
+  return !!followup && followup.getTime() === startOfToday().getTime();
+}
+
+function isRecentLead(c){
+  const createdAt = dateOnlyLocal(c.utworzono || c.dataUtworzenia || c.createdAt);
+  if(!createdAt) return false;
+  const diff = Math.round((startOfToday().getTime() - createdAt.getTime()) / 86400000);
+  return diff >= 0 && diff <= 7;
+}
+
+function hasClientHistory(c){
+  return Array.isArray(c.historia) && c.historia.some(h => h && (h.tekst || h.kto || h.data));
+}
+
+function isNewLead(c){
+  const status = (c.status || "").toString().trim().toLowerCase();
+  if(["nowy","nowy lead","zgloszenie","zgłoszenie","zglosil_sie"].includes(status)) return true;
+  if(!hasClientHistory(c)) return true;
+  return isRecentLead(c);
+}
+
+function isAdvisorLead(c){
+  const haystack = [
+    c.zrodloLeada,
+    c.produkt,
+    c.zainteresowanie,
+    ...(Array.isArray(c.historia) ? c.historia.map(h => h.tekst) : [])
+  ].join(" ").toLowerCase();
+  return haystack.includes("advisor") || haystack.includes("formularz doradczy") || haystack.includes("formularz advisor");
+}
+
+function getClientOffersWaiting(c){
+  const offers = Array.isArray(c.oferty) ? c.oferty : [];
+  const closingHistory = Array.isArray(c.historia) ? c.historia.filter(h => {
+    const parsed = parseHistoryText(h.tekst || "");
+    const text = `${parsed.type} ${parsed.text}`.toLowerCase();
+    return text.includes("zaakceptowana") || text.includes("zaakceptowano") || text.includes("odrzucona") || text.includes("odrzucono") || text.includes("nieaktualne");
+  }) : [];
+  return offers.filter(o => {
+    const status = normalizeImportOfferStatus(o.status);
+    if(status !== "Wysłana" && status !== "Czeka na decyzję") return false;
+    const offerTime = new Date(o.dataWyslania || o.dataUtworzenia || 0).getTime() || 0;
+    return !closingHistory.some(h => new Date(h.data || 0).getTime() >= offerTime);
+  });
+}
+
+function commandReasonText(c){
+  const last = getLastClientActivity(c);
+  if(!last) return "Brak historii działań.";
+  const parsed = parseHistoryText(last.tekst || "");
+  const body = parsed.text || last.tekst || "Brak opisu";
+  const prefix = parsed.type ? `[${parsed.type}] ` : "";
+  return `${formatDT(last.data)} · ${last.kto || "brak autora"} · ${prefix}${body}`;
+}
+
+function renderCommandClientCard(c, reason){
+  const followup = clientFollowup(c) || "brak follow-upu";
+  const leadSource = clientLeadSource(c) || "brak źródła";
+  const contact = clientContact(c) || "brak telefonu i e-maila";
+  const lastActivity = commandReasonText(c);
+  const statusLabel = labelFrom(STATUS_OPTS, c.status) || (c.status || "Bez statusu");
+  const prioLabel = labelFrom(PRIO_OPTS, c.priorytet) || (c.priorytet || "Bez priorytetu");
+  return `
+    <div class="commandClientCard">
+      <div class="commandClientTop">
+        <div>
+          <div class="commandClientName">${crmEsc(getClientDisplayName(c))}</div>
+          <div class="commandMeta">
+            <span>${crmEsc(contact)}</span>
+            ${clientLocation(c) ? `<span>${crmEsc(clientLocation(c))}</span>` : ""}
+          </div>
+        </div>
+        <button class="histBtn" onclick="openClientCard('${crmEsc(c.id)}')">Otwórz klienta</button>
+      </div>
+      <div class="commandBadges">
+        <span class="kanbanPill">${crmEsc(statusLabel)}</span>
+        <span class="kanbanPill">${crmEsc(prioLabel)}</span>
+        <span class="kanbanPill gold">${crmEsc(leadSource)}</span>
+        <span class="kanbanPill">${crmEsc(followup)}</span>
+      </div>
+      <div class="commandReason"><b>Powód:</b> ${crmEsc(reason)}</div>
+      <div class="commandReason" style="margin-top:8px"><b>Ostatnie działanie:</b> ${crmEsc(lastActivity)}</div>
+      <div class="commandActions">
+        <button class="histBtn" onclick="addQuickClientActivity('${crmEsc(c.id)}','tata-call')">Tata dzwonił</button>
+        <button class="histBtn" onclick="addQuickClientActivity('${crmEsc(c.id)}','mail')">Mail wysłany</button>
+        <button class="histBtn" onclick="addQuickClientActivity('${crmEsc(c.id)}','no-answer')">Brak odpowiedzi</button>
+        <button class="histBtn" onclick="addQuickClientActivity('${crmEsc(c.id)}','advisor')">Advisor wysłany</button>
+        <button class="doneBtn" onclick="addQuickClientActivity('${crmEsc(c.id)}','followup-tomorrow')">Ustaw follow-up jutro</button>
+      </div>
+    </div>
+  `;
+}
+
+function renderCommandActivityCard(item){
+  return `
+    <div class="commandClientCard commandActivityRow">
+      <div class="commandClientTop">
+        <div>
+          <div class="commandClientName">${crmEsc(item.clientName)}</div>
+          <div class="commandActivityMeta">${crmEsc(formatDT(item.entry.data))} · ${crmEsc(item.entry.kto || "brak autora")}</div>
+        </div>
+        <button class="histBtn" onclick="openClientCard('${crmEsc(item.clientId)}')">Otwórz klienta</button>
+      </div>
+      <div class="commandReason">${crmEsc(item.summary)}</div>
+    </div>
+  `;
+}
+
+function renderCommandSection(title, items, emptyText, priority){
+  return `
+    <div class="commandSection ${priority ? "priority" : ""}">
+      <div class="commandSectionHead">
+        <b>${crmEsc(title)}</b>
+        <span class="commandSectionCount">${items.length}</span>
+      </div>
+      <div class="commandList">
+        ${items.length ? items.join("") : `<div class="commandEmpty">${crmEsc(emptyText)}</div>`}
+      </div>
+    </div>
+  `;
+}
+
+function renderDailyCommandCenter(){
+  const host = document.getElementById("dailyCommandCenter");
+  const counters = document.getElementById("dailyCommandCounters");
+  if(!host || !counters) return;
+  const clients = Array.isArray(data.klienci) ? data.klienci : [];
+  const followupTodayClients = clients.filter(isTodayFollowup);
+  const overdueClients = clients.filter(isOverdueFollowup);
+  const newLeadClients = clients.filter(isNewLead);
+  const advisorClients = clients.filter(isAdvisorLead);
+  const offersWaitingClients = clients.filter(c => getClientOffersWaiting(c).length > 0);
+  const tataActivity = [];
+  const jakubActivity = [];
+
+  clients.forEach(c => {
+    (Array.isArray(c.historia) ? c.historia : []).forEach(entry => {
+      if(!entry || !entry.tekst) return;
+      const parsed = parseHistoryText(entry.tekst || "");
+      const summary = parsed.type ? `[${parsed.type}] ${parsed.text}` : (entry.tekst || "");
+      const item = {clientId:c.id, clientName:getClientDisplayName(c), entry, summary};
+      const who = normalizeClientActor(entry.kto);
+      if(who === "tata") tataActivity.push(item);
+      if(who === "jakub") jakubActivity.push(item);
+    });
+  });
+
+  tataActivity.sort((a,b)=>new Date(b.entry.data || 0) - new Date(a.entry.data || 0));
+  jakubActivity.sort((a,b)=>new Date(b.entry.data || 0) - new Date(a.entry.data || 0));
+
+  counters.innerHTML = [
+    ["Follow-upy dziś", followupTodayClients.length],
+    ["Zaległe", overdueClients.length],
+    ["Nowe leady", newLeadClients.length],
+    ["Advisor", advisorClients.length],
+    ["Oferty bez odpowiedzi", offersWaitingClients.length]
+  ].map(([label, num]) => `
+    <div class="commandCounter">
+      <div class="commandCounterNum">${num}</div>
+      <div class="commandCounterLbl">${crmEsc(label)}</div>
+    </div>
+  `).join("");
+
+  const sections = [
+    renderCommandSection("Do kontaktu dziś", followupTodayClients.map(c => renderCommandClientCard(c, "Następny follow-up wypada dzisiaj.")), "Na dziś brak klientów z ustawionym follow-upem.", true),
+    renderCommandSection("Zaległe follow-upy", overdueClients.map(c => renderCommandClientCard(c, "Termin follow-upu już minął i wymaga reakcji.")), "Brak zaległych follow-upów.", true),
+    renderCommandSection("Nowe leady", newLeadClients.map(c => renderCommandClientCard(c, hasClientHistory(c) ? "Lead jest świeży i wymaga pierwszego poprowadzenia." : "Lead nie ma jeszcze historii kontaktu.")), "Brak nowych leadów do ogarnięcia.", false),
+    renderCommandSection("Leady z Advisor", advisorClients.map(c => renderCommandClientCard(c, "Źródło lub historia wskazują na formularz Advisor.")), "Brak leadów oznaczonych jako Advisor.", false),
+    renderCommandSection("Oferty bez odpowiedzi", offersWaitingClients.map(c => renderCommandClientCard(c, `Aktywne oferty oczekujące na decyzję: ${getClientOffersWaiting(c).length}.`)), "Brak ofert czekających na odpowiedź.", false),
+    renderCommandSection("Ostatnie działania taty", tataActivity.slice(0,6).map(renderCommandActivityCard), "Brak ostatnich działań oznaczonych jako Tata.", false),
+    renderCommandSection("Ostatnie działania Jakuba", jakubActivity.slice(0,6).map(renderCommandActivityCard), "Brak ostatnich działań oznaczonych jako Jakub.", false)
+  ];
+
+  const isEmpty = !followupTodayClients.length && !overdueClients.length && !newLeadClients.length && !advisorClients.length && !offersWaitingClients.length && !tataActivity.length && !jakubActivity.length;
+  host.innerHTML = isEmpty ? '<div class="commandEmpty">Na teraz brak pilnych działań.</div>' : `<div class="commandSections">${sections.join("")}</div>`;
+}
+
+function addQuickClientActivity(clientId, action){
+  const client = (data.klienci || []).find(c => c.id === clientId);
+  if(!client) return;
+  if(!Array.isArray(client.historia)) client.historia = [];
+  const now = new Date().toISOString();
+  const tomorrow = formatDateOnly(addDaysDate(startOfToday(), 1));
+  const author = getWhoAmI();
+  const actionMap = {
+    "tata-call": {tekst:"[Tata dzwonił] Tata dzwonił do klienta.", kto:"Tata"},
+    "mail": {tekst:"[Mail wysłany] Wysłano wiadomość do klienta.", kto:author},
+    "no-answer": {tekst:"[Brak odpowiedzi] Próba kontaktu bez odpowiedzi.", kto:author},
+    "advisor": {tekst:"[Advisor wysłany] Wysłano link do formularza doradczego.", kto:author},
+    "followup-tomorrow": {tekst:`[Follow-up] Ustawiono następny kontakt na ${tomorrow}.`, kto:author, followup:tomorrow}
+  };
+  const payload = actionMap[action];
+  if(!payload) return;
+  client.historia.push({tekst:payload.tekst, kto:payload.kto, data:now});
+  if(payload.followup) client.nastepnyFollowup = payload.followup;
+  client.zaktualizowano = now;
+  saveData();
+  render();
+  renderClients();
+  renderDailyCommandCenter();
+  if(document.getElementById("clientCardModal")?.classList.contains("open")) openClientCard(clientId);
 }
 
 function followupInfo(dateStr){
@@ -4631,6 +4922,7 @@ function renderDashboard(){
       `<div class="dashListRow"><span>${i.label}</span><span style="color:var(--muted);font-weight:bold">${i.meta}</span></div>`
     ).join("") : '<div class="dashEmpty">Na dziś nie ma pilnych rzeczy w panelu.</div>';
   }
+  renderDailyCommandCenter();
   const funnelStages = [
     ["nowy","Nowy lead"],["zglosil_sie","Zgłosił się sam"],["kontakt","Do kontaktu"],
     ["rozmowa","Rozmowa odbyta"],["oferta","Oferta wysłana"],["negocjacje","Negocjacje"],["wygrany","Wygrany"]
