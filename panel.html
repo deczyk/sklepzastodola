@@ -1231,6 +1231,8 @@ function defaultData(){
 let data = null;
 let saveTimer = null;
 let initialRemoteData = null;
+let lastCloudSaveOk = true;
+let hasUnsyncedLocalChanges = false;
 
 function loadLocalCache(){
   try{
@@ -1242,39 +1244,66 @@ function loadLocalCache(){
 
 async function fetchRemote(password = getPanelPassword()){
   if(!SYNC_ENABLED) return null;
-  try{
-    const res = await fetch("/api/panel-data", {
-      headers: { "X-Panel-Password": password }
-    });
-    if(res.status === 401) throw new Error("AUTH");
-    if(!res.ok) throw new Error("HTTP "+res.status);
-    const json = await res.json();
-    return json.record;
-  }catch(e){
-    if(e && e.message === "AUTH") throw e;
-    console.warn("Nie udało się pobrać danych ze wspólnego magazynu:", e);
-    return null;
-  }
+  if(!password) throw new Error("NO_PASSWORD");
+  const res = await fetch("/api/panel-data", {
+    headers: { "X-Panel-Password": password }
+  });
+  if(res.status === 401) throw new Error("AUTH");
+  if(!res.ok) throw new Error(await syncErrorMessage(res));
+  const json = await res.json();
+  return json.record;
 }
 
 async function pushRemote(payload){
   if(!SYNC_ENABLED) return;
   try{
+    const password = getPanelPassword();
+    if(!password) throw new Error("NO_PASSWORD");
     const res = await fetch("/api/panel-data", {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
-        "X-Panel-Password": getPanelPassword()
+        "X-Panel-Password": password
       },
       body: JSON.stringify(payload)
     });
     if(res.status === 401) throw new Error("AUTH");
-    if(!res.ok) throw new Error("HTTP "+res.status);
+    if(!res.ok) throw new Error(await syncErrorMessage(res));
+    lastCloudSaveOk = true;
+    hasUnsyncedLocalChanges = false;
     setSyncStatus("Zsynchronizowano ✓", false);
   }catch(e){
     console.warn("Nie udało się zapisać do wspólnego magazynu:", e);
-    setSyncStatus(e && e.message === "AUTH" ? "Sesja wygasła - zablokuj i zaloguj ponownie" : "Zapisano tylko lokalnie (brak sieci) ⚠", true);
+    lastCloudSaveOk = false;
+    hasUnsyncedLocalChanges = true;
+    setSyncStatus(syncErrorText(e), true);
   }
+}
+
+async function syncErrorMessage(res){
+  let details = "";
+  try{
+    const text = await res.text();
+    if(text){
+      try{
+        const json = JSON.parse(text);
+        details = json.message || json.error || text;
+      }catch(e){
+        details = text;
+      }
+    }
+  }catch(e){}
+  return `HTTP ${res.status}${details ? " - " + details : ""}`;
+}
+
+function syncErrorText(e){
+  const msg = e && e.message ? e.message : "";
+  if(msg === "NO_PASSWORD") return "Błąd synchronizacji: brak hasła";
+  if(msg === "AUTH") return "Błąd synchronizacji: API zwróciło 401";
+  if(msg.includes("JSONBin")) return "Błąd synchronizacji: JSONBin odrzucił zapis";
+  if(msg.includes("HTTP 500")) return "Błąd synchronizacji: API zwróciło 500";
+  if(msg.includes("HTTP ")) return "Błąd synchronizacji: API zwróciło " + msg.replace(/^HTTP\s*/, "");
+  return "Zapisano lokalnie, ale nie zapisano w chmurze";
 }
 
 function setSyncStatus(text, warn){
@@ -1290,9 +1319,12 @@ async function initApp(){
     try{
       remote = await fetchRemote();
     }catch(e){
-      lock();
-      document.getElementById("gateErr").textContent = "Sesja wygasła. Zaloguj się ponownie.";
-      return;
+      if(e && e.message === "AUTH"){
+        lock();
+        document.getElementById("gateErr").textContent = "Sesja wygasła. Zaloguj się ponownie.";
+        return;
+      }
+      console.warn("Chmura niedostępna, używam danych lokalnych:", e);
     }
   }
   const local = loadLocalCache();
@@ -1300,7 +1332,7 @@ async function initApp(){
   const wasIncomplete = fillMissingDefaults(data);
   localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
   if(SYNC_ENABLED){
-    setSyncStatus("Zsynchronizowano ✓", false);
+    setSyncStatus(remote ? "Dane z chmury ✓" : "Dane lokalne - chmura niedostępna ⚠", !remote);
     if(wasIncomplete) pushRemote(data); // napraw brakujące dane w chmurze na stałe
   }
   render();
@@ -1343,12 +1375,16 @@ function fillMissingDefaults(d){
 
 async function refreshFromRemote(){
   if(!SYNC_ENABLED){ setSyncStatus("Synchronizacja wyłączona", true); return; }
+  if(hasUnsyncedLocalChanges || !lastCloudSaveOk){
+    const ok = confirm("Masz lokalne zmiany niezapisane w chmurze. Odświeżenie może je nadpisać. Kontynuować?");
+    if(!ok) return;
+  }
   setSyncStatus("Odświeżanie...", false);
   let remote = null;
   try{
     remote = await fetchRemote();
   }catch(e){
-    setSyncStatus("Sesja wygasła - zablokuj i zaloguj ponownie", true);
+    setSyncStatus(syncErrorText(e), true);
     return;
   }
   if(remote){
@@ -1365,6 +1401,7 @@ async function refreshFromRemote(){
 function saveData(){
   localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
   if(!SYNC_ENABLED) return;
+  hasUnsyncedLocalChanges = true;
   setSyncStatus("Zapisywanie...", false);
   clearTimeout(saveTimer);
   saveTimer = setTimeout(()=>pushRemote(data), 500); // debounce

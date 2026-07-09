@@ -51,52 +51,86 @@ function jsonBinAuthHeaders() {
   return { [keyHeader]: JSONBIN_API_KEY };
 }
 
+function serverConfigStatus() {
+  return {
+    hasJsonBinApiKey: Boolean(JSONBIN_API_KEY),
+    hasJsonBinBinId: Boolean(JSONBIN_BIN_ID),
+    hasPanelPassword: Boolean(PANEL_PASSWORD),
+    hasPanelBasicPassword: Boolean(PANEL_BASIC_PASSWORD)
+  };
+}
+
+async function readUpstreamError(upstream) {
+  let body = "";
+  try {
+    body = await upstream.text();
+  } catch (e) {}
+
+  return {
+    status: upstream.status,
+    message: upstream.status === 401 || upstream.status === 403
+      ? "JSONBin authorization failed."
+      : "JSONBin request failed.",
+    body
+  };
+}
+
 module.exports = async function handler(req, res) {
   res.setHeader("Cache-Control", "no-store");
 
   if (!JSONBIN_API_KEY || !JSONBIN_BIN_ID || (!PANEL_PASSWORD && !PANEL_BASIC_PASSWORD)) {
-    return res.status(500).json({ error: "Panel server configuration is missing." });
+    return res.status(500).json({
+      error: "Panel server configuration is missing.",
+      config: serverConfigStatus()
+    });
   }
 
   if (!isAuthorized(req)) {
     return res.status(401).json({ error: "Unauthorized" });
   }
 
-  if (req.method === "GET") {
-    const upstream = await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}/latest`, {
-      headers: jsonBinAuthHeaders()
-    });
+  try {
+    if (req.method === "GET") {
+      const upstream = await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}/latest`, {
+        headers: jsonBinAuthHeaders()
+      });
 
-    const body = await upstream.text();
-    if (upstream.status === 401 || upstream.status === 403) {
-      return res.status(502).json({ error: "JSONBin authorization failed." });
+      if (!upstream.ok) {
+        return res.status(502).json(await readUpstreamError(upstream));
+      }
+
+      const body = await upstream.text();
+      res.status(upstream.status);
+      res.setHeader("Content-Type", upstream.headers.get("content-type") || "application/json");
+      return res.send(body);
     }
 
-    res.status(upstream.status);
-    res.setHeader("Content-Type", upstream.headers.get("content-type") || "application/json");
-    return res.send(body);
-  }
+    if (req.method === "PUT") {
+      const payload = typeof req.body === "string" ? req.body : JSON.stringify(req.body);
+      const upstream = await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          ...jsonBinAuthHeaders(),
+          "X-Bin-Versioning": "false"
+        },
+        body: payload
+      });
 
-  if (req.method === "PUT") {
-    const payload = typeof req.body === "string" ? req.body : JSON.stringify(req.body);
-    const upstream = await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        ...jsonBinAuthHeaders(),
-        "X-Bin-Versioning": "false"
-      },
-      body: payload
-    });
+      if (!upstream.ok) {
+        return res.status(502).json(await readUpstreamError(upstream));
+      }
 
-    const body = await upstream.text();
-    if (upstream.status === 401 || upstream.status === 403) {
-      return res.status(502).json({ error: "JSONBin authorization failed." });
+      const body = await upstream.text();
+      res.status(upstream.status);
+      res.setHeader("Content-Type", upstream.headers.get("content-type") || "application/json");
+      return res.send(body);
     }
-
-    res.status(upstream.status);
-    res.setHeader("Content-Type", upstream.headers.get("content-type") || "application/json");
-    return res.send(body);
+  } catch (e) {
+    return res.status(500).json({
+      error: "Panel API failed before JSONBin response.",
+      message: e && e.message ? e.message : "Unknown error"
+    });
   }
 
   res.setHeader("Allow", "GET, PUT");
