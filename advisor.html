@@ -29,6 +29,12 @@
     .tag{display:inline-block;background:#edf2ed;border:1px solid #d9e2d9;padding:5px 8px;border-radius:99px;margin:3px;font-size:12px}
     .warn{background:#fff4df;border-left:4px solid var(--accent);padding:12px;border-radius:8px}.ok{background:#eaf6ed;border-left:4px solid #3d7d4e;padding:12px;border-radius:8px}.bad{background:#fdecec;border-left:4px solid #b44;padding:12px;border-radius:8px}
     .eu{background:#eef5ff;border-left:4px solid var(--blue);padding:12px;border-radius:8px}
+    .switch-row{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:16px;border:1px solid var(--line);border-radius:12px;background:var(--light)}
+    .switch-copy b{display:block;color:var(--green)} .switch-copy span{display:block;color:var(--muted);font-size:.86rem}
+    .switch{position:relative;width:55px;height:30px;flex:0 0 auto} .switch input{opacity:0;width:0;height:0}
+    .slider{position:absolute;inset:0;cursor:pointer;background:#aab7af;border-radius:999px;transition:.2s}
+    .slider::before{content:"";position:absolute;width:23px;height:23px;left:4px;top:3.5px;background:white;border-radius:50%;box-shadow:0 2px 8px rgba(0,0,0,.2);transition:.2s}
+    .switch input:checked+.slider{background:var(--green)} .switch input:checked+.slider::before{transform:translateX(24px)}
     footer{padding:22px 36px;color:#777;text-align:center}.printOnly{display:none}
     @media(max-width:900px){.grid,.row,.row3,.kpis{grid-template-columns:1fr}}
     @media print{body{background:white}header,.noPrint,button{display:none!important}.wrap{max-width:none;padding:0}.card{box-shadow:none;border:0;border-radius:0;page-break-inside:avoid}.printOnly{display:block}}
@@ -112,19 +118,19 @@
   </div>
 
   <section class="card">
-    <h2>5. Moduł dofinansowania UE</h2>
-    <div class="row3">
-      <div><label>Czy klient chce analizować dofinansowanie UE?</label><select id="euEnable"><option value="0" selected>NIE</option><option value="1">TAK</option></select></div>
-      <div><label>Zakładany poziom dofinansowania %</label><input type="number" id="euPercent" value="50"></div>
-      <div><label>Maksymalna kwota dofinansowania PLN</label><input type="number" id="euLimit" value="100000"></div>
-    </div>
-    <div class="row3">
-      <div><label>Koszty kwalifikowalne PLN</label><input type="number" id="eligibleCost" value="70000"></div>
-      <div><label>Szacowane koszty niekwalifikowalne PLN</label><input type="number" id="nonEligibleCost" value="0"></div>
-      <div><label>Ryzyko / status naboru</label><select id="euRisk"><option value="medium">Do sprawdzenia</option><option value="high">Wysokie szanse</option><option value="low">Niskie szanse / brak naboru</option></select></div>
+    <h2>5. Dofinansowanie</h2>
+    <div class="switch-row">
+      <div class="switch-copy">
+        <b>Uwzględnij możliwe dofinansowanie (orientacyjnie 50%)</b>
+        <span>Wynik będzie orientacyjny. Każdy nabór i koszt kwalifikowalny wymaga osobnej weryfikacji.</span>
+      </div>
+      <label class="switch" aria-label="Uwzględnij dofinansowanie">
+        <input id="euEnable" type="checkbox">
+        <span class="slider"></span>
+      </label>
     </div>
     <div id="euResult" class="eu" style="margin-top:14px"></div>
-    <p style="font-size:12px;color:#666">Uwaga: moduł dofinansowania jest narzędziem doradczym. Nie stanowi gwarancji otrzymania wsparcia. Każdy nabór wymaga sprawdzenia aktualnego regulaminu, kosztów kwalifikowalnych i decyzji instytucji przyznającej pomoc.</p>
+    <p style="font-size:12px;color:#666">Uwaga: to narzędzie doradcze. Nie stanowi gwarancji otrzymania wsparcia. Każdy nabór wymaga sprawdzenia aktualnego regulaminu, kosztów kwalifikowalnych i decyzji instytucji przyznającej pomoc.</p>
   </section>
 
   <section class="card">
@@ -273,8 +279,8 @@ function calculate(){
   const inv=v("investment");
   const roi=netYear>0?inv/netYear:0;
 
-  const euEnabled=v("euEnable")===1, euGrantRaw=v("eligibleCost")*v("euPercent")/100, euGrant=euEnabled?Math.min(euGrantRaw,v("euLimit")):0;
-  const ownAfterEu=Math.max(0,inv+v("nonEligibleCost")-euGrant), roiEu=netYear>0?ownAfterEu/netYear:0;
+  const euEnabled=document.getElementById("euEnable").checked, euGrant=euEnabled?inv*0.5:0;
+  const ownAfterEu=Math.max(0,inv-euGrant), roiEu=netYear>0?ownAfterEu/netYear:0;
   const principal=ownAfterEu*(1-v("down")/100), months=v("years")*12, mr=v("rate")/100/12;
   const payment=mr>0?principal*(mr*Math.pow(1+mr,months))/(Math.pow(1+mr,months)-1):principal/months;
   const cashAfterFinance=netYear-payment*12;
@@ -290,8 +296,7 @@ function calculate(){
 
   const financeLabel = euEnabled ? "Rata po uwzględnieniu dofinansowania" : `Szacowana rata finansowania (wkład własny ${v("down")}%)`;
   document.getElementById("financeResult").innerHTML=`<b>Produkcja mleka:</b> ${Math.round(prod).toLocaleString("pl-PL")} l/dzień<br><b>Sprzedaż przez mlekomat (cel):</b> ${Math.round(targetLiters).toLocaleString("pl-PL")} l/dzień<br><b>Realna sprzedaż przy ${Math.round(sellThrough*100)}% wykorzystania:</b> ${Math.round(liters).toLocaleString("pl-PL")} l/dzień<br><b>Potencjał przed kosztami eksploatacyjnymi:</b> ${money(marginYear)}<br><b>Roczne koszty eksploatacyjne:</b> −${money(opCosts)}<br><b>Szacowany wynik po kosztach eksploatacyjnych:</b> ${money(netYear)}<br><b>Inwestycja brutto:</b> ${money(inv)}<br><b>Orientacyjny czas odzyskania inwestycji bez dofinansowania:</b> ${roi.toFixed(1)} lat<br><b>${financeLabel}:</b> ${money(payment)}/mies.<br><b>Cashflow roczny po finansowaniu:</b> ${money(cashAfterFinance)}`;
-  let risk=document.getElementById("euRisk").value, riskTxt=risk==="high"?"wysokie szanse – przygotować dokumenty i sprawdzić nabór":risk==="low"?"niskie szanse lub brak aktywnego naboru – rozważyć leasing/kredyt":"do sprawdzenia – konieczna weryfikacja aktualnego programu";
-  document.getElementById("euResult").innerHTML=`<b>Szacowane dofinansowanie UE:</b> ${money(euGrant)}<br><b>Inwestycja po dofinansowaniu / do sfinansowania:</b> ${money(ownAfterEu)}<br><b>Wkład własny przy finansowaniu:</b> ${money(ownAfterEu*v("down")/100)}<br><b>Orientacyjny czas odzyskania inwestycji z dofinansowaniem:</b> ${roiEu.toFixed(1)} lat<br><b>Status:</b> ${riskTxt}`;
+  document.getElementById("euResult").innerHTML=`<b>Szacowane dofinansowanie (orientacyjnie 50%):</b> ${money(euGrant)}<br><b>Inwestycja po dofinansowaniu / do sfinansowania:</b> ${money(ownAfterEu)}<br><b>Wkład własny przy finansowaniu:</b> ${money(ownAfterEu*v("down")/100)}<br><b>Orientacyjny czas odzyskania inwestycji z dofinansowaniem:</b> ${roiEu.toFixed(1)} lat`;
 
   // --- Narracja i rekomendacja dopasowana do wybranego zakresu ---
   const showPawilon = interest==="pakiet"||interest==="pawilon"||interest==="niezdecydowany";
@@ -319,8 +324,8 @@ function calculate(){
   renderDocuments(interest);
   renderTimeline(interest);
 }
-function saveData(){const data={};document.querySelectorAll("input,select,textarea").forEach(el=>data[el.id]=el.value);localStorage.setItem("advisorDataEU",JSON.stringify(data));alert("Dane zapisane.");}
-function loadData(){const data=JSON.parse(localStorage.getItem("advisorDataEU")||"{}");Object.entries(data).forEach(([k,val])=>{const el=document.getElementById(k);if(el)el.value=val;});calculate();}
+function saveData(){const data={};document.querySelectorAll("input,select,textarea").forEach(el=>data[el.id]=el.type==="checkbox"?el.checked:el.value);localStorage.setItem("advisorDataEU",JSON.stringify(data));alert("Dane zapisane.");}
+function loadData(){const data=JSON.parse(localStorage.getItem("advisorDataEU")||"{}");Object.entries(data).forEach(([k,val])=>{const el=document.getElementById(k);if(el){if(el.type==="checkbox")el.checked=!!val;else el.value=val;}});calculate();}
 function resetAll(){localStorage.removeItem("advisorDataEU");location.reload();}
 
 async function sendToUs(){
@@ -373,16 +378,11 @@ async function sendToUs(){
   payload["Oprocentowanie roczne %"] = document.getElementById("rate").value;
   payload["Szczegóły finansowe (wyliczone)"] = document.getElementById("financeResult").innerText;
 
-  // --- Moduł dofinansowania UE ---
-  const euEnabled = document.getElementById("euEnable").value === "1";
-  payload["── MODUŁ DOTACJI UE"] = "──────────";
-  payload["Czy analizować dofinansowanie UE"] = euEnabled ? "TAK" : "NIE";
+  // --- Dofinansowanie ---
+  const euEnabled = document.getElementById("euEnable").checked;
+  payload["── DOFINANSOWANIE"] = "──────────";
+  payload["Czy uwzględniono dofinansowanie"] = euEnabled ? "TAK (orientacyjnie 50%)" : "NIE";
   if(euEnabled){
-    payload["Zakładany poziom dofinansowania %"] = document.getElementById("euPercent").value;
-    payload["Maksymalna kwota dofinansowania PLN"] = document.getElementById("euLimit").value;
-    payload["Koszty kwalifikowalne PLN"] = document.getElementById("eligibleCost").value;
-    payload["Koszty niekwalifikowalne PLN"] = document.getElementById("nonEligibleCost").value;
-    payload["Ryzyko / status naboru"] = document.getElementById("euRisk").selectedOptions[0].text;
     payload["Szczegóły dofinansowania (wyliczone)"] = document.getElementById("euResult").innerText;
   }
 
