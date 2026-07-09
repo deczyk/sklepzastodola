@@ -61,6 +61,7 @@ Leady od partnerów:
 - Możliwa współpraca z doradcami rolniczymi, firmami sprzedającymi sprzęt i osobami z dostępem do rolników.
 - Rozliczać za skutecznie skierowanego klienta, nie za słabe kontakty.
 - Szczegóły prowizji zostają prywatne.
+- Prywatne robocze warunki partnerskie, jeśli wrócą w rozmowach: rabat partnerski 18%, bonus roczny 2%, prowizja partnerska 8%, ochrona leadów 90 dni, warunki płatności 50/50. Nie publikować tych warunków na stronie publicznej.
 
 Klauzula kursowa EUR:
 - Oferty powinny chronić firmę przed istotną zmianą kursu EUR/PLN.
@@ -73,6 +74,7 @@ Czego teraz nie robimy:
 - Nie wdrażamy teraz sklepów autonomicznych 24/7.
 - Nie kupujemy urządzeń na zapas bez podpisanego klienta.
 - Nie pokazujemy prywatnych marż i kosztów na stronie publicznej.
+- Nie pokazujemy publicznie rabatów partnerskich, bonusów, prowizji, ochrony leadów ani warunków współpracy z partnerami.
 
 ## Strona i repo
 Główna strona: https://www.sklepzastodola.pl

@@ -22,6 +22,8 @@ Jeśli pojawia się cena 14 500 EUR, opisywać ją ostrożnie jako Premium / pe�
 
 Nie ujawniać publicznie kosztów zakupu, marż, cen partnerskich, prowizji ani prywatnych kalkulacji. Przy ARiMR nie obiecywać uzyskania dotacji; pisać, że pomagamy przygotować dokumenty i przejść proces, a decyzja zależy od programu, naboru i instytucji.
 
+Prywatne warunki partnerskie, takie jak rabaty, bonusy roczne, prowizje, ochrona leadów i warunki płatności 50/50, nie są treścią na publiczną stronę. Mogą pojawiać się tylko w prywatnym kontekście, panelu albo dokumentach roboczych.
+
 ## Stały prefiks dla AI
 
 Te zasady mają działać automatycznie, bez dopisywania ich w każdej wiadomości:

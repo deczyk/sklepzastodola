@@ -24,6 +24,8 @@ Cena 14 500 EUR może być publicznie opisywana tylko ostrożnie jako Premium / 
 
 Nie ujawniaj publicznie kosztów zakupu, marż, cenników partnerskich, prowizji ani prywatnych kalkulacji. Przy ARiMR nie obiecuj wygrania dotacji; bezpieczny język to: „pomagamy przygotować dokumenty i przejść proces”, „decyzja zależy od programu, naboru i instytucji”, „wymaga aktualnej weryfikacji”.
 
+Prywatne warunki partnerskie, takie jak rabaty, bonusy roczne, prowizje, ochrona leadów i warunki płatności 50/50, nie są treścią na publiczną stronę. Mogą pojawiać się tylko w prywatnym kontekście, panelu albo dokumentach roboczych.
+
 ## Stały tryb pracy AI
 
 Traktuj poniższe zasady tak, jakby użytkownik dopisał je przed każdą wiadomością:

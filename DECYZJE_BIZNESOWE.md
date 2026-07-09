@@ -338,6 +338,7 @@ Leady od partnerów:
 - Płacić za wynik, nie za same słabe kontakty.
 - Pilnować jakości leadów.
 - Szczegóły prowizji prywatnie, nie publicznie.
+- Prywatne robocze warunki partnerskie, jeśli wrócą w rozmowach: rabat partnerski 18%, bonus roczny 2%, prowizja partnerska 8%, ochrona leadów 90 dni, warunki płatności 50/50. Nie publikować tych warunków na stronie publicznej.
 
 Klauzula kursowa EUR:
 - Oferty powinny chronić firmę przed zmianą kursu euro.
@@ -350,6 +351,7 @@ Czego teraz nie robimy:
 - Nie wdrażamy teraz sklepów autonomicznych 24/7.
 - Nie kupujemy urządzeń na zapas bez podpisanego klienta.
 - Nie pokazujemy prywatnych marż i kosztów na stronie publicznej.
+- Nie pokazujemy publicznie rabatów partnerskich, bonusów, prowizji, ochrony leadów ani warunków współpracy z partnerami.
 
 Cena 14 500 EUR:
 - Publicznie tylko ostrożnie jako Premium / pełny pakiet / BRUNIMAT 650 Premium DUO netto.
