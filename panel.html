@@ -512,6 +512,17 @@
   .clientCardField select,.clientCardField input,.clientCardField textarea{width:100%;box-sizing:border-box;border:1px solid #d8e7db;
       border-radius:8px;background:white;padding:7px 9px;font:inherit}
   .clientCardField textarea{min-height:82px;resize:vertical}
+  .lastActivity{margin-top:6px;font-size:12px;color:#647066;line-height:1.35}
+  .lastActivityBadge{display:inline-flex;max-width:100%;border:1px solid #ead99a;background:#fff8df;color:#755c15;border-radius:8px;
+      padding:4px 7px;font-size:12px;line-height:1.3}
+  .quickUpdate{border:1px solid #ead99a;border-radius:10px;padding:12px;margin-top:12px;background:#fffdf4}
+  .quickUpdateHead{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:10px}
+  .quickUpdateHead b{color:#755c15}
+  .quickUpdateGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+  .quickUpdate label{font-size:11px;color:#6b766f;text-transform:uppercase;letter-spacing:.05em;font-weight:bold}
+  .quickUpdate input,.quickUpdate select,.quickUpdate textarea{width:100%;box-sizing:border-box;border:1px solid #d8e7db;border-radius:8px;background:white;padding:7px 9px;font:inherit;margin-top:4px}
+  .quickUpdate textarea{min-height:70px;resize:vertical}
+  .quickUpdateActions{display:flex;justify-content:flex-end;margin-top:10px}
   .clientCardNotes,.clientCardHistory{border:1px solid var(--line);border-radius:10px;padding:12px;margin-top:12px;background:#fff}
   .clientCardHistoryHead{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:10px}
   .clientCardHistoryHead b{color:#263b2b}
@@ -1534,9 +1545,77 @@ function renderHistoryTimeline(c, editable=false){
   }).join("")}</div>`;
 }
 
+function latestClientActivity(c){
+  const hist = Array.isArray(c.historia) ? c.historia.filter(h=>h && (h.tekst || h.data || h.kto)) : [];
+  if(hist.length===0) return null;
+  return hist.slice().sort((a,b)=>new Date(b.data || 0) - new Date(a.data || 0))[0];
+}
+
+function clientActivitySummary(c, limit=120){
+  const last = latestClientActivity(c);
+  if(!last) return "";
+  const parsed = parseHistoryText(last.tekst || "");
+  const text = crmShort(parsed.type ? `[${parsed.type}] ${parsed.text}` : (last.tekst || ""), limit);
+  return `${formatDT(last.data)} · ${last.kto || "brak autora"} · ${text}`;
+}
+
+function renderQuickClientUpdate(c){
+  return `
+    <div class="quickUpdate">
+      <div class="quickUpdateHead">
+        <b>Szybka aktualizacja klienta</b>
+        <span class="kanbanContact">Dopisuje wpis do historii i aktualizuje etap pracy</span>
+      </div>
+      <div class="quickUpdateGrid">
+        <label>Co zrobiono<select data-quick-field="action">
+          ${QUICK_ACTION_OPTS.map(v=>`<option value="${crmEsc(v)}">${crmEsc(v)}</option>`).join("")}
+        </select></label>
+        <label>Kto<select data-quick-field="who">
+          ${QUICK_WHO_OPTS.map(v=>`<option value="${crmEsc(v)}" ${v==="Ja"?"selected":""}>${crmEsc(v)}</option>`).join("")}
+        </select></label>
+        <label>Nowy status klienta<select data-quick-field="status">
+          <option value="">Bez zmiany</option>
+          ${STATUS_OPTS.map(([v,l])=>`<option value="${crmEsc(v)}">${crmEsc(l)}</option>`).join("")}
+        </select></label>
+        <label>Następny follow-up<input type="date" data-quick-field="followup" value="${crmEsc(c.nastepnyFollowup || "")}"></label>
+      </div>
+      <label>Krótka notatka<textarea data-quick-field="note" placeholder="Np. tata wysłał link do advisora, klient ma oddzwonić."></textarea></label>
+      <div class="quickUpdateActions">
+        <button class="save" onclick="saveQuickClientUpdate('${crmEsc(c.id)}')">Zapisz aktualizację</button>
+      </div>
+    </div>
+  `;
+}
+
 function renderHistoryEntries(c){
   const el = document.getElementById("historyEntries");
   el.innerHTML = renderHistoryTimeline(c, true);
+}
+
+function saveQuickClientUpdate(clientId){
+  const c = data.klienci.find(x=>x.id===clientId);
+  const form = document.querySelector(`.quickUpdate [data-quick-field="action"]`)?.closest(".quickUpdate");
+  if(!c || !form) return;
+  const get = field => (form.querySelector(`[data-quick-field="${field}"]`)?.value || "").trim();
+  const action = get("action") || "Inne";
+  const who = get("who") || getWhoAmI();
+  const status = get("status");
+  const followup = get("followup");
+  const note = get("note");
+  const dateText = /^\d{4}-\d{2}-\d{2}$/.test(followup) ? followup : "";
+  const details = [];
+  if(dateText) details.push(`Następny kontakt: ${dateText}.`);
+  if(note) details.push(`Notatka: ${note}`);
+  const tekst = `[${action}] ${details.join(" ")}`.trim();
+  if(!Array.isArray(c.historia)) c.historia = [];
+  c.historia.push({tekst, kto: who, data: new Date().toISOString()});
+  if(status && STATUS_OPTS.some(([v])=>v===status)) c.status = status;
+  if(dateText) c.nastepnyFollowup = dateText;
+  c.zaktualizowano = new Date().toISOString();
+  logActivity(`dodał(a) szybką aktualizację klienta „${c.firma||c.osoba||'bez nazwy'}”`);
+  saveData();
+  renderClients();
+  openClientCard(clientId);
 }
 
 function addHistoryEntry(){
@@ -1942,6 +2021,8 @@ const OBJECTION_OPTS = ["Cena","Niepewność co do popytu","Obawa o serwis / awa
 const OFFER_VARIANT_OPTS = ["Premium","Standard","Podstawowy","BRUNIMAT 650 Premium DUO","Pawilon / punkt sprzedaży","Pełny punkt sprzedaży","Inne"];
 const OFFER_STATUS_OPTS = ["Robocza","Wysłana","Czeka na decyzję","Do poprawy","Zaakceptowana","Odrzucona","Archiwalna"];
 const OFFER_CURRENCY_OPTS = ["EUR","PLN"];
+const QUICK_ACTION_OPTS = ["Advisor wysłany","Tata dzwonił","Mail wysłany","SMS wysłany","Brak odpowiedzi","Klient zainteresowany","Oferta wysłana","Czeka na decyzję","Do oddzwonienia","Nieaktualne","Inne"];
+const QUICK_WHO_OPTS = ["Ja","Tata","Import","Inne"];
 
 function clientField(c, field, type){
   if(type==="status"){
@@ -2224,6 +2305,7 @@ function renderClientKanbanCard(c){
   const product = clientProduct(c);
   const followup = followupInfo(clientFollowup(c));
   const objection = crmShort(clientObjections(c), 90);
+  const last = clientActivitySummary(c, 90);
   return `
     <div class="kanbanCard" onclick="openClientCard('${crmEsc(c.id)}')">
       <div class="kanbanName">${crmEsc(clientName(c))}</div>
@@ -2235,6 +2317,7 @@ function renderClientKanbanCard(c){
       </div>
       ${contact ? `<div class="kanbanContact">${crmEsc(contact)}</div>` : ""}
       ${objection ? `<div class="kanbanNote">Obiekcja: ${crmEsc(objection)}</div>` : ""}
+      ${last ? `<div class="kanbanNote">Ostatnie działanie: ${crmEsc(last)}</div>` : ""}
     </div>
   `;
 }
@@ -2273,12 +2356,14 @@ function renderFollowupItem(c){
   const note = crmShort(reason, 110);
   const product = clientProduct(c);
   const prompt = objectionPrompt(clientObjections(c));
+  const last = clientActivitySummary(c, 120);
   return `
     <div class="followItem">
       <div><b>${crmEsc(clientName(c))}</b><br><span class="kanbanContact">${crmEsc(clientContact(c) || clientLocation(c) || "brak kontaktu")}</span></div>
       <div>${crmEsc(product || labelFrom(STATUS_OPTS, c.status))}</div>
       <div>${crmEsc(clientFollowup(c) ? `${clientFollowup(c)} (${followup.label})` : "brak follow-upu")}</div>
       <div class="followAction"><button class="histBtn" onclick="openClientCard('${crmEsc(c.id)}')">Karta klienta</button></div>
+      ${last ? `<div class="kanbanNote" style="grid-column:1/-1"><b>Ostatnie działanie:</b> ${crmEsc(last)}</div>` : ""}
       ${note ? `<div class="kanbanNote" style="grid-column:1/-1">${crmEsc(note)}</div>` : ""}
       <div class="kanbanNote" style="grid-column:1/-1"><b>Co powiedzieć:</b> ${crmEsc(prompt)}</div>
     </div>
@@ -2292,11 +2377,13 @@ function openClientCard(clientId){
   if(!c || !box) return;
   const hist = c.historia || [];
   const followup = followupInfo(clientFollowup(c));
+  const lastActivity = clientActivitySummary(c, 150);
   box.innerHTML = `
     <div class="clientCardTop">
       <div>
         <h2>${crmEsc(clientName(c))}</h2>
         <div class="kanbanContact">${crmEsc(clientContact(c) || clientLocation(c) || "brak kontaktu")}</div>
+        <div class="lastActivity">${lastActivity ? `<span class="lastActivityBadge">Ostatnie działanie: ${crmEsc(lastActivity)}</span>` : '<span class="lastActivityBadge">Ostatnie działanie: brak</span>'}</div>
       </div>
       <div class="clientCardBadges">
         <span class="kanbanPill">${crmEsc(labelFrom(STATUS_OPTS, c.status))}</span>
@@ -2315,6 +2402,7 @@ function openClientCard(clientId){
       <div class="clientCardField"><b>Co go powstrzymuje</b>${clientField(c,null,"objection")}</div>
     </div>
     <div class="clientCardNotes"><b>Notatki</b><br>${crmEsc(c.notatki || "Brak notatek.")}</div>
+    ${renderQuickClientUpdate(c)}
     ${renderClientOffers(c)}
     <div class="clientCardHistory">
       <div class="clientCardHistoryHead">
@@ -2501,6 +2589,7 @@ function renderClients(){
     const addr = [c.ulica, c.miejscowosc, c.wojewodztwo].filter(Boolean).join(", ");
     const mapsUrl = addr ? `https://www.google.com/maps/search/${encodeURIComponent(addr)}` : "";
     const rowTitle = `Dodano: ${c.utworzono?formatDT(c.utworzono):"—"} | Zaktualizowano: ${c.zaktualizowano?formatDT(c.zaktualizowano):"—"}`;
+    const lastActivity = clientActivitySummary(c, 90);
     return `
     <tr title="${rowTitle}" class="${isDupe?'dupeRow':''}">
       <td>${isDupe?'<span class="dupeBadge" title="Możliwy duplikat — ten numer telefonu występuje więcej niż raz">⚠</span>':''}${clientField(c,"firma")}</td>
@@ -2514,7 +2603,7 @@ function renderClients(){
       <td>${clientField(c,"nastepnyFollowup","date")}</td>
       <td>${clientField(c,null,"prio")}</td>
       <td>${clientField(c,null,"status")}</td>
-      <td>${clientField(c,"notatki","textarea")}</td>
+      <td>${clientField(c,"notatki","textarea")}${lastActivity ? `<div class="lastActivity">Ostatnie: ${crmEsc(lastActivity)}</div>` : ""}</td>
       <td><button class="histBtn" onclick="openHistoryModal('${c.id}')">📜 ${(c.historia||[]).length}</button></td>
       <td><button class="delBtn" onclick="deleteClient('${c.id}')">Usuń</button></td>
     </tr>
