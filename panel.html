@@ -15,12 +15,13 @@
   *{box-sizing:border-box}
   body{margin:0;font-family:Arial,Helvetica,sans-serif;color:var(--text);background:var(--bg);min-height:100vh;transition:background .2s,color .2s}
   body.dark-theme{
-    --green:#5ea76c;--light:#253229;--accent:#d7b25c;--ink:#edf5ef;--muted:#a4b2aa;--line:#33443c;
-    --done:#5aa26f;--progress:#d7b25c;--todo:#cf6f65;
-    --bg:#121815;--surface:#1a211e;--surface-soft:#202925;--surface-muted:#1f2a24;
-    --text:#edf5ef;--text-muted:#a4b2aa;--border:#33443c;
-    --header-grad-start:#16211b;--header-grad-end:#0d1511;--header-text:#edf5ef;
-    --nav-panel:#18211d;--input-bg:#151d19;--shadow-soft:0 18px 36px rgba(0,0,0,.22)
+    --green:#4caf50;--light:#102319;--accent:#4caf50;--accent-2:#d6b35a;--ink:#f3f7f2;--muted:#a8b8ad;--line:rgba(255,255,255,.12);
+    --done:#67c26d;--progress:#d6b35a;--todo:#ef5350;--danger:#ef5350;--warning:#f2b84b;
+    --bg:#07120d;--bg-soft:#0d1c15;--card:#102319;--card-2:#13281d;
+    --surface:#102319;--surface-soft:#13281d;--surface-muted:#0d1c15;
+    --text:#f3f7f2;--text-muted:#a8b8ad;--border:rgba(255,255,255,.12);
+    --header-grad-start:#102017;--header-grad-end:#0a1510;--header-text:#f3f7f2;
+    --nav-panel:#102319;--input-bg:#13281d;--shadow-soft:0 18px 36px rgba(0,0,0,.28)
   }
 
   /* --- Password gate --- */
@@ -627,6 +628,291 @@
   .clientInlineLink{color:var(--green);text-decoration:none;font-weight:bold}
   .clientInlineLink:hover{text-decoration:underline}
   .clientMobileActions{display:flex;flex-wrap:wrap;gap:8px}
+
+  body.dark-theme{
+    background:var(--bg) !important;
+    color:var(--text);
+  }
+  body.dark-theme #app,
+  body.dark-theme .wrap,
+  body.dark-theme .statsBar,
+  body.dark-theme .dashGrid,
+  body.dark-theme .tabPane,
+  body.dark-theme .tableWrap,
+  body.dark-theme .clientsFollowups,
+  body.dark-theme .clientsKanban,
+  body.dark-theme .backupPreview,
+  body.dark-theme .salesLayout,
+  body.dark-theme .settingsGrid{
+    background:transparent;
+    color:var(--text);
+  }
+  body.dark-theme header p,
+  body.dark-theme .dashHeroSub{color:#d7e4d9}
+  body.dark-theme .section,
+  body.dark-theme .dashCard,
+  body.dark-theme .statCard,
+  body.dark-theme .item,
+  body.dark-theme .instItem,
+  body.dark-theme .terminItem,
+  body.dark-theme .finItem,
+  body.dark-theme .linkCard,
+  body.dark-theme .priceCard,
+  body.dark-theme .vendorCard,
+  body.dark-theme .loanScenario,
+  body.dark-theme .zadanieItem,
+  body.dark-theme .budgetItem,
+  body.dark-theme .checkCard,
+  body.dark-theme .followGroup,
+  body.dark-theme .clientCardBox,
+  body.dark-theme .historyBox,
+  body.dark-theme .previewBox,
+  body.dark-theme .salesDoc,
+  body.dark-theme .settingsCard,
+  body.dark-theme .clientMobileCard{
+    background:var(--card) !important;
+    color:var(--text);
+    border-color:var(--border) !important;
+    box-shadow:var(--shadow-soft);
+  }
+  body.dark-theme .section,
+  body.dark-theme .dashCard{
+    background:var(--card) !important;
+  }
+  body.dark-theme .dashHero{
+    background:
+      linear-gradient(135deg,rgba(16,32,23,.96),rgba(24,53,34,.92)),
+      linear-gradient(90deg,transparent,rgba(214,179,90,.16)) !important;
+  }
+  body.dark-theme .commandCenter,
+  body.dark-theme .dashAi,
+  body.dark-theme .clientOffers,
+  body.dark-theme .quickUpdate{
+    background:var(--card-2) !important;
+    color:var(--text);
+    border-color:rgba(214,179,90,.35) !important;
+  }
+  body.dark-theme .commandSection.priority{
+    background:linear-gradient(180deg,rgba(30,44,33,.98),rgba(16,35,25,.98)) !important;
+  }
+  body.dark-theme .commandClientCard,
+  body.dark-theme .notifyCard,
+  body.dark-theme .commandReason,
+  body.dark-theme .offerCard,
+  body.dark-theme .offerForm,
+  body.dark-theme .clientCardField,
+  body.dark-theme .historyEntry,
+  body.dark-theme .aiWorkflowCard,
+  body.dark-theme .aiWorkflowList li,
+  body.dark-theme .aiPromptText,
+  body.dark-theme .backupPreviewStatus,
+  body.dark-theme .dashFinance > div,
+  body.dark-theme .kanbanColumn,
+  body.dark-theme .kanbanCard,
+  body.dark-theme .salesText,
+  body.dark-theme .vendorContact,
+  body.dark-theme .pricePreview,
+  body.dark-theme .fileCard{
+    background:var(--card-2) !important;
+    color:var(--text);
+    border-color:var(--border) !important;
+  }
+  body.dark-theme .mainCategoryNav,
+  body.dark-theme .subCategoryNav,
+  body.dark-theme .crmViewToggle,
+  body.dark-theme .salesMenu{
+    background:var(--card) !important;
+    border-color:var(--border) !important;
+  }
+  body.dark-theme .mainCategoryBtn,
+  body.dark-theme .subCategoryBtn,
+  body.dark-theme .crmViewBtn,
+  body.dark-theme .salesMenu button,
+  body.dark-theme .themeChoiceBtn{
+    background:transparent;
+    color:var(--text-muted);
+    border-color:var(--border);
+  }
+  body.dark-theme .mainCategoryBtn:hover,
+  body.dark-theme .subCategoryBtn:hover,
+  body.dark-theme .crmViewBtn:hover,
+  body.dark-theme .salesMenu button:hover,
+  body.dark-theme .themeChoiceBtn:hover{
+    background:var(--card-2);
+    color:var(--text);
+  }
+  body.dark-theme .mainCategoryBtn.active,
+  body.dark-theme .subCategoryBtn.active,
+  body.dark-theme .crmViewBtn.active,
+  body.dark-theme .salesMenu button.active,
+  body.dark-theme .themeChoiceBtn.active{
+    background:linear-gradient(135deg,#245b31,#4caf50) !important;
+    color:#f7fbf6 !important;
+    border-color:transparent !important;
+  }
+  body.dark-theme .tabBtn:hover,
+  body.dark-theme .histBtn:hover,
+  body.dark-theme .addBtn:hover,
+  body.dark-theme .doneBtn:hover,
+  body.dark-theme .priceBtn.secondary:hover{
+    background:var(--card-2) !important;
+  }
+  body.dark-theme table,
+  body.dark-theme table.clients,
+  body.dark-theme table.planTable{
+    background:var(--card);
+    color:var(--text);
+  }
+  body.dark-theme table.clients th,
+  body.dark-theme table.planTable th{
+    background:rgba(214,179,90,.12) !important;
+    color:var(--text) !important;
+    border-bottom-color:var(--border) !important;
+  }
+  body.dark-theme table.clients td,
+  body.dark-theme table.planTable td{
+    color:var(--text);
+    border-bottom-color:var(--border) !important;
+  }
+  body.dark-theme table.clients tbody tr:hover{
+    background:rgba(255,255,255,.04) !important;
+  }
+  body.dark-theme .followItem{
+    border-top-color:var(--border) !important;
+  }
+  body.dark-theme input,
+  body.dark-theme select,
+  body.dark-theme textarea,
+  body.dark-theme .docSearch,
+  body.dark-theme .filterRow input,
+  body.dark-theme .filterRow select,
+  body.dark-theme #addClientModal input,
+  body.dark-theme #addClientModal select,
+  body.dark-theme .clientCardField select,
+  body.dark-theme .clientCardField input,
+  body.dark-theme .clientCardField textarea,
+  body.dark-theme .historyEditForm input,
+  body.dark-theme .historyEditForm textarea,
+  body.dark-theme .historyAdd input,
+  body.dark-theme .historyAdd textarea,
+  body.dark-theme .offerForm input,
+  body.dark-theme .offerForm select,
+  body.dark-theme .offerForm textarea,
+  body.dark-theme .quickUpdate input,
+  body.dark-theme .quickUpdate select,
+  body.dark-theme .quickUpdate textarea,
+  body.dark-theme .newItemForm input{
+    background:var(--card-2) !important;
+    color:var(--text) !important;
+    border-color:var(--border) !important;
+  }
+  body.dark-theme input::placeholder,
+  body.dark-theme textarea::placeholder{
+    color:var(--text-muted) !important;
+  }
+  body.dark-theme table.clients input:hover,
+  body.dark-theme table.clients select:hover,
+  body.dark-theme table.clients textarea:hover,
+  body.dark-theme table.clients input:focus,
+  body.dark-theme table.clients select:focus,
+  body.dark-theme table.clients textarea:focus{
+    background:rgba(255,255,255,.05) !important;
+    border-color:rgba(76,175,80,.45) !important;
+    box-shadow:0 0 0 3px rgba(76,175,80,.14) !important;
+  }
+  body.dark-theme .addBtn,
+  body.dark-theme .histBtn,
+  body.dark-theme .doneBtn,
+  body.dark-theme .priceBtn.secondary{
+    background:var(--card-2) !important;
+    color:var(--text) !important;
+    border:1px solid var(--border) !important;
+  }
+  body.dark-theme .importBtn,
+  body.dark-theme .priceBtn,
+  body.dark-theme .salesActions button:not(.secondary),
+  body.dark-theme .previewClose{
+    background:#245b31 !important;
+    color:#f7fbf6 !important;
+    border-color:transparent !important;
+  }
+  body.dark-theme .dangerBtn,
+  body.dark-theme .delBtn{
+    background:rgba(239,83,80,.12) !important;
+    color:#ffb4b2 !important;
+    border-color:rgba(239,83,80,.35) !important;
+  }
+  body.dark-theme .docBadge,
+  body.dark-theme .kanbanPill,
+  body.dark-theme .offerBadge,
+  body.dark-theme .notifySource,
+  body.dark-theme select.statCell{
+    background:rgba(76,175,80,.14) !important;
+    color:#cce7cf !important;
+    border-color:rgba(76,175,80,.28) !important;
+  }
+  body.dark-theme .docBadge.confidential,
+  body.dark-theme .docWarning,
+  body.dark-theme .commandSectionCount,
+  body.dark-theme .notifyUnread,
+  body.dark-theme .dashAiTags span,
+  body.dark-theme .aiPromptBadge,
+  body.dark-theme .lastActivityBadge,
+  body.dark-theme .kanbanPill.gold,
+  body.dark-theme .subCategoryBtn[data-priority="true"]{
+    background:rgba(214,179,90,.14) !important;
+    color:#f0d991 !important;
+    border-color:rgba(214,179,90,.35) !important;
+  }
+  body.dark-theme .docBadge.strict,
+  body.dark-theme .backupPreviewStatus.error{
+    background:rgba(239,83,80,.12) !important;
+    color:#ffb4b2 !important;
+    border-color:rgba(239,83,80,.3) !important;
+  }
+  body.dark-theme .backupPreviewStatus.warn,
+  body.dark-theme .privateNotice,
+  body.dark-theme .vendorIntro,
+  body.dark-theme .salesWarn{
+    background:rgba(214,179,90,.12) !important;
+    color:#f0d991 !important;
+    border-color:rgba(214,179,90,.32) !important;
+  }
+  body.dark-theme .fileThumb,
+  body.dark-theme .dashFunnelBarWrap{
+    background:rgba(255,255,255,.06) !important;
+  }
+  body.dark-theme .logRow,
+  body.dark-theme .loanRow,
+  body.dark-theme .dashListRow,
+  body.dark-theme .settingsMetaRow{
+    border-bottom-color:var(--border) !important;
+  }
+  body.dark-theme #activityLog,
+  body.dark-theme .logRow,
+  body.dark-theme .dateCaption,
+  body.dark-theme .noLinkText,
+  body.dark-theme .notifyDate,
+  body.dark-theme .notifyMeta,
+  body.dark-theme .commandMeta,
+  body.dark-theme .kanbanContact,
+  body.dark-theme .kanbanNote,
+  body.dark-theme .budgetNoteText,
+  body.dark-theme .dashAiText,
+  body.dark-theme .salesText,
+  body.dark-theme .vendorMeta{
+    color:var(--text-muted) !important;
+  }
+  body.dark-theme .notifyClient,
+  body.dark-theme .commandClientName,
+  body.dark-theme .kanbanName,
+  body.dark-theme .budgetItem strong,
+  body.dark-theme .salesDoc h3,
+  body.dark-theme #historyClientName,
+  body.dark-theme .clientOffersHead b,
+  body.dark-theme .quickUpdateHead b{
+    color:var(--text) !important;
+  }
 
   .statusPill,.prio,.dashPill,.terminBadge,.ktoBadge{letter-spacing:.01em}
   .statusPill{padding:4px 10px}
