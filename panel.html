@@ -90,6 +90,13 @@
   .lockBtn{background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.4);
            color:white;border-radius:20px;padding:6px 14px;font-size:12px;cursor:pointer}
   .themeBtn{margin-left:0}
+  .themeToggleGroup{display:inline-flex;align-items:center;gap:2px;border:1px solid rgba(255,255,255,.35);
+                    background:rgba(255,255,255,.12);border-radius:999px;padding:3px}
+  .themeToggleGroup button{border:0;background:transparent;color:#e6efe8;border-radius:999px;padding:5px 10px;
+                           font-size:12px;font-weight:bold;cursor:pointer}
+  .themeToggleGroup button.active{background:#f7fbf6;color:#244b2f;box-shadow:0 6px 14px rgba(0,0,0,.16)}
+  body.dark-theme .themeToggleGroup{background:rgba(214,179,90,.08);border-color:rgba(214,179,90,.32)}
+  body.dark-theme .themeToggleGroup button.active{background:#d6b35a;color:#102017}
 
   /* --- Client table --- */
   .tableWrap{overflow-x:auto}
@@ -481,6 +488,8 @@
   .commandActivityRow{display:grid;gap:7px}
   .commandActivityMeta{font-size:12px;color:var(--text-muted);line-height:1.35}
   .dashNotifications{grid-column:span 4}
+  .dashFollowups{grid-column:span 4}
+  .dashActivityCard{grid-column:span 4}
   .notifyHead{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:10px}
   .notifyUnread{font-size:12px;font-weight:bold;color:#755c15;background:#fff8df;border:1px solid #ead99a;border-radius:999px;padding:4px 9px}
   .notifyList{display:grid;gap:8px}
@@ -609,6 +618,8 @@
   .offerActions{display:flex;gap:8px;justify-content:flex-end;margin-top:10px}
   .dashHeroMeta{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
   .dashSyncPill{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;background:var(--surface-muted);border:1px solid var(--border);font-size:12px;font-weight:bold;color:var(--text)}
+  .dashSecondary{opacity:.92}
+  .dashSecondary .dashCardTitle{color:var(--text-muted)}
   .settingsGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
   .settingsCard{background:var(--surface-soft);border:1px solid var(--border);border-radius:12px;padding:14px}
   .settingsCard h3{margin:0 0 8px;color:var(--green);font-size:15px}
@@ -679,6 +690,7 @@
   body.dark-theme .dashCard{
     background:var(--card) !important;
   }
+  body.dark-theme .themeToggleGroup button{color:#d7e4d9}
   body.dark-theme .dashHero{
     background:
       linear-gradient(135deg,rgba(16,32,23,.96),rgba(24,53,34,.92)),
@@ -922,7 +934,7 @@
     header{position:static;padding:18px 18px}
     .wrap{padding:18px 14px 44px}
     .dashGrid{grid-template-columns:1fr}
-    .dashCard,.dashToday,.dashAi{grid-column:1/-1}
+    .dashCard,.dashToday,.dashAi,.dashFollowups,.dashActivityCard{grid-column:1/-1}
     .dashKpiRow{grid-template-columns:1fr 1fr}
     .commandSections,.commandCounters{grid-template-columns:1fr 1fr}
     .mainCategoryNav,.subCategoryNav{flex-wrap:nowrap;overflow-x:auto;padding-bottom:10px}
@@ -977,7 +989,10 @@
     </div>
     <span id="syncStatus" style="font-size:11px;color:#cfe8d6;margin-left:auto;margin-right:4px"></span>
     <button class="lockBtn" onclick="refreshFromRemote()">⟳ Odśwież</button>
-    <button class="lockBtn themeBtn" id="themeToggleBtn" onclick="toggleTheme()">🌗 Motyw</button>
+    <div class="themeToggleGroup" aria-label="Motyw panelu">
+      <button type="button" id="headerThemeLight" onclick="setTheme('light')">Jasny</button>
+      <button type="button" id="headerThemeDark" onclick="setTheme('dark')">Ciemny</button>
+    </div>
     <button class="lockBtn" onclick="lock()">Zablokuj</button>
   </header>
 
@@ -1027,6 +1042,16 @@
           <div id="dashNotifications"></div>
         </div>
 
+        <div class="dashCard dashFollowups">
+          <div class="dashCardTitle">Najbliższe follow-upy</div>
+          <div id="dashFollowups"></div>
+        </div>
+
+        <div class="dashCard dashActivityCard">
+          <div class="dashCardTitle">Ostatnie działania</div>
+          <div id="dashActivity"></div>
+        </div>
+
         <div class="dashCard dashToday">
           <div class="dashCardTitle">Dzisiaj do ogarnięcia</div>
           <div id="dashToday"></div>
@@ -1043,29 +1068,24 @@
           <button class="doneBtn" onclick="switchTab('aiworkflow')" style="margin-top:12px">Otwórz AI Workflow</button>
         </div>
 
-        <div class="dashCard">
+        <div class="dashCard dashSecondary">
           <div class="dashCardTitle">👥 Lejek sprzedażowy</div>
           <div id="dashFunnel" class="dashFunnel"></div>
         </div>
 
-        <div class="dashCard">
+        <div class="dashCard dashSecondary">
           <div class="dashCardTitle">💰 Bilans finansowy</div>
           <div id="dashFinance" class="dashFinance"></div>
         </div>
 
-        <div class="dashCard">
+        <div class="dashCard dashSecondary">
           <div class="dashCardTitle">📅 Najbliższe terminy</div>
           <div id="dashTerminy"></div>
         </div>
 
-        <div class="dashCard">
+        <div class="dashCard dashSecondary">
           <div class="dashCardTitle">🥛 Instalacje</div>
           <div id="dashInstalacje" class="dashMiniStats"></div>
-        </div>
-
-        <div class="dashCard">
-          <div class="dashCardTitle">🕓 Ostatnia aktywność</div>
-          <div id="dashActivity"></div>
         </div>
       </div>
     </div>
@@ -1648,8 +1668,8 @@ function setTheme(theme, silent){
   const next = theme === "dark" ? "dark" : "light";
   document.body.classList.toggle("dark-theme", next === "dark");
   localStorage.setItem("panel_theme", next);
-  const toggleBtn = document.getElementById("themeToggleBtn");
-  if(toggleBtn) toggleBtn.textContent = next === "dark" ? "☀️ Jasny" : "🌗 Motyw";
+  document.getElementById("headerThemeLight")?.classList.toggle("active", next === "light");
+  document.getElementById("headerThemeDark")?.classList.toggle("active", next === "dark");
   document.getElementById("themeChoiceLight")?.classList.toggle("active", next === "light");
   document.getElementById("themeChoiceDark")?.classList.toggle("active", next === "dark");
   if(!silent) renderPanelSettings();
@@ -1678,7 +1698,7 @@ function renderNavigation(){
   mainNav.innerHTML = Object.entries(PANEL_NAV).map(([key, section]) => `
     <button class="mainCategoryBtn ${currentMainCategory===key?"active":""}" onclick="setMainCategory('${key}')">${crmEsc(section.label)}</button>
   `).join("");
-  const activeSection = PANEL_NAV[currentMainCategory] || PANEL_NAV.today;
+  const activeSection = PANEL_NAV[currentMainCategory] || PANEL_NAV.start;
   subNav.innerHTML = activeSection.views.map(view => `
     <button class="subCategoryBtn ${currentSubView===view.key?"active":""}" data-priority="${view.priority ? "true" : "false"}" onclick="setSubView('${view.key}')">${crmEsc(view.label)}</button>
   `).join("");
@@ -1721,14 +1741,14 @@ function syncNavigationFromTab(name){
       advisor:"sales-advisor",
       advisorolx:"sales-advisorolx"
     };
-    currentMainCategory = currentSubView === "today-followups" ? "today" : "sales";
+    currentMainCategory = currentSubView === "today-followups" ? "start" : "sales";
     currentSubView = clientMap[currentClientsView] || "sales-table";
     renderNavigation();
     return;
   }
   if(tabMap[name]){
     currentSubView = tabMap[name];
-    currentMainCategory = SUB_VIEW_INDEX[currentSubView]?.categoryKey || "today";
+    currentMainCategory = SUB_VIEW_INDEX[currentSubView]?.categoryKey || "start";
     renderNavigation();
   }
 }
@@ -2713,72 +2733,60 @@ function populateFilterOptions(){
 let currentClientsView = "table";
 let currentClientCardId = null;
 let currentOfferEdit = null;
-let currentMainCategory = "today";
+let currentMainCategory = "start";
 let currentSubView = "dashboard";
 
 const PANEL_NAV = {
-  today: {
-    label: "Dzisiaj",
+  start: {
+    label: "START",
     views: [
       {key:"dashboard", label:"Dashboard", tab:"dashboard"},
       {key:"today-command", label:"Centrum dnia", tab:"dashboard", focusId:"dailyCommandCenter"},
       {key:"today-notifications", label:"Powiadomienia", tab:"dashboard", focusId:"dashNotifications"},
-      {key:"today-followups", label:"Do kontaktu", tab:"klienci", clientsView:"followups", priority:true}
+      {key:"today-followups", label:"Najbliższe follow-upy", tab:"klienci", clientsView:"followups", priority:true}
     ]
   },
   sales: {
-    label: "Klienci i sprzedaż",
+    label: "SPRZEDAŻ",
     views: [
       {key:"sales-table", label:"Baza klientów", tab:"klienci", clientsView:"table"},
       {key:"sales-advisor", label:"Advisor", tab:"klienci", clientsView:"advisor"},
       {key:"sales-advisorolx", label:"Advisor OLX", tab:"klienci", clientsView:"advisorolx"},
-      {key:"sales-kanban", label:"Kanban", tab:"klienci", clientsView:"kanban"},
+      {key:"sales-kanban", label:"Kanban CRM", tab:"klienci", clientsView:"kanban"},
       {key:"sales-followups", label:"Do kontaktu", tab:"klienci", clientsView:"followups"},
       {key:"sales-offers", label:"Oferty", tab:"klienci", clientsView:"table", focusId:"section-klienci"},
       {key:"sales-history", label:"Historia działań", tab:"klienci", clientsView:"table", focusId:"section-klienci"}
     ]
   },
-  documents: {
-    label: "Dokumenty i oferty",
+  company: {
+    label: "FIRMA",
     views: [
       {key:"docs-home", label:"Dokumenty", tab:"dokumenty"},
       {key:"docs-price", label:"Cenniki", tab:"cenniki"},
-      {key:"docs-materials", label:"Materiały sprzedażowe", tab:"materialy"},
+      {key:"fin-budget", label:"Budżet", tab:"budzet"},
+      {key:"fin-finance", label:"Finanse", tab:"finanse"},
       {key:"docs-formal", label:"Umowy / formalne", tab:"dokumenty", documentSearch:"formalne"}
     ]
   },
   operations: {
-    label: "Operacje",
+    label: "OPERACJE",
     views: [
       {key:"ops-tasks", label:"Zadania", tab:"zadania"},
       {key:"ops-checklists", label:"Checklisty", tab:"checklisty"},
-      {key:"ops-deadlines", label:"Terminy", tab:"terminy"},
+      {key:"ops-deadlines", label:"Terminy / formalności", tab:"terminy"},
       {key:"ops-installations", label:"Instalacje", tab:"instalacje"},
-      {key:"ops-activity", label:"Sprawy i aktywności", tab:"sprawy"}
-    ]
-  },
-  finances: {
-    label: "Finanse",
-    views: [
-      {key:"fin-budget", label:"Budżet startowy", tab:"budzet"},
-      {key:"fin-finance", label:"Finanse", tab:"finanse"}
-    ]
-  },
-  marketing: {
-    label: "Marketing i partnerzy",
-    views: [
+      {key:"ops-activity", label:"Sprawy w toku", tab:"sprawy"},
+      {key:"docs-materials", label:"Materiały", tab:"materialy"},
       {key:"marketing-home", label:"Marketing", tab:"marketing"},
-      {key:"marketing-vendors", label:"Podwykonawcy", tab:"podwykonawcy"},
       {key:"marketing-links", label:"Szybkie linki", tab:"linki"},
-      {key:"marketing-partners", label:"Partnerzy / leady partnerskie", tab:"podwykonawcy"}
+      {key:"marketing-vendors", label:"Podwykonawcy", tab:"podwykonawcy"}
     ]
   },
   ai: {
-    label: "AI i ustawienia",
+    label: "AI / SYSTEM",
     views: [
       {key:"ai-workflow", label:"AI Workflow", tab:"aiworkflow"},
-      {key:"ai-backup", label:"Backup", tab:"backup"},
-      {key:"ai-importexport", label:"Import / eksport JSON", tab:"backup", focusId:"importPackagePreviewResult"},
+      {key:"ai-backup", label:"Backup / Import / Eksport", tab:"backup"},
       {key:"ai-settings", label:"Ustawienia panelu", tab:"ustawienia"}
     ]
   }
@@ -5760,6 +5768,20 @@ function renderDashboard(){
     dashTodayEl.innerHTML = todayItems.length ? todayItems.map(i=>
       `<div class="dashListRow"><span>${i.label}</span><span style="color:var(--muted);font-weight:bold">${i.meta}</span></div>`
     ).join("") : '<div class="dashEmpty">Na dziś nie ma pilnych rzeczy w panelu.</div>';
+  }
+  const dashFollowupsEl = document.getElementById("dashFollowups");
+  if(dashFollowupsEl){
+    const followupRows = klienci
+      .filter(c => clientFollowup(c))
+      .map(c => ({client:c, date:dateOnlyLocal(clientFollowup(c))}))
+      .filter(x => x.date)
+      .sort((a,b) => a.date - b.date)
+      .slice(0,5);
+    dashFollowupsEl.innerHTML = followupRows.length ? followupRows.map(({client,date}) => {
+      const info = followupInfo(clientFollowup(client));
+      const tone = info.days !== null && info.days < 0 ? "var(--todo)" : (info.days === 0 ? "var(--progress)" : "var(--muted)");
+      return `<div class="dashListRow"><span><strong>${crmEsc(clientName(client))}</strong><br><span style="color:var(--text-muted)">${crmEsc(clientContact(client) || clientLocation(client) || "brak kontaktu")}</span></span><span style="color:${tone};font-weight:bold">${crmEsc(info.label)}</span></div>`;
+    }).join("") : '<div class="dashEmpty">Brak ustawionych follow-upów.</div>';
   }
   renderDailyCommandCenter();
   const funnelStages = [
