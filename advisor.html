@@ -416,5 +416,75 @@ async function sendToUs(){
 }
 renderAuditQuestions();calculate();
 </script>
+<script>
+async function sendToUs(){
+  calculate();
+  const statusEl = document.getElementById("sendStatus");
+  const farm = document.getElementById("farm").value.trim();
+  const owner = document.getElementById("owner").value.trim();
+  const phone = document.getElementById("phone").value.trim();
+  const region = document.getElementById("region").value.trim();
+  const county = document.getElementById("county").value.trim();
+  const interestVal = document.getElementById("interest").value;
+  const answersText = [
+    farm ? `Gospodarstwo: ${farm}` : "",
+    owner ? `Osoba kontaktowa: ${owner}` : "",
+    phone ? `Telefon: ${phone}` : "",
+    region || county ? `Region: ${[region, county].filter(Boolean).join(" / ")}` : "",
+    `Zainteresowanie: ${INTEREST_LABELS[interestVal] || interestVal}`,
+    `Wynik potencjału: ${document.getElementById("scoreTxt").innerText}`,
+    `Scenariusz bez dofinansowania: ${document.getElementById("roiTxt").innerText} lat`,
+    `Scenariusz z dofinansowaniem: ${document.getElementById("roiEuTxt").innerText} lat`,
+    `Potencjał przed kosztami: ${document.getElementById("profitYearTxt").innerText}`,
+    `Ekonomia i finansowanie: ${document.getElementById("financeResult").innerText}`,
+    document.getElementById("euEnable").checked ? `Dofinansowanie: ${document.getElementById("euResult").innerText}` : "Dofinansowanie nie uwzględnione",
+    `Rekomendacja: ${document.getElementById("solutionNarrative").innerText} ${document.getElementById("solution").innerText}`,
+    `Dokumenty: ${document.getElementById("documentsTable").innerText}`,
+    `Harmonogram: ${document.getElementById("timelineTable").innerText}`,
+    document.getElementById("notes").value.trim() ? `Uwagi klienta: ${document.getElementById("notes").value.trim()}` : ""
+  ].filter(Boolean).join("\n");
+
+  const leadPayload = {
+    source: "advisor",
+    firma: farm,
+    osoba: owner,
+    telefon: phone,
+    email: "",
+    wojewodztwo: region,
+    miejscowosc: county,
+    zainteresowanie: INTEREST_LABELS[interestVal] || interestVal,
+    produkt: INTEREST_LABELS[interestVal] || interestVal,
+    interest: interestVal,
+    notes: document.getElementById("notes").value.trim(),
+    answersText,
+    website: ""
+  };
+
+  statusEl.textContent = "Wysyłanie...";
+  statusEl.style.color = "#666";
+  try{
+    const leadRes = await fetch('/api/leads', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify(leadPayload)
+    });
+    if(!leadRes.ok) throw new Error('lead');
+    const mailPayload = {
+      _subject: `Advisor EU — wynik kalkulatora: ${farm || "(brak nazwy)"} (${owner || "(brak kontaktu)"})`,
+      "Dane formularza Advisor": answersText
+    };
+    fetch('https://formspree.io/f/xdarjozy', {
+      method: 'POST',
+      body: JSON.stringify(mailPayload),
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' }
+    }).catch(()=>{});
+    statusEl.textContent = "Dziękujemy. Formularz doradczy został zapisany i trafił do zespołu.";
+    statusEl.style.color = "#2f7a45";
+  } catch(e){
+    statusEl.textContent = "Nie udało się zapisać zgłoszenia. Spróbuj ponownie albo skontaktuj się telefonicznie.";
+    statusEl.style.color = "#b44";
+  }
+}
+</script>
 </body>
 </html>

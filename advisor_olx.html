@@ -670,6 +670,7 @@
                 <label for="notes">Dodatkowa informacja <span style="font-weight:500;color:var(--muted)">(opcjonalnie)</span></label>
                 <textarea id="notes" name="notes" placeholder="Np. liczba krów, miejscowość, obecna sprzedaż bezpośrednia..."></textarea>
               </div>
+              <input id="companyUrl" name="company_url" type="text" tabindex="-1" autocomplete="off" style="position:absolute;left:-9999px;opacity:0;pointer-events:none" aria-hidden="true">
               <label class="checkbox field full">
                 <input id="privacyConsent" type="checkbox" required>
                 <span>Proszę o kontakt w sprawie kalkulacji i oferty. Administratorem danych jest Sklep za Stodołą Sp. z o.o. Dane zostaną wykorzystane do odpowiedzi na zapytanie i przygotowania oferty. Szczegóły znajdują się w <a href="/polityka.html" target="_blank" rel="noopener">Polityce prywatności</a>.</span>
@@ -700,6 +701,7 @@
       // Przykład: "https://formspree.io/f/ABC123XY"
       // Gdy pole pozostaje puste, strona otwiera gotową wiadomość w programie pocztowym.
       const FORM_ENDPOINT = "https://formspree.io/f/xdarjozy";
+      window.ADVISOR_OLX_FORM_ENDPOINT = FORM_ENDPOINT;
       const CONTACT_EMAIL = "kontakt@sklepzastodola.pl";
 
       const $ = (selector) => document.querySelector(selector);
@@ -795,6 +797,7 @@
           marginPerLiter, annualMargin, monthlyMargin, grantValue, netInvestment,
           paybackMonths, score, recommendationTitle
         };
+        window.lastCalculation = lastCalculation;
 
         $("#monthlyMargin").textContent = numberPLN.format(monthlyMargin);
         $("#annualMargin").textContent = numberPLN.format(annualMargin);
@@ -891,6 +894,87 @@
         window.location.href = `mailto:${CONTACT_EMAIL}?subject=${subject}&body=${body}`;
         statusMessage.textContent = "Otwieram gotową wiadomość w programie pocztowym.";
       });
+    })();
+  </script>
+  <script>
+    (() => {
+      const leadForm = document.getElementById("leadForm");
+      const statusMessage = document.getElementById("statusMessage");
+      if (!leadForm || !statusMessage) return;
+
+      leadForm.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        statusMessage.textContent = "";
+
+        if (!window.lastCalculation) {
+          statusMessage.textContent = "Najpierw oblicz wynik w kalkulatorze.";
+          document.querySelector("#calculatorForm")?.scrollIntoView({ behavior: "smooth" });
+          return;
+        }
+
+        if (!leadForm.reportValidity()) return;
+
+        const c = window.lastCalculation;
+        const message = [
+          "Klient wypełnił formularz Advisor OLX.",
+          `Imię i nazwisko: ${document.getElementById("name").value.trim()}`,
+          `Telefon: ${document.getElementById("phone").value.trim()}`,
+          `E-mail: ${document.getElementById("email").value.trim() || "nie podano"}`,
+          `Województwo: ${c.region}`,
+          `Wariant: ${c.packageName}`,
+          `Sprzedaż: ${c.liters} l/dzień przez ${c.days} dni w roku`,
+          `Szacowany potencjał roczny: ${c.annualMargin}`,
+          `Koszt po możliwym dofinansowaniu: ${c.netInvestment}`,
+          `Ocena: ${c.recommendationTitle} (${c.score}%)`,
+          document.getElementById("notes").value.trim() ? `Uwagi: ${document.getElementById("notes").value.trim()}` : ""
+        ].filter(Boolean).join("\n");
+
+        const leadPayload = {
+          source: "advisor_olx",
+          osoba: document.getElementById("name").value.trim(),
+          telefon: document.getElementById("phone").value.trim(),
+          email: document.getElementById("email").value.trim(),
+          wojewodztwo: c.region || "",
+          miejscowosc: "",
+          zainteresowanie: c.packageName || "Advisor OLX",
+          produkt: c.packageName || "Advisor OLX",
+          packageName: c.packageName || "",
+          notes: document.getElementById("notes").value.trim(),
+          answersText: message,
+          company_url: document.getElementById("companyUrl").value.trim()
+        };
+
+        try {
+          statusMessage.textContent = "Wysyłanie…";
+          const leadRes = await fetch("/api/leads", {
+            method: "POST",
+            headers: { "Content-Type": "application/json", "Accept": "application/json" },
+            body: JSON.stringify(leadPayload)
+          });
+          if (!leadRes.ok) throw new Error("lead");
+
+          if (typeof window.ADVISOR_OLX_FORM_ENDPOINT === "string" && window.ADVISOR_OLX_FORM_ENDPOINT) {
+            fetch(window.ADVISOR_OLX_FORM_ENDPOINT, {
+              method: "POST",
+              headers: { "Content-Type": "application/json", "Accept": "application/json" },
+              body: JSON.stringify({
+                name: document.getElementById("name").value.trim(),
+                phone: document.getElementById("phone").value.trim(),
+                email: document.getElementById("email").value.trim(),
+                notes: document.getElementById("notes").value.trim(),
+                calculation: c,
+                message
+              })
+            }).catch(() => {});
+          }
+
+          statusMessage.textContent = "Dziękujemy. Formularz OLX został zapisany i trafił do zespołu.";
+          leadForm.reset();
+        } catch (error) {
+          statusMessage.textContent = "Nie udało się zapisać zgłoszenia. Spróbuj ponownie albo skontaktuj się telefonicznie.";
+        }
+      }, true);
     })();
   </script>
 </body>

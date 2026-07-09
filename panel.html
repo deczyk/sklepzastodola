@@ -461,6 +461,17 @@
   .commandEmpty{font-size:13px;color:#6f7b72;background:#f8fbf8;border:1px dashed #d8e4da;border-radius:10px;padding:14px;text-align:center}
   .commandActivityRow{display:grid;gap:7px}
   .commandActivityMeta{font-size:12px;color:#647066;line-height:1.35}
+  .dashNotifications{grid-column:span 4}
+  .notifyHead{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:10px}
+  .notifyUnread{font-size:12px;font-weight:bold;color:#755c15;background:#fff8df;border:1px solid #ead99a;border-radius:999px;padding:4px 9px}
+  .notifyList{display:grid;gap:8px}
+  .notifyCard{background:#f8fbf8;border:1px solid #e4eee6;border-radius:10px;padding:10px}
+  .notifyTop{display:flex;justify-content:space-between;gap:8px;align-items:flex-start;margin-bottom:6px}
+  .notifySource{font-size:11px;font-weight:bold;color:#2d5a27;background:#edf6ef;border:1px solid #d7e8db;border-radius:999px;padding:3px 8px}
+  .notifyDate{font-size:11px;color:#6a756d}
+  .notifyClient{font-weight:bold;color:#23372a}
+  .notifyMeta{font-size:12px;color:#617066;line-height:1.4;margin-top:3px}
+  .notifyActions{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
   .dashToday{grid-column:span 8}
   .dashAi{grid-column:span 4;background:linear-gradient(180deg,#fffdf4,#ffffff);border-color:#ead99a}
   .dashAi .dashCardTitle{color:#755c15}
@@ -685,6 +696,14 @@
             <div class="commandCounters" id="dailyCommandCounters"></div>
           </div>
           <div id="dailyCommandCenter"></div>
+        </div>
+
+        <div class="dashCard dashNotifications">
+          <div class="notifyHead">
+            <div class="dashCardTitle">Powiadomienia</div>
+            <div class="notifyUnread" id="dashNotificationsUnread">0 nieprzeczytanych</div>
+          </div>
+          <div id="dashNotifications"></div>
         </div>
 
         <div class="dashCard dashToday">
@@ -948,6 +967,8 @@
           <button class="crmViewBtn active" id="clientsViewTableBtn" onclick="setClientsView('table')">Tabela</button>
           <button class="crmViewBtn" id="clientsViewKanbanBtn" onclick="setClientsView('kanban')">Kanban</button>
           <button class="crmViewBtn" id="clientsViewFollowBtn" onclick="setClientsView('followups')">Do kontaktu</button>
+          <button class="crmViewBtn" id="clientsViewAdvisorBtn" onclick="setClientsView('advisor')">Advisor</button>
+          <button class="crmViewBtn" id="clientsViewAdvisorOlxBtn" onclick="setClientsView('advisorolx')">Advisor OLX</button>
         </div>
         <div class="crmHint">Widoki robocze korzystaja tylko z obecnych danych klientow.</div>
       </div>
@@ -1293,6 +1314,7 @@ function defaultData(){
     finanse: [],
     budzetStartowy: [],
     linki: [],
+    powiadomienia: [],
     zadania: [],
     checklisty: []
   };
@@ -1429,6 +1451,7 @@ function fillMissingDefaults(d){
   if(!d.finanse){ d.finanse = []; changed = true; }
   if(!d.budzetStartowy){ d.budzetStartowy = []; changed = true; }
   if(!d.linki || d.linki.length===0){ d.linki = dflt.linki; changed = true; }
+  if(!d.powiadomienia){ d.powiadomienia = []; changed = true; }
   if(!d.checklisty){ d.checklisty = []; changed = true; }
   if(!d.zadania || d.zadania.length===0){
     d.zadania = dflt.zadania;
@@ -2324,6 +2347,7 @@ function isNewLead(c){
 function isAdvisorLead(c){
   const haystack = [
     c.zrodloLeada,
+    c.kategoriaLeada,
     c.produkt,
     c.zainteresowanie,
     ...(Array.isArray(c.historia) ? c.historia.map(h => h.tekst) : [])
@@ -2500,7 +2524,132 @@ function addQuickClientActivity(clientId, action){
   render();
   renderClients();
   renderDailyCommandCenter();
+  renderDashboardNotifications();
   if(document.getElementById("clientCardModal")?.classList.contains("open")) openClientCard(clientId);
+}
+
+function getLeadCategory(c){
+  return (c.kategoriaLeada || c.zrodloLeada || "").toString().trim();
+}
+
+function isAdvisorOlxClient(c){
+  const category = getLeadCategory(c).toLowerCase();
+  const source = clientLeadSource(c).toLowerCase();
+  return category === "advisor olx" || source.includes("advisor olx");
+}
+
+function isAdvisorClient(c){
+  if(isAdvisorOlxClient(c)) return false;
+  const category = getLeadCategory(c).toLowerCase();
+  const source = clientLeadSource(c).toLowerCase();
+  return category === "advisor" || source === "advisor" || source.includes("advisor");
+}
+
+function getLeadNotifications(){
+  return (Array.isArray(data.powiadomienia) ? data.powiadomienia : []).filter(item => item && item.typ === "lead");
+}
+
+function renderDashboardNotifications(){
+  const host = document.getElementById("dashNotifications");
+  const badge = document.getElementById("dashNotificationsUnread");
+  if(!host || !badge) return;
+  const notifications = getLeadNotifications().slice().sort((a,b)=>new Date(b.data || 0) - new Date(a.data || 0));
+  const unreadCount = notifications.filter(item => !item.przeczytane).length;
+  badge.textContent = `${unreadCount} nieprzeczytanych`;
+  host.innerHTML = notifications.length ? notifications.slice(0,5).map(item => {
+    const client = (data.klienci || []).find(c => c.id === item.klientId);
+    const clientLabel = client ? getClientDisplayName(client) : "Klient spoza bazy";
+    const clientMeta = client ? (clientContact(client) || clientLocation(client) || "brak kontaktu") : "brak danych klienta";
+    return `
+      <div class="notifyCard">
+        <div class="notifyTop">
+          <span class="notifySource">${crmEsc(item.zrodlo || "Lead")}</span>
+          <span class="notifyDate">${crmEsc(formatDT(item.data))}</span>
+        </div>
+        <div class="notifyClient">${crmEsc(clientLabel)}</div>
+        <div class="notifyMeta">${crmEsc(item.tytul || "")}</div>
+        <div class="notifyMeta">${crmEsc(clientMeta)}</div>
+        <div class="notifyActions">
+          ${client ? `<button class="histBtn" onclick="openClientCard('${crmEsc(client.id)}')">Otwórz klienta</button>` : ""}
+          ${!item.przeczytane ? `<button class="doneBtn" onclick="markNotificationRead('${crmEsc(item.id)}')">Oznacz jako przeczytane</button>` : `<span class="kanbanPill gold">Przeczytane</span>`}
+        </div>
+      </div>
+    `;
+  }).join("") + (unreadCount ? `<div class="notifyActions" style="margin-top:10px"><button class="histBtn" onclick="markAllNotificationsRead()">Oznacz wszystkie jako przeczytane</button></div>` : "")
+  : '<div class="dashEmpty">Brak nowych powiadomień leadowych.</div>';
+}
+
+function markNotificationRead(notificationId){
+  const item = (data.powiadomienia || []).find(entry => entry.id === notificationId);
+  if(!item) return;
+  item.przeczytane = true;
+  saveData();
+  render();
+}
+
+function markAllNotificationsRead(){
+  let changed = false;
+  (data.powiadomienia || []).forEach(item => {
+    if(item && !item.przeczytane){
+      item.przeczytane = true;
+      changed = true;
+    }
+  });
+  if(!changed) return;
+  saveData();
+  render();
+}
+
+function renderLeadViewCard(c){
+  const product = clientProduct(c) || "brak określonego produktu";
+  const last = clientActivitySummary(c, 110) || "Brak historii działań";
+  const id = crmEsc(c.id);
+  return `
+    <div class="commandClientCard">
+      <div class="commandClientTop">
+        <div>
+          <div class="commandClientName">${crmEsc(clientName(c))}</div>
+          <div class="commandMeta">
+            <span>${crmEsc(clientContact(c) || "brak telefonu i e-maila")}</span>
+            <span>${crmEsc(clientLocation(c) || "brak lokalizacji")}</span>
+          </div>
+        </div>
+        <button class="histBtn" onclick="openClientCard('${id}')">Otwórz klienta</button>
+      </div>
+      <div class="commandBadges">
+        <span class="kanbanPill">${crmEsc(labelFrom(STATUS_OPTS, c.status))}</span>
+        <span class="kanbanPill">${crmEsc(labelFrom(PRIO_OPTS, c.priorytet))}</span>
+        <span class="kanbanPill gold">${crmEsc(clientLeadSource(c) || getLeadCategory(c) || "Lead")}</span>
+      </div>
+      <div class="commandReason"><b>Czym zainteresowany:</b> ${crmEsc(product)}</div>
+      <div class="commandReason" style="margin-top:8px"><b>Ostatnie działanie:</b> ${crmEsc(last)}</div>
+      <div class="commandActions">
+        <button class="histBtn" onclick="addQuickClientActivity('${id}','tata-call')">Tata dzwonił</button>
+        <button class="histBtn" onclick="addQuickClientActivity('${id}','mail')">Mail wysłany</button>
+        <button class="histBtn" onclick="addQuickClientActivity('${id}','no-answer')">Brak odpowiedzi</button>
+        <button class="doneBtn" onclick="addQuickClientActivity('${id}','followup-tomorrow')">Ustaw follow-up jutro</button>
+      </div>
+    </div>
+  `;
+}
+
+function renderLeadSourceView(list, mode){
+  const el = document.getElementById("clientsFollowups");
+  if(!el) return;
+  const filtered = list.filter(c => mode === "advisor" ? isAdvisorClient(c) : isAdvisorOlxClient(c));
+  const title = mode === "advisor" ? "Leady z Advisor" : "Leady z Advisor OLX";
+  const hint = mode === "advisor"
+    ? "Źródło lub kategoria leada wskazuje na formularz Advisor."
+    : "Źródło lub kategoria leada wskazuje na formularz Advisor OLX.";
+  el.innerHTML = `
+    <div class="followGroup">
+      <h3>${crmEsc(title)} (${filtered.length})</h3>
+      <div class="crmHint" style="margin-bottom:10px">${crmEsc(hint)}</div>
+      <div class="commandList">
+        ${filtered.length ? filtered.map(renderLeadViewCard).join("") : '<div class="empty">Brak leadów w tym widoku.</div>'}
+      </div>
+    </div>
+  `;
 }
 
 function followupInfo(dateStr){
@@ -2643,7 +2792,14 @@ function renderOfferCard(o, clientId, offerIndex){
 
 function setClientsView(view){
   currentClientsView = view;
-  document.querySelectorAll(".crmViewBtn").forEach(btn=>btn.classList.toggle("active", btn.id === `clientsView${view==="followups"?"Follow":view==="kanban"?"Kanban":"Table"}Btn`));
+  const viewMap = {
+    table: "clientsViewTableBtn",
+    kanban: "clientsViewKanbanBtn",
+    followups: "clientsViewFollowBtn",
+    advisor: "clientsViewAdvisorBtn",
+    advisorolx: "clientsViewAdvisorOlxBtn"
+  };
+  document.querySelectorAll(".crmViewBtn").forEach(btn=>btn.classList.toggle("active", btn.id === viewMap[view]));
   renderClients();
 }
 
@@ -2654,7 +2810,7 @@ function setClientsViewContainers(){
   const followups = document.getElementById("clientsFollowups");
   if(tableWrap) tableWrap.style.display = currentClientsView === "table" ? "" : "none";
   if(kanban) kanban.style.display = currentClientsView === "kanban" ? "grid" : "none";
-  if(followups) followups.style.display = currentClientsView === "followups" ? "block" : "none";
+  if(followups) followups.style.display = ["followups","advisor","advisorolx"].includes(currentClientsView) ? "block" : "none";
 }
 
 function renderClientsKanban(list){
@@ -2952,6 +3108,14 @@ function renderClients(){
   }
   if(currentClientsView==="followups"){
     renderClientsFollowups(list);
+    return;
+  }
+  if(currentClientsView==="advisor"){
+    renderLeadSourceView(list, "advisor");
+    return;
+  }
+  if(currentClientsView==="advisorolx"){
+    renderLeadSourceView(list, "advisorolx");
     return;
   }
 

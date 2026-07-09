@@ -161,6 +161,7 @@
           <label for="fw">Wiadomość</label>
           <textarea id="fw" name="wiadomosc" placeholder="Napisz kilka słów o swoim gospodarstwie — co chciałbyś sprzedawać, gdzie jesteś..."></textarea>
         </div>
+        <input type="text" id="fwebsite" name="website" tabindex="-1" autocomplete="off" style="position:absolute;left:-9999px;opacity:0;pointer-events:none" aria-hidden="true">
         <button type="submit" class="btn btn-green" id="sbtn" style="width:100%;justify-content:center">
           <span id="stxt">Wyślij wiadomość →</span>
         </button>
@@ -238,6 +239,66 @@ document.getElementById('cform').addEventListener('submit', async function(e){
   e.target.reset();
   setTimeout(function(){ btn.disabled=false; txt.textContent='Wyślij wiadomość →'; msg.style.display='none'; },5000);
 });
+</script>
+<script>
+(function(){
+  const form = document.getElementById('cform');
+  if(!form) return;
+  form.addEventListener('submit', async function(e){
+    e.preventDefault();
+    e.stopImmediatePropagation();
+    const btn=document.getElementById('sbtn');
+    const txt=document.getElementById('stxt');
+    const msg=document.getElementById('smsg');
+    btn.disabled=true;
+    txt.textContent='Wysyłamy...';
+    const leadPayload = {
+      source: 'kontakt',
+      osoba: document.getElementById('fi').value.trim(),
+      telefon: document.getElementById('ft').value.trim(),
+      email: document.getElementById('fm').value.trim(),
+      temat: document.getElementById('ftem').value.trim(),
+      zainteresowanie: document.getElementById('ftem').value ? document.getElementById('ftem').options[document.getElementById('ftem').selectedIndex].text : '',
+      produkt: document.getElementById('ftem').value ? document.getElementById('ftem').options[document.getElementById('ftem').selectedIndex].text : '',
+      lokalizacja: document.getElementById('floc').value.trim(),
+      wiadomosc: document.getElementById('fw').value.trim(),
+      notes: [
+        document.getElementById('ftem').value ? `Temat: ${document.getElementById('ftem').options[document.getElementById('ftem').selectedIndex].text}` : '',
+        document.getElementById('floc').value.trim() ? `Lokalizacja: ${document.getElementById('floc').value.trim()}` : '',
+        document.getElementById('fcows').value ? `Liczba krów: ${document.getElementById('fcows').options[document.getElementById('fcows').selectedIndex].text}` : '',
+        document.getElementById('fl').value ? `Litry dziennie: ${document.getElementById('fl').options[document.getElementById('fl').selectedIndex].text}` : '',
+        document.getElementById('fw').value.trim()
+      ].filter(Boolean).join('\n'),
+      website: document.getElementById('fwebsite').value.trim()
+    };
+    try{
+      const leadRes = await fetch('/api/leads', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify(leadPayload)
+      });
+      if(!leadRes.ok) throw new Error('lead');
+      const formData = new FormData(form);
+      fetch('https://formspree.io/f/xbdvbrnp', {
+        method: 'POST',
+        body: formData,
+        headers: { 'Accept': 'application/json' }
+      }).catch(()=>{});
+      txt.textContent='✓ Wiadomość wysłana!';
+      msg.textContent='Dziękujemy. Zgłoszenie trafiło do zespołu.';
+      msg.style.display='block';
+      msg.style.color='var(--moss)';
+      form.reset();
+      setTimeout(function(){ btn.disabled=false; txt.textContent='Wyślij wiadomość →'; msg.style.display='none'; }, 5000);
+    }catch(err){
+      txt.textContent='Wyślij wiadomość →';
+      msg.textContent='Nie udało się zapisać zgłoszenia. Spróbuj ponownie albo skontaktuj się telefonicznie.';
+      msg.style.color='#c0392b';
+      msg.style.display='block';
+      btn.disabled=false;
+    }
+  }, true);
+})();
 </script>
 </body>
 </html>
