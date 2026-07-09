@@ -3,6 +3,7 @@ const JSONBIN_BIN_ID = process.env.JSONBIN_BIN_ID;
 const PANEL_PASSWORD = process.env.PANEL_PASSWORD;
 const PANEL_BASIC_USER = process.env.PANEL_BASIC_USER;
 const PANEL_BASIC_PASSWORD = process.env.PANEL_BASIC_PASSWORD;
+const JSONBIN_KEY_HEADER = process.env.JSONBIN_KEY_HEADER;
 
 function getBasicAuth(req) {
   const header = req.headers.authorization || "";
@@ -44,11 +45,15 @@ function isAuthorized(req) {
 }
 
 function jsonBinAuthHeaders() {
-  const keyHeader = JSONBIN_API_KEY && JSONBIN_API_KEY.startsWith("sk_")
+  const keyHeader = JSONBIN_KEY_HEADER === "X-Access-Key"
     ? "X-Access-Key"
     : "X-Master-Key";
 
   return { [keyHeader]: JSONBIN_API_KEY };
+}
+
+function jsonBinKeyHeaderName() {
+  return JSONBIN_KEY_HEADER === "X-Access-Key" ? "X-Access-Key" : "X-Master-Key";
 }
 
 function serverConfigStatus() {
@@ -66,13 +71,27 @@ async function readUpstreamError(upstream) {
     body = await upstream.text();
   } catch (e) {}
 
+  const safeBody = body.slice(0, 500);
   return {
     status: upstream.status,
     message: upstream.status === 401 || upstream.status === 403
       ? "JSONBin authorization failed."
       : "JSONBin request failed.",
-    body
+    body: safeBody
   };
+}
+
+function logJsonBinError(method, payloadLength, details) {
+  console.error("JSONBin request failed", {
+    method,
+    jsonbinStatus: details && details.status,
+    hasBinId: Boolean(JSONBIN_BIN_ID),
+    hasApiKey: Boolean(JSONBIN_API_KEY),
+    keyHeader: jsonBinKeyHeaderName(),
+    payloadLength,
+    message: details && details.message,
+    bodyPreview: details && details.body ? details.body.slice(0, 240) : ""
+  });
 }
 
 module.exports = async function handler(req, res) {
@@ -96,7 +115,9 @@ module.exports = async function handler(req, res) {
       });
 
       if (!upstream.ok) {
-        return res.status(502).json(await readUpstreamError(upstream));
+        const details = await readUpstreamError(upstream);
+        logJsonBinError("GET", 0, details);
+        return res.status(502).json(details);
       }
 
       const body = await upstream.text();
@@ -107,6 +128,7 @@ module.exports = async function handler(req, res) {
 
     if (req.method === "PUT") {
       const payload = typeof req.body === "string" ? req.body : JSON.stringify(req.body);
+      const payloadLength = Buffer.byteLength(payload || "", "utf8");
       const upstream = await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}`, {
         method: "PUT",
         headers: {
@@ -118,7 +140,9 @@ module.exports = async function handler(req, res) {
       });
 
       if (!upstream.ok) {
-        return res.status(502).json(await readUpstreamError(upstream));
+        const details = await readUpstreamError(upstream);
+        logJsonBinError("PUT", payloadLength, details);
+        return res.status(502).json(details);
       }
 
       const body = await upstream.text();

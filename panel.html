@@ -510,6 +510,8 @@
   .clientCardBadges{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
   .clientCardGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:14px 0}
   .clientCardField{background:#f8fbf8;border:1px solid #e4eee6;border-radius:10px;padding:10px}
+  .addClientLabel{display:block;font-size:11px;color:#6b766f;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px}
+  #addClientModal input,#addClientModal select{width:100%;padding:8px 10px;border:1px solid #cfd7cf;border-radius:8px;font-size:14px;background:white}
   .clientCardField b{display:block;font-size:11px;color:#6b766f;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px}
   .clientCardField select,.clientCardField input,.clientCardField textarea{width:100%;box-sizing:border-box;border:1px solid #d8e7db;
       border-radius:8px;background:white;padding:7px 9px;font:inherit}
@@ -894,7 +896,7 @@
     </div>
     <div class="tabPane" id="tabpane-klienci">
     <div class="section" id="section-klienci">
-      <h2>Baza klientów <button class="addBtn" onclick="addClient()">+ Dodaj klienta</button></h2>
+      <h2>Baza klientów <button class="addBtn" onclick="openAddClientModal()">+ Dodaj klienta</button></h2>
       <div class="clientActions">
         <button class="importBtn" id="importBtn" onclick="importClientsFromXlsx()">⇩ Wczytaj z pliku XLSX (jednorazowo)</button>
         <button class="importBtn" style="background:#3a6b4a" onclick="exportClientsToXlsx()">⇧ Eksportuj do XLSX</button>
@@ -1167,6 +1169,33 @@
       <div id="clientCardContent"></div>
     </div>
   </div>
+
+  <div id="addClientModal" class="previewModal" onclick="if(event.target===this) closeAddClientModal()">
+    <div class="clientCardBox">
+      <button class="previewClose" onclick="closeAddClientModal()">Zamknij</button>
+      <h2 style="margin-top:0;color:#263b2b">Dodaj klienta</h2>
+      <div class="clientCardGrid">
+        <div><label class="addClientLabel">Firma / gospodarstwo</label><input type="text" id="ac_firma"></div>
+        <div><label class="addClientLabel">Osoba kontaktowa</label><input type="text" id="ac_osoba"></div>
+        <div><label class="addClientLabel">Telefon</label><input type="text" id="ac_telefon"></div>
+        <div><label class="addClientLabel">E-mail</label><input type="text" id="ac_email"></div>
+        <div><label class="addClientLabel">Województwo</label><input type="text" id="ac_wojewodztwo"></div>
+        <div><label class="addClientLabel">Miejscowość</label><input type="text" id="ac_miejscowosc"></div>
+        <div><label class="addClientLabel">Ulica</label><input type="text" id="ac_ulica"></div>
+        <div><label class="addClientLabel">Priorytet</label>
+          <select id="ac_priorytet"></select>
+        </div>
+        <div><label class="addClientLabel">Źródło leada</label>
+          <select id="ac_zrodloLeada"></select>
+        </div>
+        <div><label class="addClientLabel">Czym zainteresowany</label>
+          <select id="ac_produkt"></select>
+        </div>
+      </div>
+      <div id="addClientError" style="color:#a34747;font-size:13px;margin:6px 0;display:none">Podaj przynajmniej firmę/gospodarstwo lub osobę kontaktową.</div>
+      <button class="save" onclick="submitAddClient()">Zapisz klienta</button>
+    </div>
+  </div>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -1300,7 +1329,8 @@ function syncErrorText(e){
   const msg = e && e.message ? e.message : "";
   if(msg === "NO_PASSWORD") return "Błąd synchronizacji: brak hasła";
   if(msg === "AUTH") return "Błąd synchronizacji: API zwróciło 401";
-  if(msg.includes("JSONBin")) return "Błąd synchronizacji: JSONBin odrzucił zapis";
+  const jsonBinStatus = msg.match(/"status"\s*:\s*(\d{3})/) || msg.match(/status[^\d]*(\d{3})/i);
+  if(msg.includes("JSONBin")) return "Błąd synchronizacji: JSONBin odrzucił zapis" + (jsonBinStatus ? `: HTTP ${jsonBinStatus[1]}` : "");
   if(msg.includes("HTTP 500")) return "Błąd synchronizacji: API zwróciło 500";
   if(msg.includes("HTTP ")) return "Błąd synchronizacji: API zwróciło " + msg.replace(/^HTTP\s*/, "");
   return "Zapisano lokalnie, ale nie zapisano w chmurze";
@@ -2678,13 +2708,48 @@ function formatDT(iso){
 }
 
 function addClient(){
+  openAddClientModal();
+}
+
+function openAddClientModal(){
+  const prioSel = document.getElementById("ac_priorytet");
+  prioSel.innerHTML = PRIO_OPTS.map(p=>`<option value="${p[0]}"${p[0]==="B"?" selected":""}>${p[1]}</option>`).join("");
+  const srcSel = document.getElementById("ac_zrodloLeada");
+  srcSel.innerHTML = `<option value="">— wybierz —</option>` + LEAD_SOURCE_OPTS.map(s=>`<option value="${crmEsc(s)}">${crmEsc(s)}</option>`).join("");
+  const prodSel = document.getElementById("ac_produkt");
+  prodSel.innerHTML = `<option value="">— wybierz —</option>` + PRODUCT_OPTS.map(p=>`<option value="${crmEsc(p)}">${crmEsc(p)}</option>`).join("");
+  ["ac_firma","ac_osoba","ac_telefon","ac_email","ac_wojewodztwo","ac_miejscowosc","ac_ulica"].forEach(id=>{document.getElementById(id).value="";});
+  document.getElementById("addClientError").style.display="none";
+  document.getElementById("addClientModal").classList.add("open");
+  document.getElementById("ac_firma").focus();
+}
+
+function closeAddClientModal(){
+  document.getElementById("addClientModal").classList.remove("open");
+}
+
+function submitAddClient(){
+  const val = id => document.getElementById(id).value.trim();
+  const firma = val("ac_firma"), osoba = val("ac_osoba");
+  if(!firma && !osoba){
+    document.getElementById("addClientError").style.display="block";
+    return;
+  }
   const now = new Date().toISOString();
-  data.klienci.push({id:"c_"+Date.now(), firma:"", osoba:"", wojewodztwo:"", miejscowosc:"", ulica:"",
-                      telefon:"", email:"", zainteresowanie:"", priorytet:"B", status:"nowy", notatki:"",
-                      nastepnyFollowup:"", zrodloLeada:"", produkt:"", obiekcje:"",
-                      utworzono: now, zaktualizowano: now, historia: [], oferty: []});
-  logActivity("dodał(a) nowego klienta");
+  data.klienci.push({
+    id:"c_"+Date.now(),
+    firma, osoba,
+    wojewodztwo: val("ac_wojewodztwo"), miejscowosc: val("ac_miejscowosc"), ulica: val("ac_ulica"),
+    telefon: val("ac_telefon"), email: val("ac_email"),
+    zainteresowanie:"", priorytet: document.getElementById("ac_priorytet").value || "B",
+    status:"nowy", notatki:"",
+    nastepnyFollowup:"", zrodloLeada: document.getElementById("ac_zrodloLeada").value,
+    produkt: document.getElementById("ac_produkt").value, obiekcje:"",
+    utworzono: now, zaktualizowano: now, historia: [], oferty: []
+  });
+  logActivity(`dodał(a) nowego klienta „${firma||osoba}”`);
   saveData(); renderClients(); renderStatsBar();
+  closeAddClientModal();
 }
 
 function deleteClient(id){
