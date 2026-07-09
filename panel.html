@@ -7,14 +7,26 @@
 <title>Panel — Sklep za Stodołą</title>
 <style>
   :root{--green:#244b2f;--light:#eef5ef;--accent:#c9a24a;--ink:#1e1e1e;--muted:#666;--line:#d8ded8;
-        --done:#2f7a45;--progress:#c9a24a;--todo:#b5493f}
+        --done:#2f7a45;--progress:#c9a24a;--todo:#b5493f;
+        --bg:#f6f7f4;--surface:#ffffff;--surface-soft:#fbfcfb;--surface-muted:#f4f8f5;
+        --text:var(--ink);--text-muted:var(--muted);--border:var(--line);
+        --header-grad-start:var(--green);--header-grad-end:#17301e;--header-text:#ffffff;
+        --nav-panel:#ffffff;--input-bg:#ffffff;--shadow-soft:0 2px 10px #0000000d}
   *{box-sizing:border-box}
-  body{margin:0;font-family:Arial,Helvetica,sans-serif;color:var(--ink);background:#f6f7f4;min-height:100vh}
+  body{margin:0;font-family:Arial,Helvetica,sans-serif;color:var(--text);background:var(--bg);min-height:100vh;transition:background .2s,color .2s}
+  body.dark-theme{
+    --green:#5ea76c;--light:#253229;--accent:#d7b25c;--ink:#edf5ef;--muted:#a4b2aa;--line:#33443c;
+    --done:#5aa26f;--progress:#d7b25c;--todo:#cf6f65;
+    --bg:#121815;--surface:#1a211e;--surface-soft:#202925;--surface-muted:#1f2a24;
+    --text:#edf5ef;--text-muted:#a4b2aa;--border:#33443c;
+    --header-grad-start:#16211b;--header-grad-end:#0d1511;--header-text:#edf5ef;
+    --nav-panel:#18211d;--input-bg:#151d19;--shadow-soft:0 18px 36px rgba(0,0,0,.22)
+  }
 
   /* --- Password gate --- */
   #gate{position:fixed;inset:0;background:linear-gradient(135deg,var(--green),#17301e);
         display:flex;align-items:center;justify-content:center;z-index:100}
-  .gateBox{background:white;border-radius:16px;padding:36px 32px;width:320px;text-align:center;
+  .gateBox{background:var(--surface);border-radius:16px;padding:36px 32px;width:320px;text-align:center;
            box-shadow:0 10px 40px #0000004d}
   .gateBox .logo{width:48px;height:48px;margin:0 auto 14px}
   .gateBox h2{margin:0 0 6px;font-size:20px;color:var(--green)}
@@ -26,20 +38,20 @@
   #gateErr{color:var(--todo);font-size:12px;height:16px;margin-top:8px}
 
   /* --- App --- */
-  header{background:linear-gradient(135deg,var(--green),#17301e);color:white;padding:22px 32px;
+  header{background:linear-gradient(135deg,var(--header-grad-start),var(--header-grad-end));color:var(--header-text);padding:22px 32px;
          display:flex;align-items:center;gap:14px}
   header .logo{width:42px;height:42px;flex-shrink:0}
   header h1{margin:0;font-size:22px} header p{margin:4px 0 0;color:#e6efe8;font-size:13px}
   .wrap{max-width:1180px;margin:0 auto;padding:24px 20px 60px}
 
-  .section{background:white;border:1px solid var(--line);border-radius:14px;padding:20px 22px;margin-bottom:20px;
-            box-shadow:0 2px 10px #0000000d}
+  .section{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px 22px;margin-bottom:20px;
+            box-shadow:var(--shadow-soft)}
   .section h2{margin:0 0 14px;font-size:16px;color:var(--green);display:flex;align-items:center;justify-content:space-between}
   .addBtn{background:var(--light);border:1px solid var(--line);color:var(--green);border-radius:8px;
           padding:6px 12px;font-size:12px;cursor:pointer;font-weight:bold}
   .addBtn:hover{background:#dcebe0}
 
-  .item{border:1px solid var(--line);border-radius:10px;padding:14px 16px;margin-bottom:10px;background:#fbfcfb}
+  .item{border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin-bottom:10px;background:var(--surface-soft)}
   .item .topRow{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
   .item .titleRow{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
   .item .title{font-weight:bold;font-size:14.5px}
@@ -61,10 +73,10 @@
       border-radius:7px;padding:5px 8px;font-weight:bold;opacity:1}
   .delBtn:hover{background:#ffecea;border-color:#c66b62}
 
-  .newItemForm{display:none;gap:8px;flex-direction:column;border:1px dashed var(--line);border-radius:10px;
-               padding:14px;margin-bottom:10px;background:#fafdfb}
+  .newItemForm{display:none;gap:8px;flex-direction:column;border:1px dashed var(--border);border-radius:10px;
+               padding:14px;margin-bottom:10px;background:var(--surface-soft)}
   .newItemForm.open{display:flex}
-  .newItemForm input{padding:8px 10px;border:1px solid var(--line);border-radius:6px;font-size:13px}
+  .newItemForm input{padding:8px 10px;border:1px solid var(--border);border-radius:6px;font-size:13px;background:var(--input-bg);color:var(--text)}
   .newItemForm .row{display:flex;gap:8px}
   .newItemForm .row input{flex:1}
   .newItemForm .actions{display:flex;gap:8px;justify-content:flex-end}
@@ -74,15 +86,16 @@
 
   .empty{color:var(--muted);font-size:13px;font-style:italic;padding:6px 0}
   footer{text-align:center;color:#999;font-size:12px;padding:20px}
-  .lockBtn{margin-left:auto;background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.4);
+  .lockBtn{background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.4);
            color:white;border-radius:20px;padding:6px 14px;font-size:12px;cursor:pointer}
+  .themeBtn{margin-left:0}
 
   /* --- Client table --- */
   .tableWrap{overflow-x:auto}
   table.clients{width:100%;border-collapse:collapse;font-size:12.5px;min-width:1200px;table-layout:fixed}
-  table.clients th{text-align:left;color:var(--muted);font-weight:bold;font-size:11px;text-transform:uppercase;
+  table.clients th{text-align:left;color:var(--text-muted);font-weight:bold;font-size:11px;text-transform:uppercase;
                     letter-spacing:.03em;padding:6px 8px;border-bottom:2px solid var(--line);white-space:nowrap;overflow:hidden}
-  table.clients td{padding:5px 7px;border-bottom:1px solid #eee;vertical-align:top;overflow:hidden}
+  table.clients td{padding:5px 7px;border-bottom:1px solid var(--border);vertical-align:top;overflow:hidden}
   table.clients col.firma{width:140px} table.clients col.osoba{width:130px}
   table.clients col.woj{width:110px} table.clients col.miejsc{width:110px}
   table.clients col.ulica{width:90px} table.clients col.tel{width:120px}
@@ -91,10 +104,10 @@
   table.clients col.hist{width:80px} table.clients col.usun{width:90px}
   table.clients input, table.clients select, table.clients textarea{
       width:100%;border:1px solid transparent;background:transparent;padding:5px 6px;border-radius:6px;
-      font-size:12.5px;font-family:inherit;color:var(--ink)}
+      font-size:12.5px;font-family:inherit;color:var(--text)}
   table.clients input:hover, table.clients select:hover, table.clients textarea:hover,
   table.clients input:focus, table.clients select:focus, table.clients textarea:focus{
-      border-color:var(--line);background:#fbfcfb}
+      border-color:var(--border);background:var(--surface-soft)}
   table.clients textarea{resize:vertical;min-height:70px;line-height:1.35}
   .prio{font-size:11px;padding:2px 8px;border-radius:12px;font-weight:bold;color:white;display:inline-block}
   .prio-A{background:#b5493f} .prio-B{background:#c9a24a} .prio-C{background:#7a9a7e}
@@ -112,23 +125,23 @@
 
   /* --- Stats bar --- */
   .statsBar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px}
-  .statCard{background:white;border:1px solid var(--line);border-radius:10px;padding:10px 16px;
-            box-shadow:0 2px 8px #0000000a;min-width:110px}
+  .statCard{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 16px;
+            box-shadow:var(--shadow-soft);min-width:110px}
   .statCard .num{font-size:22px;font-weight:bold;color:var(--green)}
   .statCard .lbl{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.03em}
 
   .whoRow{font-size:12px;color:var(--muted);margin-bottom:14px;display:flex;align-items:center;gap:6px}
-  .whoRow select{border:1px solid var(--line);border-radius:6px;padding:4px 8px;font-size:12px}
+  .whoRow select{border:1px solid var(--border);border-radius:6px;padding:4px 8px;font-size:12px;background:var(--input-bg);color:var(--text)}
 
   .filterRow{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
-  .filterRow select, .filterRow input{border:1px solid var(--line);border-radius:8px;padding:6px 10px;font-size:12.5px}
+  .filterRow select, .filterRow input{border:1px solid var(--border);border-radius:8px;padding:6px 10px;font-size:12.5px;background:var(--input-bg);color:var(--text)}
   .filterRow input{flex:1;min-width:160px}
 
 
   .previewModal{display:none;position:fixed;inset:0;background:#000000b3;z-index:200;
                 align-items:center;justify-content:center}
   .previewModal.open{display:flex}
-  .previewBox{background:white;border-radius:10px;width:90vw;height:88vh;position:relative;overflow:hidden}
+  .previewBox{background:var(--surface);border-radius:10px;width:90vw;height:88vh;position:relative;overflow:hidden}
   .previewBox iframe{width:100%;height:100%;border:none}
   .previewClose{position:absolute;top:10px;right:10px;z-index:5;background:var(--green);color:white;
                 border:none;border-radius:20px;padding:6px 14px;font-size:12px;cursor:pointer}
@@ -158,11 +171,16 @@
   .dateCaption{color:#bbb;font-size:10.5px;margin-top:4px}
 
   /* --- Tabs --- */
-  .tabNav{display:flex;gap:6px;margin-bottom:16px;border-bottom:2px solid var(--line);flex-wrap:wrap}
-  .tabBtn{background:none;border:none;padding:10px 16px;font-size:13.5px;font-weight:bold;color:var(--muted);
-          cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-2px;white-space:nowrap}
-  .tabBtn:hover{color:var(--green)}
-  .tabBtn.active{color:var(--green);border-bottom-color:var(--green)}
+  .navShell{display:grid;gap:12px;margin-bottom:18px}
+  .mainCategoryNav,.subCategoryNav{display:flex;gap:8px;flex-wrap:wrap;background:var(--nav-panel);border:1px solid var(--border);border-radius:14px;padding:8px;box-shadow:var(--shadow-soft)}
+  .mainCategoryBtn,.subCategoryBtn{background:transparent;border:1px solid transparent;color:var(--text-muted);cursor:pointer;border-radius:10px;font-weight:bold}
+  .mainCategoryBtn{padding:10px 14px;font-size:13px}
+  .subCategoryBtn{padding:8px 12px;font-size:12px}
+  .mainCategoryBtn:hover,.subCategoryBtn:hover{background:var(--surface-muted);color:var(--green);border-color:var(--border)}
+  .mainCategoryBtn.active{background:linear-gradient(135deg,var(--green),#2f7a45);color:#fff;border-color:transparent;box-shadow:0 8px 18px #1d3b2420}
+  .subCategoryBtn.active{background:var(--surface-muted);color:var(--green);border-color:var(--border)}
+  .subCategoryBtn[data-priority="true"]{border-color:#ead99a;background:#fff8df;color:#755c15}
+  body.dark-theme .subCategoryBtn[data-priority="true"]{background:#3a3120;border-color:#6a5631;color:#f0d991}
   .tabPane{display:none}
   .tabPane.active{display:block}
 
@@ -178,16 +196,16 @@
   .histBtn{background:var(--light);border:1px solid var(--line);border-radius:8px;padding:5px 8px;
            font-size:12px;cursor:pointer;color:var(--green);font-weight:bold}
   .histBtn:hover{background:#dcebe0}
-  .historyBox{background:white;border-radius:12px;width:720px;max-width:92vw;max-height:84vh;
+  .historyBox{background:var(--surface);border:1px solid var(--border);border-radius:12px;width:720px;max-width:92vw;max-height:84vh;
               padding:22px 24px;position:relative;overflow-y:auto}
   .historyBox h3{margin:0 0 14px;color:var(--green)}
   .historyTimeline{display:grid;gap:10px;margin-top:10px}
-  .historyEntry{position:relative;border:1px solid #dfece2;border-radius:12px;padding:12px 14px 12px 18px;
-                font-size:13px;background:#fbfcfb;box-shadow:0 8px 22px rgba(45,90,39,.06)}
+  .historyEntry{position:relative;border:1px solid var(--border);border-radius:12px;padding:12px 14px 12px 18px;
+                font-size:13px;background:var(--surface-soft);box-shadow:0 8px 22px rgba(45,90,39,.06)}
   .historyEntry:before{content:"";position:absolute;left:0;top:12px;bottom:12px;width:4px;border-radius:999px;background:var(--green)}
   .historyEntry .who{font-weight:800;color:var(--green)}
-  .historyEntry .when{color:#7a867f;font-size:12px;margin-left:6px}
-  .historyEntry .txt{margin-top:8px;color:#263b2b;line-height:1.48;white-space:normal}
+  .historyEntry .when{color:var(--text-muted);font-size:12px;margin-left:6px}
+  .historyEntry .txt{margin-top:8px;color:var(--text);line-height:1.48;white-space:normal}
   .historyMeta{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
   .historyTypeBadge{display:inline-flex;align-items:center;border:1px solid #ead99a;background:#fff8dc;color:#755c15;
                     border-radius:999px;padding:2px 7px;font-size:11px;font-weight:800}
@@ -195,14 +213,14 @@
   .historyEditForm{display:grid;gap:8px;margin-top:8px}
   .historyEditGrid,.historyAddGrid{display:grid;grid-template-columns:160px 1fr;gap:8px}
   .historyEditForm input,.historyEditForm textarea,.historyAdd input,.historyAdd textarea{
-    border:1px solid var(--line);border-radius:8px;padding:8px 10px;font-family:inherit;font-size:13px;background:white;box-sizing:border-box;width:100%
+    border:1px solid var(--line);border-radius:8px;padding:8px 10px;font-family:inherit;font-size:13px;background:var(--input-bg);color:var(--text);box-sizing:border-box;width:100%
   }
   .historyEditForm textarea,.historyAdd textarea{min-height:96px;resize:vertical}
   .historyAdd{margin-top:16px;display:flex;flex-direction:column;gap:8px;border-top:1px solid var(--line);padding-top:14px}
   .historyAdd button{align-self:flex-end}
 
   .docSearch{width:100%;border:1px solid var(--line);border-radius:8px;padding:9px 12px;font-size:13px;
-             margin-bottom:14px}
+             margin-bottom:14px;background:var(--input-bg);color:var(--text)}
 
   /* --- Terminy --- */
   .terminItem{display:flex;align-items:center;gap:14px;border:1px solid var(--line);border-radius:10px;
@@ -303,7 +321,7 @@
 
   /* --- Dashboard --- */
   .dashGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px}
-  .dashCard{background:white;border:1px solid var(--line);border-radius:14px;padding:20px 22px;
+  .dashCard{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:20px 22px;
             box-shadow:0 2px 10px #0000000d}
   .dashCardTitle{font-size:13px;font-weight:bold;color:var(--green);margin-bottom:14px;
                  text-transform:uppercase;letter-spacing:.03em}
@@ -326,9 +344,9 @@
   .dashMiniStats{display:flex;flex-wrap:wrap;gap:8px}
   .dashPill{font-size:11px;font-weight:bold;color:white;padding:4px 10px;border-radius:12px}
 
-  .dashListRow{font-size:12.5px;padding:6px 0;border-bottom:1px solid #f0f0f0;display:flex;justify-content:space-between;gap:8px}
+  .dashListRow{font-size:12.5px;padding:6px 0;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;gap:8px}
   .dashListRow:last-child{border-bottom:none}
-  .dashEmpty{color:#bbb;font-size:12.5px;font-style:italic}
+  .dashEmpty{color:var(--text-muted);font-size:12.5px;font-style:italic}
 
 
   /* --- Materiały sprzedażowe --- */
@@ -409,7 +427,7 @@
   .statCard{border-radius:12px;min-width:132px;background:linear-gradient(180deg,#fff,#f9fbf9);padding:12px 16px}
   .statCard .num{color:var(--green2)}
   .statCard .lbl{letter-spacing:.06em}
-  .whoRow{background:white;border:1px solid var(--line);border-radius:12px;padding:10px 12px;width:max-content;
+  .whoRow{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 12px;width:max-content;
           box-shadow:0 8px 20px #1d3b240d}
 
   .tabNav{gap:8px;border:1px solid var(--line);border-radius:14px;background:white;padding:8px;margin-bottom:18px;
@@ -430,7 +448,7 @@
   .dashHeroTitle{font-size:27px}
   .dashHeroSub{color:#eaf4eb}
   .dashKpiRow{grid-column:1/-1;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
-  .dashKpiCard{background:white;border:1px solid var(--line);border-radius:12px;padding:16px 18px;
+  .dashKpiCard{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px 18px;
                box-shadow:var(--shadow);min-height:96px}
   .dashKpiCard .num{font-size:26px;font-weight:bold;color:var(--green2)}
   .dashKpiCard .lbl{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-top:4px}
@@ -438,34 +456,34 @@
   .commandCenter{grid-column:1/-1;background:linear-gradient(180deg,#fffef8,#ffffff);border-color:#ead99a}
   .commandHeader{display:flex;justify-content:space-between;gap:16px;align-items:flex-start;margin-bottom:14px;flex-wrap:wrap}
   .commandHeader p{margin:6px 0 0;color:#5d675f;font-size:13px;line-height:1.45;max-width:780px}
-  .commandCounters{display:grid;grid-template-columns:repeat(5,minmax(90px,1fr));gap:8px;min-width:min(100%,520px)}
-  .commandCounter{background:white;border:1px solid #ead99a;border-radius:12px;padding:10px 12px;box-shadow:0 6px 16px #c9a24a12}
+  .commandCounters{display:grid;grid-template-columns:repeat(6,minmax(84px,1fr));gap:8px;min-width:min(100%,620px)}
+  .commandCounter{background:var(--surface);border:1px solid #ead99a;border-radius:12px;padding:10px 12px;box-shadow:0 6px 16px #c9a24a12}
   .commandCounterNum{font-size:22px;font-weight:bold;color:#2d5a27}
   .commandCounterLbl{font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:#7b6a35;margin-top:4px}
   .commandSections{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
-  .commandSection{background:#fff;border:1px solid #eef1e8;border-radius:12px;padding:12px;box-shadow:0 8px 18px #1d3b2408}
+  .commandSection{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px;box-shadow:0 8px 18px #1d3b2408}
   .commandSection.priority{border-color:#ead99a;background:linear-gradient(180deg,#fffdf7,#fff)}
   .commandSectionHead{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:10px}
   .commandSectionHead b{color:#2d5a27;font-size:14px}
   .commandSectionCount{font-size:11px;font-weight:bold;color:#755c15;background:#fff8df;border:1px solid #ead99a;border-radius:999px;padding:3px 8px}
   .commandList{display:grid;gap:8px}
-  .commandClientCard{background:#f8fbf8;border:1px solid #e4eee6;border-radius:12px;padding:11px}
+  .commandClientCard{background:var(--surface-soft);border:1px solid var(--border);border-radius:12px;padding:11px}
   .commandClientTop{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;margin-bottom:8px}
   .commandClientName{font-weight:bold;color:#25362a;font-size:14px}
   .commandMeta{display:grid;gap:3px;font-size:12px;color:#5f6d64;line-height:1.35}
   .commandBadges{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}
-  .commandReason{font-size:12px;color:#4d5b51;background:white;border:1px solid #e4eee6;border-radius:10px;padding:8px 9px;line-height:1.45}
+  .commandReason{font-size:12px;color:var(--text);background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:8px 9px;line-height:1.45}
   .commandActions{display:flex;gap:6px;flex-wrap:wrap;margin-top:9px}
   .commandActions .histBtn,.commandActions .doneBtn,.commandActions .dangerBtn{margin-bottom:0;padding:6px 10px;font-size:12px}
   .commandActions .dangerBtn{padding:6px 10px}
-  .commandEmpty{font-size:13px;color:#6f7b72;background:#f8fbf8;border:1px dashed #d8e4da;border-radius:10px;padding:14px;text-align:center}
+  .commandEmpty{font-size:13px;color:var(--text-muted);background:var(--surface-soft);border:1px dashed var(--border);border-radius:10px;padding:14px;text-align:center}
   .commandActivityRow{display:grid;gap:7px}
-  .commandActivityMeta{font-size:12px;color:#647066;line-height:1.35}
+  .commandActivityMeta{font-size:12px;color:var(--text-muted);line-height:1.35}
   .dashNotifications{grid-column:span 4}
   .notifyHead{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:10px}
   .notifyUnread{font-size:12px;font-weight:bold;color:#755c15;background:#fff8df;border:1px solid #ead99a;border-radius:999px;padding:4px 9px}
   .notifyList{display:grid;gap:8px}
-  .notifyCard{background:#f8fbf8;border:1px solid #e4eee6;border-radius:10px;padding:10px}
+  .notifyCard{background:var(--surface-soft);border:1px solid var(--border);border-radius:10px;padding:10px}
   .notifyTop{display:flex;justify-content:space-between;gap:8px;align-items:flex-start;margin-bottom:6px}
   .notifySource{font-size:11px;font-weight:bold;color:#2d5a27;background:#edf6ef;border:1px solid #d7e8db;border-radius:999px;padding:3px 8px}
   .notifyDate{font-size:11px;color:#6a756d}
@@ -473,7 +491,7 @@
   .notifyMeta{font-size:12px;color:#617066;line-height:1.4;margin-top:3px}
   .notifyActions{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
   .dashToday{grid-column:span 8}
-  .dashAi{grid-column:span 4;background:linear-gradient(180deg,#fffdf4,#ffffff);border-color:#ead99a}
+  .dashAi{grid-column:span 4;background:linear-gradient(180deg,color-mix(in srgb, var(--surface) 88%, #ead99a 12%),var(--surface));border-color:#ead99a}
   .dashAi .dashCardTitle{color:#755c15}
   .dashAiText{font-size:13px;line-height:1.5;color:#4d563f}
   .dashAiTags{display:flex;gap:6px;flex-wrap:wrap;margin-top:12px}
@@ -513,15 +531,15 @@
       border-color:#bfd9c4;background:white;box-shadow:0 0 0 3px #2f7a4512}
   select.statCell{background:#f3f8f4;border:1px solid #cfe2d2;color:#2d5a27;font-weight:bold;border-radius:999px}
   .crmViewBar{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:14px 0 12px;flex-wrap:wrap}
-  .crmViewToggle{display:flex;gap:6px;background:#f4f8f5;border:1px solid var(--line);border-radius:12px;padding:5px}
+  .crmViewToggle{display:flex;gap:6px;background:var(--surface-soft);border:1px solid var(--line);border-radius:12px;padding:5px}
   .crmViewBtn{border:0;background:transparent;color:#506156;border-radius:8px;padding:8px 12px;font-weight:bold;cursor:pointer}
-  .crmViewBtn.active{background:white;color:var(--green);box-shadow:0 6px 16px #1d3b2412}
+  .crmViewBtn.active{background:var(--surface);color:var(--green);box-shadow:0 6px 16px #1d3b2412}
   .crmHint{font-size:12px;color:var(--muted)}
   .clientsKanban{display:none;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;align-items:start}
-  .kanbanColumn{background:#f8fbf8;border:1px solid var(--line);border-radius:12px;padding:10px;min-height:120px}
+  .kanbanColumn{background:var(--surface-soft);border:1px solid var(--line);border-radius:12px;padding:10px;min-height:120px}
   .kanbanHead{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:10px;font-weight:bold;color:#355b3a}
-  .kanbanCount{font-size:12px;color:#6c7a70;background:white;border:1px solid #e0ebe3;border-radius:999px;padding:2px 8px}
-  .kanbanCard{background:white;border:1px solid #e5eee7;border-radius:10px;padding:10px;margin-bottom:8px;cursor:pointer;
+  .kanbanCount{font-size:12px;color:#6c7a70;background:var(--surface);border:1px solid #e0ebe3;border-radius:999px;padding:2px 8px}
+  .kanbanCard{background:var(--surface);border:1px solid #e5eee7;border-radius:10px;padding:10px;margin-bottom:8px;cursor:pointer;
               box-shadow:0 6px 14px #1d3b240a}
   .kanbanCard:hover{border-color:#bfd9c4;box-shadow:0 10px 20px #1d3b2412;transform:translateY(-1px)}
   .kanbanName{font-weight:bold;color:#263b2b;margin-bottom:6px}
@@ -532,62 +550,83 @@
   .kanbanPill.gold{background:#fff8df;color:#755c15;border-color:#ead99a}
   .kanbanContact,.kanbanNote{font-size:12px;color:#647066;line-height:1.35}
   .clientsFollowups{display:none}
-  .followGroup{background:white;border:1px solid var(--line);border-radius:12px;margin-bottom:12px;padding:12px}
+  .followGroup{background:var(--surface);border:1px solid var(--line);border-radius:12px;margin-bottom:12px;padding:12px}
   .followGroup h3{margin:0 0 8px;font-size:14px;color:#355b3a}
   .followList{display:grid;gap:8px}
   .followItem{display:grid;grid-template-columns:minmax(160px,1.2fr) minmax(150px,1fr) minmax(120px,.8fr) auto;
               gap:10px;align-items:center;border-top:1px solid #eef3ef;padding-top:8px;font-size:13px}
   .followItem:first-child{border-top:0;padding-top:0}
   .followAction{white-space:nowrap}
-  .clientCardBox{background:white;border-radius:14px;max-width:780px;width:calc(100vw - 36px);max-height:88vh;overflow:auto;padding:22px;
+  .clientCardBox{background:var(--surface);border:1px solid var(--border);border-radius:14px;max-width:780px;width:calc(100vw - 36px);max-height:88vh;overflow:auto;padding:22px;
                  box-shadow:0 24px 70px #10201833}
   .clientCardTop{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;border-bottom:1px solid var(--line);
                  padding-bottom:14px;margin-bottom:14px}
-  .clientCardTop h2{margin:0 0 4px;color:#263b2b}
+  .clientCardTop h2{margin:0 0 4px;color:var(--text)}
   .clientCardBadges{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
   .clientCardGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:14px 0}
-  .clientCardField{background:#f8fbf8;border:1px solid #e4eee6;border-radius:10px;padding:10px}
+  .clientCardField{background:var(--surface-soft);border:1px solid var(--border);border-radius:10px;padding:10px}
   .addClientLabel{display:block;font-size:11px;color:#6b766f;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px}
   #addClientModal input,#addClientModal select{width:100%;padding:8px 10px;border:1px solid #cfd7cf;border-radius:8px;font-size:14px;background:white}
   .clientCardField b{display:block;font-size:11px;color:#6b766f;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px}
   .clientCardField select,.clientCardField input,.clientCardField textarea{width:100%;box-sizing:border-box;border:1px solid #d8e7db;
-      border-radius:8px;background:white;padding:7px 9px;font:inherit}
+      border-radius:8px;background:var(--input-bg);color:var(--text);padding:7px 9px;font:inherit}
   .clientCardField textarea{min-height:82px;resize:vertical}
-  .lastActivity{margin-top:6px;font-size:12px;color:#647066;line-height:1.35}
+  .lastActivity{margin-top:6px;font-size:12px;color:var(--text-muted);line-height:1.35}
   .lastActivityBadge{display:inline-flex;max-width:100%;border:1px solid #ead99a;background:#fff8df;color:#755c15;border-radius:8px;
       padding:4px 7px;font-size:12px;line-height:1.3}
   .quickUpdate{border:1px solid #ead99a;border-radius:10px;padding:12px;margin-top:12px;background:#fffdf4}
   .quickUpdateHead{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:10px}
   .quickUpdateHead b{color:#755c15}
   .quickUpdateGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
-  .quickUpdate label{font-size:11px;color:#6b766f;text-transform:uppercase;letter-spacing:.05em;font-weight:bold}
-  .quickUpdate input,.quickUpdate select,.quickUpdate textarea{width:100%;box-sizing:border-box;border:1px solid #d8e7db;border-radius:8px;background:white;padding:7px 9px;font:inherit;margin-top:4px}
+  .quickUpdate label{font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em;font-weight:bold}
+  .quickUpdate input,.quickUpdate select,.quickUpdate textarea{width:100%;box-sizing:border-box;border:1px solid var(--border);border-radius:8px;background:var(--input-bg);color:var(--text);padding:7px 9px;font:inherit;margin-top:4px}
   .quickUpdate textarea{min-height:70px;resize:vertical}
   .quickUpdateActions{display:flex;justify-content:flex-end;margin-top:10px}
-  .clientCardHistory{border:1px solid var(--line);border-radius:10px;padding:12px;margin-top:12px;background:#fff}
+  .clientCardHistory{border:1px solid var(--line);border-radius:10px;padding:12px;margin-top:12px;background:var(--surface)}
   .clientCardHistoryHead{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:10px}
-  .clientCardHistoryHead b{color:#263b2b}
+  .clientCardHistoryHead b{color:var(--text)}
   .clientDangerZone{display:flex;justify-content:flex-end;margin-top:12px;padding-top:12px;border-top:1px solid #f0d0cb}
   .dangerBtn{border:1px solid #d8a19b;background:#fff5f4;color:#a33b33;border-radius:8px;padding:8px 12px;font-weight:bold;cursor:pointer}
   .dangerBtn:hover{background:#ffecea;border-color:#c66b62}
-  .clientOffers{border:1px solid #ead99a;border-radius:10px;padding:12px;margin-top:12px;background:#fffdf4}
+  .clientOffers{border:1px solid #ead99a;border-radius:10px;padding:12px;margin-top:12px;background:color-mix(in srgb, var(--surface) 88%, #ead99a 12%)}
   .clientOffersHead{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:10px}
   .clientOffersHead b{color:#755c15}
   .offerList{display:grid;gap:8px}
-  .offerCard{background:white;border:1px solid #ead99a;border-radius:10px;padding:10px}
+  .offerCard{background:var(--surface);border:1px solid #ead99a;border-radius:10px;padding:10px}
   .offerTop{display:flex;justify-content:space-between;gap:8px;align-items:flex-start;margin-bottom:6px}
-  .offerTitle{font-weight:bold;color:#263b2b}
-  .offerMeta{display:flex;gap:6px;flex-wrap:wrap;font-size:12px;color:#647066}
+  .offerTitle{font-weight:bold;color:var(--text)}
+  .offerMeta{display:flex;gap:6px;flex-wrap:wrap;font-size:12px;color:var(--text-muted)}
   .offerBadge{font-size:11px;font-weight:bold;border-radius:999px;padding:3px 8px;background:#f3f8f4;color:#2d5a27;border:1px solid #d8e7db}
   .offerCardActions{display:flex;gap:6px;justify-content:flex-end;margin-top:8px;flex-wrap:wrap}
   .offerEditInline{display:block;margin:4px 0 0}
-  .offerForm{display:none;background:#f8fbf8;border:1px solid #e4eee6;border-radius:10px;padding:10px;margin:10px 0}
+  .offerForm{display:none;background:var(--surface-soft);border:1px solid var(--border);border-radius:10px;padding:10px;margin:10px 0}
   .offerForm.open{display:block}
   .offerFormGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
-  .offerForm label{font-size:11px;color:#6b766f;text-transform:uppercase;letter-spacing:.05em;font-weight:bold}
-  .offerForm input,.offerForm select,.offerForm textarea{width:100%;box-sizing:border-box;border:1px solid #d8e7db;border-radius:8px;background:white;padding:7px 9px;font:inherit;margin-top:4px}
+  .offerForm label{font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em;font-weight:bold}
+  .offerForm input,.offerForm select,.offerForm textarea{width:100%;box-sizing:border-box;border:1px solid var(--border);border-radius:8px;background:var(--input-bg);color:var(--text);padding:7px 9px;font:inherit;margin-top:4px}
   .offerForm textarea{min-height:70px;resize:vertical}
   .offerActions{display:flex;gap:8px;justify-content:flex-end;margin-top:10px}
+  .dashHeroMeta{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+  .dashSyncPill{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;background:var(--surface-muted);border:1px solid var(--border);font-size:12px;font-weight:bold;color:var(--text)}
+  .settingsGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
+  .settingsCard{background:var(--surface-soft);border:1px solid var(--border);border-radius:12px;padding:14px}
+  .settingsCard h3{margin:0 0 8px;color:var(--green);font-size:15px}
+  .settingsCard p{margin:0;color:var(--text-muted);line-height:1.5;font-size:13px}
+  .themeSwitchRow{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+  .themeChoiceBtn{padding:8px 12px;border-radius:10px;border:1px solid var(--border);background:var(--input-bg);color:var(--text);font-weight:bold;cursor:pointer}
+  .themeChoiceBtn.active{background:var(--green);color:#fff;border-color:transparent}
+  .settingsMeta{display:grid;gap:8px;margin-top:12px}
+  .settingsMetaRow{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px}
+  .settingsMetaRow:last-child{border-bottom:none}
+  .clientsMobileCards{display:none}
+  .clientMobileCard{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:14px;box-shadow:var(--shadow-soft);display:grid;gap:10px}
+  .clientMobileTop{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+  .clientMobileName{font-weight:bold;font-size:15px;color:var(--text)}
+  .clientMobileMeta{display:flex;flex-wrap:wrap;gap:6px;font-size:12px;color:var(--text-muted)}
+  .clientMobileContact{display:flex;flex-wrap:wrap;gap:8px}
+  .clientInlineLink{color:var(--green);text-decoration:none;font-weight:bold}
+  .clientInlineLink:hover{text-decoration:underline}
+  .clientMobileActions{display:flex;flex-wrap:wrap;gap:8px}
 
   .statusPill,.prio,.dashPill,.terminBadge,.ktoBadge{letter-spacing:.01em}
   .statusPill{padding:4px 10px}
@@ -600,15 +639,22 @@
     .dashCard,.dashToday,.dashAi{grid-column:1/-1}
     .dashKpiRow{grid-template-columns:1fr 1fr}
     .commandSections,.commandCounters{grid-template-columns:1fr 1fr}
+    .mainCategoryNav,.subCategoryNav{flex-wrap:nowrap;overflow-x:auto;padding-bottom:10px}
+    .mainCategoryBtn,.subCategoryBtn{white-space:nowrap}
   }
   @media(max-width:620px){
     .dashKpiRow{grid-template-columns:1fr}
-    .tabBtn{width:100%;text-align:left}
     .whoRow{width:100%}
     .followItem{grid-template-columns:1fr}
     .clientCardGrid,.offerFormGrid{grid-template-columns:1fr}
     .commandSections,.commandCounters{grid-template-columns:1fr}
     .commandHeader{flex-direction:column}
+    .clientActions,.clientMobileActions,.commandActions,.themeSwitchRow{flex-direction:column}
+    .lockBtn{padding:6px 10px}
+  }
+  @media(max-width:900px){
+  .tableWrap{display:none}
+    .clientsMobileCards{display:grid;gap:10px}
   }
 
 </style>
@@ -640,11 +686,12 @@
       <path d="M50 44 C56 38 76 28 82 10 C82 10 60 8 50 30 Z" fill="rgba(255,255,255,0.88)"/>
     </svg>
     <div>
-      <h1>Panel — dokumenty i sprawy</h1>
-      <p>Prywatna lista roboczcza. Widoczna tylko dla Ciebie.</p>
+      <h1>Panel — centrum pracy firmy</h1>
+      <p>Prywatne centrum CRM, dokumentów, follow-upów i operacji.</p>
     </div>
     <span id="syncStatus" style="font-size:11px;color:#cfe8d6;margin-left:auto;margin-right:4px"></span>
     <button class="lockBtn" onclick="refreshFromRemote()">⟳ Odśwież</button>
+    <button class="lockBtn themeBtn" id="themeToggleBtn" onclick="toggleTheme()">🌗 Motyw</button>
     <button class="lockBtn" onclick="lock()">Zablokuj</button>
   </header>
 
@@ -658,24 +705,9 @@
       </select>
     </div>
 
-    <div class="tabNav">
-      <button class="tabBtn active" data-tab="dashboard" onclick="switchTab('dashboard')">✨ Dashboard</button>
-      <button class="tabBtn" data-tab="zadania" onclick="switchTab('zadania')">✅ Do zrobienia</button>
-      <button class="tabBtn" data-tab="checklisty" onclick="switchTab('checklisty')">☑️ Checklisty</button>
-      <button class="tabBtn" data-tab="aiworkflow" onclick="switchTab('aiworkflow')">🤖 AI Workflow</button>
-      <button class="tabBtn" data-tab="backup" onclick="switchTab('backup')">💾 Backup</button>
-      <button class="tabBtn" data-tab="klienci" onclick="switchTab('klienci')">👥 Baza klientów</button>
-      <button class="tabBtn" data-tab="dokumenty" onclick="switchTab('dokumenty')">📄 Dokumenty i oferty</button>
-      <button class="tabBtn" data-tab="cenniki" onclick="switchTab('cenniki')">💶 Cenniki</button>
-      <button class="tabBtn" data-tab="sprawy" onclick="switchTab('sprawy')">📋 Sprawy i aktywność</button>
-      <button class="tabBtn" data-tab="terminy" onclick="switchTab('terminy')">📅 Terminy</button>
-      <button class="tabBtn" data-tab="instalacje" onclick="switchTab('instalacje')">🥛 Instalacje</button>
-      <button class="tabBtn" data-tab="budzet" onclick="switchTab('budzet')">📊 Budżet startowy</button>
-      <button class="tabBtn" data-tab="finanse" onclick="switchTab('finanse')">💰 Finanse</button>
-      <button class="tabBtn" data-tab="linki" onclick="switchTab('linki')">🔗 Szybkie linki</button>
-      <button class="tabBtn" data-tab="podwykonawcy" onclick="switchTab('podwykonawcy')">🤝 Podwykonawcy</button>
-      <button class="tabBtn" data-tab="marketing" onclick="switchTab('marketing')">📢 Marketing</button>
-      <button class="tabBtn" data-tab="materialy" onclick="switchTab('materialy')">📋 Materiały sprzedażowe</button>
+    <div class="navShell">
+      <div id="mainNav" class="mainCategoryNav"></div>
+      <div id="subNav" class="subCategoryNav"></div>
     </div>
 
     <div class="tabPane active" id="tabpane-dashboard">
@@ -683,6 +715,9 @@
         <div class="dashCard dashHero">
           <div class="dashHeroTitle">Cześć, <span id="dashWho">Jakub</span> 👋</div>
           <div class="dashHeroSub" id="dashDate"></div>
+          <div class="dashHeroMeta">
+            <div class="dashSyncPill" id="dashSyncPill">Status synchronizacji: sprawdzanie...</div>
+          </div>
         </div>
 
         <div class="dashKpiRow" id="dashKpi"></div>
@@ -970,7 +1005,7 @@
           <button class="crmViewBtn" id="clientsViewAdvisorBtn" onclick="setClientsView('advisor')">Advisor</button>
           <button class="crmViewBtn" id="clientsViewAdvisorOlxBtn" onclick="setClientsView('advisorolx')">Advisor OLX</button>
         </div>
-        <div class="crmHint">Widoki robocze korzystaja tylko z obecnych danych klientow.</div>
+        <div class="crmHint" id="crmViewHint">Widoki robocze korzystaja tylko z obecnych danych klientow.</div>
       </div>
       <div class="filterRow">
         <select id="filterStatus" onchange="renderClients()">
@@ -1005,6 +1040,7 @@
           <tbody id="clientsBody"></tbody>
         </table>
       </div>
+      <div id="clientsMobileCards" class="clientsMobileCards"></div>
       <div id="clientsKanban" class="clientsKanban"></div>
       <div id="clientsFollowups" class="clientsFollowups"></div>
     </div>
@@ -1201,6 +1237,26 @@
         <div id="salesText" class="empty">Materialy zostana odtworzone jako widok ladowany po zalogowaniu.</div>
       </div>
     </div>
+    <div class="tabPane" id="tabpane-ustawienia">
+      <div class="section">
+        <h2>Ustawienia panelu</h2>
+        <div class="settingsGrid">
+          <div class="settingsCard">
+            <h3>Motyw panelu</h3>
+            <p>Przełącz wygląd między jasnym i ciemnym motywem. Ustawienie zapisuje się lokalnie w tej przeglądarce.</p>
+            <div class="themeSwitchRow">
+              <button class="themeChoiceBtn" id="themeChoiceLight" onclick="setTheme('light')">Jasny</button>
+              <button class="themeChoiceBtn" id="themeChoiceDark" onclick="setTheme('dark')">Ciemny</button>
+            </div>
+          </div>
+          <div class="settingsCard">
+            <h3>Status pracy panelu</h3>
+            <p>Tu masz szybki podgląd synchronizacji, autora zmian i trybu pracy bez wchodzenia w backup.</p>
+            <div class="settingsMeta" id="panelSettingsMeta"></div>
+          </div>
+        </div>
+      </div>
+    </div>
   <div id="previewModal" class="previewModal" onclick="if(event.target===this) closePreview()">
     <div class="previewBox">
       <button class="previewClose" onclick="closePreview()">✕ Zamknij</button>
@@ -1297,9 +1353,123 @@ function lock(){
   document.getElementById("pwInput").value="";
 }
 
-function switchTab(name){
+function initTheme(){
+  const saved = localStorage.getItem("panel_theme") || "light";
+  setTheme(saved, true);
+}
+
+function setTheme(theme, silent){
+  const next = theme === "dark" ? "dark" : "light";
+  document.body.classList.toggle("dark-theme", next === "dark");
+  localStorage.setItem("panel_theme", next);
+  const toggleBtn = document.getElementById("themeToggleBtn");
+  if(toggleBtn) toggleBtn.textContent = next === "dark" ? "☀️ Jasny" : "🌗 Motyw";
+  document.getElementById("themeChoiceLight")?.classList.toggle("active", next === "light");
+  document.getElementById("themeChoiceDark")?.classList.toggle("active", next === "dark");
+  if(!silent) renderPanelSettings();
+}
+
+function toggleTheme(){
+  setTheme(document.body.classList.contains("dark-theme") ? "light" : "dark");
+}
+
+function getActiveTabName(){
+  return document.querySelector(".tabPane.active")?.id?.replace("tabpane-","") || "dashboard";
+}
+
+function scrollToPanelTarget(targetId){
+  if(!targetId) return;
+  setTimeout(()=>{
+    const el = document.getElementById(targetId);
+    if(el) el.scrollIntoView({behavior:"smooth", block:"start"});
+  }, 50);
+}
+
+function renderNavigation(){
+  const mainNav = document.getElementById("mainNav");
+  const subNav = document.getElementById("subNav");
+  if(!mainNav || !subNav) return;
+  mainNav.innerHTML = Object.entries(PANEL_NAV).map(([key, section]) => `
+    <button class="mainCategoryBtn ${currentMainCategory===key?"active":""}" onclick="setMainCategory('${key}')">${crmEsc(section.label)}</button>
+  `).join("");
+  const activeSection = PANEL_NAV[currentMainCategory] || PANEL_NAV.today;
+  subNav.innerHTML = activeSection.views.map(view => `
+    <button class="subCategoryBtn ${currentSubView===view.key?"active":""}" data-priority="${view.priority ? "true" : "false"}" onclick="setSubView('${view.key}')">${crmEsc(view.label)}</button>
+  `).join("");
+}
+
+function setMainCategory(categoryKey){
+  if(!PANEL_NAV[categoryKey]) return;
+  currentMainCategory = categoryKey;
+  const section = PANEL_NAV[categoryKey];
+  const belongs = section.views.some(view => view.key === currentSubView);
+  renderNavigation();
+  if(!belongs && section.views[0]) setSubView(section.views[0].key);
+}
+
+function syncNavigationFromTab(name){
+  const tabMap = {
+    dashboard:"dashboard",
+    zadania:"ops-tasks",
+    checklisty:"ops-checklists",
+    aiworkflow:"ai-workflow",
+    backup:"ai-backup",
+    dokumenty:"docs-home",
+    cenniki:"docs-price",
+    sprawy:"ops-activity",
+    terminy:"ops-deadlines",
+    instalacje:"ops-installations",
+    budzet:"fin-budget",
+    finanse:"fin-finance",
+    linki:"marketing-links",
+    podwykonawcy:"marketing-vendors",
+    marketing:"marketing-home",
+    materialy:"docs-materials",
+    ustawienia:"ai-settings"
+  };
+  if(name === "klienci"){
+    const clientMap = {
+      table:"sales-table",
+      kanban:"sales-kanban",
+      followups:"sales-followups",
+      advisor:"sales-advisor",
+      advisorolx:"sales-advisorolx"
+    };
+    currentMainCategory = currentSubView === "today-followups" ? "today" : "sales";
+    currentSubView = clientMap[currentClientsView] || "sales-table";
+    renderNavigation();
+    return;
+  }
+  if(tabMap[name]){
+    currentSubView = tabMap[name];
+    currentMainCategory = SUB_VIEW_INDEX[currentSubView]?.categoryKey || "today";
+    renderNavigation();
+  }
+}
+
+function setSubView(subViewKey){
+  const view = SUB_VIEW_INDEX[subViewKey];
+  if(!view) return;
+  currentSubView = subViewKey;
+  currentMainCategory = view.categoryKey;
+  renderNavigation();
+  if(view.documentSearch !== undefined){
+    const search = document.getElementById("searchDokumenty");
+    if(search) search.value = view.documentSearch;
+  }
+  if(view.tab) switchTab(view.tab, {preserveSubView:true});
+  if(view.clientsView) setClientsView(view.clientsView, {preserveNavigation:true});
+  if(view.focusId) scrollToPanelTarget(view.focusId);
+}
+
+function switchTab(name, options={}){
   document.querySelectorAll(".tabBtn").forEach(b=>b.classList.toggle("active", b.dataset.tab===name));
   document.querySelectorAll(".tabPane").forEach(p=>p.classList.toggle("active", p.id==="tabpane-"+name));
+  if(name === "dokumenty" && currentSubView !== "docs-formal"){
+    const search = document.getElementById("searchDokumenty");
+    if(search) search.value = "";
+  }
+  if(!options.preserveSubView) syncNavigationFromTab(name);
 }
 
 function defaultData(){
@@ -1401,6 +1571,24 @@ function syncErrorText(e){
 function setSyncStatus(text, warn){
   const el = document.getElementById("syncStatus");
   if(el){ el.textContent = text; el.style.color = warn ? "#f0c419" : "#cfe8d6"; }
+  const dash = document.getElementById("dashSyncPill");
+  if(dash) dash.textContent = text;
+  renderPanelSettings();
+}
+
+function renderPanelSettings(){
+  document.getElementById("themeChoiceLight")?.classList.toggle("active", !document.body.classList.contains("dark-theme"));
+  document.getElementById("themeChoiceDark")?.classList.toggle("active", document.body.classList.contains("dark-theme"));
+  const meta = document.getElementById("panelSettingsMeta");
+  if(!meta) return;
+  const syncText = document.getElementById("syncStatus")?.textContent || "Brak danych";
+  const modeText = SYNC_ENABLED ? "Chmura + lokalny cache" : "Tylko lokalnie";
+  meta.innerHTML = `
+    <div class="settingsMetaRow"><span>Motyw</span><strong>${crmEsc(document.body.classList.contains("dark-theme") ? "Ciemny" : "Jasny")}</strong></div>
+    <div class="settingsMetaRow"><span>Synchronizacja</span><strong>${crmEsc(syncText)}</strong></div>
+    <div class="settingsMetaRow"><span>Tryb danych</span><strong>${crmEsc(modeText)}</strong></div>
+    <div class="settingsMetaRow"><span>Piszesz jako</span><strong>${crmEsc(getWhoAmI())}</strong></div>
+  `;
 }
 
 async function initApp(){
@@ -1500,6 +1688,8 @@ function saveData(){
   saveTimer = setTimeout(()=>pushRemote(data), 500); // debounce
 }
 
+initTheme();
+
 if(sessionStorage.getItem("panel_unlocked")==="1" && getPanelPassword()){
   document.getElementById("gate").style.display="none";
   document.getElementById("app").style.display="block";
@@ -1508,7 +1698,11 @@ if(sessionStorage.getItem("panel_unlocked")==="1" && getPanelPassword()){
 
 // ================= Kto edytuje / log aktywności =================
 function getWhoAmI(){ return localStorage.getItem("panel_who") || "Jakub"; }
-function setWhoAmI(v){ localStorage.setItem("panel_who", v); }
+function setWhoAmI(v){
+  localStorage.setItem("panel_who", v);
+  renderPanelSettings();
+  if(document.getElementById("app")?.style.display !== "none") renderDashboard();
+}
 
 function logActivity(text){
   if(!data.log) data.log = [];
@@ -1993,6 +2187,7 @@ function fillDocumentClientOptions(){
 
 function render(){
   document.getElementById("whoAmI").value = getWhoAmI();
+  renderNavigation();
   renderStatsBar();
   renderActivityLog();
   renderClients();
@@ -2065,6 +2260,7 @@ function render(){
   renderPriceDocuments();
   renderLoanCalc();
   renderDashboard();
+  renderPanelSettings();
 }
 
 function toggleForm(cat){
@@ -2231,6 +2427,79 @@ function populateFilterOptions(){
 let currentClientsView = "table";
 let currentClientCardId = null;
 let currentOfferEdit = null;
+let currentMainCategory = "today";
+let currentSubView = "dashboard";
+
+const PANEL_NAV = {
+  today: {
+    label: "Dzisiaj",
+    views: [
+      {key:"dashboard", label:"Dashboard", tab:"dashboard"},
+      {key:"today-command", label:"Centrum dnia", tab:"dashboard", focusId:"dailyCommandCenter"},
+      {key:"today-notifications", label:"Powiadomienia", tab:"dashboard", focusId:"dashNotifications"},
+      {key:"today-followups", label:"Do kontaktu", tab:"klienci", clientsView:"followups", priority:true}
+    ]
+  },
+  sales: {
+    label: "Klienci i sprzedaż",
+    views: [
+      {key:"sales-table", label:"Baza klientów", tab:"klienci", clientsView:"table"},
+      {key:"sales-advisor", label:"Advisor", tab:"klienci", clientsView:"advisor"},
+      {key:"sales-advisorolx", label:"Advisor OLX", tab:"klienci", clientsView:"advisorolx"},
+      {key:"sales-kanban", label:"Kanban", tab:"klienci", clientsView:"kanban"},
+      {key:"sales-followups", label:"Do kontaktu", tab:"klienci", clientsView:"followups"},
+      {key:"sales-offers", label:"Oferty", tab:"klienci", clientsView:"table", focusId:"section-klienci"},
+      {key:"sales-history", label:"Historia działań", tab:"klienci", clientsView:"table", focusId:"section-klienci"}
+    ]
+  },
+  documents: {
+    label: "Dokumenty i oferty",
+    views: [
+      {key:"docs-home", label:"Dokumenty", tab:"dokumenty"},
+      {key:"docs-price", label:"Cenniki", tab:"cenniki"},
+      {key:"docs-materials", label:"Materiały sprzedażowe", tab:"materialy"},
+      {key:"docs-formal", label:"Umowy / formalne", tab:"dokumenty", documentSearch:"formalne"}
+    ]
+  },
+  operations: {
+    label: "Operacje",
+    views: [
+      {key:"ops-tasks", label:"Zadania", tab:"zadania"},
+      {key:"ops-checklists", label:"Checklisty", tab:"checklisty"},
+      {key:"ops-deadlines", label:"Terminy", tab:"terminy"},
+      {key:"ops-installations", label:"Instalacje", tab:"instalacje"},
+      {key:"ops-activity", label:"Sprawy i aktywności", tab:"sprawy"}
+    ]
+  },
+  finances: {
+    label: "Finanse",
+    views: [
+      {key:"fin-budget", label:"Budżet startowy", tab:"budzet"},
+      {key:"fin-finance", label:"Finanse", tab:"finanse"}
+    ]
+  },
+  marketing: {
+    label: "Marketing i partnerzy",
+    views: [
+      {key:"marketing-home", label:"Marketing", tab:"marketing"},
+      {key:"marketing-vendors", label:"Podwykonawcy", tab:"podwykonawcy"},
+      {key:"marketing-links", label:"Szybkie linki", tab:"linki"},
+      {key:"marketing-partners", label:"Partnerzy / leady partnerskie", tab:"podwykonawcy"}
+    ]
+  },
+  ai: {
+    label: "AI i ustawienia",
+    views: [
+      {key:"ai-workflow", label:"AI Workflow", tab:"aiworkflow"},
+      {key:"ai-backup", label:"Backup", tab:"backup"},
+      {key:"ai-importexport", label:"Import / eksport JSON", tab:"backup", focusId:"importPackagePreviewResult"},
+      {key:"ai-settings", label:"Ustawienia panelu", tab:"ustawienia"}
+    ]
+  }
+};
+
+const SUB_VIEW_INDEX = Object.values(PANEL_NAV).flatMap(section => section.views.map(view => [view.key, {...view, categoryKey:Object.keys(PANEL_NAV).find(key => PANEL_NAV[key] === section)}]))
+  .reduce((acc, [key, value]) => { acc[key] = value; return acc; }, {});
 
 function crmEsc(value){
   return (value ?? "").toString().replace(/[&<>"']/g, ch => ({
@@ -2257,6 +2526,31 @@ function clientLocation(c){
 
 function clientContact(c){
   return [c.telefon, c.email].filter(Boolean).join(" | ");
+}
+
+function phoneHref(value){
+  const digits = (value || "").replace(/[^\d+]/g,"");
+  return digits ? `tel:${digits}` : "";
+}
+
+function emailHref(value){
+  const mail = (value || "").trim();
+  return mail && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(mail) ? `mailto:${mail}` : "";
+}
+
+function renderClientContactLinks(c){
+  const parts = [];
+  const tel = (c.telefon || "").trim();
+  const mail = (c.email || "").trim();
+  if(tel){
+    const href = phoneHref(tel);
+    parts.push(href ? `<a class="clientInlineLink" href="${crmEsc(href)}">${crmEsc(tel)}</a>` : crmEsc(tel));
+  }
+  if(mail){
+    const href = emailHref(mail);
+    parts.push(href ? `<a class="clientInlineLink" href="${crmEsc(href)}">${crmEsc(mail)}</a>` : crmEsc(mail));
+  }
+  return parts.join('<span style="color:var(--text-muted)">•</span>');
 }
 
 function clientProduct(c){
@@ -2382,7 +2676,7 @@ function commandReasonText(c){
 function renderCommandClientCard(c, reason){
   const followup = clientFollowup(c) || "brak follow-upu";
   const leadSource = clientLeadSource(c) || "brak źródła";
-  const contact = clientContact(c) || "brak telefonu i e-maila";
+  const contact = renderClientContactLinks(c) || crmEsc(clientContact(c) || "brak telefonu i e-maila");
   const lastActivity = commandReasonText(c);
   const statusLabel = labelFrom(STATUS_OPTS, c.status) || (c.status || "Bez statusu");
   const prioLabel = labelFrom(PRIO_OPTS, c.priorytet) || (c.priorytet || "Bez priorytetu");
@@ -2392,7 +2686,7 @@ function renderCommandClientCard(c, reason){
         <div>
           <div class="commandClientName">${crmEsc(getClientDisplayName(c))}</div>
           <div class="commandMeta">
-            <span>${crmEsc(contact)}</span>
+            <span>${contact}</span>
             ${clientLocation(c) ? `<span>${crmEsc(clientLocation(c))}</span>` : ""}
           </div>
         </div>
@@ -2454,7 +2748,8 @@ function renderDailyCommandCenter(){
   const followupTodayClients = clients.filter(isTodayFollowup);
   const overdueClients = clients.filter(isOverdueFollowup);
   const newLeadClients = clients.filter(isNewLead);
-  const advisorClients = clients.filter(isAdvisorLead);
+  const advisorClients = clients.filter(isAdvisorClient);
+  const advisorOlxClients = clients.filter(isAdvisorOlxClient);
   const offersWaitingClients = clients.filter(c => getClientOffersWaiting(c).length > 0);
   const tataActivity = [];
   const jakubActivity = [];
@@ -2479,6 +2774,7 @@ function renderDailyCommandCenter(){
     ["Zaległe", overdueClients.length],
     ["Nowe leady", newLeadClients.length],
     ["Advisor", advisorClients.length],
+    ["Advisor OLX", advisorOlxClients.length],
     ["Oferty bez odpowiedzi", offersWaitingClients.length]
   ].map(([label, num]) => `
     <div class="commandCounter">
@@ -2492,12 +2788,13 @@ function renderDailyCommandCenter(){
     renderCommandSection("Zaległe follow-upy", overdueClients.map(c => renderCommandClientCard(c, "Termin follow-upu już minął i wymaga reakcji.")), "Brak zaległych follow-upów.", true),
     renderCommandSection("Nowe leady", newLeadClients.map(c => renderCommandClientCard(c, hasClientHistory(c) ? "Lead jest świeży i wymaga pierwszego poprowadzenia." : "Lead nie ma jeszcze historii kontaktu.")), "Brak nowych leadów do ogarnięcia.", false),
     renderCommandSection("Leady z Advisor", advisorClients.map(c => renderCommandClientCard(c, "Źródło lub historia wskazują na formularz Advisor.")), "Brak leadów oznaczonych jako Advisor.", false),
+    renderCommandSection("Leady z Advisor OLX", advisorOlxClients.map(c => renderCommandClientCard(c, "Źródło lub historia wskazują na formularz Advisor OLX.")), "Brak leadów oznaczonych jako Advisor OLX.", false),
     renderCommandSection("Oferty bez odpowiedzi", offersWaitingClients.map(c => renderCommandClientCard(c, `Aktywne oferty oczekujące na decyzję: ${getClientOffersWaiting(c).length}.`)), "Brak ofert czekających na odpowiedź.", false),
     renderCommandSection("Ostatnie działania taty", tataActivity.slice(0,6).map(renderCommandActivityCard), "Brak ostatnich działań oznaczonych jako Tata.", false),
     renderCommandSection("Ostatnie działania Jakuba", jakubActivity.slice(0,6).map(renderCommandActivityCard), "Brak ostatnich działań oznaczonych jako Jakub.", false)
   ];
 
-  const isEmpty = !followupTodayClients.length && !overdueClients.length && !newLeadClients.length && !advisorClients.length && !offersWaitingClients.length && !tataActivity.length && !jakubActivity.length;
+  const isEmpty = !followupTodayClients.length && !overdueClients.length && !newLeadClients.length && !advisorClients.length && !advisorOlxClients.length && !offersWaitingClients.length && !tataActivity.length && !jakubActivity.length;
   host.innerHTML = isEmpty ? '<div class="commandEmpty">Na teraz brak pilnych działań.</div>' : `<div class="commandSections">${sections.join("")}</div>`;
 }
 
@@ -2604,13 +2901,14 @@ function renderLeadViewCard(c){
   const product = clientProduct(c) || "brak określonego produktu";
   const last = clientActivitySummary(c, 110) || "Brak historii działań";
   const id = crmEsc(c.id);
+  const contact = renderClientContactLinks(c) || crmEsc(clientContact(c) || "brak telefonu i e-maila");
   return `
     <div class="commandClientCard">
       <div class="commandClientTop">
         <div>
           <div class="commandClientName">${crmEsc(clientName(c))}</div>
           <div class="commandMeta">
-            <span>${crmEsc(clientContact(c) || "brak telefonu i e-maila")}</span>
+            <span>${contact}</span>
             <span>${crmEsc(clientLocation(c) || "brak lokalizacji")}</span>
           </div>
         </div>
@@ -2790,7 +3088,28 @@ function renderOfferCard(o, clientId, offerIndex){
   `;
 }
 
-function setClientsView(view){
+function updateClientsViewHint(){
+  const hint = document.getElementById("crmViewHint");
+  if(!hint) return;
+  const hints = {
+    table:"Baza klientów z szybką edycją pól CRM i ostatnim działaniem.",
+    kanban:"Kolumny statusów pomagają szybko ocenić etap każdego klienta.",
+    followups:"Widok pracy na follow-upach oparty na realnym następnym kontakcie.",
+    advisor:"Leady z formularza Advisor jako osobny roboczy widok sprzedażowy.",
+    advisorolx:"Leady z formularza Advisor OLX jako osobny widok do szybkiego działania."
+  };
+  if(currentSubView === "sales-offers"){
+    hint.textContent = "Oferty są zarządzane w karcie klienta. Otwórz klienta z tabeli albo kart mobilnych.";
+    return;
+  }
+  if(currentSubView === "sales-history"){
+    hint.textContent = "Historia działań jest w karcie klienta i w Centrum dnia. Otwórz klienta, aby dopisać szczegóły.";
+    return;
+  }
+  hint.textContent = hints[currentClientsView] || "Widoki robocze korzystaja tylko z obecnych danych klientow.";
+}
+
+function setClientsView(view, options={}){
   currentClientsView = view;
   const viewMap = {
     table: "clientsViewTableBtn",
@@ -2800,6 +3119,19 @@ function setClientsView(view){
     advisorolx: "clientsViewAdvisorOlxBtn"
   };
   document.querySelectorAll(".crmViewBtn").forEach(btn=>btn.classList.toggle("active", btn.id === viewMap[view]));
+  if(!options.preserveNavigation){
+    const subViewMap = {
+      table:"sales-table",
+      kanban:"sales-kanban",
+      followups:"sales-followups",
+      advisor:"sales-advisor",
+      advisorolx:"sales-advisorolx"
+    };
+    currentMainCategory = "sales";
+    currentSubView = subViewMap[view] || "sales-table";
+    renderNavigation();
+  }
+  updateClientsViewHint();
   renderClients();
 }
 
@@ -2850,7 +3182,7 @@ function renderClientKanbanCard(c){
         ${product ? `<span class="kanbanPill">${crmEsc(product)}</span>` : ""}
         <span class="kanbanPill gold">${crmEsc(followup.label)}</span>
       </div>
-      ${contact ? `<div class="kanbanContact">${crmEsc(contact)}</div>` : ""}
+      ${contact ? `<div class="kanbanContact">${renderClientContactLinks(c) || crmEsc(contact)}</div>` : ""}
       ${objection ? `<div class="kanbanNote">Obiekcja: ${crmEsc(objection)}</div>` : ""}
       ${last ? `<div class="kanbanNote">Ostatnie działanie: ${crmEsc(last)}</div>` : ""}
     </div>
@@ -2885,6 +3217,45 @@ function renderClientsFollowups(list){
   `).join("");
 }
 
+function renderClientsMobileCards(list){
+  const host = document.getElementById("clientsMobileCards");
+  if(!host) return;
+  if(currentClientsView !== "table"){
+    host.innerHTML = "";
+    return;
+  }
+  host.innerHTML = list.length ? list.map(c => {
+    const id = crmEsc(c.id);
+    const last = clientActivitySummary(c, 100) || "Brak historii działań";
+    const contact = renderClientContactLinks(c) || `<span class="kanbanContact">${crmEsc(clientContact(c) || "brak telefonu i e-maila")}</span>`;
+    return `
+      <div class="clientMobileCard">
+        <div class="clientMobileTop">
+          <div>
+            <div class="clientMobileName">${crmEsc(clientName(c))}</div>
+            <div class="clientMobileMeta">
+              <span>${crmEsc(clientLocation(c) || "brak lokalizacji")}</span>
+              <span>${crmEsc(clientProduct(c) || "brak produktu")}</span>
+            </div>
+          </div>
+          <button class="delBtn" onclick="deleteClient('${id}')">Usuń</button>
+        </div>
+        <div class="commandBadges">
+          <span class="kanbanPill">${crmEsc(labelFrom(STATUS_OPTS, c.status))}</span>
+          <span class="kanbanPill">${crmEsc(labelFrom(PRIO_OPTS, c.priorytet))}</span>
+          ${clientFollowup(c) ? `<span class="kanbanPill gold">${crmEsc(clientFollowup(c))}</span>` : ""}
+        </div>
+        <div class="clientMobileContact">${contact}</div>
+        <div class="kanbanNote"><b>Ostatnie działanie:</b> ${crmEsc(last)}</div>
+        <div class="clientMobileActions">
+          <button class="histBtn" onclick="openClientCard('${id}')">Otwórz klienta</button>
+          <button class="histBtn" onclick="openHistoryModal('${id}')">Historia</button>
+        </div>
+      </div>
+    `;
+  }).join("") : '<div class="empty">Brak klientów pasujących do filtrów.</div>';
+}
+
 function renderFollowupItem(c){
   const followup = followupInfo(clientFollowup(c));
   const reason = clientObjections(c) || c.notatki || (c.historia || []).slice(-1)[0]?.tekst || "";
@@ -2894,7 +3265,7 @@ function renderFollowupItem(c){
   const last = clientActivitySummary(c, 120);
   return `
     <div class="followItem">
-      <div><b>${crmEsc(clientName(c))}</b><br><span class="kanbanContact">${crmEsc(clientContact(c) || clientLocation(c) || "brak kontaktu")}</span></div>
+      <div><b>${crmEsc(clientName(c))}</b><br><span class="kanbanContact">${renderClientContactLinks(c) || crmEsc(clientContact(c) || clientLocation(c) || "brak kontaktu")}</span></div>
       <div>${crmEsc(product || labelFrom(STATUS_OPTS, c.status))}</div>
       <div>${crmEsc(clientFollowup(c) ? `${clientFollowup(c)} (${followup.label})` : "brak follow-upu")}</div>
       <div class="followAction"><button class="histBtn" onclick="openClientCard('${crmEsc(c.id)}')">Karta klienta</button></div>
@@ -2918,7 +3289,7 @@ function openClientCard(clientId){
     <div class="clientCardTop">
       <div>
         <h2>${crmEsc(clientName(c))}</h2>
-        <div class="kanbanContact">${crmEsc(clientContact(c) || clientLocation(c) || "brak kontaktu")}</div>
+        <div class="kanbanContact">${renderClientContactLinks(c) || crmEsc(clientContact(c) || clientLocation(c) || "brak kontaktu")}</div>
         <div class="lastActivity">${lastActivity ? `<span class="lastActivityBadge">Ostatnie działanie: ${crmEsc(lastActivity)}</span>` : '<span class="lastActivityBadge">Ostatnie działanie: brak</span>'}</div>
       </div>
       <div class="clientCardBadges">
@@ -2928,8 +3299,8 @@ function openClientCard(clientId){
       </div>
     </div>
     <div class="clientCardGrid">
-      <div class="clientCardField"><b>Telefon</b>${crmEsc(c.telefon || "brak")}</div>
-      <div class="clientCardField"><b>E-mail</b>${crmEsc(c.email || "brak")}</div>
+      <div class="clientCardField"><b>Telefon</b>${c.telefon ? (phoneHref(c.telefon) ? `<a class="clientInlineLink" href="${crmEsc(phoneHref(c.telefon))}">${crmEsc(c.telefon)}</a>` : crmEsc(c.telefon)) : "brak"}</div>
+      <div class="clientCardField"><b>E-mail</b>${c.email ? (emailHref(c.email) ? `<a class="clientInlineLink" href="${crmEsc(emailHref(c.email))}">${crmEsc(c.email)}</a>` : crmEsc(c.email)) : "brak"}</div>
       <div class="clientCardField"><b>Lokalizacja</b>${crmEsc(clientLocation(c) || c.ulica || "brak")}</div>
       <div class="clientCardField"><b>Skąd trafił</b>${clientField(c,null,"source")}</div>
       <div class="clientCardField"><b>Czym zainteresowany</b>${clientField(c,null,"product")}</div>
@@ -2938,7 +3309,6 @@ function openClientCard(clientId){
       <div class="clientCardField"><b>Co go powstrzymuje</b>${clientField(c,null,"objection")}</div>
     </div>
     ${renderQuickClientUpdate(c)}
-    ${renderClientOffers(c)}
     <div class="clientCardHistory">
       <div class="clientCardHistoryHead">
         <b>Historia kontaktu (${historyCount})</b>
@@ -2946,6 +3316,7 @@ function openClientCard(clientId){
       </div>
       ${renderHistoryTimeline(c, false)}
     </div>
+    ${renderClientOffers(c)}
     <div class="clientDangerZone">
       <button class="dangerBtn" onclick="deleteClient('${crmEsc(c.id)}')">Usuń klienta</button>
     </div>
@@ -3102,25 +3473,31 @@ function renderClients(){
   if(sortBy==="miejscowosc") list.sort((a,b)=>(a.miejscowosc||"").localeCompare(b.miejscowosc||""));
 
   setClientsViewContainers();
+  updateClientsViewHint();
   if(currentClientsView==="kanban"){
     renderClientsKanban(list);
+    renderClientsMobileCards([]);
     return;
   }
   if(currentClientsView==="followups"){
     renderClientsFollowups(list);
+    renderClientsMobileCards([]);
     return;
   }
   if(currentClientsView==="advisor"){
     renderLeadSourceView(list, "advisor");
+    renderClientsMobileCards([]);
     return;
   }
   if(currentClientsView==="advisorolx"){
     renderLeadSourceView(list, "advisorolx");
+    renderClientsMobileCards([]);
     return;
   }
 
   if(list.length===0){
     body.innerHTML = `<tr><td colspan="13" class="empty">Brak klientów pasujących do filtrów.</td></tr>`;
+    renderClientsMobileCards([]);
     return;
   }
   const phoneCounts = {};
@@ -3155,6 +3532,7 @@ function renderClients(){
     </tr>
   `;
   }).join("");
+  renderClientsMobileCards(list);
 }
 
 function formatDT(iso){
@@ -3219,8 +3597,7 @@ function deleteClient(id){
   if(currentClientCardId === id) closeClientCard();
   if(currentHistoryClientId === id) closeHistoryModal();
   saveData();
-  renderClients();
-  renderStatsBar();
+  render();
 }
 
 function updateClient(el){
@@ -5063,14 +5440,26 @@ function renderDashboard(){
     return dni !== null && dni <= 14;
   }).length;
   const sprawyOpen = (data.sprawy||[]).filter(s=>s.status!=="done").length;
+  const followupToday = klienci.filter(isTodayFollowup).length;
+  const overdue = klienci.filter(isOverdueFollowup).length;
+  const newLeads = klienci.filter(isNewLead).length;
+  const advisorCount = klienci.filter(isAdvisorClient).length;
+  const advisorOlxCount = klienci.filter(isAdvisorOlxClient).length;
+  const waitingOffers = klienci.filter(c => getClientOffersWaiting(c).length > 0).length;
   const dashKpiEl = document.getElementById("dashKpi");
   if(dashKpiEl){
     dashKpiEl.innerHTML = `
-      <div class="dashKpiCard"><div class="num">${klienci.length}</div><div class="lbl">Klienci</div><div class="hint">Baza CRM</div></div>
-      <div class="dashKpiCard"><div class="num">${zadaniaOtwarte.length}</div><div class="lbl">Otwarte zadania</div><div class="hint">Do domknięcia</div></div>
-      <div class="dashKpiCard"><div class="num">${terminyPilne}</div><div class="lbl">Pilne terminy</div><div class="hint">Do 14 dni lub po terminie</div></div>
-      <div class="dashKpiCard"><div class="num">${sprawyOpen}</div><div class="lbl">Sprawy</div><div class="hint">W toku</div></div>
+      <div class="dashKpiCard"><div class="num">${newLeads}</div><div class="lbl">Nowe leady</div><div class="hint">Świeże zgłoszenia do poprowadzenia</div></div>
+      <div class="dashKpiCard"><div class="num">${followupToday}</div><div class="lbl">Follow-upy dziś</div><div class="hint">Klienci do kontaktu dzisiaj</div></div>
+      <div class="dashKpiCard"><div class="num">${overdue}</div><div class="lbl">Zaległe</div><div class="hint">Kontakty po terminie</div></div>
+      <div class="dashKpiCard"><div class="num">${advisorCount}</div><div class="lbl">Advisor</div><div class="hint">Leady z formularza doradczego</div></div>
+      <div class="dashKpiCard"><div class="num">${advisorOlxCount}</div><div class="lbl">Advisor OLX</div><div class="hint">Leady z formularza OLX</div></div>
+      <div class="dashKpiCard"><div class="num">${waitingOffers}</div><div class="lbl">Oferty bez odpowiedzi</div><div class="hint">Czekają na decyzję klienta</div></div>
     `;
+  }
+  const dashSync = document.getElementById("dashSyncPill");
+  if(dashSync){
+    dashSync.textContent = document.getElementById("syncStatus")?.textContent || "Status synchronizacji niedostępny";
   }
   const todayItems = [
     ...zadaniaOtwarte.slice(0,3).map(z=>({label:z.tekst, meta:z.kto || "Zadanie"})),
