@@ -133,7 +133,7 @@
 .practice-pills span { display: inline-flex; align-items: center; border: 1px solid rgba(255,255,255,.22); border-radius: 999px; padding: .38rem .68rem; color: rgba(255,255,255,.84); font-size: .76rem; font-weight: 700; }
 
 /* FIT CHECK */
-.fit-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: .9rem; margin-top: 2.5rem; }
+.fit-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: .9rem; margin-top: 2.5rem; align-items: start; }
 .fit-card { background: var(--paper); border: 1px solid var(--line); border-radius: var(--r-lg); box-shadow: var(--shadow); overflow: hidden; transition: border-color .2s, box-shadow .2s, transform .2s; }
 .fit-card:hover { transform: translateY(-2px); border-color: rgba(45,90,39,.3); box-shadow: var(--shadow-lg); }
 .fit-card summary { list-style: none; cursor: pointer; display: grid; grid-template-columns: 1.55rem 1fr auto; gap: .8rem; align-items: center; padding: 1rem 1.1rem; color: var(--ink); font-weight: 800; line-height: 1.3; }
@@ -834,6 +834,15 @@ document.addEventListener('DOMContentLoaded', function(){
       card.classList.add('active');
       if(practiceTitle) practiceTitle.textContent=card.dataset.practiceTitle || '';
       if(practiceCopy) practiceCopy.textContent=card.dataset.practiceCopy || '';
+    });
+  });
+
+  document.querySelectorAll('.fit-card').forEach(function(card){
+    card.addEventListener('toggle',function(){
+      if(!card.open) return;
+      document.querySelectorAll('.fit-card').forEach(function(other){
+        if(other!==card) other.open=false;
+      });
     });
   });
 });
