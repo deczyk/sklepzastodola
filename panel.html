@@ -3658,13 +3658,15 @@ function openClientCard(clientId){
       </div>
     </div>
     <div class="clientCardGrid">
-      <div class="clientCardField"><b>Telefon</b>${c.telefon ? (phoneHref(c.telefon) ? `<a class="clientInlineLink" href="${crmEsc(phoneHref(c.telefon))}">${crmEsc(c.telefon)}</a>` : crmEsc(c.telefon)) : "brak"}</div>
-      <div class="clientCardField"><b>E-mail</b>${c.email ? (emailHref(c.email) ? `<a class="clientInlineLink" href="${crmEsc(emailHref(c.email))}">${crmEsc(c.email)}</a>` : crmEsc(c.email)) : "brak"}</div>
-      <div class="clientCardField"><b>Lokalizacja</b>${crmEsc(clientLocation(c) || c.ulica || "brak")}</div>
+      <div class="clientCardField"><b>Telefon</b>${clientField(c,"telefon")}</div>
+      <div class="clientCardField"><b>E-mail</b>${clientField(c,"email")}</div>
+      <div class="clientCardField"><b>Województwo</b>${clientField(c,"wojewodztwo")}</div>
+      <div class="clientCardField"><b>Miejscowość</b>${clientField(c,"miejscowosc")}</div>
+      <div class="clientCardField"><b>Adres / lokalizacja</b>${clientField(c,"ulica")}</div>
       <div class="clientCardField"><b>Skąd trafił</b>${clientField(c,null,"source")}</div>
       <div class="clientCardField"><b>Czym zainteresowany</b>${clientField(c,null,"product")}</div>
       <div class="clientCardField"><b>Następny kontakt</b>${clientField(c,"nastepnyFollowup","date")}</div>
-      <div class="clientCardField"><b>Zainteresowanie</b>${crmEsc(c.zainteresowanie || "brak")}</div>
+      <div class="clientCardField"><b>Zainteresowanie</b>${clientField(c,null,"zain")}</div>
       <div class="clientCardField"><b>Co go powstrzymuje</b>${clientField(c,null,"objection")}</div>
     </div>
     ${renderQuickClientUpdate(c)}
@@ -3976,7 +3978,7 @@ function updateClient(el){
     }
     saveData();
     if(field==="status" || field==="priorytet") renderStatsBar();
-    if(["produkt","nastepnyFollowup","zrodloLeada","obiekcje"].includes(field)){
+    if(["telefon","email","wojewodztwo","miejscowosc","ulica","zainteresowanie","produkt","nastepnyFollowup","zrodloLeada","obiekcje"].includes(field)){
       renderClients();
       if(currentClientCardId===id) openClientCard(id);
     }
