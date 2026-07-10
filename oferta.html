@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link rel="icon" type="image/png" sizes="192x192" href="favicon-192.png">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+
+<title>Nasza oferta - pakiety sprzedaży bezpośredniej dla gospodarstw</title>
+<meta name="description" content="Trzy pakiety Sklep za Stodołą dla gospodarstw: START, SPRZEDAŻOWY i PREMIUM. Mlekomat, pawilon, butelki, wdrożenie, dokumenty i wsparcie w uruchomieniu sprzedaży bezpośredniej.">
+<link rel="canonical" href="https://www.sklepzastodola.pl/oferta.html">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Sklep za Stodołą">
+<meta property="og:title" content="Nasza oferta - pakiety sprzedaży bezpośredniej">
+<meta property="og:description" content="Wybierz poziom wsparcia: START, SPRZEDAŻOWY albo PREMIUM. Budujemy gotowy punkt sprzedaży przy gospodarstwie.">
+<meta property="og:url" content="https://www.sklepzastodola.pl/oferta.html">
+<meta property="og:image" content="https://www.sklepzastodola.pl/pawilon-1.jpg">
+<meta property="og:locale" content="pl_PL">
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Nasza oferta - pakiety sprzedaży bezpośredniej">
+<meta name="twitter:description" content="START, SPRZEDAŻOWY i PREMIUM - trzy poziomy uruchomienia punktu sprzedaży przy gospodarstwie.">
+<meta name="twitter:image" content="https://www.sklepzastodola.pl/pawilon-1.jpg">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,700;1,400;1,700&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,700;1,400;1,700&display=swap"></noscript>
+<link rel="stylesheet" href="style.css">
+<style>
+.offer-hero{padding:9rem 5vw 4.5rem;background:linear-gradient(180deg,var(--bg),var(--bg2));border-bottom:1px solid var(--line);position:relative;overflow:hidden}
+.offer-hero::after{content:"";position:absolute;right:-7rem;bottom:-10rem;width:24rem;height:24rem;border-radius:50%;background:rgba(45,90,39,.08);pointer-events:none}
+.offer-hero .wrap{position:relative;z-index:1}
+.offer-kicker{font-size:.73rem;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--wheat);margin-bottom:1rem;display:flex;align-items:center;gap:.65rem}
+.offer-kicker::before{content:"";width:2rem;height:1px;background:var(--wheat)}
+.offer-hero h1{font-size:clamp(2.25rem,5vw,4.6rem);line-height:1.05;letter-spacing:-.04em;max-width:13ch;color:var(--ink);margin:0}
+.offer-hero h1 em{display:block;color:var(--forest);font-style:italic}
+.offer-lead{max-width:720px;margin-top:1.3rem;color:var(--muted);font-size:1.04rem;line-height:1.8}
+.packages-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:var(--r-lg);overflow:hidden;margin-top:3rem}
+.package-card{background:var(--paper);padding:2rem;display:flex;flex-direction:column;min-height:100%;position:relative}
+.package-card.featured{background:linear-gradient(180deg,var(--paper),var(--sage))}
+.package-label{font-size:.68rem;font-weight:900;letter-spacing:.14em;text-transform:uppercase;color:var(--wheat);margin-bottom:.9rem}
+.package-card h2{font-size:1.45rem;line-height:1.12;color:var(--ink);margin-bottom:.8rem}
+.package-card p{font-size:.92rem;color:var(--muted);line-height:1.7;margin-bottom:1.2rem}
+.package-badge{display:inline-flex;align-self:flex-start;margin-bottom:1rem;padding:.28rem .72rem;border-radius:999px;background:var(--sage);border:1px solid rgba(45,90,39,.22);color:var(--forest);font-size:.68rem;font-weight:900;letter-spacing:.08em;text-transform:uppercase}
+.package-list{list-style:none;display:grid;gap:.7rem;margin:1rem 0 1.4rem;padding:0}
+.package-list li{display:flex;gap:.55rem;font-size:.88rem;color:var(--ink2);line-height:1.45}
+.package-list li::before{content:"✓";width:1.25rem;height:1.25rem;border-radius:50%;background:var(--sage);color:var(--forest);display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto;font-size:.72rem;font-weight:900}
+.package-card .btn{margin-top:auto;justify-content:center}
+.package-note{margin-top:2rem;background:var(--wheat-bg);border:1px solid rgba(155,122,58,.25);border-radius:var(--r-lg);padding:1.4rem 1.55rem;color:var(--muted);font-size:.92rem;line-height:1.75}
+.parts-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1rem;margin-top:3rem}
+.part-card{background:var(--paper);border:1px solid var(--line);border-radius:var(--r-lg);box-shadow:var(--shadow);overflow:hidden;display:flex;flex-direction:column}
+.part-card img{width:100%;height:210px;object-fit:cover;background:var(--bg3)}
+.part-body{padding:1.35rem;display:flex;flex-direction:column;gap:.7rem;flex:1}
+.part-body h3{font-size:1.08rem;color:var(--ink);line-height:1.22}
+.part-body p{font-size:.88rem;color:var(--muted);line-height:1.65}
+.part-body a{margin-top:auto;color:var(--forest);font-size:.85rem;font-weight:900}
+@media(max-width:920px){.packages-grid,.parts-grid{grid-template-columns:1fr}.package-card{padding:1.5rem}.part-card img{height:230px}}
+</style>
+</head>
+<body>
+
+<div class="ticker">
+  <div class="ticker-inner">
+    <span>Kompleksowa obsługa farmera</span><span>Drewniany pawilon pod klucz</span><span>Mlekomat Premium CE-MID</span><span>Szklane butelki zwrotne</span><span>Pomoc przy finansowaniu inwestycji</span><span>Instalacja i serwis - cała Polska</span><span>Kompleksowa obsługa farmera</span><span>Drewniany pawilon pod klucz</span><span>Mlekomat Premium CE-MID</span><span>Szklane butelki zwrotne</span><span>Pomoc przy finansowaniu inwestycji</span><span>Instalacja i serwis - cała Polska</span>
+  </div>
+</div>
+
+<nav class="nav" id="nav">
+  <a href="index.html" class="nav-logo"><span class="nav-logo-dot"></span>Sklep za Stodołą</a>
+  <ul class="nav-links">
+    <li><a href="index.html">Start</a></li>
+    <li><a href="jak-dzialamy.html">Jak działamy</a></li>
+    <li><a href="dlaczego.html">Dlaczego to działa?</a></li>
+    <li class="nav-item nav-dropdown">
+      <a href="oferta.html" class="nav-dropdown-toggle active">Nasza oferta</a>
+      <div class="nav-dropdown-menu" aria-label="Nasza oferta">
+        <a href="oferta.html">Pakiety</a>
+        <a href="mlekomat.html">Mlekomat</a>
+        <a href="pawilony.html">Pawilon</a>
+        <a href="butelki.html">Butelki</a>
+      </div>
+    </li>
+    <li><a href="poradnik.html">Poradnik</a></li>
+    <li><a href="faq.html">FAQ</a></li>
+    <li><a href="kontakt.html">Kontakt</a></li>
+  </ul>
+  <a href="kontakt.html" class="nav-cta">Porozmawiajmy</a>
+  <button class="burger" id="burger" aria-label="Menu" aria-expanded="false"><span></span><span></span><span></span></button>
+</nav>
+<nav class="mob-nav" id="mob-nav"><button class="mob-close" id="mob-close">×</button>
+  <a href="index.html">Start</a>
+  <a href="jak-dzialamy.html">Jak działamy</a>
+  <a href="dlaczego.html">Dlaczego to działa?</a>
+  <div class="mob-nav-group">
+    <span>Nasza oferta</span>
+    <a href="oferta.html">Pakiety</a>
+    <a href="mlekomat.html">Mlekomat</a>
+    <a href="pawilony.html">Pawilon</a>
+    <a href="butelki.html">Butelki</a>
+  </div>
+  <a href="poradnik.html">Poradnik</a>
+  <a href="faq.html">FAQ</a>
+  <a href="kontakt.html">Kontakt</a>
+</nav>
+
+<header class="offer-hero">
+  <div class="wrap">
+    <p class="offer-kicker" data-r="fade">Nasza oferta</p>
+    <h1 data-r>Trzy drogi do własnego <em>punktu sprzedaży.</em></h1>
+    <p class="offer-lead" data-r data-d="1">Nie sprzedajemy samego urządzenia. Pomagamy dobrać poziom wdrożenia do gospodarstwa: od prostego startu z mlekomatem po kompletny punkt sprzedaży z pawilonem, butelkami, dokumentami i opieką przy uruchomieniu.</p>
+  </div>
+</header>
+
+<section class="sec">
+<div class="wrap">
+  <div data-r>
+    <p class="sec-label">Pakiety</p>
+    <h2 class="sec-title">Wybierz zakres,<br><em>który pasuje do etapu gospodarstwa.</em></h2>
+    <p class="sec-body">Każdy pakiet dopasowujemy po rozmowie: inaczej wygląda gospodarstwo, które ma już lokal i klientów, a inaczej takie, które dopiero buduje sprzedaż bezpośrednią.</p>
+  </div>
+
+  <div class="packages-grid">
+    <article class="package-card" data-r data-d="1">
+      <span class="package-label">START</span>
+      <h2>Mlekomat i podstawowe uruchomienie</h2>
+      <p>Dla gospodarstwa, które chce zacząć sprzedaż mleka możliwie prosto i ma już miejsce pod punkt.</p>
+      <ul class="package-list">
+        <li>Dobór mlekomatu do skali sprzedaży.</li>
+        <li>Podstawowe wdrożenie i instrukcja pracy.</li>
+        <li>Pomoc w przygotowaniu do rozmów formalnych.</li>
+        <li>Minimalny zakres marketingu startowego.</li>
+      </ul>
+      <a href="kontakt.html" class="btn btn-outline">Zapytaj o wycenę</a>
+    </article>
+
+    <article class="package-card featured" data-r data-d="2">
+      <span class="package-badge">Najbardziej praktyczny</span>
+      <span class="package-label">SPRZEDAŻOWY</span>
+      <h2>Mlekomat, pawilon i start sprzedaży</h2>
+      <p>Dla gospodarstwa, które chce gotowy punkt przy gospodarstwie i spokojne przejście od pomysłu do pierwszych klientów.</p>
+      <ul class="package-list">
+        <li>Mlekomat jako główny element sprzedaży.</li>
+        <li>Pawilon lub przygotowanie miejsca sprzedaży.</li>
+        <li>Wsparcie przy dokumentach i finansowaniu.</li>
+        <li>Prosty marketing lokalny na start.</li>
+        <li>Pomoc w ułożeniu asortymentu i obsługi punktu.</li>
+      </ul>
+      <a href="kontakt.html" class="btn btn-green">Omów pakiet sprzedażowy</a>
+    </article>
+
+    <article class="package-card" data-r data-d="3">
+      <span class="package-label">PREMIUM</span>
+      <h2>Pełny punkt sprzedaży z opieką</h2>
+      <p>Dla gospodarstwa, które chce wejść w sprzedaż bezpośrednią profesjonalnie i od razu budować lokalną markę.</p>
+      <ul class="package-list">
+        <li>Rozszerzony wariant urządzenia i konfiguracji.</li>
+        <li>Rozbudowany pawilon albo pełny punkt sprzedaży.</li>
+        <li>Butelki, materiały startowe i oznaczenie punktu.</li>
+        <li>Priorytetowe wsparcie przy uruchomieniu.</li>
+        <li>Opieka po starcie i rozwój sprzedaży.</li>
+      </ul>
+      <a href="kontakt.html" class="btn btn-outline">Zapytaj o pełny pakiet</a>
+    </article>
+  </div>
+
+  <div class="package-note" data-r>
+    <strong style="color:var(--ink)">Ceny ustalamy po rozmowie.</strong> Zakres zależy od miejsca, konfiguracji mlekomatu, pawilonu, finansowania i tego, ile wsparcia potrzebuje gospodarstwo. Nie obiecujemy dotacji, ale pomagamy przygotować się do procesu i dobrać bezpieczny wariant inwestycji.
+  </div>
+</div>
+</section>
+
+<section class="sec sec-alt">
+<div class="wrap">
+  <div data-r>
+    <p class="sec-label">Co zawierają pakiety</p>
+    <h2 class="sec-title">Elementy, z których budujemy<br><em>punkt sprzedaży.</em></h2>
+    <p class="sec-body">Poniżej są główne części systemu. W zależności od wybranego pakietu dobieramy je w prostszej albo pełniejszej wersji.</p>
+  </div>
+
+  <div class="parts-grid">
+    <article class="part-card" data-r data-d="1">
+      <img src="automat2.webp" alt="Mlekomat Brunimat jako element punktu sprzedaży">
+      <div class="part-body">
+        <h3>Mlekomat</h3>
+        <p>Centralny element punktu: sprzedaż świeżego mleka bez Twojej stałej obecności, z płatnościami i kontrolą pracy.</p>
+        <a href="mlekomat.html">Zobacz mlekomat →</a>
+      </div>
+    </article>
+
+    <article class="part-card" data-r data-d="2">
+      <img src="pawilon-1.jpg" alt="Pawilon handlowy przy gospodarstwie">
+      <div class="part-body">
+        <h3>Pawilon</h3>
+        <p>Miejsce, które chroni urządzenie, porządkuje sprzedaż i sprawia, że punkt wygląda profesjonalnie dla klientów.</p>
+        <a href="pawilony.html">Zobacz pawilon →</a>
+      </div>
+    </article>
+
+    <article class="part-card" data-r data-d="3">
+      <img src="pawilon-1.jpg" alt="Wyposażenie punktu sprzedaży i butelki zwrotne">
+      <div class="part-body">
+        <h3>Butelki</h3>
+        <p>Szklane butelki zwrotne 1 l i 0,5 l z naszym oznaczeniem albo indywidualnym nadrukiem gospodarstwa.</p>
+        <a href="butelki.html">Zobacz butelki →</a>
+      </div>
+    </article>
+  </div>
+</div>
+</section>
+
+<section class="cta-band">
+<div class="wrap">
+  <div class="cta-band-inner" data-r>
+    <h2>Nie wiesz, który pakiet<br><em>ma sens u Ciebie?</em></h2>
+    <p>Opowiedz nam, gdzie chcesz sprzedawać, ile mleka możesz przeznaczyć na sprzedaż i jaki masz budżet. Zaproponujemy rozsądny wariant bez wciskania rzeczy, których nie potrzebujesz.</p>
+    <div class="cta-actions">
+      <a href="kontakt.html" class="btn btn-green">Porozmawiajmy →</a>
+      <a href="jak-dzialamy.html" class="btn btn-outline">Jak pracujemy</a>
+    </div>
+  </div>
+</div>
+</section>
+
+<footer class="footer">
+  <div class="footer-inner">
+    <div><p class="footer-brand">Sklep za Stodołą</p><p class="footer-sub">Tworzymy dochodowe sklepy przy gospodarstwach: pawilon, mlekomat, wdrożenie, dokumenty i wyposażenie punktu sprzedaży.</p>
+      <div class="footer-soc"><a href="https://www.facebook.com/profile.php?id=61590896125832" class="soc-btn" target="_blank" rel="noopener">f</a><a href="https://www.instagram.com/sklepzastodola/" class="soc-btn" target="_blank" rel="noopener">ig</a></div>
+    </div>
+    <div class="footer-col"><h3>Strony</h3><ul>
+  <li><a href="index.html">Start</a></li>
+  <li><a href="oferta.html">Oferta</a></li>
+  <li><a href="jak-dzialamy.html">Jak działamy</a></li>
+  <li><a href="dlaczego.html">Dlaczego to działa?</a></li>
+  <li><a href="mlekomat.html">Mlekomat</a></li>
+  <li><a href="pawilony.html">Pawilon</a></li>
+  <li><a href="butelki.html">Butelki</a></li>
+  <li><a href="poradnik.html">Poradnik</a></li>
+  <li><a href="faq.html">FAQ</a></li>
+  <li><a href="kontakt.html">Kontakt</a></li>
+</ul></div>
+    <div class="footer-col"><h3>Kontakt</h3><ul><li><a href="tel:735115427">735 115 427</a></li><li><a href="tel:690000923">690 000 923</a></li><li><a href="mailto:kontakt@sklepzastodola.pl">kontakt@sklepzastodola.pl</a></li></ul></div>
+  </div>
+  <div class="footer-bottom"><p class="footer-copy">© 2026 Sklep za Stodołą Sp. z o.o.</p><div class="footer-links"><a href="polityka.html">Polityka prywatności</a></div></div>
+</footer>
+<div class="cookie" id="cookie"><p>Ta strona używa plików cookies. <a href="polityka.html">Polityka prywatności</a></p><div class="cookie-btns"><button class="ck-yes" onclick="setCk('yes')">Akceptuję</button><button class="ck-no" onclick="setCk('no')">Tylko niezbędne</button></div></div>
+<script>
+  if(localStorage.getItem('ck') && !localStorage.getItem('cookie_consent')){
+    var v = localStorage.getItem('ck');
+    localStorage.setItem('cookie_consent', v === 'yes' ? 'accept' : 'reject');
+    localStorage.removeItem('ck');
+  }
+</script>
+<script src="nav.js"></script>
+</body>
+</html>
