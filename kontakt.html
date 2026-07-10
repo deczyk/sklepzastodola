@@ -197,13 +197,9 @@
     </div>
     <div class="footer-col"><h3>Strony</h3><ul>
   <li><a href="index.html">Start</a></li>
+  <li><a href="oferta.html">Nasza oferta</a></li>
   <li><a href="jak-dzialamy.html">Jak działamy</a></li>
-  <li><a href="dlaczego.html">Dlaczego to działa?</a></li>
-  <li><a href="pawilony.html">Pawilony</a></li>
-  <li><a href="mlekomat.html">Mlekomat</a></li>
-  <li><a href="poradnik.html">Poradnik</a></li>
-  <li><a href="faq.html">FAQ</a></li>
-    <li><a href="kontakt.html">Kontakt</a></li>
+  <li><a href="kontakt.html">Kontakt</a></li>
 </ul></div>
     <div class="footer-col"><h3>Kontakt</h3><ul><li><a href="tel:533200652">533 200 652</a></li><li><a href="tel:690000923">690 000 923</a></li><li><a href="mailto:kontakt@sklepzastodola.pl">kontakt@sklepzastodola.pl</a></li></ul></div>
   </div>
@@ -277,6 +273,8 @@ document.getElementById('cform').addEventListener('submit', async function(e){
       });
       if(!leadRes.ok) throw new Error('lead');
       const formData = new FormData(form);
+      if (leadPayload.email) formData.set('_replyto', leadPayload.email);
+      formData.set('_subject', 'Nowe zapytanie ze strony Sklep za Stodołą');
       fetch('https://formspree.io/f/xbdvbrnp', {
         method: 'POST',
         body: formData,
@@ -287,7 +285,7 @@ document.getElementById('cform').addEventListener('submit', async function(e){
       msg.style.display='block';
       msg.style.color='var(--moss)';
       form.reset();
-      setTimeout(function(){ btn.disabled=false; txt.textContent='Wyślij wiadomość →'; msg.style.display='none'; }, 5000);
+      window.location.href='dziekujemy.html';
     }catch(err){
       txt.textContent='Wyślij wiadomość →';
       msg.textContent='Nie udało się zapisać zgłoszenia. Spróbuj ponownie albo skontaktuj się telefonicznie.';

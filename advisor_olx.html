@@ -962,6 +962,8 @@
                 name: document.getElementById("name").value.trim(),
                 phone: document.getElementById("phone").value.trim(),
                 email: document.getElementById("email").value.trim(),
+                _replyto: document.getElementById("email").value.trim(),
+                _subject: "Nowy wynik Advisor OLX - Sklep za Stodołą",
                 notes: document.getElementById("notes").value.trim(),
                 calculation: c,
                 message
@@ -971,6 +973,7 @@
 
           statusMessage.textContent = "Dziękujemy. Formularz OLX został zapisany i trafił do zespołu.";
           leadForm.reset();
+          window.location.href = "dziekujemy.html";
         } catch (error) {
           statusMessage.textContent = "Nie udało się zapisać zgłoszenia. Spróbuj ponownie albo skontaktuj się telefonicznie.";
         }

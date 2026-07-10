@@ -480,6 +480,7 @@ async function sendToUs(){
     }).catch(()=>{});
     statusEl.textContent = "Dziękujemy. Formularz doradczy został zapisany i trafił do zespołu.";
     statusEl.style.color = "#2f7a45";
+    window.location.href = "dziekujemy.html";
   } catch(e){
     statusEl.textContent = "Nie udało się zapisać zgłoszenia. Spróbuj ponownie albo skontaktuj się telefonicznie.";
     statusEl.style.color = "#b44";
