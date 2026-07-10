@@ -110,7 +110,8 @@
   .empty{color:var(--muted);font-size:13px;font-style:italic;padding:6px 0}
   footer{text-align:center;color:#999;font-size:12px;padding:20px}
   .lockBtn{background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.4);
-           color:white;border-radius:20px;padding:6px 14px;font-size:12px;cursor:pointer}
+           color:white;border-radius:20px;padding:6px 14px;font-size:12px;cursor:pointer;text-decoration:none}
+  .lockBtn:hover{background:rgba(255,255,255,0.22)}
   .themeBtn{margin-left:0}
   .themeToggleGroup{display:inline-flex;align-items:center;gap:2px;border:1px solid rgba(255,255,255,.35);
                     background:rgba(255,255,255,.12);border-radius:999px;padding:3px}
@@ -1029,6 +1030,7 @@
       <p>Prywatne centrum CRM, dokumentów, follow-upów i operacji.</p>
     </div>
     <span id="syncStatus" style="font-size:11px;color:#cfe8d6;margin-left:auto;margin-right:4px"></span>
+    <a class="lockBtn" href="index.html">Strona główna</a>
     <button class="lockBtn" onclick="refreshFromRemote()">⟳ Odśwież</button>
     <div class="themeToggleGroup" aria-label="Motyw panelu">
       <button type="button" id="headerThemeLight" onclick="setTheme('light')">Jasny</button>
