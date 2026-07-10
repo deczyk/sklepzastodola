@@ -81,6 +81,12 @@
   .formHint{font-size:12px;color:var(--text-muted);line-height:1.45}
   .formHint a{color:var(--green);font-weight:bold;text-decoration:none}
   .formHint a:hover{text-decoration:underline}
+  .docFilterBar{display:grid;grid-template-columns:repeat(5,minmax(140px,1fr));gap:8px;margin:10px 0 12px}
+  .docFilterBar select{border:1px solid var(--border);border-radius:8px;padding:7px 10px;font-size:12.5px;background:var(--input-bg);color:var(--text)}
+  .docToolbar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:8px}
+  .docToolbar .docSearch{flex:1;min-width:240px;margin:0}
+  .docCount{font-size:12px;color:var(--text-muted)}
+  .organizeHint{border:1px dashed var(--border);background:var(--surface-soft);border-radius:10px;padding:10px 12px;font-size:12px;color:var(--text-muted);margin:8px 0 12px}
   .driveStatus{font-size:12px;color:var(--text-muted);margin-top:6px;min-height:16px}
   .driveStatus.error{color:var(--todo)}
   .driveStatus.ok{color:var(--done)}
@@ -618,6 +624,14 @@
   .clientCardHistory{border:1px solid var(--line);border-radius:10px;padding:12px;margin-top:12px;background:var(--surface)}
   .clientCardHistoryHead{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:10px}
   .clientCardHistoryHead b{color:var(--text)}
+  .clientDocs{border:1px solid var(--line);border-radius:10px;padding:12px;margin-top:12px;background:var(--surface)}
+  .clientDocsHead{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:10px}
+  .clientDocsHead b{color:var(--text)}
+  .clientDocList{display:grid;gap:8px}
+  .clientDocRow{border:1px solid var(--border);border-radius:10px;background:var(--surface-soft);padding:10px}
+  .clientDocTop{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+  .clientDocName{font-weight:bold;color:var(--text)}
+  .clientDocMeta{display:flex;gap:6px;flex-wrap:wrap;font-size:12px;color:var(--text-muted);margin-top:4px}
   .clientDangerZone{display:flex;justify-content:flex-end;margin-top:12px;padding-top:12px;border-top:1px solid #f0d0cb}
   .dangerBtn{border:1px solid #d8a19b;background:#fff5f4;color:#a33b33;border-radius:8px;padding:8px 12px;font-weight:bold;cursor:pointer}
   .dangerBtn:hover{background:#ffecea;border-color:#c66b62}
@@ -1323,7 +1337,18 @@
         <button class="docActionBtn" onclick="syncDocumentsFromDrive()">Synchronizuj z Drive</button>
         <span id="driveSyncStatus" class="driveStatus"></span>
       </div>
-      <input type="text" id="searchDokumenty" class="docSearch" placeholder="🔍 Szukaj dokumentu (nazwa, opis, kategoria)..." oninput="render()">
+      <div class="docToolbar">
+        <input type="text" id="searchDokumenty" class="docSearch" placeholder="🔍 Szukaj dokumentu (nazwa, opis, kategoria)..." oninput="render()">
+        <span id="docResultCount" class="docCount"></span>
+      </div>
+      <div class="docFilterBar">
+        <select id="filterDocCategory" onchange="render()"><option value="">Wszystkie kategorie</option></select>
+        <select id="filterDocType" onchange="render()"><option value="">Wszystkie typy</option></select>
+        <select id="filterDocStatus" onchange="render()"><option value="">Wszystkie statusy</option></select>
+        <select id="filterDocConfidentiality" onchange="render()"><option value="">Każda poufność</option></select>
+        <select id="filterDocClient" onchange="render()"><option value="">Wszyscy klienci</option></select>
+      </div>
+      <div class="organizeHint">Filtr „Do uporządkowania” pokazuje pliki bez opisu, bez linku, bez sensownej kategorii albo oferty/dokumenty klienta bez przypisanego klienta.</div>
       <div id="list-dokumenty"></div>
     </div>
     </div>
@@ -2639,6 +2664,79 @@ function fillDocumentClientOptions(){
   select.value = current;
 }
 
+function uniqueSorted(values){
+  return [...new Set(values.filter(Boolean))].sort((a,b)=>a.localeCompare(b, "pl"));
+}
+
+function setSelectOptions(selectId, options, firstLabel, currentValue){
+  const select = document.getElementById(selectId);
+  if(!select) return;
+  const current = currentValue ?? select.value;
+  select.innerHTML = `<option value="">${crmEsc(firstLabel)}</option>` +
+    options.map(v=>`<option value="${crmEsc(v)}">${crmEsc(v)}</option>`).join("");
+  if(current && options.includes(current)) select.value = current;
+}
+
+function documentNeedsOrganizing(item){
+  const category = item.kategoria || "";
+  const type = docType(item);
+  const title = docName(item);
+  const note = docNote(item);
+  const link = docLink(item);
+  const looksClientDoc = ["Oferta wysłana","Dokument klienta","Cennik klienta"].includes(type) || category === "Klienci" || category === "Oferty";
+  return !title || !link || !note || !category || ["Google Drive","Inne dokumenty"].includes(category) || (looksClientDoc && !item.klientId);
+}
+
+function updateDocumentFilters(docs){
+  const selected = {
+    category: document.getElementById("filterDocCategory")?.value || "",
+    type: document.getElementById("filterDocType")?.value || "",
+    status: document.getElementById("filterDocStatus")?.value || "",
+    confidentiality: document.getElementById("filterDocConfidentiality")?.value || "",
+    client: document.getElementById("filterDocClient")?.value || ""
+  };
+  const categories = uniqueSorted([...(docs || []).map(d=>d.kategoria || "Inne dokumenty"), ...DOC_CATEGORY_SUGGESTIONS, "Do uporządkowania"]);
+  setSelectOptions("filterDocCategory", categories, "Wszystkie kategorie", selected.category);
+  setSelectOptions("filterDocType", uniqueSorted((docs || []).map(docType)), "Wszystkie typy", selected.type);
+  setSelectOptions("filterDocStatus", uniqueSorted((docs || []).map(docStatus)), "Wszystkie statusy", selected.status);
+  setSelectOptions("filterDocConfidentiality", uniqueSorted((docs || []).map(docConfidentiality)), "Każda poufność", selected.confidentiality);
+  const clients = (data.klienci || []).map(c => ({id:c.id, name:clientName(c)})).sort((a,b)=>a.name.localeCompare(b.name, "pl"));
+  const clientSelect = document.getElementById("filterDocClient");
+  if(clientSelect){
+    clientSelect.innerHTML = '<option value="">Wszyscy klienci</option><option value="__none">Bez klienta</option>' +
+      clients.map(c=>`<option value="${crmEsc(c.id)}">${crmEsc(c.name)}</option>`).join("");
+    if(selected.client && (selected.client === "__none" || clients.some(c=>c.id === selected.client))) clientSelect.value = selected.client;
+  }
+}
+
+function documentMatchesFilters(item, searchQ){
+  const categoryFilter = document.getElementById("filterDocCategory")?.value || "";
+  const typeFilter = document.getElementById("filterDocType")?.value || "";
+  const statusFilter = document.getElementById("filterDocStatus")?.value || "";
+  const confidentialityFilter = document.getElementById("filterDocConfidentiality")?.value || "";
+  const clientFilter = document.getElementById("filterDocClient")?.value || "";
+  if(categoryFilter === "Do uporządkowania"){
+    if(!documentNeedsOrganizing(item)) return false;
+  } else if(categoryFilter && (item.kategoria || "Inne dokumenty") !== categoryFilter) return false;
+  if(typeFilter && docType(item) !== typeFilter) return false;
+  if(statusFilter && docStatus(item) !== statusFilter) return false;
+  if(confidentialityFilter && docConfidentiality(item) !== confidentialityFilter) return false;
+  if(clientFilter === "__none" && item.klientId) return false;
+  if(clientFilter && clientFilter !== "__none" && item.klientId !== clientFilter) return false;
+  if(!searchQ) return true;
+  return (docName(item)||"").toLowerCase().includes(searchQ) ||
+    (docNote(item)||"").toLowerCase().includes(searchQ) ||
+    (item.kategoria||"").toLowerCase().includes(searchQ) ||
+    (docType(item)||"").toLowerCase().includes(searchQ) ||
+    (docConfidentiality(item)||"").toLowerCase().includes(searchQ) ||
+    (docStatus(item)||"").toLowerCase().includes(searchQ) ||
+    (docFileName(item)||"").toLowerCase().includes(searchQ);
+}
+
+function documentSortTime(item){
+  return Date.parse(item.driveModifiedTime || item.dataDokumentu || item.zaktualizowano || item.utworzono || "") || 0;
+}
+
 function render(){
   document.getElementById("whoAmI").value = getWhoAmI();
   renderNavigation();
@@ -2652,20 +2750,13 @@ function render(){
   const searchEl = document.getElementById("searchDokumenty");
   const searchQ = searchEl ? searchEl.value.trim().toLowerCase() : "";
   dokList.innerHTML = "";
-  let dokFiltered = data.dokumenty || [];
-  if(searchQ){
-    dokFiltered = dokFiltered.filter(item =>
-      (docName(item)||"").toLowerCase().includes(searchQ) ||
-      (docNote(item)||"").toLowerCase().includes(searchQ) ||
-      (item.kategoria||"").toLowerCase().includes(searchQ) ||
-      (docType(item)||"").toLowerCase().includes(searchQ) ||
-      (docConfidentiality(item)||"").toLowerCase().includes(searchQ) ||
-      (docStatus(item)||"").toLowerCase().includes(searchQ) ||
-      (docFileName(item)||"").toLowerCase().includes(searchQ)
-    );
-  }
+  updateDocumentFilters(data.dokumenty || []);
+  let dokFiltered = (data.dokumenty || []).filter(item=>documentMatchesFilters(item, searchQ));
+  const countEl = document.getElementById("docResultCount");
+  if(countEl) countEl.textContent = `${dokFiltered.length} / ${(data.dokumenty || []).length} dokumentów`;
   if(dokFiltered.length===0){
-    dokList.innerHTML = `<div class="empty">${searchQ ? "Brak dokumentów pasujących do wyszukiwania." : "Brak pozycji — dodaj pierwszą."}</div>`;
+    const hasDocs = (data.dokumenty || []).length > 0;
+    dokList.innerHTML = `<div class="empty">${hasDocs ? "Brak dokumentów pasujących do filtrów." : "Brak pozycji — dodaj pierwszą."}</div>`;
   } else {
     const groups = {};
     dokFiltered.forEach(item=>{
@@ -2689,7 +2780,10 @@ function render(){
       header.className = "kategoriaHeader";
       header.textContent = kategoria;
       dokList.appendChild(header);
-      groups[kategoria].forEach(item=>dokList.appendChild(renderItemCard(item, "dokumenty")));
+      groups[kategoria]
+        .slice()
+        .sort((a,b)=>documentSortTime(b)-documentSortTime(a) || docName(a).localeCompare(docName(b), "pl"))
+        .forEach(item=>dokList.appendChild(renderItemCard(item, "dokumenty")));
     });
   }
 
@@ -3658,6 +3752,45 @@ function renderClientOffers(c){
   `;
 }
 
+function renderClientDocuments(c){
+  const docs = (data.dokumenty || []).filter(doc => doc.klientId === c.id);
+  return `
+    <div class="clientDocs">
+      <div class="clientDocsHead">
+        <b>Dokumenty klienta (${docs.length})</b>
+        <button class="histBtn" onclick="setMainCategory('company'); setSubView('docs-home'); document.getElementById('filterDocClient').value='${crmEsc(c.id)}'; render();">Pokaż w dokumentach</button>
+      </div>
+      <div class="clientDocList">
+        ${docs.length ? docs.map(doc => {
+          const safeLink = safeDocumentHref(docLink(doc));
+          const previewLink = safeLink && isPreviewable(safeLink) ? drivePreviewHref(safeLink) : "";
+          const downloadLink = safeLink ? driveDownloadHref(safeLink) : "";
+          return `
+            <div class="clientDocRow">
+              <div class="clientDocTop">
+                <div>
+                  <div class="clientDocName">${crmEsc(docName(doc) || docFileName(doc) || "Dokument")}</div>
+                  <div class="clientDocMeta">
+                    ${doc.kategoria ? `<span>${crmEsc(doc.kategoria)}</span>` : ""}
+                    ${docType(doc) ? `<span>${crmEsc(docType(doc))}</span>` : ""}
+                    ${docStatus(doc) ? `<span>${crmEsc(docStatus(doc))}</span>` : ""}
+                  </div>
+                </div>
+                <div class="docActions">
+                  ${previewLink ? `<button class="docActionBtn primary" onclick="openPreview('${crmEsc(previewLink)}')">Podgląd</button>` : ""}
+                  ${safeLink ? `<a class="docActionBtn" href="${crmEsc(safeLink)}" target="_blank" rel="noopener">Otwórz</a>` : ""}
+                  ${downloadLink ? `<a class="docActionBtn" href="${crmEsc(downloadLink)}" target="_blank" rel="noopener">Pobierz</a>` : ""}
+                </div>
+              </div>
+              ${docNote(doc) ? `<div class="desc">${crmEsc(docNote(doc))}</div>` : ""}
+            </div>
+          `;
+        }).join("") : '<div class="empty">Brak dokumentów przypisanych do tego klienta.</div>'}
+      </div>
+    </div>
+  `;
+}
+
 function renderOfferCard(o, clientId, offerIndex){
   if(currentOfferEdit && currentOfferEdit.clientId === clientId && currentOfferEdit.index === offerIndex){
     return `
@@ -3981,6 +4114,7 @@ function openClientCard(clientId){
       <div class="clientCardField"><b>Co go powstrzymuje</b>${clientField(c,null,"objection")}</div>
     </div>
     ${renderQuickClientUpdate(c)}
+    ${renderClientDocuments(c)}
     <div class="clientCardHistory">
       <div class="clientCardHistoryHead">
         <b>Historia kontaktu (${historyCount})</b>
