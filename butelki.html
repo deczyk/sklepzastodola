@@ -44,9 +44,17 @@
 .bottle-spec span{display:block;font-size:.84rem;color:var(--muted);line-height:1.55}
 .bottle-note{margin-top:2rem;background:var(--sage);border:1.5px solid rgba(45,90,39,.28);border-radius:var(--r-lg);padding:1.6rem}
 .bottle-note p{color:var(--ink2);font-size:.94rem;line-height:1.7;max-width:70ch}
+.bottle-showcase{display:grid;grid-template-columns:minmax(0,.9fr) minmax(320px,1.1fr);gap:3rem;align-items:center;margin-top:3rem}
+.bottle-photo{border-radius:var(--r-lg);overflow:hidden;border:1px solid var(--line);box-shadow:var(--shadow-lg);background:var(--bg3)}
+.bottle-photo img{width:100%;height:520px;object-fit:cover;object-position:center}
+.bottle-points{display:grid;gap:.8rem;margin-top:1.4rem}
+.bottle-points span{display:flex;align-items:flex-start;gap:.65rem;color:var(--ink2);font-size:.92rem;line-height:1.55}
+.bottle-points span::before{content:"✓";width:1.35rem;height:1.35rem;border-radius:50%;background:var(--sage);color:var(--forest);display:inline-flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:900;flex:0 0 auto;margin-top:.05rem}
 @media(max-width:860px){
   .bottle-grid{grid-template-columns:1fr}
   .bottle-specs{grid-template-columns:1fr}
+  .bottle-showcase{grid-template-columns:1fr;gap:2rem}
+  .bottle-photo img{height:360px}
 }
 </style>
 <script type="application/ld+json">
@@ -102,6 +110,26 @@
   <p class="page-hero-sub" data-r data-d="1">Butelki są naturalnym uzupełnieniem systemu sprzedaży bezpośredniej: mlekomatu, pawilonu i punktu przy gospodarstwie. Pomagają sprzedawać mleko w estetyczny, powtarzalny i wygodny sposób — bez przypadkowych opakowań.</p>
 </div>
 </header>
+
+<section class="sec">
+<div class="wrap">
+  <div class="bottle-showcase">
+    <div data-r>
+      <p class="sec-label">Podgląd produktu</p>
+      <h2 class="sec-title">Tak może wyglądać<br><em>butelka z oznaczeniem.</em></h2>
+      <p class="sec-body">Butelka ma wyglądać jak część profesjonalnego punktu sprzedaży, a nie przypadkowe opakowanie. Możemy przygotować wariant z naszym oznaczeniem albo nadrukiem gospodarstwa.</p>
+      <div class="bottle-points">
+        <span>Szklana butelka do świeżego mleka, pasująca do mlekomatu i pawilonu.</span>
+        <span>Logo lub indywidualny nadruk gospodarstwa jako element lokalnej marki.</span>
+        <span>Estetyczny wygląd dla klienta końcowego i sprzedaży bezpośredniej.</span>
+      </div>
+    </div>
+    <figure class="bottle-photo" data-r="right">
+      <img src="butelka-sklep-za-stodola.png" alt="Szklana butelka do mleka z logo Sklep za Stodołą" loading="lazy">
+    </figure>
+  </div>
+</div>
+</section>
 
 <section class="sec">
 <div class="wrap">
