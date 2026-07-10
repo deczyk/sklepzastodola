@@ -53,16 +53,17 @@
 
 /* STATEMENT */
 .stmt { padding: 5.5rem 5vw; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); background: var(--bg2); }
-.stmt-inner { max-width: 900px; display: grid; grid-template-columns: 1fr 1fr; gap: 4.5rem; align-items: center; }
-.stmt-quote { font-family: var(--sans); font-size: clamp(1.3rem, 2.5vw, 2rem); font-weight: 700; line-height: 1.25; letter-spacing: -.02em; }
-.stmt-quote .accent { color: var(--forest); }
+.stmt-inner { max-width: 1100px; display: grid; grid-template-columns: minmax(0,1.05fr) minmax(320px,.95fr); gap: 3rem; align-items: center; }
+.stmt-photo { margin: 0; border-radius: var(--r-lg); overflow: hidden; border: 1px solid var(--line); background: var(--paper); box-shadow: var(--shadow-lg); }
+.stmt-photo img { width: 100%; height: 420px; object-fit: cover; object-position: center; display: block; }
 .stmt-meta { border-left: 2px solid var(--forest); padding-left: 1.5rem; background: transparent; }
 .stmt-meta p { font-size: .93rem; color: var(--dim); line-height: 1.72; margin-bottom: 1.1rem; }
 .stmt-meta p strong { color: var(--ink); }
-.founder { display: flex; align-items: center; gap: .85rem; margin-top: 1.4rem; padding-top: 1.4rem; border-top: 1px solid var(--line); }
-.founder-av { width: 42px; height: 42px; border-radius: 50%; background: var(--forest); color: #fff; display: flex; align-items: center; justify-content: center; font-family: var(--sans); font-weight: 800; font-size: .95rem; flex-shrink: 0; }
-.founder-info { font-size: .78rem; color: var(--muted); line-height: 1.4; }
-.founder-info strong { display: block; color: var(--ink); font-size: .83rem; font-weight: 700; }
+.stmt-meta .sec-label { margin-bottom: .75rem; color: var(--wheat); }
+.stmt-meta .sec-title { font-size: clamp(1.7rem, 3vw, 2.6rem); margin-bottom: 1.1rem; }
+.trust-list { display: grid; gap: .75rem; margin-top: 1.4rem; padding-top: 1.4rem; border-top: 1px solid var(--line); }
+.trust-list span { position: relative; padding-left: 1.6rem; font-size: .9rem; color: var(--ink); line-height: 1.55; }
+.trust-list span::before { content: '✓'; position: absolute; left: 0; top: .05rem; width: 1rem; height: 1rem; border-radius: 50%; background: var(--forest); color: #fff; font-size: .65rem; display: flex; align-items: center; justify-content: center; }
 
 /* PHOTO STRIP */
 .strip { padding: 0 5vw 4.5rem; }
@@ -139,12 +140,15 @@
 }
 @media(max-width:860px){
   .stmt-inner { grid-template-columns: 1fr; gap: 2.5rem; }
+  .stmt-photo img { height: 320px; }
   .strip-row-top img { height: 220px; }
   .strip-row-bottom img { height: 280px; }
   .preview-grid { grid-template-columns: 1fr; }
   .hero-scroll { display: none; }
 }
 @media(max-width:600px){
+  .stmt-photo img { height: 260px; }
+  .stmt-meta { padding-left: 1rem; }
   .strip-row-top { grid-template-columns: 1fr; }
   .strip-row-top img { height: 220px; }
   .strip-row-bottom { grid-template-columns: 1fr; }
@@ -291,21 +295,22 @@
 <section class="stmt">
 <div class="wrap">
   <div class="stmt-inner">
-    <div class="stmt-quote" data-r="left">
-      <span class="accent">„Rolnicy w Szwajcarii zarabiają 4× więcej na tym samym mleku."</span><br><br>
-      W Polsce większość nadal oddaje za grosze. Postanowiłem to zmienić.
-    </div>
+    <figure class="stmt-photo" data-r="left">
+      <img src="auto-firmowe-sklep-za-stodola.png" alt="Wizualizacja auta Sklep za Stodołą przy gospodarstwie" loading="lazy">
+    </figure>
     <div class="stmt-meta" data-r="right">
-      <p>Widziałem jak działa sprzedaż bezpośrednia za granicą — automat do mleka przy bramie, drewniany pawilon z lokalnymi produktami, stali klienci. <strong>Prosta sprawa, która po prostu działa.</strong></p>
-      <p>Dlatego zamiast sprzedawać samo urządzenie, bierzemy cały projekt: pawilon, mlekomat, ustawienie produktów, finansowanie, dokumenty <a href="poradnik-dotacja-arimr-mlekomat.html" style="color:var(--forest);text-decoration:underline">ARiMR</a>, prosty marketing lokalny i opiekę po starcie. Ty zajmujesz się gospodarstwem — my prowadzimy wdrożenie.</p>
-      <div class="founder">
-        <div class="founder-av">JD</div>
-        <div class="founder-info">
-          <strong>Jakub</strong>
-          Założyciel, Sklep za Stodołą
-        </div>
+      <p class="sec-label">Pracujemy w terenie</p>
+      <h2 class="sec-title">Najpierw miejsce i plan.<br><em>Dopiero potem sprzęt.</em></h2>
+      <p>Nie zaczynamy od wciskania urządzenia z katalogu. Najpierw sprawdzamy, gdzie punkt ma stać, ile mleka chcesz sprzedawać, jak wygląda dojazd klienta i jakie formalności trzeba przygotować.</p>
+      <p>Kontakt i analizę prowadzi <strong>Jakub Deczyński</strong>. Po rozmowie układamy prosty wariant: mlekomat, pawilon, butelki, finansowanie, dokumenty i plan uruchomienia sprzedaży.</p>
+      <div class="trust-list">
+        <span>Rozmawiasz z konkretną osobą, nie anonimowym formularzem.</span>
+        <span>Nie obiecujemy dotacji — pomagamy przygotować się do procesu.</span>
+        <span>Dobieramy punkt sprzedaży do gospodarstwa, a nie odwrotnie.</span>
       </div>
     </div>
+  </div>
+</div>
 </section>
 
 <!-- <!-- PHOTO STRIP -->
