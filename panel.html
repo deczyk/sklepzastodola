@@ -1258,6 +1258,7 @@
         <div>
           <b>Magazyn plików:</b> dokumenty trzymaj w prywatnym folderze Google Drive, a w panelu zapisuj link, opis, kategorię i powiązanego klienta.
           <p>Panel nie wrzuca PDF/DOCX/XLSX do GitHub ani na Vercel.</p>
+          <p>Przy uploadzie i synchronizacji panel sugeruje kategorie po nazwie pliku: cenniki, umowy, oferty, formalne, ARiMR, materiały, BRUNIMAT, pawilony i klienci.</p>
         </div>
         <a class="docActionBtn primary" href="https://drive.google.com/drive/folders/1FMmp6qdMuMl13vkdfhpddeHH46kTgDy0?usp=sharing" target="_blank" rel="noopener">Otwórz folder Drive</a>
       </div>
@@ -2552,7 +2553,49 @@ function renderItemCard(item, cat){
   return div;
 }
 
-const KATEGORIA_ORDER = ["Cenniki", "Umowy", "Finansowanie", "Marketing", "Inne dokumenty"];
+const KATEGORIA_ORDER = [
+  "Cenniki",
+  "Umowy",
+  "Oferty",
+  "KRS / formalne",
+  "Finansowanie / ARiMR",
+  "Materiały sprzedażowe",
+  "BRUNIMAT",
+  "Pawilony",
+  "Klienci",
+  "Google Drive",
+  "Inne dokumenty"
+];
+const DOC_CATEGORY_SUGGESTIONS = [...KATEGORIA_ORDER];
+
+function inferDocumentCategory(file){
+  const name = (file.name || file.title || file.nazwaPliku || "").toLowerCase();
+  const mime = (file.mimeType || "").toLowerCase();
+  const text = `${name} ${mime}`;
+  if(/cennik|price|pricing|koszt|wycena|xls|xlsx|arkusz/.test(text)) return "Cenniki";
+  if(/umowa|kontrakt|podpis|agreement/.test(text)) return "Umowy";
+  if(/oferta|offer|propozycja|zamowienie|zamówienie/.test(text)) return "Oferty";
+  if(/krs|nip|regon|ceidg|spolka|spółka|formal|rejestr|podpisany|podpis/.test(text)) return "KRS / formalne";
+  if(/arimr|ari?mr|dotacj|leasing|kredyt|finansow|wniosek/.test(text)) return "Finansowanie / ARiMR";
+  if(/marketing|ulotk|baner|grafik|social|facebook|olx|material|materiał|sprzedaz|sprzedaż/.test(text)) return "Materiały sprzedażowe";
+  if(/brunimat|mlekomat|automat|duo|premium|650/.test(text)) return "BRUNIMAT";
+  if(/pawilon|sklep|punkt sprzeda|kontener|budka/.test(text)) return "Pawilony";
+  if(/klient|gospodarstwo|lead|crm/.test(text)) return "Klienci";
+  return "Inne dokumenty";
+}
+
+function inferDocumentType(file){
+  const category = inferDocumentCategory(file);
+  const mime = (file.mimeType || "").toLowerCase();
+  const name = (file.name || "").toLowerCase();
+  if(category === "Cenniki") return "Cennik wewnętrzny";
+  if(category === "Umowy") return "Umowa";
+  if(category === "Oferty") return "Oferta wysłana";
+  if(category === "KRS / formalne") return "KRS / formalne";
+  if(category === "Materiały sprzedażowe") return "Materiał sprzedażowy";
+  if(mime.includes("spreadsheet") || /\.(xls|xlsx|csv)$/.test(name)) return "Cennik wewnętrzny";
+  return "Dokument firmowy";
+}
 
 function renderPriceDocuments(){
   const list = document.getElementById("list-cenniki");
@@ -2637,7 +2680,7 @@ function render(){
     // update datalist for category autocomplete (zawsze z pełnej listy, nie przefiltrowanej)
     const dl = document.getElementById("kategorieList");
     if(dl){
-      const allCats = [...new Set((data.dokumenty||[]).map(d=>d.kategoria||"Inne dokumenty"))];
+      const allCats = [...new Set([...DOC_CATEGORY_SUGGESTIONS, ...(data.dokumenty||[]).map(d=>d.kategoria||"Inne dokumenty")])];
       dl.innerHTML = allCats.map(k=>`<option value="${crmEsc(k)}">`).join("");
     }
 
@@ -2742,7 +2785,7 @@ function setDriveStatus(id, text, type){
 
 function readDocumentFormValues(fileName){
   const title = document.getElementById("title-dokumenty").value.trim() || fileName || "Dokument";
-  const kategoria = document.getElementById("kategoria-dokumenty").value.trim() || "Inne dokumenty";
+  const kategoria = document.getElementById("kategoria-dokumenty").value.trim() || inferDocumentCategory({name:fileName});
   return {
     title,
     typ: document.getElementById("typ-dokumenty").value,
@@ -2782,14 +2825,7 @@ function arrayBufferToBase64(buffer){
 }
 
 function inferDriveDocType(file){
-  const mime = (file.mimeType || "").toLowerCase();
-  const name = (file.name || "").toLowerCase();
-  if(mime.includes("spreadsheet") || /\.(xls|xlsx|csv)$/.test(name)) return "Cennik wewnętrzny";
-  if(mime.includes("document") || /\.(doc|docx)$/.test(name)) return "Dokument firmowy";
-  if(name.includes("umowa")) return "Umowa";
-  if(name.includes("cennik")) return "Cennik wewnętrzny";
-  if(name.includes("oferta")) return "Oferta wysłana";
-  return "Dokument firmowy";
+  return inferDocumentType(file);
 }
 
 function driveDocumentLink(file){
@@ -2816,7 +2852,7 @@ function documentFromDriveFile(file, fallback){
     title: values.title || file.name || "Dokument z Google Drive",
     link: driveDocumentLink(file),
     desc: values.desc || "",
-    kategoria: values.kategoria || "Google Drive",
+    kategoria: values.kategoria || inferDocumentCategory(file),
     status:"todo",
     notes:"",
     typ: values.typ || inferDriveDocType(file),
@@ -2897,7 +2933,8 @@ async function syncDocumentsFromDrive(){
         skipped++;
       } else {
         data.dokumenty.push(documentFromDriveFile(file, {
-          kategoria:"Google Drive",
+          kategoria: inferDocumentCategory(file),
+          typ: inferDocumentType(file),
           statusDokumentu:"Aktualny"
         }));
         added++;
