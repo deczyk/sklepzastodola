@@ -1996,6 +1996,37 @@ async function initApp(){
     if(wasIncomplete) pushRemote(data); // napraw brakujące dane w chmurze na stałe
   }
   render();
+  scheduleDriveAutoSync();
+}
+
+function normalizePanelDocuments(d){
+  if(!Array.isArray(d.dokumenty)) return false;
+  let changed = false;
+  d.dokumenty.forEach(doc => {
+    const file = {name: doc.nazwaPliku || doc.title || doc.nazwa || "", mimeType: doc.mimeType || ""};
+    const inferredCategory = inferDocumentCategory(file);
+    const inferredType = inferDocumentType(file);
+    if(!doc.title && doc.nazwaPliku){ doc.title = doc.nazwaPliku; changed = true; }
+    if(!doc.nazwaPliku && doc.title){ doc.nazwaPliku = doc.title; changed = true; }
+    if(!doc.kategoria || (["Google Drive","Inne dokumenty"].includes(doc.kategoria) && inferredCategory !== "Inne dokumenty")){
+      doc.kategoria = inferredCategory;
+      changed = true;
+    }
+    if(!doc.typ || (doc.typ === "Dokument firmowy" && inferredType !== "Dokument firmowy")){
+      doc.typ = inferredType;
+      changed = true;
+    }
+    if(!doc.poufnosc){ doc.poufnosc = "Wewnętrzne"; changed = true; }
+    if(!doc.statusDokumentu || ["todo","progress","done"].includes(doc.statusDokumentu)){
+      doc.statusDokumentu = doc.link || doc.googleDriveId ? "Aktualny" : "Roboczy";
+      changed = true;
+    }
+    if(doc.status && ["todo","progress","done"].includes(doc.status) && doc.statusDokumentu){
+      delete doc.status;
+      changed = true;
+    }
+  });
+  return changed;
 }
 
 function fillMissingDefaults(d){
@@ -2011,6 +2042,7 @@ function fillMissingDefaults(d){
       changed = true;
     }
   }
+  if(normalizePanelDocuments(d)) changed = true;
   if(!d.sprawy || d.sprawy.length===0){ d.sprawy = dflt.sprawy; changed = true; }
   if(!d.klienci){ d.klienci = []; changed = true; }
   if(!d.log){ d.log = []; changed = true; }
@@ -2474,7 +2506,7 @@ function statusLabel(s){ return s==="done"?"Gotowe":s==="progress"?"W trakcie":"
 
 function docName(item){ return item.title || item.nazwa || ""; }
 function docNote(item){ return item.desc || item.notatka || item.notes || ""; }
-function docStatus(item){ return item.statusDokumentu || item.status || ""; }
+function docStatus(item){ return item.statusDokumentu || ""; }
 function docLink(item){ return item.link || ""; }
 function docFileName(item){ return item.nazwaPliku || ""; }
 function docType(item){ return item.typ || ""; }
@@ -2718,10 +2750,9 @@ function documentNeedsOrganizing(item){
   const category = item.kategoria || "";
   const type = docType(item);
   const title = docName(item);
-  const note = docNote(item);
   const link = docLink(item);
   const looksClientDoc = ["Oferta wysłana","Dokument klienta","Cennik klienta"].includes(type) || category === "Klienci" || category === "Oferty";
-  return !title || !link || !note || !category || ["Google Drive","Inne dokumenty"].includes(category) || (looksClientDoc && !item.klientId);
+  return !title || !link || !category || ["Google Drive","Inne dokumenty"].includes(category) || (looksClientDoc && !item.klientId);
 }
 
 function updateDocumentFilters(docs){
@@ -3051,8 +3082,14 @@ async function uploadDocumentToDrive(){
   }
 }
 
-async function syncDocumentsFromDrive(){
-  setDriveStatus("driveSyncStatus", "Pobieram listę plików z Drive...", "");
+function scheduleDriveAutoSync(){
+  if(sessionStorage.getItem("panel_drive_auto_sync_done")==="1") return;
+  sessionStorage.setItem("panel_drive_auto_sync_done","1");
+  setTimeout(()=>syncDocumentsFromDrive({silent:true}), 900);
+}
+
+async function syncDocumentsFromDrive(options={}){
+  if(!options.silent) setDriveStatus("driveSyncStatus", "Pobieram listę plików z Drive...", "");
   try{
     const json = await driveApi("/api/drive-documents");
     const files = Array.isArray(json.files) ? json.files : [];
@@ -3076,9 +3113,9 @@ async function syncDocumentsFromDrive(){
       saveData();
     }
     render();
-    setDriveStatus("driveSyncStatus", `Drive: dodano ${added}, pominięto ${skipped}.`, "ok");
+    if(!options.silent) setDriveStatus("driveSyncStatus", `Drive: dodano ${added}, pominięto ${skipped}.`, "ok");
   }catch(e){
-    setDriveStatus("driveSyncStatus", `Błąd Drive: ${e.message || e}`, "error");
+    if(!options.silent) setDriveStatus("driveSyncStatus", `Błąd Drive: ${e.message || e}`, "error");
   }
 }
 
