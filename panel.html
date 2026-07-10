@@ -81,6 +81,9 @@
   .formHint{font-size:12px;color:var(--text-muted);line-height:1.45}
   .formHint a{color:var(--green);font-weight:bold;text-decoration:none}
   .formHint a:hover{text-decoration:underline}
+  .driveStatus{font-size:12px;color:var(--text-muted);margin-top:6px;min-height:16px}
+  .driveStatus.error{color:var(--todo)}
+  .driveStatus.ok{color:var(--done)}
   .delBtn{background:#fff5f4;border:1px solid #e2aaa4;color:#a33b33;cursor:pointer;font-size:12px;
       border-radius:7px;padding:5px 8px;font-weight:bold;opacity:1}
   .delBtn:hover{background:#ffecea;border-color:#c66b62}
@@ -1298,6 +1301,10 @@
         </div>
         <div class="formHint">Najpierw dodaj plik do folderu Drive, potem wklej tutaj link do pliku. Panel pokaże podgląd i pobieranie, jeśli Google Drive pozwala na dostęp.</div>
         <div class="row">
+          <input type="file" id="plik-dokumenty">
+        </div>
+        <div class="formHint">Możesz też wybrać plik tutaj: panel wyśle go do Google Drive i od razu zapisze kartę dokumentu.</div>
+        <div class="row">
           <select id="klientId-dokumenty">
             <option value="">Brak powiązanego klienta</option>
           </select>
@@ -1306,8 +1313,14 @@
         <datalist id="kategorieList"></datalist>
         <div class="actions">
           <button class="cancel" onclick="toggleForm('dokumenty')">Anuluj</button>
+          <button class="save" onclick="uploadDocumentToDrive()">Wyślij do Drive i zapisz</button>
           <button class="save" onclick="addItem('dokumenty')">Zapisz</button>
         </div>
+        <div id="driveUploadStatus" class="driveStatus"></div>
+      </div>
+      <div class="docActions">
+        <button class="docActionBtn" onclick="syncDocumentsFromDrive()">Synchronizuj z Drive</button>
+        <span id="driveSyncStatus" class="driveStatus"></span>
       </div>
       <input type="text" id="searchDokumenty" class="docSearch" placeholder="🔍 Szukaj dokumentu (nazwa, opis, kategoria)..." oninput="render()">
       <div id="list-dokumenty"></div>
@@ -2717,6 +2730,188 @@ function addItem(cat){
   }
   toggleForm(cat);
   render();
+}
+
+function setDriveStatus(id, text, type){
+  const el = document.getElementById(id);
+  if(!el) return;
+  el.textContent = text || "";
+  el.classList.toggle("error", type === "error");
+  el.classList.toggle("ok", type === "ok");
+}
+
+function readDocumentFormValues(fileName){
+  const title = document.getElementById("title-dokumenty").value.trim() || fileName || "Dokument";
+  const kategoria = document.getElementById("kategoria-dokumenty").value.trim() || "Inne dokumenty";
+  return {
+    title,
+    typ: document.getElementById("typ-dokumenty").value,
+    poufnosc: document.getElementById("poufnosc-dokumenty").value,
+    statusDokumentu: document.getElementById("statusDokumentu-dokumenty").value,
+    nazwaPliku: document.getElementById("nazwaPliku-dokumenty").value.trim() || fileName || "",
+    klientId: document.getElementById("klientId-dokumenty").value,
+    dataDokumentu: document.getElementById("dataDokumentu-dokumenty").value,
+    desc: document.getElementById("desc-dokumenty").value.trim(),
+    kategoria
+  };
+}
+
+function resetDocumentForm(){
+  document.getElementById("title-dokumenty").value = "";
+  document.getElementById("link-dokumenty").value = "";
+  document.getElementById("desc-dokumenty").value = "";
+  document.getElementById("kategoria-dokumenty").value = "";
+  document.getElementById("typ-dokumenty").value = "Dokument firmowy";
+  document.getElementById("poufnosc-dokumenty").value = "Wewnętrzne";
+  document.getElementById("statusDokumentu-dokumenty").value = "Roboczy";
+  document.getElementById("nazwaPliku-dokumenty").value = "";
+  document.getElementById("klientId-dokumenty").value = "";
+  document.getElementById("dataDokumentu-dokumenty").value = "";
+  const fileInput = document.getElementById("plik-dokumenty");
+  if(fileInput) fileInput.value = "";
+}
+
+function arrayBufferToBase64(buffer){
+  const bytes = new Uint8Array(buffer);
+  let binary = "";
+  const chunkSize = 0x8000;
+  for(let i = 0; i < bytes.length; i += chunkSize){
+    binary += String.fromCharCode.apply(null, bytes.subarray(i, i + chunkSize));
+  }
+  return btoa(binary);
+}
+
+function inferDriveDocType(file){
+  const mime = (file.mimeType || "").toLowerCase();
+  const name = (file.name || "").toLowerCase();
+  if(mime.includes("spreadsheet") || /\.(xls|xlsx|csv)$/.test(name)) return "Cennik wewnętrzny";
+  if(mime.includes("document") || /\.(doc|docx)$/.test(name)) return "Dokument firmowy";
+  if(name.includes("umowa")) return "Umowa";
+  if(name.includes("cennik")) return "Cennik wewnętrzny";
+  if(name.includes("oferta")) return "Oferta wysłana";
+  return "Dokument firmowy";
+}
+
+function driveDocumentLink(file){
+  return file.webViewLink || (file.id ? `https://drive.google.com/file/d/${file.id}/view` : "");
+}
+
+function driveDocumentDuplicate(file, existingDocs){
+  const id = (file.id || "").toString();
+  const link = driveDocumentLink(file);
+  const name = (file.name || "").toString().trim().toLowerCase();
+  return (existingDocs || []).some(doc => {
+    const docDriveId = (doc.googleDriveId || "").toString();
+    const docLinkValue = (doc.link || "").toString();
+    const docNameValue = (doc.nazwaPliku || doc.title || "").toString().trim().toLowerCase();
+    return (id && docDriveId === id) || (link && docLinkValue === link) || (name && docNameValue === name);
+  });
+}
+
+function documentFromDriveFile(file, fallback){
+  const nowTs = new Date().toISOString();
+  const values = fallback || {};
+  return {
+    id:`item_${Date.now()}_${Math.random().toString(36).slice(2,8)}`,
+    title: values.title || file.name || "Dokument z Google Drive",
+    link: driveDocumentLink(file),
+    desc: values.desc || "",
+    kategoria: values.kategoria || "Google Drive",
+    status:"todo",
+    notes:"",
+    typ: values.typ || inferDriveDocType(file),
+    poufnosc: values.poufnosc || "Wewnętrzne",
+    statusDokumentu: values.statusDokumentu || "Aktualny",
+    nazwaPliku: values.nazwaPliku || file.name || "",
+    klientId: values.klientId || "",
+    dataDokumentu: values.dataDokumentu || (file.createdTime ? file.createdTime.slice(0,10) : ""),
+    googleDriveId: file.id || "",
+    mimeType: file.mimeType || "",
+    driveModifiedTime: file.modifiedTime || "",
+    utworzono: nowTs,
+    zaktualizowano: nowTs
+  };
+}
+
+async function driveApi(path, options = {}){
+  const password = getPanelPassword();
+  if(!password) throw new Error("Brak hasła panelu.");
+  const res = await fetch(path, {
+    ...options,
+    headers: {
+      ...(options.headers || {}),
+      "X-Panel-Password": password
+    }
+  });
+  if(res.status === 401) throw new Error("Sesja wygasła albo hasło panelu jest nieprawidłowe.");
+  const json = await res.json().catch(() => ({}));
+  if(!res.ok) throw new Error(json.message || json.error || `HTTP ${res.status}`);
+  return json;
+}
+
+async function uploadDocumentToDrive(){
+  const input = document.getElementById("plik-dokumenty");
+  const file = input && input.files ? input.files[0] : null;
+  if(!file){
+    setDriveStatus("driveUploadStatus", "Wybierz plik do wysłania.", "error");
+    return;
+  }
+  setDriveStatus("driveUploadStatus", "Wysyłam plik do Google Drive...", "");
+  try{
+    const values = readDocumentFormValues(file.name);
+    const contentBase64 = arrayBufferToBase64(await file.arrayBuffer());
+    const json = await driveApi("/api/drive-documents", {
+      method:"POST",
+      headers:{ "Content-Type":"application/json" },
+      body:JSON.stringify({
+        name: values.nazwaPliku || file.name,
+        mimeType: file.type || "application/octet-stream",
+        contentBase64
+      })
+    });
+    if(!data.dokumenty) data.dokumenty = [];
+    if(!driveDocumentDuplicate(json.file, data.dokumenty)){
+      data.dokumenty.push(documentFromDriveFile(json.file, values));
+    }
+    logActivity(`wysłał(a) dokument do Google Drive: „${values.title}”`);
+    saveData();
+    resetDocumentForm();
+    document.getElementById("form-dokumenty")?.classList.remove("open");
+    render();
+    setDriveStatus("driveUploadStatus", "Plik wysłany do Drive i zapisany w panelu.", "ok");
+  }catch(e){
+    setDriveStatus("driveUploadStatus", `Nie udało się wysłać pliku: ${e.message || e}`, "error");
+  }
+}
+
+async function syncDocumentsFromDrive(){
+  setDriveStatus("driveSyncStatus", "Pobieram listę plików z Drive...", "");
+  try{
+    const json = await driveApi("/api/drive-documents");
+    const files = Array.isArray(json.files) ? json.files : [];
+    if(!data.dokumenty) data.dokumenty = [];
+    let added = 0;
+    let skipped = 0;
+    files.forEach(file => {
+      if(driveDocumentDuplicate(file, data.dokumenty)){
+        skipped++;
+      } else {
+        data.dokumenty.push(documentFromDriveFile(file, {
+          kategoria:"Google Drive",
+          statusDokumentu:"Aktualny"
+        }));
+        added++;
+      }
+    });
+    if(added){
+      logActivity(`zsynchronizował(a) dokumenty z Google Drive: dodano ${added}`);
+      saveData();
+    }
+    render();
+    setDriveStatus("driveSyncStatus", `Drive: dodano ${added}, pominięto ${skipped}.`, "ok");
+  }catch(e){
+    setDriveStatus("driveSyncStatus", `Błąd Drive: ${e.message || e}`, "error");
+  }
 }
 
 function deleteItem(cat, id){
