@@ -112,6 +112,38 @@
 .sc-val.counting { animation: countUp .35s ease-out; }
 .sc-result-val.counting { animation: countUp .45s ease-out; }
 
+/* PRACTICE FLOW */
+.practice-sec { padding: 5.5rem 5vw; background: var(--bg2); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.practice-head { max-width: 720px; }
+.practice-flow { display: grid; grid-template-columns: minmax(0,1fr) minmax(300px,.82fr); gap: 1.2rem; margin-top: 3rem; align-items: stretch; }
+.practice-steps { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: .9rem; }
+.practice-card { position: relative; width: 100%; min-height: 170px; display: flex; flex-direction: column; align-items: flex-start; gap: .65rem; text-align: left; padding: 1.35rem; border-radius: var(--r-lg); border: 1px solid var(--line); background: var(--paper); color: var(--ink); box-shadow: var(--shadow); transition: transform .2s, border-color .2s, box-shadow .2s, background .2s; }
+.practice-card:hover, .practice-card.active { transform: translateY(-3px); border-color: rgba(45,90,39,.38); background: #fbfaf6; box-shadow: var(--shadow-lg); }
+.practice-card.active::after { content: ''; position: absolute; inset: auto 1.2rem 0; height: 3px; border-radius: 999px 999px 0 0; background: linear-gradient(90deg,var(--forest),var(--wheat)); }
+.practice-icon { width: 2.65rem; height: 2.65rem; display: inline-flex; align-items: center; justify-content: center; border-radius: 50%; background: var(--sage); border: 1px solid rgba(45,90,39,.18); font-size: 1.2rem; }
+.practice-kicker { font-size: .68rem; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; color: var(--wheat); }
+.practice-card strong { font-size: 1rem; line-height: 1.25; color: var(--ink); }
+.practice-card span:last-child { font-size: .84rem; line-height: 1.55; color: var(--muted); }
+.practice-outcome { display: flex; flex-direction: column; justify-content: space-between; gap: 1.5rem; min-height: 100%; padding: 2rem; border-radius: var(--r-lg); background: var(--forest); color: #fff; box-shadow: var(--shadow-lg); }
+.practice-outcome small { font-size: .7rem; font-weight: 800; letter-spacing: .13em; text-transform: uppercase; color: rgba(255,255,255,.62); }
+.practice-outcome h3 { font-size: clamp(1.45rem,2.8vw,2.35rem); line-height: 1.1; letter-spacing: -.02em; margin-top: .75rem; }
+.practice-outcome p { color: rgba(255,255,255,.78); line-height: 1.7; font-size: .94rem; margin-top: 1rem; }
+.practice-pills { display: flex; flex-wrap: wrap; gap: .55rem; }
+.practice-pills span { display: inline-flex; align-items: center; border: 1px solid rgba(255,255,255,.22); border-radius: 999px; padding: .38rem .68rem; color: rgba(255,255,255,.84); font-size: .76rem; font-weight: 700; }
+
+/* FIT CHECK */
+.fit-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: .9rem; margin-top: 2.5rem; }
+.fit-card { background: var(--paper); border: 1px solid var(--line); border-radius: var(--r-lg); box-shadow: var(--shadow); overflow: hidden; transition: border-color .2s, box-shadow .2s, transform .2s; }
+.fit-card:hover { transform: translateY(-2px); border-color: rgba(45,90,39,.3); box-shadow: var(--shadow-lg); }
+.fit-card summary { list-style: none; cursor: pointer; display: grid; grid-template-columns: 1.55rem 1fr auto; gap: .8rem; align-items: center; padding: 1rem 1.1rem; color: var(--ink); font-weight: 800; line-height: 1.3; }
+.fit-card summary::-webkit-details-marker { display: none; }
+.fit-card summary::before { content: '✓'; width: 1.55rem; height: 1.55rem; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; background: var(--sage); color: var(--forest); font-size: .75rem; font-weight: 900; }
+.fit-card summary::after { content: '+'; width: 1.55rem; height: 1.55rem; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; border: 1px solid var(--line); color: var(--forest); font-weight: 900; transition: transform .2s, background .2s; }
+.fit-card[open] summary::after { transform: rotate(45deg); background: var(--forest); color: #fff; border-color: var(--forest); }
+.fit-card p { padding: 0 1.1rem 1.1rem 3.45rem; color: var(--muted); font-size: .9rem; line-height: 1.65; }
+.fit-note { margin-top: 2rem; padding: 1.35rem 1.5rem; background: var(--sage); border: 1px solid rgba(45,90,39,.2); border-radius: var(--r-lg); max-width: 690px; box-shadow: var(--shadow); }
+.fit-note p { font-size: .93rem; color: var(--ink2); line-height: 1.7; }
+
 /* CALC TABS (copied from jak-dzialamy) */
 .calc-tab { padding: .6rem 1.4rem; border: 1.5px solid var(--line); border-radius: 2rem; font-family: var(--sans); font-size: .85rem; font-weight: 700; cursor: pointer; background: var(--paper); color: var(--muted); transition: all .2s; }
 .calc-tab:hover { border-color: var(--forest); color: var(--forest); }
@@ -119,11 +151,17 @@
 
 @media(max-width:860px){
   .scenario-grid { grid-template-columns: 1fr; gap: 2rem; }
+  .practice-flow { grid-template-columns: 1fr; }
+  .fit-grid { grid-template-columns: 1fr; }
 }
 @media(max-width:600px){
   .sc-val { min-width: 60px; font-size: .9rem; }
   .hero { min-height: auto; padding: 8.5rem 5vw 3rem; justify-content: flex-start; }
   .hero-actions { margin-bottom: 1rem; }
+  .practice-sec { padding: 4rem 5vw; }
+  .practice-steps { grid-template-columns: 1fr; }
+  .practice-card { min-height: auto; }
+  .practice-outcome { padding: 1.5rem; }
 }
 
 .cta-band { padding: 5.5rem 5vw; border-top: 1px solid var(--line); }
@@ -328,43 +366,53 @@
 </div> -->
 
 <!-- JAK WYGLĄDA GOTOWY SKLEP -->
-<section style="background:var(--bg2);border-top:1px solid var(--line);border-bottom:1px solid var(--line)">
-<div class="wrap" style="padding:5rem 0">
-  <div data-r style="max-width:700px">
+<section class="practice-sec">
+<div class="wrap">
+  <div class="practice-head" data-r>
     <p class="sec-label">Jak to działa w praktyce</p>
     <h2 class="sec-title">Jak wygląda gotowy<br><em>sklep przy gospodarstwie?</em></h2>
+    <p class="sec-body">Kliknij krok i zobacz, co dzieje się po stronie klienta oraz po stronie gospodarstwa.</p>
   </div>
-  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:var(--r-lg);overflow:hidden;margin-top:3rem">
-    <div style="background:var(--paper);padding:2rem;text-align:center" data-r data-d="1">
-      <div style="font-size:2.2rem;margin-bottom:.8rem">🚗</div>
-      <p style="font-size:.72rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--forest);margin-bottom:.5rem">Krok 1</p>
-      <p style="font-size:.95rem;font-weight:700;color:var(--ink);margin-bottom:.4rem">Klient przyjeżdża</p>
-      <p style="font-size:.83rem;color:var(--muted);line-height:1.6">Po świeże mleko — o każdej porze, 24/7. Bez kolejek, bez sklepu.</p>
+  <div class="practice-flow" data-r data-d="1">
+    <div class="practice-steps" data-practice-steps>
+      <button type="button" class="practice-card active" data-practice-title="Klient widzi prosty punkt sprzedaży" data-practice-copy="Podjeżdża po świeże mleko wtedy, kiedy mu pasuje. Bez sklepu, bez kolejki i bez umawiania się z gospodarzem.">
+        <span class="practice-icon">🚗</span>
+        <span class="practice-kicker">Krok 1</span>
+        <strong>Klient przyjeżdża</strong>
+        <span>Świeże mleko dostępne o każdej porze, blisko drogi i gospodarstwa.</span>
+      </button>
+      <button type="button" class="practice-card" data-practice-title="Mlekomat obsługuje sprzedaż" data-practice-copy="Urządzenie chłodzi, odmierza i wydaje mleko. Płatność może działać kartą, BLIK-iem lub gotówką, zależnie od konfiguracji.">
+        <span class="practice-icon">🥛</span>
+        <span class="practice-kicker">Krok 2</span>
+        <strong>Kupuje mleko</strong>
+        <span>Automatyczna sprzedaż bez stałego stania przy punkcie.</span>
+      </button>
+      <button type="button" class="practice-card" data-practice-title="Punkt zaczyna sprzedawać więcej niż mleko" data-practice-copy="Przy mleku można pokazać jajka, sery, masło, miód albo przetwory. To podnosi wartość koszyka i buduje stały ruch.">
+        <span class="practice-icon">🧀</span>
+        <span class="practice-kicker">Krok 3</span>
+        <strong>Bierze też coś więcej</strong>
+        <span>Produkty z gospodarstwa mają swoje miejsce obok mlekomatu.</span>
+      </button>
+      <button type="button" class="practice-card" data-practice-title="Sprzedaż pracuje codziennie" data-practice-copy="Klient wraca, bo ma wygodny punkt po drodze. Ty widzisz sprzedaż i nie oddajesz całej wartości mleka pośrednikom.">
+        <span class="practice-icon">📊</span>
+        <span class="practice-kicker">Efekt</span>
+        <strong>Płaci i wraca</strong>
+        <span>Stały punkt przy gospodarstwie zamiast jednorazowej sprzedaży.</span>
+      </button>
     </div>
-    <div style="background:var(--paper);padding:2rem;text-align:center" data-r data-d="2">
-      <div style="font-size:2.2rem;margin-bottom:.8rem">🥛</div>
-      <p style="font-size:.72rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--forest);margin-bottom:.5rem">Krok 2</p>
-      <p style="font-size:.95rem;font-weight:700;color:var(--ink);margin-bottom:.4rem">Kupuje mleko</p>
-      <p style="font-size:.83rem;color:var(--muted);line-height:1.6">Kartą, BLIK-iem lub gotówką. Mlekomat wydaje, liczy i chłodzi automatycznie.</p>
-    </div>
-    <div style="background:var(--paper);padding:2rem;text-align:center" data-r data-d="3">
-      <div style="font-size:2.2rem;margin-bottom:.8rem">🧀</div>
-      <p style="font-size:.72rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--forest);margin-bottom:.5rem">Krok 3</p>
-      <p style="font-size:.95rem;font-weight:700;color:var(--ink);margin-bottom:.4rem">Bierze też coś więcej</p>
-      <p style="font-size:.83rem;color:var(--muted);line-height:1.6">Jajka, ser, masło, miód, przetwory — wszystko z Twojego gospodarstwa.</p>
-    </div>
-    <div style="background:var(--paper);padding:2rem;text-align:center" data-r data-d="4">
-      <div style="font-size:2.2rem;margin-bottom:.8rem">💳</div>
-      <p style="font-size:.72rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--forest);margin-bottom:.5rem">Krok 4</p>
-      <p style="font-size:.95rem;font-weight:700;color:var(--ink);margin-bottom:.4rem">Płaci i wraca</p>
-      <p style="font-size:.83rem;color:var(--muted);line-height:1.6">Zostaje stałym klientem. Ty masz wyższe marże niż w skupie — bez pośredników.</p>
-    </div>
-    <div style="background:var(--sage);border-left:3px solid var(--forest);padding:2rem;text-align:center" data-r data-d="5">
-      <div style="font-size:2.2rem;margin-bottom:.8rem">📊</div>
-      <p style="font-size:.72rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--forest);margin-bottom:.5rem">A Ty tymczasem</p>
-      <p style="font-size:.95rem;font-weight:700;color:var(--ink);margin-bottom:.4rem">Zajmujesz się krowami</p>
-      <p style="font-size:.83rem;color:var(--muted);line-height:1.6">Panel online pokazuje sprzedaż. SMS gdy mleko się kończy. Sklep działa sam.</p>
-    </div>
+    <aside class="practice-outcome" aria-live="polite">
+      <div>
+        <small>Co to daje w praktyce</small>
+        <h3 id="practice-title">Klient widzi prosty punkt sprzedaży</h3>
+        <p id="practice-copy">Podjeżdża po świeże mleko wtedy, kiedy mu pasuje. Bez sklepu, bez kolejki i bez umawiania się z gospodarzem.</p>
+      </div>
+      <div class="practice-pills">
+        <span>24/7</span>
+        <span>mlekomat</span>
+        <span>pawilon</span>
+        <span>produkty lokalne</span>
+      </div>
+    </aside>
   </div>
 </div>
 </section>
@@ -376,15 +424,30 @@
     <h2 class="sec-title">Czy to ma sens<br><em>w Twoim gospodarstwie?</em></h2>
     <p class="sec-body">Mówimy uczciwie — sklep przy gospodarstwie nie opłaca się każdemu. Sprawdź te 5 punktów, zanim zaczniesz liczyć szczegóły w kalkulatorze niżej.</p>
   </div>
-  <ul class="check-list" data-r data-d="1" style="margin-top:2.5rem">
-    <li><strong>Liczba krów mlecznych</strong> — orientacyjnie od 20-30 wzwyż. Mniej też ma sens, ale zwykle jako wariant podstawowy z możliwością późniejszej rozbudowy.</li>
-    <li><strong>Lokalizacja z ruchem</strong> — blisko wsi, miasteczka, osiedla, drogi przelotowej lub szlaku agroturystycznego. To ważniejsze niż sama wielkość stada.</li>
-    <li><strong>Realna liczba potencjalnych klientów</strong> — czy w okolicy jest 20-50 gospodarstw domowych, które realnie kupiłyby mleko prosto od Ciebie?</li>
-    <li><strong>Produkty dodatkowe (plus, nie warunek)</strong> — jajka, sery, miód, warzywa. Zwiększają potencjał punktu sprzedaży, a mlekomat może być pierwszym etapem.</li>
-    <li><strong>Miejsce i dojazd</strong> — utwardzony dojazd, miejsce na pawilon blisko drogi, dostęp do prądu (woda przydatna, ale nie zawsze konieczna).</li>
-  </ul>
-  <div style="margin-top:2rem;padding:1.4rem 1.6rem;background:var(--sage);border:1px solid rgba(45,90,39,.2);border-radius:var(--r-lg);max-width:640px" data-r data-d="2">
-    <p style="font-size:.92rem;color:var(--ink2);line-height:1.7">Spełniasz większość punktów? Przejdź do kalkulatora niżej. Nie jesteś pewien? <a href="kontakt.html" style="color:var(--forest);font-weight:700">Zadzwoń</a> — powiemy wprost, czy ma to sens u Ciebie, zamiast obiecywać złote góry każdemu.</p>
+  <div class="fit-grid" data-r data-d="1">
+    <details class="fit-card" open>
+      <summary>Liczba krów mlecznych</summary>
+      <p>Orientacyjnie od 20-30 wzwyż. Mniej też może mieć sens, ale zwykle jako wariant podstawowy z możliwością późniejszej rozbudowy.</p>
+    </details>
+    <details class="fit-card">
+      <summary>Lokalizacja z ruchem</summary>
+      <p>Blisko wsi, miasteczka, osiedla, drogi przelotowej lub szlaku agroturystycznego. To ważniejsze niż sama wielkość stada.</p>
+    </details>
+    <details class="fit-card">
+      <summary>Realna liczba klientów</summary>
+      <p>Czy w okolicy jest 20-50 gospodarstw domowych, które realnie kupiłyby mleko prosto od Ciebie?</p>
+    </details>
+    <details class="fit-card">
+      <summary>Produkty dodatkowe</summary>
+      <p>Jajka, sery, miód, warzywa i przetwory zwiększają potencjał punktu. To plus, ale nie warunek startu.</p>
+    </details>
+    <details class="fit-card">
+      <summary>Miejsce i dojazd</summary>
+      <p>Liczy się utwardzony dojazd, miejsce na pawilon blisko drogi i dostęp do prądu. Woda bywa przydatna, ale nie zawsze jest konieczna.</p>
+    </details>
+  </div>
+  <div class="fit-note" data-r data-d="2">
+    <p>Spełniasz większość punktów? Przejdź do kalkulatora niżej. Nie jesteś pewien? <a href="kontakt.html" style="color:var(--forest);font-weight:700">Zadzwoń</a> — powiemy wprost, czy ma to sens u Ciebie, zamiast obiecywać złote góry każdemu.</p>
   </div>
 </div>
 </section>
@@ -757,6 +820,17 @@ document.addEventListener('DOMContentLoaded', function(){
       }
     },{threshold:0.25}).observe(scSec);
   }
+
+  var practiceTitle=document.getElementById('practice-title');
+  var practiceCopy=document.getElementById('practice-copy');
+  document.querySelectorAll('.practice-card').forEach(function(card){
+    card.addEventListener('click',function(){
+      document.querySelectorAll('.practice-card').forEach(function(other){ other.classList.remove('active'); });
+      card.classList.add('active');
+      if(practiceTitle) practiceTitle.textContent=card.dataset.practiceTitle || '';
+      if(practiceCopy) practiceCopy.textContent=card.dataset.practiceCopy || '';
+    });
+  });
 });
 </script>
 </body>
