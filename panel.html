@@ -87,6 +87,8 @@
   .docToolbar .docSearch{flex:1;min-width:240px;margin:0}
   .docCount{font-size:12px;color:var(--text-muted)}
   .organizeHint{border:1px dashed var(--border);background:var(--surface-soft);border-radius:10px;padding:10px 12px;font-size:12px;color:var(--text-muted);margin:8px 0 12px}
+  .docQuickEdit{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;margin-top:10px}
+  .docQuickEdit select{width:100%;border:1px solid var(--border);border-radius:8px;background:var(--input-bg);color:var(--text);padding:7px 9px;font-size:12px}
   .driveStatus{font-size:12px;color:var(--text-muted);margin-top:6px;min-height:16px}
   .driveStatus.error{color:var(--todo)}
   .driveStatus.ok{color:var(--done)}
@@ -2502,6 +2504,22 @@ function priceGroup(item){
   return "Pozostałe cenniki";
 }
 
+const DOC_TYPE_OPTS = ["Dokument firmowy","Dokument klienta","Oferta wysłana","Cennik klienta","Cennik wewnętrzny","Cennik zakupowy / partnerski","Materiał sprzedażowy","Umowa","KRS / formalne","Inne"];
+const DOC_CONFIDENTIALITY_OPTS = ["Wewnętrzne","Publiczne","Poufne","Ściśle poufne"];
+const DOC_STATUS_OPTS = ["Roboczy","Aktualny","Wysłany","Do podpisu","Podpisany","Archiwalny"];
+
+function renderSimpleOptions(options, selected){
+  const value = selected || "";
+  const opts = value && !options.includes(value) ? [value, ...options] : options;
+  return opts.map(v=>`<option value="${crmEsc(v)}" ${value===v?"selected":""}>${crmEsc(v)}</option>`).join("");
+}
+
+function renderDocumentClientOptions(selected){
+  const clients = (data.klienci || []).slice().sort((a,b)=>clientName(a).localeCompare(clientName(b), "pl"));
+  return '<option value="">Bez klienta</option>' +
+    clients.map(c=>`<option value="${crmEsc(c.id)}" ${selected===c.id?"selected":""}>${crmEsc(clientName(c))}</option>`).join("");
+}
+
 function renderItemCard(item, cat){
   const div = document.createElement("div");
   div.className = "item";
@@ -2558,6 +2576,24 @@ function renderItemCard(item, cat){
       <a class="docActionBtn" href="${crmEsc(safeLink)}" target="_blank" rel="noopener">Otwórz</a>
       ${downloadLink ? `<a class="docActionBtn" href="${crmEsc(downloadLink)}" target="_blank" rel="noopener">Pobierz</a>` : ""}
     </div>` : "";
+  const quickEditHtml = cat==="dokumenty" ? `
+    <div class="docQuickEdit">
+      <select data-id="${crmEsc(item.id)}" data-doc-field="kategoria" onchange="updateDocumentMeta(this)">
+        ${renderSimpleOptions(DOC_CATEGORY_SUGGESTIONS, item.kategoria || "Inne dokumenty")}
+      </select>
+      <select data-id="${crmEsc(item.id)}" data-doc-field="typ" onchange="updateDocumentMeta(this)">
+        ${renderSimpleOptions(DOC_TYPE_OPTS, type || "Dokument firmowy")}
+      </select>
+      <select data-id="${crmEsc(item.id)}" data-doc-field="statusDokumentu" onchange="updateDocumentMeta(this)">
+        ${renderSimpleOptions(DOC_STATUS_OPTS, statusValue || "Roboczy")}
+      </select>
+      <select data-id="${crmEsc(item.id)}" data-doc-field="poufnosc" onchange="updateDocumentMeta(this)">
+        ${renderSimpleOptions(DOC_CONFIDENTIALITY_OPTS, confidentiality || "Wewnętrzne")}
+      </select>
+      <select data-id="${crmEsc(item.id)}" data-doc-field="klientId" onchange="updateDocumentMeta(this)">
+        ${renderDocumentClientOptions(item.klientId || "")}
+      </select>
+    </div>` : "";
   div.innerHTML = `
     <div class="topRow">
       <div class="titleRow">
@@ -2572,6 +2608,7 @@ function renderItemCard(item, cat){
     ${docMetaHtml}
     ${warningHtml}
     ${docActions}
+    ${quickEditHtml}
     ${dateCaption}
     <textarea placeholder="Notatki..." data-cat="${cat}" data-id="${item.id}" onblur="updateNotes(this)">${crmEsc(item.notes||"")}</textarea>
   `;
@@ -3067,6 +3104,19 @@ function updateNotes(ta){
   const cat = ta.dataset.cat, id = ta.dataset.id;
   const item = data[cat].find(i=>i.id===id);
   if(item){ item.notes = ta.value; item.zaktualizowano = new Date().toISOString(); saveData(); renderStatsBar(); }
+}
+
+function updateDocumentMeta(sel){
+  const id = sel.dataset.id;
+  const field = sel.dataset.docField;
+  const doc = (data.dokumenty || []).find(item => item.id === id);
+  if(!doc || !field) return;
+  doc[field] = sel.value;
+  doc.zaktualizowano = new Date().toISOString();
+  logActivity(`uporządkował(a) dokument „${docName(doc) || docFileName(doc) || 'bez nazwy'}”`);
+  saveData();
+  render();
+  if(currentClientCardId) openClientCard(currentClientCardId);
 }
 
 // ================= Baza klientów =================
