@@ -70,6 +70,17 @@
   .docBadge.strict{background:#fff1f1;color:#9b2c2c;border-color:#f2c0c0}
   .docMeta{font-size:12px;color:var(--muted);display:flex;gap:10px;flex-wrap:wrap;margin-top:6px}
   .docWarning{font-size:12px;color:#8a5b00;background:#fff8e1;border-left:4px solid var(--accent);border-radius:8px;padding:8px 10px;margin-top:8px}
+  .docDriveIntro{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+  .docDriveIntro p{margin:4px 0 0}
+  .docActions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+  .docActionBtn{display:inline-flex;align-items:center;gap:6px;background:var(--light);color:var(--green);
+                border:1px solid var(--line);border-radius:8px;padding:7px 10px;font-size:12px;font-weight:bold;
+                text-decoration:none;cursor:pointer}
+  .docActionBtn.primary{background:var(--green);color:white;border-color:var(--green)}
+  .docActionBtn:hover{opacity:.92;text-decoration:none}
+  .formHint{font-size:12px;color:var(--text-muted);line-height:1.45}
+  .formHint a{color:var(--green);font-weight:bold;text-decoration:none}
+  .formHint a:hover{text-decoration:underline}
   .delBtn{background:#fff5f4;border:1px solid #e2aaa4;color:#a33b33;cursor:pointer;font-size:12px;
       border-radius:7px;padding:5px 8px;font-weight:bold;opacity:1}
   .delBtn:hover{background:#ffecea;border-color:#c66b62}
@@ -174,6 +185,7 @@
   .ext{font-size:9px;font-weight:bold;color:var(--muted);text-transform:uppercase;
        border:1px solid var(--line);border-radius:4px;padding:1px 5px;align-self:flex-start}
   .icon-pdf{background:#c0392b} .icon-docx{background:#2f5f8f} .icon-xlsx{background:#2f7a45}
+  .icon-drive{background:#2f7a45}
   .icon-img{background:#8e44ad} .icon-file{background:#7a8a80}
   .noLinkText{color:#bbb;font-size:11px}
   .dateCaption{color:#bbb;font-size:10.5px;margin-top:4px}
@@ -1239,6 +1251,13 @@
     <div class="tabPane" id="tabpane-dokumenty">
     <div class="section" id="section-dokumenty">
       <h2>Dokumenty / oferty <button class="addBtn" onclick="toggleForm('dokumenty')">+ Dodaj</button></h2>
+      <div class="privateNotice docDriveIntro">
+        <div>
+          <b>Magazyn plików:</b> dokumenty trzymaj w prywatnym folderze Google Drive, a w panelu zapisuj link, opis, kategorię i powiązanego klienta.
+          <p>Panel nie wrzuca PDF/DOCX/XLSX do GitHub ani na Vercel.</p>
+        </div>
+        <a class="docActionBtn primary" href="https://drive.google.com/drive/folders/1FMmp6qdMuMl13vkdfhpddeHH46kTgDy0?usp=sharing" target="_blank" rel="noopener">Otwórz folder Drive</a>
+      </div>
       <div class="newItemForm" id="form-dokumenty">
         <div class="row">
           <input type="text" id="title-dokumenty" placeholder="Nazwa dokumentu">
@@ -1274,9 +1293,10 @@
         </div>
         <div class="row">
           <input type="date" id="dataDokumentu-dokumenty">
-          <input type="text" id="link-dokumenty" placeholder="Link http/https (opcjonalnie)">
+          <input type="text" id="link-dokumenty" placeholder="Link Google Drive / http / https">
           <input type="text" id="nazwaPliku-dokumenty" placeholder="Nazwa pliku (bez uploadu)">
         </div>
+        <div class="formHint">Najpierw dodaj plik do folderu Drive, potem wklej tutaj link do pliku. Panel pokaże podgląd i pobieranie, jeśli Google Drive pozwala na dostęp.</div>
         <div class="row">
           <select id="klientId-dokumenty">
             <option value="">Brak powiązanego klienta</option>
@@ -2043,6 +2063,8 @@ function renderActivityLog(){
 }
 
 // ================= Podgląd dokumentów =================
+const COMPANY_DRIVE_FOLDER_URL = "https://drive.google.com/drive/folders/1FMmp6qdMuMl13vkdfhpddeHH46kTgDy0?usp=sharing";
+
 function safeDocumentHref(link){
   const value = (link || "").trim();
   if(!value) return "";
@@ -2054,12 +2076,57 @@ function safeDocumentHref(link){
   }
 }
 
+function driveFileId(link){
+  const safeLink = safeDocumentHref(link);
+  if(!safeLink) return "";
+  try{
+    const url = new URL(safeLink);
+    if(!url.hostname.includes("drive.google.com") && !url.hostname.includes("docs.google.com")) return "";
+    const pathMatch = url.pathname.match(/\/(?:file|document|spreadsheets|presentation)\/d\/([^/]+)/);
+    if(pathMatch) return pathMatch[1];
+    return url.searchParams.get("id") || "";
+  }catch(e){
+    return "";
+  }
+}
+
+function drivePreviewHref(link){
+  const safeLink = safeDocumentHref(link);
+  const id = driveFileId(safeLink);
+  if(!id) return safeLink;
+  try{
+    const url = new URL(safeLink);
+    const docsMatch = url.pathname.match(/\/(document|spreadsheets|presentation)\/d\/([^/]+)/);
+    if(url.hostname.includes("docs.google.com") && docsMatch){
+      return `https://docs.google.com/${docsMatch[1]}/d/${encodeURIComponent(id)}/preview`;
+    }
+  }catch(e){}
+  return `https://drive.google.com/file/d/${encodeURIComponent(id)}/preview`;
+}
+
+function driveDownloadHref(link){
+  const id = driveFileId(link);
+  if(!id) return "";
+  try{
+    const url = new URL(safeDocumentHref(link));
+    if(url.hostname.includes("docs.google.com")){
+      const docsMatch = url.pathname.match(/\/(document|spreadsheets|presentation)\/d\/([^/]+)/);
+      if(docsMatch){
+        const format = docsMatch[1] === "spreadsheets" ? "xlsx" : "pdf";
+        return `https://docs.google.com/${docsMatch[1]}/d/${encodeURIComponent(id)}/export?format=${format}`;
+      }
+    }
+  }catch(e){}
+  return `https://drive.google.com/uc?export=download&id=${encodeURIComponent(id)}`;
+}
+
 function isPreviewable(link){
-  return !!safeDocumentHref(link) && /\.(pdf|png|jpg|jpeg)$/i.test(link||"");
+  return !!safeDocumentHref(link) && (!!driveFileId(link) || /\.(pdf|png|jpg|jpeg)$/i.test(link||""));
 }
 
 function fileTypeInfo(link){
   const ext = (link.match(/\.(\w+)$/)||[,""])[1].toLowerCase();
+  if(driveFileId(link)) return {icon:"D", cls:"icon-drive", label:"DRIVE"};
   if(ext==="pdf") return {icon:"📄", cls:"icon-pdf", label:"PDF"};
   if(["doc","docx"].includes(ext)) return {icon:"📝", cls:"icon-docx", label:"WORD"};
   if(["xls","xlsx"].includes(ext)) return {icon:"📊", cls:"icon-xlsx", label:"EXCEL"};
@@ -2073,13 +2140,16 @@ function fileChip(link, title){
   if(!safeLink) return `<span>${safeTitle}</span> <span class="noLinkText">(brak bezpiecznego linku)</span>`;
   const info = fileTypeInfo(safeLink);
   const ext = (safeLink.match(/\.(\w+)$/)||[,""])[1].toLowerCase();
+  const previewLink = drivePreviewHref(safeLink);
   const clickAttr = isPreviewable(safeLink)
-    ? `href="javascript:void(0)" data-href="${crmEsc(safeLink)}" onclick="openPreview(this.dataset.href)"`
+    ? `href="javascript:void(0)" data-href="${crmEsc(previewLink)}" onclick="openPreview(this.dataset.href)"`
     : `href="${crmEsc(safeLink)}" target="_blank" rel="noopener"`;
   const hint = isPreviewable(link) ? "Kliknij, aby podejrzeć" : "Kliknij, aby otworzyć / pobrać";
 
   let thumb;
-  if(["png","jpg","jpeg"].includes(ext)){
+  if(driveFileId(safeLink)){
+    thumb = `<span class="bigIcon ${info.cls}">${info.icon}</span>`;
+  } else if(["png","jpg","jpeg"].includes(ext)){
     thumb = `<img src="${crmEsc(safeLink)}" loading="lazy" alt="">`;
   } else if(ext==="pdf"){
     thumb = `<iframe src="${crmEsc(safeLink)}#page=1&toolbar=0&navpanes=0&scrollbar=0" loading="lazy"></iframe>`;
@@ -2098,7 +2168,7 @@ function fileChip(link, title){
 function openPreview(link){
   const safeLink = safeDocumentHref(link);
   if(!safeLink) return;
-  document.getElementById("previewFrame").src = safeLink;
+  document.getElementById("previewFrame").src = drivePreviewHref(safeLink);
   document.getElementById("previewModal").classList.add("open");
 }
 function closePreview(){
@@ -2408,6 +2478,8 @@ function renderItemCard(item, cat){
   const fileName = docFileName(item);
   const client = docClientName(item);
   const documentDate = item.dataDokumentu || "";
+  const previewLink = safeLink && isPreviewable(safeLink) ? drivePreviewHref(safeLink) : "";
+  const downloadLink = safeLink ? driveDownloadHref(safeLink) : "";
   let linkHtml;
   if(safeLink){
     linkHtml = fileChip(safeLink, title);
@@ -2441,6 +2513,12 @@ function renderItemCard(item, cat){
     ? '<div class="docWarning">Poufne — nie wysyłać klientowi</div>' : "";
   const dateCaption = (cat==="dokumenty" && item.utworzono)
     ? `<div class="dateCaption">Dodano ${formatDT(item.utworzono)}</div>` : "";
+  const docActions = cat==="dokumenty" && safeLink ? `
+    <div class="docActions">
+      ${previewLink ? `<button class="docActionBtn primary" onclick="openPreview('${crmEsc(previewLink)}')">Podgląd</button>` : ""}
+      <a class="docActionBtn" href="${crmEsc(safeLink)}" target="_blank" rel="noopener">Otwórz</a>
+      ${downloadLink ? `<a class="docActionBtn" href="${crmEsc(downloadLink)}" target="_blank" rel="noopener">Pobierz</a>` : ""}
+    </div>` : "";
   div.innerHTML = `
     <div class="topRow">
       <div class="titleRow">
@@ -2454,6 +2532,7 @@ function renderItemCard(item, cat){
     ${note ? `<div class="desc">${crmEsc(note)}</div>` : ""}
     ${docMetaHtml}
     ${warningHtml}
+    ${docActions}
     ${dateCaption}
     <textarea placeholder="Notatki..." data-cat="${cat}" data-id="${item.id}" onblur="updateNotes(this)">${crmEsc(item.notes||"")}</textarea>
   `;
