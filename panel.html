@@ -545,6 +545,14 @@
   .crmViewBtn{border:0;background:transparent;color:#506156;border-radius:8px;padding:8px 12px;font-weight:bold;cursor:pointer}
   .crmViewBtn.active{background:var(--surface);color:var(--green);box-shadow:0 6px 16px #1d3b2412}
   .crmHint{font-size:12px;color:var(--muted)}
+  .clientsDirectory{display:none;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px}
+  .clientDirectoryCard{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px;
+                       box-shadow:0 6px 14px #1d3b240a;display:grid;gap:9px}
+  .clientDirectoryCard:hover{border-color:#bfd9c4;box-shadow:0 10px 20px #1d3b2412}
+  .clientDirectoryTop{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+  .clientDirectoryName{font-weight:bold;color:#263b2b;font-size:15px;line-height:1.25}
+  .clientDirectoryMeta{font-size:12px;color:var(--text-muted);line-height:1.4}
+  .clientDirectoryActions{display:flex;gap:8px;flex-wrap:wrap}
   .clientsKanban{display:none;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;align-items:start}
   .kanbanColumn{background:var(--surface-soft);border:1px solid var(--line);border-radius:12px;padding:10px;min-height:120px}
   .kanbanHead{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:10px;font-weight:bold;color:#355b3a}
@@ -712,6 +720,7 @@
   body.dark-theme .commandReason,
   body.dark-theme .offerCard,
   body.dark-theme .offerForm,
+  body.dark-theme .clientDirectoryCard,
   body.dark-theme .clientCardField,
   body.dark-theme .historyEntry,
   body.dark-theme .aiWorkflowCard,
@@ -917,6 +926,7 @@
   }
   body.dark-theme .notifyClient,
   body.dark-theme .commandClientName,
+  body.dark-theme .clientDirectoryName,
   body.dark-theme .kanbanName,
   body.dark-theme .budgetItem strong,
   body.dark-theme .salesDoc h3,
@@ -1305,7 +1315,8 @@
       </div>
       <div class="crmViewBar">
         <div class="crmViewToggle" aria-label="Widok klientow">
-          <button class="crmViewBtn active" id="clientsViewTableBtn" onclick="setClientsView('table')">Tabela</button>
+          <button class="crmViewBtn active" id="clientsViewDirectoryBtn" onclick="setClientsView('directory')">Klienci</button>
+          <button class="crmViewBtn" id="clientsViewTableBtn" onclick="setClientsView('table')">Tabela</button>
           <button class="crmViewBtn" id="clientsViewKanbanBtn" onclick="setClientsView('kanban')">Kanban</button>
           <button class="crmViewBtn" id="clientsViewFollowBtn" onclick="setClientsView('followups')">Do kontaktu</button>
           <button class="crmViewBtn" id="clientsViewAdvisorBtn" onclick="setClientsView('advisor')">Advisor</button>
@@ -1328,6 +1339,7 @@
           <option value="miejscowosc">Sortuj: miejscowość</option>
         </select>
       </div>
+      <div id="clientsDirectory" class="clientsDirectory"></div>
       <div class="tableWrap">
         <table class="clients">
           <colgroup>
@@ -1735,14 +1747,15 @@ function syncNavigationFromTab(name){
   };
   if(name === "klienci"){
     const clientMap = {
+      directory:"clients-directory",
       table:"sales-table",
       kanban:"sales-kanban",
       followups:"sales-followups",
       advisor:"sales-advisor",
       advisorolx:"sales-advisorolx"
     };
-    currentMainCategory = currentSubView === "today-followups" ? "start" : "sales";
-    currentSubView = clientMap[currentClientsView] || "sales-table";
+    currentMainCategory = currentClientsView === "directory" || currentSubView.startsWith("clients-") ? "clients" : (currentSubView === "today-followups" ? "start" : "sales");
+    currentSubView = clientMap[currentClientsView] || "clients-directory";
     renderNavigation();
     return;
   }
@@ -2730,7 +2743,7 @@ function populateFilterOptions(){
   if(fp && fp.options.length===1) PRIO_OPTS.forEach(([v,l])=>fp.add(new Option(l,v)));
 }
 
-let currentClientsView = "table";
+let currentClientsView = "directory";
 let currentClientCardId = null;
 let currentOfferEdit = null;
 let currentMainCategory = "start";
@@ -2744,6 +2757,15 @@ const PANEL_NAV = {
       {key:"today-command", label:"Centrum dnia", tab:"dashboard", focusId:"dailyCommandCenter"},
       {key:"today-notifications", label:"Powiadomienia", tab:"dashboard", focusId:"dashNotifications"},
       {key:"today-followups", label:"Najbliższe follow-upy", tab:"klienci", clientsView:"followups", priority:true}
+    ]
+  },
+  clients: {
+    label: "KLIENCI",
+    views: [
+      {key:"clients-directory", label:"Lista klientów", tab:"klienci", clientsView:"directory", priority:true},
+      {key:"clients-followups", label:"Do kontaktu", tab:"klienci", clientsView:"followups"},
+      {key:"clients-advisor", label:"Advisor", tab:"klienci", clientsView:"advisor"},
+      {key:"clients-advisorolx", label:"Advisor OLX", tab:"klienci", clientsView:"advisorolx"}
     ]
   },
   sales: {
@@ -3386,6 +3408,7 @@ function updateClientsViewHint(){
   const hint = document.getElementById("crmViewHint");
   if(!hint) return;
   const hints = {
+    directory:"Lista klientów do szybkiego otwierania kart klienta i pracy po rozmowie.",
     table:"Baza klientów z szybką edycją pól CRM i ostatnim działaniem.",
     kanban:"Kolumny statusów pomagają szybko ocenić etap każdego klienta.",
     followups:"Widok pracy na follow-upach oparty na realnym następnym kontakcie.",
@@ -3406,6 +3429,7 @@ function updateClientsViewHint(){
 function setClientsView(view, options={}){
   currentClientsView = view;
   const viewMap = {
+    directory: "clientsViewDirectoryBtn",
     table: "clientsViewTableBtn",
     kanban: "clientsViewKanbanBtn",
     followups: "clientsViewFollowBtn",
@@ -3415,14 +3439,15 @@ function setClientsView(view, options={}){
   document.querySelectorAll(".crmViewBtn").forEach(btn=>btn.classList.toggle("active", btn.id === viewMap[view]));
   if(!options.preserveNavigation){
     const subViewMap = {
+      directory:"clients-directory",
       table:"sales-table",
       kanban:"sales-kanban",
       followups:"sales-followups",
       advisor:"sales-advisor",
       advisorolx:"sales-advisorolx"
     };
-    currentMainCategory = "sales";
-    currentSubView = subViewMap[view] || "sales-table";
+    currentMainCategory = view === "directory" ? "clients" : "sales";
+    currentSubView = subViewMap[view] || "clients-directory";
     renderNavigation();
   }
   updateClientsViewHint();
@@ -3432,11 +3457,51 @@ function setClientsView(view, options={}){
 function setClientsViewContainers(){
   const section = document.getElementById("section-klienci");
   const tableWrap = section?.querySelector(".tableWrap");
+  const directory = document.getElementById("clientsDirectory");
   const kanban = document.getElementById("clientsKanban");
   const followups = document.getElementById("clientsFollowups");
+  if(directory) directory.style.display = currentClientsView === "directory" ? "grid" : "none";
   if(tableWrap) tableWrap.style.display = currentClientsView === "table" ? "" : "none";
   if(kanban) kanban.style.display = currentClientsView === "kanban" ? "grid" : "none";
   if(followups) followups.style.display = ["followups","advisor","advisorolx"].includes(currentClientsView) ? "block" : "none";
+}
+
+function renderClientDirectory(list){
+  const el = document.getElementById("clientsDirectory");
+  if(!el) return;
+  if(list.length===0){
+    el.innerHTML = '<div class="empty">Brak klientów pasujących do filtrów.</div>';
+    return;
+  }
+  el.innerHTML = list.map(c => {
+    const id = crmEsc(c.id);
+    const followup = followupInfo(clientFollowup(c));
+    const product = clientProduct(c);
+    const last = clientActivitySummary(c, 110) || "Brak historii działań";
+    const contact = renderClientContactLinks(c) || crmEsc(clientContact(c) || "brak telefonu i e-maila");
+    return `
+      <div class="clientDirectoryCard">
+        <div class="clientDirectoryTop">
+          <div>
+            <div class="clientDirectoryName">${crmEsc(clientName(c))}</div>
+            <div class="clientDirectoryMeta">${crmEsc(clientLocation(c) || "brak lokalizacji")}</div>
+          </div>
+          <span class="kanbanPill gold">${crmEsc(followup.label)}</span>
+        </div>
+        <div class="commandBadges">
+          <span class="kanbanPill">${crmEsc(labelFrom(STATUS_OPTS, c.status))}</span>
+          <span class="kanbanPill">${crmEsc(labelFrom(PRIO_OPTS, c.priorytet))}</span>
+          ${product ? `<span class="kanbanPill">${crmEsc(product)}</span>` : ""}
+        </div>
+        <div class="clientMobileContact">${contact}</div>
+        <div class="kanbanNote"><b>Ostatnie działanie:</b> ${crmEsc(last)}</div>
+        <div class="clientDirectoryActions">
+          <button class="histBtn" onclick="openClientCard('${id}')">Otwórz klienta</button>
+          <button class="histBtn" onclick="openHistoryModal('${id}')">Historia</button>
+        </div>
+      </div>
+    `;
+  }).join("");
 }
 
 function renderClientsKanban(list){
@@ -3768,6 +3833,11 @@ function renderClients(){
 
   setClientsViewContainers();
   updateClientsViewHint();
+  if(currentClientsView==="directory"){
+    renderClientDirectory(list);
+    renderClientsMobileCards([]);
+    return;
+  }
   if(currentClientsView==="kanban"){
     renderClientsKanban(list);
     renderClientsMobileCards([]);
