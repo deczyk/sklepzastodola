@@ -6,6 +6,7 @@ const PANEL_BASIC_PASSWORD = process.env.PANEL_BASIC_PASSWORD;
 const GOOGLE_SERVICE_ACCOUNT_EMAIL = process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL;
 const GOOGLE_PRIVATE_KEY = process.env.GOOGLE_PRIVATE_KEY;
 const GOOGLE_DRIVE_FOLDER_ID = process.env.GOOGLE_DRIVE_FOLDER_ID || "1FMmp6qdMuMl13vkdfhpddeHH46kTgDy0";
+const DRIVE_FOLDER_MIME_TYPE = "application/vnd.google-apps.folder";
 
 let tokenCache = { token: "", expiresAt: 0 };
 
@@ -139,26 +140,63 @@ function normalizeDriveFile(file) {
     size: file.size || "",
     createdTime: file.createdTime || "",
     modifiedTime: file.modifiedTime || "",
+    folderPath: file.folderPath || "",
     webViewLink: file.webViewLink || (id ? `https://drive.google.com/file/d/${id}/view` : ""),
     webContentLink: file.webContentLink || (id ? `https://drive.google.com/uc?export=download&id=${id}` : "")
   };
 }
 
+async function listDriveFolder(token, folderId) {
+  const files = [];
+  let pageToken = "";
+  do {
+    const params = new URLSearchParams({
+      q: `'${folderId}' in parents and trashed = false`,
+      fields: "nextPageToken,files(id,name,mimeType,size,createdTime,modifiedTime,webViewLink,webContentLink)",
+      orderBy: "folder,name_natural",
+      pageSize: "1000",
+      supportsAllDrives: "true",
+      includeItemsFromAllDrives: "true"
+    });
+    if (pageToken) params.set("pageToken", pageToken);
+    const res = await fetch(`https://www.googleapis.com/drive/v3/files?${params.toString()}`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    const json = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(json.error && json.error.message ? json.error.message : "Google Drive list failed.");
+    files.push(...(json.files || []));
+    pageToken = json.nextPageToken || "";
+  } while (pageToken);
+  return files;
+}
+
 async function listDriveFiles(token) {
-  const params = new URLSearchParams({
-    q: `'${GOOGLE_DRIVE_FOLDER_ID}' in parents and trashed = false`,
-    fields: "files(id,name,mimeType,size,createdTime,modifiedTime,webViewLink,webContentLink)",
-    orderBy: "modifiedTime desc",
-    pageSize: "100",
-    supportsAllDrives: "true",
-    includeItemsFromAllDrives: "true"
+  const result = [];
+  const queue = [{ id: GOOGLE_DRIVE_FOLDER_ID, path: "" }];
+  let scanned = 0;
+
+  while (queue.length) {
+    const folder = queue.shift();
+    scanned += 1;
+    if (scanned > 250) throw new Error("Drive folder tree is too large for one panel sync.");
+    const files = await listDriveFolder(token, folder.id);
+    files.forEach(file => {
+      const folderPath = folder.path;
+      if (file.mimeType === DRIVE_FOLDER_MIME_TYPE) {
+        queue.push({
+          id: file.id,
+          path: folderPath ? `${folderPath} / ${file.name}` : file.name
+        });
+        return;
+      }
+      result.push(normalizeDriveFile({ ...file, folderPath }));
+    });
+  }
+
+  return result.sort((a, b) => {
+    const timeDiff = Date.parse(b.modifiedTime || "") - Date.parse(a.modifiedTime || "");
+    return timeDiff || String(a.name || "").localeCompare(String(b.name || ""), "pl");
   });
-  const res = await fetch(`https://www.googleapis.com/drive/v3/files?${params.toString()}`, {
-    headers: { Authorization: `Bearer ${token}` }
-  });
-  const json = await res.json().catch(() => ({}));
-  if (!res.ok) throw new Error(json.error && json.error.message ? json.error.message : "Google Drive list failed.");
-  return (json.files || []).map(normalizeDriveFile);
 }
 
 async function uploadDriveFile(token, payload) {

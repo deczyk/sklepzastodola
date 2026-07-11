@@ -1318,7 +1318,7 @@
           <input type="text" id="link-dokumenty" placeholder="Link Google Drive / http / https">
           <input type="text" id="nazwaPliku-dokumenty" placeholder="Nazwa pliku (bez uploadu)">
         </div>
-        <div class="formHint">Najpierw dodaj plik do folderu Drive, potem wklej tutaj link do pliku. Panel pokaże podgląd i pobieranie, jeśli Google Drive pozwala na dostęp.</div>
+        <div class="formHint">Pliki wrzucone do firmowego folderu Google Drive pojawią się tutaj automatycznie. Panel pokaże podgląd i pobieranie, jeśli Google Drive pozwala na dostęp.</div>
         <div class="row">
           <input type="file" id="plik-dokumenty">
         </div>
@@ -2996,16 +2996,53 @@ function driveDocumentLink(file){
   return file.webViewLink || (file.id ? `https://drive.google.com/file/d/${file.id}/view` : "");
 }
 
-function driveDocumentDuplicate(file, existingDocs){
+function findDriveDocumentMatch(file, existingDocs){
   const id = (file.id || "").toString();
   const link = driveDocumentLink(file);
   const name = (file.name || "").toString().trim().toLowerCase();
-  return (existingDocs || []).some(doc => {
+  return (existingDocs || []).find(doc => {
     const docDriveId = (doc.googleDriveId || "").toString();
     const docLinkValue = (doc.link || "").toString();
     const docNameValue = (doc.nazwaPliku || doc.title || "").toString().trim().toLowerCase();
     return (id && docDriveId === id) || (link && docLinkValue === link) || (name && docNameValue === name);
   });
+}
+
+function driveDocumentDuplicate(file, existingDocs){
+  return Boolean(findDriveDocumentMatch(file, existingDocs));
+}
+
+function mergeDriveDocument(doc, file){
+  let changed = false;
+  const link = driveDocumentLink(file);
+  const updates = {
+    googleDriveId: file.id || doc.googleDriveId || "",
+    link: link || doc.link || "",
+    nazwaPliku: file.name || doc.nazwaPliku || doc.title || "",
+    mimeType: file.mimeType || doc.mimeType || "",
+    driveModifiedTime: file.modifiedTime || doc.driveModifiedTime || "",
+    driveFolderPath: file.folderPath || doc.driveFolderPath || ""
+  };
+  Object.entries(updates).forEach(([key, value]) => {
+    if(value && doc[key] !== value){
+      doc[key] = value;
+      changed = true;
+    }
+  });
+  if(!doc.dataDokumentu && file.createdTime){
+    doc.dataDokumentu = file.createdTime.slice(0,10);
+    changed = true;
+  }
+  if(!doc.statusDokumentu || ["todo","progress","done"].includes(doc.statusDokumentu)){
+    doc.statusDokumentu = "Aktualny";
+    changed = true;
+  }
+  if(!doc.desc && file.folderPath){
+    doc.desc = `Drive: ${file.folderPath}`;
+    changed = true;
+  }
+  if(changed) doc.zaktualizowano = new Date().toISOString();
+  return changed;
 }
 
 function documentFromDriveFile(file, fallback){
@@ -3028,6 +3065,7 @@ function documentFromDriveFile(file, fallback){
     googleDriveId: file.id || "",
     mimeType: file.mimeType || "",
     driveModifiedTime: file.modifiedTime || "",
+    driveFolderPath: file.folderPath || "",
     utworzono: nowTs,
     zaktualizowano: nowTs
   };
@@ -3084,42 +3122,72 @@ async function uploadDocumentToDrive(){
   }
 }
 
+let driveAutoSyncTimer = null;
+let driveAutoSyncRunning = false;
+let driveLastAutoSyncAt = 0;
+
 function scheduleDriveAutoSync(){
-  if(sessionStorage.getItem("panel_drive_auto_sync_done")==="1") return;
-  sessionStorage.setItem("panel_drive_auto_sync_done","1");
-  setTimeout(()=>syncDocumentsFromDrive({silent:true}), 900);
+  if(sessionStorage.getItem("panel_drive_auto_sync_done")!=="1"){
+    sessionStorage.setItem("panel_drive_auto_sync_done","1");
+    setTimeout(()=>syncDocumentsFromDrive({silent:true, auto:true}), 900);
+  }
+  if(!driveAutoSyncTimer){
+    driveAutoSyncTimer = setInterval(()=>syncDocumentsFromDrive({silent:true, auto:true}), 5 * 60 * 1000);
+  }
 }
 
 async function syncDocumentsFromDrive(options={}){
   if(!options.silent) setDriveStatus("driveSyncStatus", "Pobieram listę plików z Drive...", "");
+  if(driveAutoSyncRunning) return;
+  driveAutoSyncRunning = true;
   try{
     const json = await driveApi("/api/drive-documents");
     const files = Array.isArray(json.files) ? json.files : [];
     if(!data.dokumenty) data.dokumenty = [];
     let added = 0;
+    let updated = 0;
     let skipped = 0;
     files.forEach(file => {
-      if(driveDocumentDuplicate(file, data.dokumenty)){
-        skipped++;
+      const existing = findDriveDocumentMatch(file, data.dokumenty);
+      if(existing){
+        if(mergeDriveDocument(existing, file)){
+          updated++;
+        } else {
+          skipped++;
+        }
       } else {
+        const folderNote = file.folderPath ? `Drive: ${file.folderPath}` : "";
         data.dokumenty.push(documentFromDriveFile(file, {
           kategoria: inferDocumentCategory(file),
           typ: inferDocumentType(file),
-          statusDokumentu:"Aktualny"
+          statusDokumentu:"Aktualny",
+          desc: folderNote
         }));
         added++;
       }
     });
-    if(added){
-      logActivity(`zsynchronizował(a) dokumenty z Google Drive: dodano ${added}`);
+    if(added || updated){
+      const parts = [];
+      if(added) parts.push(`dodano ${added}`);
+      if(updated) parts.push(`zaktualizowano ${updated}`);
+      logActivity(`zsynchronizował(a) dokumenty z Google Drive: ${parts.join(", ")}`);
       saveData();
     }
+    driveLastAutoSyncAt = Date.now();
     render();
-    if(!options.silent) setDriveStatus("driveSyncStatus", `Drive: dodano ${added}, pominięto ${skipped}.`, "ok");
+    if(!options.silent) setDriveStatus("driveSyncStatus", `Drive: dodano ${added}, zaktualizowano ${updated}, pominięto ${skipped}.`, "ok");
   }catch(e){
     if(!options.silent) setDriveStatus("driveSyncStatus", `Błąd Drive: ${e.message || e}`, "error");
+  }finally{
+    driveAutoSyncRunning = false;
   }
 }
+
+window.addEventListener("focus", () => {
+  if(!data || document.getElementById("app")?.style.display === "none") return;
+  if(Date.now() - driveLastAutoSyncAt < 60 * 1000) return;
+  syncDocumentsFromDrive({silent:true, auto:true});
+});
 
 function deleteItem(cat, id){
   const item = data[cat].find(i=>i.id===id);
