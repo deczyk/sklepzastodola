@@ -512,8 +512,7 @@
   .commandActivityRow{display:grid;gap:7px}
   .commandActivityMeta{font-size:12px;color:var(--text-muted);line-height:1.35}
   .dashNotifications{grid-column:span 4}
-  .dashFollowups{grid-column:span 4}
-  .dashActivityCard{grid-column:span 4}
+.dashActivityCard{grid-column:span 4}
   .notifyHead{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:10px}
   .notifyUnread{font-size:12px;font-weight:bold;color:#755c15;background:#fff8df;border:1px solid #ead99a;border-radius:999px;padding:4px 9px}
   .notifyList{display:grid;gap:8px}
@@ -976,7 +975,7 @@
     header{position:static;padding:18px 18px}
     .wrap{padding:18px 14px 44px}
     .dashGrid{grid-template-columns:1fr}
-    .dashCard,.dashToday,.dashAi,.dashFollowups,.dashActivityCard{grid-column:1/-1}
+    .dashCard,.dashToday,.dashAi,.dashActivityCard{grid-column:1/-1}
     .dashKpiRow{grid-template-columns:1fr 1fr}
     .commandSections,.commandCounters{grid-template-columns:1fr 1fr}
     .mainCategoryNav,.subCategoryNav{flex-wrap:nowrap;overflow-x:auto;padding-bottom:10px}
@@ -1070,7 +1069,7 @@
           <div class="commandHeader">
             <div>
               <div class="dashCardTitle">Centrum dnia</div>
-              <p>Najpilniejsze follow-upy, nowe leady, oferty bez odpowiedzi i ostatnie działania w CRM.</p>
+              <p>Najpilniejsze kontakty i zaległe sprawy bez przeładowania głównego widoku.</p>
             </div>
             <div class="commandCounters" id="dailyCommandCounters"></div>
           </div>
@@ -1083,11 +1082,6 @@
             <div class="notifyUnread" id="dashNotificationsUnread">0 nieprzeczytanych</div>
           </div>
           <div id="dashNotifications"></div>
-        </div>
-
-        <div class="dashCard dashFollowups">
-          <div class="dashCardTitle">Najbliższe follow-upy</div>
-          <div id="dashFollowups"></div>
         </div>
 
         <div class="dashCard dashActivityCard">
@@ -1597,9 +1591,54 @@
 
     <div class="tabPane" id="tabpane-podwykonawcy">
       <div class="section">
-        <h2>Podwykonawcy</h2>
-        <div class="privateNotice"><b>Prywatnie:</b> lista podwykonawcow, kontakty i wyceny nie sa juz zapisane w zrodle HTML. Przeniesiemy je do prywatnego magazynu przy przebudowie panelu.</div>
-        <div class="empty">Dane podwykonawcow zostana odtworzone jako widok ladowany po zalogowaniu.</div>
+        <h2>Podwykonawcy <button class="addBtn" onclick="toggleForm('podwykonawcy')">+ Dodaj</button></h2>
+        <div class="privateNotice"><b>Prywatnie:</b> kontakty, wyceny i notatki zapisują się po zalogowaniu w prywatnych danych panelu, nie w publicznej stronie.</div>
+        <div class="newItemForm" id="form-podwykonawcy">
+          <div class="row">
+            <input type="text" id="nazwa-podwykonawcy" placeholder="Nazwa / opis (np. Printario - okleiny)">
+            <select id="kategoria-podwykonawcy">
+              <option>pawilon</option>
+              <option>transport</option>
+              <option>naklejki</option>
+              <option>butelki</option>
+              <option>inne</option>
+            </select>
+            <select id="status-podwykonawcy">
+              <option>do sprawdzenia</option>
+              <option>aktywny</option>
+              <option>rezerwowy</option>
+              <option>odrzucony</option>
+            </select>
+          </div>
+          <div class="row">
+            <input type="text" id="osoba-podwykonawcy" placeholder="Osoba kontaktowa">
+            <input type="text" id="telefon-podwykonawcy" placeholder="Telefon">
+            <input type="email" id="email-podwykonawcy" placeholder="E-mail">
+          </div>
+          <div class="row">
+            <input type="text" id="strona-podwykonawcy" placeholder="Strona / link">
+            <input type="text" id="lokalizacja-podwykonawcy" placeholder="Lokalizacja">
+            <input type="text" id="cennik-podwykonawcy" placeholder="Cennik / oferta - link do Drive">
+          </div>
+          <textarea id="coRobia-podwykonawcy" placeholder="Co robią"></textarea>
+          <textarea id="notatki-podwykonawcy" placeholder="Notatki / wycena / ustalenia"></textarea>
+          <div class="actions">
+            <button class="cancel" onclick="toggleForm('podwykonawcy')">Anuluj</button>
+            <button class="save" onclick="addPodwykonawca()">Zapisz</button>
+          </div>
+        </div>
+        <div class="docToolbar">
+          <input type="text" id="searchPodwykonawcy" class="docSearch" placeholder="Szukaj podwykonawcy..." oninput="renderPodwykonawcy()">
+          <select id="filterPodwykonawcy" onchange="renderPodwykonawcy()">
+            <option value="">Wszystkie kategorie</option>
+            <option>pawilon</option>
+            <option>transport</option>
+            <option>naklejki</option>
+            <option>butelki</option>
+            <option>inne</option>
+          </select>
+        </div>
+        <div id="list-podwykonawcy"></div>
       </div>
     </div>
     <div class="tabPane" id="tabpane-marketing">
@@ -1866,6 +1905,7 @@ function defaultData(){
     finanse: [],
     budzetStartowy: [],
     linki: [],
+    podwykonawcy: [],
     powiadomienia: [],
     zadania: [],
     checklisty: []
@@ -2053,6 +2093,7 @@ function fillMissingDefaults(d){
   if(!d.finanse){ d.finanse = []; changed = true; }
   if(!d.budzetStartowy){ d.budzetStartowy = []; changed = true; }
   if(!d.linki || d.linki.length===0){ d.linki = dflt.linki; changed = true; }
+  if(!d.podwykonawcy){ d.podwykonawcy = []; changed = true; }
   if(!d.powiadomienia){ d.powiadomienia = []; changed = true; }
   if(!d.checklisty){ d.checklisty = []; changed = true; }
   if(!d.zadania || d.zadania.length===0){
@@ -2871,6 +2912,7 @@ function render(){
   renderFinanse();
   renderBudzetStartowy();
   renderLinki();
+  renderPodwykonawcy();
   renderZadania();
   renderChecklisty();
   renderAIWorkflow();
@@ -3625,35 +3667,10 @@ function renderDailyCommandCenter(){
   const clients = Array.isArray(data.klienci) ? data.klienci : [];
   const followupTodayClients = clients.filter(isTodayFollowup);
   const overdueClients = clients.filter(isOverdueFollowup);
-  const newLeadClients = clients.filter(isNewLead);
-  const advisorClients = clients.filter(isAdvisorClient);
-  const advisorOlxClients = clients.filter(isAdvisorOlxClient);
-  const offersWaitingClients = clients.filter(c => getClientOffersWaiting(c).length > 0);
-  const tataActivity = [];
-  const jakubActivity = [];
-
-  clients.forEach(c => {
-    (Array.isArray(c.historia) ? c.historia : []).forEach(entry => {
-      if(!entry || !entry.tekst) return;
-      const parsed = parseHistoryText(entry.tekst || "");
-      const summary = parsed.type ? `[${parsed.type}] ${parsed.text}` : (entry.tekst || "");
-      const item = {clientId:c.id, clientName:getClientDisplayName(c), entry, summary};
-      const who = normalizeClientActor(entry.kto);
-      if(who === "tata") tataActivity.push(item);
-      if(who === "jakub") jakubActivity.push(item);
-    });
-  });
-
-  tataActivity.sort((a,b)=>new Date(b.entry.data || 0) - new Date(a.entry.data || 0));
-  jakubActivity.sort((a,b)=>new Date(b.entry.data || 0) - new Date(a.entry.data || 0));
 
   counters.innerHTML = [
     ["Follow-upy dziś", followupTodayClients.length],
-    ["Zaległe", overdueClients.length],
-    ["Nowe leady", newLeadClients.length],
-    ["Advisor", advisorClients.length],
-    ["Advisor OLX", advisorOlxClients.length],
-    ["Oferty bez odpowiedzi", offersWaitingClients.length]
+    ["Zaległe", overdueClients.length]
   ].map(([label, num]) => `
     <div class="commandCounter">
       <div class="commandCounterNum">${num}</div>
@@ -3663,16 +3680,10 @@ function renderDailyCommandCenter(){
 
   const sections = [
     renderCommandSection("Do kontaktu dziś", followupTodayClients.map(c => renderCommandClientCard(c, "Następny follow-up wypada dzisiaj.")), "Na dziś brak klientów z ustawionym follow-upem.", true),
-    renderCommandSection("Zaległe follow-upy", overdueClients.map(c => renderCommandClientCard(c, "Termin follow-upu już minął i wymaga reakcji.")), "Brak zaległych follow-upów.", true),
-    renderCommandSection("Nowe leady", newLeadClients.map(c => renderCommandClientCard(c, hasClientHistory(c) ? "Lead jest świeży i wymaga pierwszego poprowadzenia." : "Lead nie ma jeszcze historii kontaktu.")), "Brak nowych leadów do ogarnięcia.", false),
-    renderCommandSection("Leady z Advisor", advisorClients.map(c => renderCommandClientCard(c, "Źródło lub historia wskazują na formularz Advisor.")), "Brak leadów oznaczonych jako Advisor.", false),
-    renderCommandSection("Leady z Advisor OLX", advisorOlxClients.map(c => renderCommandClientCard(c, "Źródło lub historia wskazują na formularz Advisor OLX.")), "Brak leadów oznaczonych jako Advisor OLX.", false),
-    renderCommandSection("Oferty bez odpowiedzi", offersWaitingClients.map(c => renderCommandClientCard(c, `Aktywne oferty oczekujące na decyzję: ${getClientOffersWaiting(c).length}.`)), "Brak ofert czekających na odpowiedź.", false),
-    renderCommandSection("Ostatnie działania taty", tataActivity.slice(0,6).map(renderCommandActivityCard), "Brak ostatnich działań oznaczonych jako Tata.", false),
-    renderCommandSection("Ostatnie działania Jakuba", jakubActivity.slice(0,6).map(renderCommandActivityCard), "Brak ostatnich działań oznaczonych jako Jakub.", false)
+    renderCommandSection("Zaległe follow-upy", overdueClients.map(c => renderCommandClientCard(c, "Termin follow-upu już minął i wymaga reakcji.")), "Brak zaległych follow-upów.", true)
   ];
 
-  const isEmpty = !followupTodayClients.length && !overdueClients.length && !newLeadClients.length && !advisorClients.length && !advisorOlxClients.length && !offersWaitingClients.length && !tataActivity.length && !jakubActivity.length;
+  const isEmpty = !followupTodayClients.length && !overdueClients.length;
   host.innerHTML = isEmpty ? '<div class="commandEmpty">Na teraz brak pilnych działań.</div>' : `<div class="commandSections">${sections.join("")}</div>`;
 }
 
@@ -4997,6 +5008,113 @@ function deleteLink(id){
   saveData(); renderLinki();
 }
 
+// ================= Podwykonawcy =================
+function vendorText(item){
+  return [
+    item.nazwa,
+    item.kategoria,
+    item.osoba,
+    item.telefon,
+    item.email,
+    item.strona,
+    item.lokalizacja,
+    item.coRobia,
+    item.status,
+    item.notatki,
+    item.cennik
+  ].join(" ").toLowerCase();
+}
+
+function vendorHref(value){
+  const raw = (value || "").trim();
+  if(!raw) return "";
+  const candidate = /^https?:\/\//i.test(raw) ? raw : `https://${raw}`;
+  return safeDocumentHref(candidate);
+}
+
+function renderPodwykonawcy(){
+  const list = document.getElementById("list-podwykonawcy");
+  if(!list || !data) return;
+  const q = (document.getElementById("searchPodwykonawcy")?.value || "").trim().toLowerCase();
+  const category = document.getElementById("filterPodwykonawcy")?.value || "";
+  const items = (data.podwykonawcy || [])
+    .filter(item => (!category || item.kategoria === category) && (!q || vendorText(item).includes(q)))
+    .sort((a,b) => String(a.kategoria || "").localeCompare(String(b.kategoria || ""), "pl") || String(a.nazwa || "").localeCompare(String(b.nazwa || ""), "pl"));
+
+  if(!items.length){
+    list.innerHTML = '<div class="empty">Brak podwykonawców w tej kategorii. Dodaj pierwszy kontakt po zalogowaniu.</div>';
+    return;
+  }
+
+  list.innerHTML = items.map(item => {
+    const phoneHref = item.telefon ? `tel:${String(item.telefon).replace(/\s+/g, "")}` : "";
+    const mailHref = item.email ? `mailto:${item.email}` : "";
+    const siteHref = vendorHref(item.strona || "");
+    const offerHref = vendorHref(item.cennik || "");
+    return `
+      <div class="clientCard vendorCard">
+        <div class="clientCardTop">
+          <div>
+            <h3>${crmEsc(item.nazwa || "Podwykonawca")}</h3>
+            <div class="clientContactLine">${crmEsc(item.osoba || "brak osoby kontaktowej")}${item.lokalizacja ? " · " + crmEsc(item.lokalizacja) : ""}</div>
+          </div>
+          <div class="clientBadges">
+            <span class="clientBadge">${crmEsc(item.kategoria || "inne")}</span>
+            <span class="clientBadge">${crmEsc(item.status || "do sprawdzenia")}</span>
+          </div>
+        </div>
+        ${item.coRobia ? `<div class="clientReason">${crmEsc(item.coRobia)}</div>` : ""}
+        ${item.notatki ? `<div class="desc">${crmEsc(item.notatki)}</div>` : ""}
+        <div class="clientQuickActions">
+          ${phoneHref ? `<a class="quickActionBtn" href="${crmEsc(phoneHref)}">Zadzwoń</a>` : ""}
+          ${mailHref ? `<a class="quickActionBtn" href="${crmEsc(mailHref)}">E-mail</a>` : ""}
+          ${siteHref ? `<a class="quickActionBtn" href="${crmEsc(siteHref)}" target="_blank" rel="noopener">Strona</a>` : ""}
+          ${offerHref ? `<a class="quickActionBtn" href="${crmEsc(offerHref)}" target="_blank" rel="noopener">Oferta</a>` : ""}
+          <button class="delBtn" onclick="deletePodwykonawca('${crmEsc(item.id)}')">Usuń</button>
+        </div>
+      </div>
+    `;
+  }).join("");
+}
+
+function addPodwykonawca(){
+  const nazwa = document.getElementById("nazwa-podwykonawcy").value.trim();
+  if(!nazwa) return;
+  if(!Array.isArray(data.podwykonawcy)) data.podwykonawcy = [];
+  const item = {
+    id: "v_"+Date.now(),
+    nazwa,
+    kategoria: document.getElementById("kategoria-podwykonawcy").value,
+    osoba: document.getElementById("osoba-podwykonawcy").value.trim(),
+    telefon: document.getElementById("telefon-podwykonawcy").value.trim(),
+    email: document.getElementById("email-podwykonawcy").value.trim(),
+    strona: document.getElementById("strona-podwykonawcy").value.trim(),
+    lokalizacja: document.getElementById("lokalizacja-podwykonawcy").value.trim(),
+    coRobia: document.getElementById("coRobia-podwykonawcy").value.trim(),
+    status: document.getElementById("status-podwykonawcy").value,
+    notatki: document.getElementById("notatki-podwykonawcy").value.trim(),
+    cennik: document.getElementById("cennik-podwykonawcy").value.trim(),
+    utworzono: new Date().toISOString()
+  };
+  data.podwykonawcy.push(item);
+  logActivity(`dodał(a) podwykonawcę „${nazwa}”`);
+  saveData();
+  ["nazwa","osoba","telefon","email","strona","lokalizacja","coRobia","notatki","cennik"].forEach(id => {
+    const el = document.getElementById(`${id}-podwykonawcy`);
+    if(el) el.value = "";
+  });
+  document.getElementById("kategoria-podwykonawcy").value = "pawilon";
+  document.getElementById("status-podwykonawcy").value = "do sprawdzenia";
+  toggleForm("podwykonawcy");
+  renderPodwykonawcy();
+}
+
+function deletePodwykonawca(id){
+  data.podwykonawcy = (data.podwykonawcy || []).filter(item => item.id !== id);
+  saveData();
+  renderPodwykonawcy();
+}
+
 // ================= Checklisty i procedury =================
 const CHECKLIST_TEMPLATES = [
   {
@@ -5439,6 +5557,7 @@ function renderBackupPreviewStats(parsed, fileName){
     ["Finanse", backupPreviewCount(parsed, "finanse")],
     ["Budżet startowy", backupPreviewCount(parsed, "budzetStartowy")],
     ["Linki", backupPreviewCount(parsed, "linki")],
+    ["Podwykonawcy", backupPreviewCount(parsed, "podwykonawcy")],
     ["Zadania", backupPreviewCount(parsed, "zadania")],
     ["Checklisty", backupPreviewCount(parsed, "checklisty")]
   ];
@@ -6410,19 +6529,14 @@ function renderDashboard(){
   const sprawyOpen = (data.sprawy||[]).filter(s=>s.status!=="done").length;
   const followupToday = klienci.filter(isTodayFollowup).length;
   const overdue = klienci.filter(isOverdueFollowup).length;
-  const newLeads = klienci.filter(isNewLead).length;
-  const advisorCount = klienci.filter(isAdvisorClient).length;
-  const advisorOlxCount = klienci.filter(isAdvisorOlxClient).length;
-  const waitingOffers = klienci.filter(c => getClientOffersWaiting(c).length > 0).length;
   const dashKpiEl = document.getElementById("dashKpi");
   if(dashKpiEl){
     dashKpiEl.innerHTML = `
-      <div class="dashKpiCard"><div class="num">${newLeads}</div><div class="lbl">Nowe leady</div><div class="hint">Świeże zgłoszenia do poprowadzenia</div></div>
       <div class="dashKpiCard"><div class="num">${followupToday}</div><div class="lbl">Follow-upy dziś</div><div class="hint">Klienci do kontaktu dzisiaj</div></div>
       <div class="dashKpiCard"><div class="num">${overdue}</div><div class="lbl">Zaległe</div><div class="hint">Kontakty po terminie</div></div>
-      <div class="dashKpiCard"><div class="num">${advisorCount}</div><div class="lbl">Advisor</div><div class="hint">Leady z formularza doradczego</div></div>
-      <div class="dashKpiCard"><div class="num">${advisorOlxCount}</div><div class="lbl">Advisor OLX</div><div class="hint">Leady z formularza OLX</div></div>
-      <div class="dashKpiCard"><div class="num">${waitingOffers}</div><div class="lbl">Oferty bez odpowiedzi</div><div class="hint">Czekają na decyzję klienta</div></div>
+      <div class="dashKpiCard"><div class="num">${zadaniaOtwarte.length}</div><div class="lbl">Otwarte zadania</div><div class="hint">Rzeczy do domknięcia</div></div>
+      <div class="dashKpiCard"><div class="num">${terminyPilne}</div><div class="lbl">Pilne terminy</div><div class="hint">Najbliższe 14 dni</div></div>
+      <div class="dashKpiCard"><div class="num">${sprawyOpen}</div><div class="lbl">Sprawy w toku</div><div class="hint">Ogólne operacje firmy</div></div>
     `;
   }
   const dashSync = document.getElementById("dashSyncPill");
@@ -6442,20 +6556,6 @@ function renderDashboard(){
     dashTodayEl.innerHTML = todayItems.length ? todayItems.map(i=>
       `<div class="dashListRow"><span>${i.label}</span><span style="color:var(--muted);font-weight:bold">${i.meta}</span></div>`
     ).join("") : '<div class="dashEmpty">Na dziś nie ma pilnych rzeczy w panelu.</div>';
-  }
-  const dashFollowupsEl = document.getElementById("dashFollowups");
-  if(dashFollowupsEl){
-    const followupRows = klienci
-      .filter(c => clientFollowup(c))
-      .map(c => ({client:c, date:dateOnlyLocal(clientFollowup(c))}))
-      .filter(x => x.date)
-      .sort((a,b) => a.date - b.date)
-      .slice(0,5);
-    dashFollowupsEl.innerHTML = followupRows.length ? followupRows.map(({client,date}) => {
-      const info = followupInfo(clientFollowup(client));
-      const tone = info.days !== null && info.days < 0 ? "var(--todo)" : (info.days === 0 ? "var(--progress)" : "var(--muted)");
-      return `<div class="dashListRow"><span><strong>${crmEsc(clientName(client))}</strong><br><span style="color:var(--text-muted)">${crmEsc(clientContact(client) || clientLocation(client) || "brak kontaktu")}</span></span><span style="color:${tone};font-weight:bold">${crmEsc(info.label)}</span></div>`;
-    }).join("") : '<div class="dashEmpty">Brak ustawionych follow-upów.</div>';
   }
   renderDailyCommandCenter();
   const funnelStages = [
