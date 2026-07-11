@@ -1593,6 +1593,7 @@
       <div class="section">
         <h2>Podwykonawcy <button class="addBtn" onclick="toggleForm('podwykonawcy')">+ Dodaj</button></h2>
         <div class="privateNotice"><b>Prywatnie:</b> kontakty, wyceny i notatki zapisują się po zalogowaniu w prywatnych danych panelu, nie w publicznej stronie.</div>
+        <input type="hidden" id="editId-podwykonawcy">
         <div class="newItemForm" id="form-podwykonawcy">
           <div class="row">
             <input type="text" id="nazwa-podwykonawcy" placeholder="Nazwa / opis (np. Printario - okleiny)">
@@ -1623,8 +1624,8 @@
           <textarea id="coRobia-podwykonawcy" placeholder="Co robią"></textarea>
           <textarea id="notatki-podwykonawcy" placeholder="Notatki / wycena / ustalenia"></textarea>
           <div class="actions">
-            <button class="cancel" onclick="toggleForm('podwykonawcy')">Anuluj</button>
-            <button class="save" onclick="addPodwykonawca()">Zapisz</button>
+            <button class="cancel" onclick="cancelPodwykonawcaEdit()">Anuluj</button>
+            <button class="save" onclick="savePodwykonawca()">Zapisz</button>
           </div>
         </div>
         <div class="docToolbar">
@@ -1822,9 +1823,8 @@ function setMainCategory(categoryKey){
   if(!PANEL_NAV[categoryKey]) return;
   currentMainCategory = categoryKey;
   const section = PANEL_NAV[categoryKey];
-  const belongs = section.views.some(view => view.key === currentSubView);
   renderNavigation();
-  if(!belongs && section.views[0]) setSubView(section.views[0].key);
+  if(section.views[0]) setSubView(section.views[0].key);
 }
 
 function syncNavigationFromTab(name){
@@ -1842,7 +1842,7 @@ function syncNavigationFromTab(name){
     budzet:"fin-budget",
     finanse:"fin-finance",
     linki:"marketing-links",
-    podwykonawcy:"marketing-vendors",
+    podwykonawcy:"company-vendors",
     marketing:"marketing-home",
     materialy:"docs-materials",
     ustawienia:"ai-settings"
@@ -3391,7 +3391,8 @@ const PANEL_NAV = {
       {key:"docs-price", label:"Cenniki", tab:"cenniki"},
       {key:"fin-budget", label:"Budżet", tab:"budzet"},
       {key:"fin-finance", label:"Finanse", tab:"finanse"},
-      {key:"docs-formal", label:"Umowy / formalne", tab:"dokumenty", documentSearch:"formalne"}
+      {key:"docs-formal", label:"Umowy / formalne", tab:"dokumenty", documentSearch:"formalne"},
+      {key:"company-vendors", label:"Podwykonawcy", tab:"podwykonawcy"}
     ]
   },
   operations: {
@@ -3404,8 +3405,7 @@ const PANEL_NAV = {
       {key:"ops-activity", label:"Sprawy w toku", tab:"sprawy"},
       {key:"docs-materials", label:"Materiały", tab:"materialy"},
       {key:"marketing-home", label:"Marketing", tab:"marketing"},
-      {key:"marketing-links", label:"Szybkie linki", tab:"linki"},
-      {key:"marketing-vendors", label:"Podwykonawcy", tab:"podwykonawcy"}
+      {key:"marketing-links", label:"Szybkie linki", tab:"linki"}
     ]
   },
   ai: {
@@ -5070,6 +5070,7 @@ function renderPodwykonawcy(){
           ${mailHref ? `<a class="quickActionBtn" href="${crmEsc(mailHref)}">E-mail</a>` : ""}
           ${siteHref ? `<a class="quickActionBtn" href="${crmEsc(siteHref)}" target="_blank" rel="noopener">Strona</a>` : ""}
           ${offerHref ? `<a class="quickActionBtn" href="${crmEsc(offerHref)}" target="_blank" rel="noopener">Oferta</a>` : ""}
+          <button class="histBtn" onclick="editPodwykonawca('${crmEsc(item.id)}')">Edytuj</button>
           <button class="delBtn" onclick="deletePodwykonawca('${crmEsc(item.id)}')">Usuń</button>
         </div>
       </div>
@@ -5077,12 +5078,10 @@ function renderPodwykonawcy(){
   }).join("");
 }
 
-function addPodwykonawca(){
+function readPodwykonawcaForm(){
   const nazwa = document.getElementById("nazwa-podwykonawcy").value.trim();
-  if(!nazwa) return;
-  if(!Array.isArray(data.podwykonawcy)) data.podwykonawcy = [];
-  const item = {
-    id: "v_"+Date.now(),
+  if(!nazwa) return null;
+  return {
     nazwa,
     kategoria: document.getElementById("kategoria-podwykonawcy").value,
     osoba: document.getElementById("osoba-podwykonawcy").value.trim(),
@@ -5093,20 +5092,73 @@ function addPodwykonawca(){
     coRobia: document.getElementById("coRobia-podwykonawcy").value.trim(),
     status: document.getElementById("status-podwykonawcy").value,
     notatki: document.getElementById("notatki-podwykonawcy").value.trim(),
-    cennik: document.getElementById("cennik-podwykonawcy").value.trim(),
-    utworzono: new Date().toISOString()
+    cennik: document.getElementById("cennik-podwykonawcy").value.trim()
   };
-  data.podwykonawcy.push(item);
-  logActivity(`dodał(a) podwykonawcę „${nazwa}”`);
-  saveData();
+}
+
+function clearPodwykonawcaForm(){
   ["nazwa","osoba","telefon","email","strona","lokalizacja","coRobia","notatki","cennik"].forEach(id => {
     const el = document.getElementById(`${id}-podwykonawcy`);
     if(el) el.value = "";
   });
   document.getElementById("kategoria-podwykonawcy").value = "pawilon";
   document.getElementById("status-podwykonawcy").value = "do sprawdzenia";
+  document.getElementById("editId-podwykonawcy").value = "";
+}
+
+function savePodwykonawca(){
+  const values = readPodwykonawcaForm();
+  if(!values) return;
+  if(!Array.isArray(data.podwykonawcy)) data.podwykonawcy = [];
+  const editId = document.getElementById("editId-podwykonawcy").value;
+  const now = new Date().toISOString();
+  if(editId){
+    const item = data.podwykonawcy.find(v => v.id === editId);
+    if(item){
+      Object.assign(item, values, {zaktualizowano: now});
+      logActivity(`zaktualizował(a) podwykonawcę „${values.nazwa}”`);
+    }
+  } else {
+    data.podwykonawcy.push({
+      id: "v_"+Date.now(),
+      ...values,
+      utworzono: now,
+      zaktualizowano: now
+    });
+    logActivity(`dodał(a) podwykonawcę „${values.nazwa}”`);
+  }
+  saveData();
+  clearPodwykonawcaForm();
   toggleForm("podwykonawcy");
   renderPodwykonawcy();
+}
+
+function addPodwykonawca(){
+  savePodwykonawca();
+}
+
+function editPodwykonawca(id){
+  const item = (data.podwykonawcy || []).find(v => v.id === id);
+  if(!item) return;
+  document.getElementById("editId-podwykonawcy").value = item.id;
+  document.getElementById("nazwa-podwykonawcy").value = item.nazwa || "";
+  document.getElementById("kategoria-podwykonawcy").value = item.kategoria || "inne";
+  document.getElementById("status-podwykonawcy").value = item.status || "do sprawdzenia";
+  document.getElementById("osoba-podwykonawcy").value = item.osoba || "";
+  document.getElementById("telefon-podwykonawcy").value = item.telefon || "";
+  document.getElementById("email-podwykonawcy").value = item.email || "";
+  document.getElementById("strona-podwykonawcy").value = item.strona || "";
+  document.getElementById("lokalizacja-podwykonawcy").value = item.lokalizacja || "";
+  document.getElementById("cennik-podwykonawcy").value = item.cennik || "";
+  document.getElementById("coRobia-podwykonawcy").value = item.coRobia || "";
+  document.getElementById("notatki-podwykonawcy").value = item.notatki || "";
+  document.getElementById("form-podwykonawcy").classList.add("open");
+  document.getElementById("form-podwykonawcy").scrollIntoView({behavior:"smooth", block:"start"});
+}
+
+function cancelPodwykonawcaEdit(){
+  clearPodwykonawcaForm();
+  document.getElementById("form-podwykonawcy").classList.remove("open");
 }
 
 function deletePodwykonawca(id){
