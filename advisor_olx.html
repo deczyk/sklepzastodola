@@ -713,22 +713,16 @@
     (() => {
       "use strict";
 
-      // Wklej tutaj adres endpointu Formspree, aby formularz wysyłał się bezpośrednio.
-      // Przykład: "https://formspree.io/f/ABC123XY"
-      // Gdy pole pozostaje puste, strona otwiera gotową wiadomość w programie pocztowym.
       const FORM_ENDPOINT = "https://formspree.io/f/xdarjozy";
       window.ADVISOR_OLX_FORM_ENDPOINT = FORM_ENDPOINT;
-      const CONTACT_EMAIL = "kontakt@sklepzastodola.pl";
 
       const $ = (selector) => document.querySelector(selector);
       const form = $("#calculatorForm");
-      const leadForm = $("#leadForm");
       const packageSelect = $("#package");
       const investmentInput = $("#investment");
       const grantEnabled = $("#grantEnabled");
       const grantField = $("#grantField");
       const resultBox = $("#result");
-      const statusMessage = $("#statusMessage");
 
       let lastCalculation = null;
 
@@ -840,77 +834,6 @@
       });
 
       $("#printResult").addEventListener("click", () => window.print());
-
-      function buildMessage() {
-        const c = lastCalculation;
-        const paybackText = Number.isFinite(c.paybackMonths) ? `${c.paybackMonths} miesięcy` : "brak wyniku przy podanych założeniach";
-        return [
-          "Proszę o kontakt w sprawie kalkulacji pakietu sprzedaży bezpośredniej.",
-          "",
-          `Imię i nazwisko: ${$("#name").value.trim()}`,
-          `Telefon: ${$("#phone").value.trim()}`,
-          `E-mail: ${$("#email").value.trim() || "nie podano"}`,
-          `Województwo: ${c.region}`,
-          `Pakiet: ${c.packageName}`,
-          `Sprzedaż: ${c.liters} l/dzień przez ${c.days} dni w roku`,
-          `Cena skupu: ${c.collectionPrice.toFixed(2)} zł/l`,
-          `Cena bezpośrednia: ${c.directPrice.toFixed(2)} zł/l`,
-          `Koszt sprzedaży: ${c.operatingCost.toFixed(2)} zł/l`,
-          `Koszt pakietu: ${numberPLN.format(c.investment)}`,
-          `Dofinansowanie: ${c.grantEnabled ? `${c.grantRate}%` : "nie uwzględniono"}`,
-          `Szacowany potencjał roczny: ${numberPLN.format(c.annualMargin)}`,
-          `Koszt po możliwym dofinansowaniu: ${numberPLN.format(c.netInvestment)}`,
-          `Orientacyjny czas odzyskania inwestycji: ${paybackText}`,
-          `Ocena: ${c.recommendationTitle} (${c.score}%)`,
-          "",
-          `Uwagi: ${$("#notes").value.trim() || "brak"}`
-        ].join("\n");
-      }
-
-      leadForm.addEventListener("submit", async (event) => {
-        event.preventDefault();
-        statusMessage.textContent = "";
-
-        if (!lastCalculation) {
-          statusMessage.textContent = "Najpierw oblicz wynik w kalkulatorze.";
-          document.querySelector("#calculatorForm").scrollIntoView({ behavior: "smooth" });
-          return;
-        }
-
-        if (!leadForm.reportValidity()) return;
-
-        const message = buildMessage();
-        const payload = {
-          name: $("#name").value.trim(),
-          phone: $("#phone").value.trim(),
-          email: $("#email").value.trim(),
-          notes: $("#notes").value.trim(),
-          calculation: lastCalculation,
-          message
-        };
-
-        if (FORM_ENDPOINT) {
-          try {
-            statusMessage.textContent = "Wysyłanie…";
-            const response = await fetch(FORM_ENDPOINT, {
-              method: "POST",
-              headers: { "Content-Type": "application/json", "Accept": "application/json" },
-              body: JSON.stringify(payload)
-            });
-            if (!response.ok) throw new Error("Błąd wysyłki");
-            statusMessage.textContent = "Dziękujemy. Wynik został wysłany — skontaktujemy się z Tobą.";
-            leadForm.reset();
-          } catch (error) {
-            statusMessage.textContent = "Nie udało się wysłać formularza. Spróbuj ponownie lub napisz do nas e-mail.";
-          }
-          return;
-        }
-
-        const subject = encodeURIComponent("Kalkulacja pakietu sprzedaży bezpośredniej — prośba o kontakt");
-        const body = encodeURIComponent(message);
-        window.location.href = `mailto:${CONTACT_EMAIL}?subject=${subject}&body=${body}`;
-        statusMessage.textContent = "Otwieram gotową wiadomość w programie pocztowym.";
-      });
     })();
   </script>
   <script>
@@ -954,52 +877,60 @@
           document.getElementById("notes").value.trim() ? `Uwagi: ${document.getElementById("notes").value.trim()}` : ""
         ].filter(Boolean).join("\n");
 
-        const leadPayload = {
-          source: "advisor_olx",
-          osoba: document.getElementById("name").value.trim(),
-          telefon: document.getElementById("phone").value.trim(),
-          email: document.getElementById("email").value.trim(),
-          wojewodztwo: c.region || "",
-          miejscowosc: "",
-          zainteresowanie: c.packageName || "Advisor OLX",
-          produkt: c.packageName || "Advisor OLX",
-          packageName: c.packageName || "",
-          notes: document.getElementById("notes").value.trim(),
-          answersText: message,
-          company_url: document.getElementById("companyUrl").value.trim()
-        };
+        statusMessage.textContent = "Wysyłanie…";
 
+        // Formspree wysyłamy ZAWSZE i NIEZALEŻNIE od /api/leads — to niezawodny kanał,
+        // nie zależy od stanu backendu panelu.
+        let formspreeOk = false;
         try {
-          statusMessage.textContent = "Wysyłanie…";
-          const leadRes = await fetch("/api/leads", {
+          const fsRes = await fetch("https://formspree.io/f/xdarjozy", {
             method: "POST",
             headers: { "Content-Type": "application/json", "Accept": "application/json" },
-            body: JSON.stringify(leadPayload)
+            body: JSON.stringify({
+              name: document.getElementById("name").value.trim(),
+              phone: document.getElementById("phone").value.trim(),
+              email: document.getElementById("email").value.trim(),
+              _replyto: document.getElementById("email").value.trim(),
+              _subject: "Nowy wynik Advisor OLX - Sklep za Stodołą",
+              notes: document.getElementById("notes").value.trim(),
+              calculation: c,
+              message
+            })
           });
-          if (!leadRes.ok) throw new Error("lead");
+          formspreeOk = fsRes.ok;
+        } catch (e) {
+          formspreeOk = false;
+        }
 
-          if (typeof window.ADVISOR_OLX_FORM_ENDPOINT === "string" && window.ADVISOR_OLX_FORM_ENDPOINT) {
-            fetch(window.ADVISOR_OLX_FORM_ENDPOINT, {
-              method: "POST",
-              headers: { "Content-Type": "application/json", "Accept": "application/json" },
-              body: JSON.stringify({
-                name: document.getElementById("name").value.trim(),
-                phone: document.getElementById("phone").value.trim(),
-                email: document.getElementById("email").value.trim(),
-                _replyto: document.getElementById("email").value.trim(),
-                _subject: "Nowy wynik Advisor OLX - Sklep za Stodołą",
-                notes: document.getElementById("notes").value.trim(),
-                calculation: c,
-                message
-              })
-            }).catch(() => {});
-          }
+        // /api/leads próbujemy dodatkowo dla CRM/panelu, ale NIE blokujemy sukcesu formularza,
+        // jeśli backend akurat nie działa.
+        try {
+          await fetch("/api/leads", {
+            method: "POST",
+            headers: { "Content-Type": "application/json", "Accept": "application/json" },
+            body: JSON.stringify({
+              source: "advisor_olx",
+              osoba: document.getElementById("name").value.trim(),
+              telefon: document.getElementById("phone").value.trim(),
+              email: document.getElementById("email").value.trim(),
+              wojewodztwo: c.region || "",
+              zainteresowanie: c.packageName || "Advisor OLX",
+              produkt: c.packageName || "Advisor OLX",
+              notes: document.getElementById("notes").value.trim(),
+              answersText: message,
+              company_url: document.getElementById("companyUrl").value.trim()
+            })
+          });
+        } catch (e) {
+          // ignorujemy błąd /api/leads - Formspree i tak zapisał zgłoszenie
+        }
 
-          statusMessage.textContent = "Dziękujemy. Formularz OLX został zapisany i trafił do zespołu.";
+        if (formspreeOk) {
+          statusMessage.textContent = "Dziękujemy. Wynik został wysłany — skontaktujemy się z Tobą.";
           leadForm.reset();
           window.location.href = "dziekujemy.html";
-        } catch (error) {
-          statusMessage.textContent = "Nie udało się zapisać zgłoszenia. Spróbuj ponownie albo skontaktuj się telefonicznie.";
+        } else {
+          statusMessage.textContent = "Nie udało się wysłać formularza. Zadzwoń: 735 115 427 albo napisz na kontakt@sklepzastodola.pl.";
         }
       }, true);
     })();
