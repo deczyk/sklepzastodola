@@ -26,9 +26,70 @@ const ALLOWED_SOURCES = {
   }
 };
 
-function jsonBinAuthHeaders() {
-  const keyHeader = JSONBIN_KEY_HEADER === "X-Access-Key" ? "X-Access-Key" : "X-Master-Key";
-  return { [keyHeader]: JSONBIN_API_KEY };
+function jsonBinAuthHeaderVariants() {
+  const preferred = JSONBIN_KEY_HEADER === "X-Access-Key" ? "X-Access-Key" : "X-Master-Key";
+  const variants = [{ name: preferred, headers: { [preferred]: JSONBIN_API_KEY } }];
+
+  if (!JSONBIN_KEY_HEADER) {
+    const fallback = preferred === "X-Master-Key" ? "X-Access-Key" : "X-Master-Key";
+    variants.push({ name: fallback, headers: { [fallback]: JSONBIN_API_KEY } });
+  }
+
+  return variants;
+}
+
+async function readUpstreamError(upstream) {
+  let body = "";
+  try {
+    body = await upstream.text();
+  } catch (e) {}
+
+  return {
+    status: upstream.status,
+    usedHeader: upstream.usedJsonBinHeader,
+    message: upstream.status === 401 || upstream.status === 403
+      ? "JSONBin authorization failed."
+      : "JSONBin request failed.",
+    body: body.slice(0, 500)
+  };
+}
+
+function logJsonBinError(method, details) {
+  console.error("Lead intake JSONBin request failed", {
+    method,
+    jsonbinStatus: details && details.status,
+    usedHeader: details && details.usedHeader,
+    hasBinId: Boolean(JSONBIN_BIN_ID),
+    hasApiKey: Boolean(JSONBIN_API_KEY),
+    message: details && details.message,
+    bodyPreview: details && details.body ? details.body.slice(0, 240) : ""
+  });
+}
+
+async function fetchJsonBin(url, options = {}) {
+  let lastResponse = null;
+  const variants = jsonBinAuthHeaderVariants();
+
+  for (const variant of variants) {
+    const headers = {
+      ...(options.headers || {}),
+      ...variant.headers
+    };
+
+    const response = await fetch(url, {
+      ...options,
+      headers
+    });
+
+    response.usedJsonBinHeader = variant.name;
+    lastResponse = response;
+
+    if (response.ok || !(response.status === 401 || response.status === 403)) {
+      return response;
+    }
+  }
+
+  return lastResponse;
 }
 
 function clampText(value, max) {
@@ -216,12 +277,12 @@ module.exports = async function handler(req, res) {
   }
 
   try {
-    const upstreamGet = await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}/latest`, {
-      headers: jsonBinAuthHeaders()
-    });
+    const upstreamGet = await fetchJsonBin(`https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}/latest`);
 
     if (!upstreamGet.ok) {
-      return res.status(502).json({ error: "Failed to read CRM data." });
+      const details = await readUpstreamError(upstreamGet);
+      logJsonBinError("GET", details);
+      return res.status(502).json({ error: "Failed to read CRM data.", details });
     }
 
     const upstreamJson = await upstreamGet.json();
@@ -255,18 +316,19 @@ module.exports = async function handler(req, res) {
 
       data.powiadomienia.unshift(buildNotification(existing, lead, now, true));
 
-      const upstreamPut = await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}`, {
+      const upstreamPut = await fetchJsonBin(`https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
-          ...jsonBinAuthHeaders(),
           "X-Bin-Versioning": "false"
         },
         body: JSON.stringify(data)
       });
 
       if (!upstreamPut.ok) {
-        return res.status(502).json({ error: "Failed to update existing client." });
+        const details = await readUpstreamError(upstreamPut);
+        logJsonBinError("PUT existing", details);
+        return res.status(502).json({ error: "Failed to update existing client.", details });
       }
 
       return res.status(200).json({ ok: true, updatedExisting: true });
@@ -299,18 +361,19 @@ module.exports = async function handler(req, res) {
     data.klienci.push(client);
     data.powiadomienia.unshift(buildNotification(client, lead, now, false));
 
-    const upstreamPut = await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}`, {
+    const upstreamPut = await fetchJsonBin(`https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
-        ...jsonBinAuthHeaders(),
         "X-Bin-Versioning": "false"
       },
       body: JSON.stringify(data)
     });
 
     if (!upstreamPut.ok) {
-      return res.status(502).json({ error: "Failed to save new client." });
+      const details = await readUpstreamError(upstreamPut);
+      logJsonBinError("PUT new", details);
+      return res.status(502).json({ error: "Failed to save new client.", details });
     }
 
     return res.status(200).json({ ok: true, created: true });

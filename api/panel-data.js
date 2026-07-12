@@ -44,12 +44,16 @@ function isAuthorized(req) {
   );
 }
 
-function jsonBinAuthHeaders() {
-  const keyHeader = JSONBIN_KEY_HEADER === "X-Access-Key"
-    ? "X-Access-Key"
-    : "X-Master-Key";
+function jsonBinAuthHeaderVariants() {
+  const preferred = JSONBIN_KEY_HEADER === "X-Access-Key" ? "X-Access-Key" : "X-Master-Key";
+  const variants = [{ name: preferred, headers: { [preferred]: JSONBIN_API_KEY } }];
 
-  return { [keyHeader]: JSONBIN_API_KEY };
+  if (!JSONBIN_KEY_HEADER) {
+    const fallback = preferred === "X-Master-Key" ? "X-Access-Key" : "X-Master-Key";
+    variants.push({ name: fallback, headers: { [fallback]: JSONBIN_API_KEY } });
+  }
+
+  return variants;
 }
 
 function jsonBinKeyHeaderName() {
@@ -94,6 +98,32 @@ function logJsonBinError(method, payloadLength, details) {
   });
 }
 
+async function fetchJsonBin(url, options = {}) {
+  let lastResponse = null;
+  const variants = jsonBinAuthHeaderVariants();
+
+  for (const variant of variants) {
+    const headers = {
+      ...(options.headers || {}),
+      ...variant.headers
+    };
+
+    const response = await fetch(url, {
+      ...options,
+      headers
+    });
+
+    response.usedJsonBinHeader = variant.name;
+    lastResponse = response;
+
+    if (response.ok || !(response.status === 401 || response.status === 403)) {
+      return response;
+    }
+  }
+
+  return lastResponse;
+}
+
 module.exports = async function handler(req, res) {
   res.setHeader("Cache-Control", "no-store");
 
@@ -110,12 +140,11 @@ module.exports = async function handler(req, res) {
 
   try {
     if (req.method === "GET") {
-      const upstream = await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}/latest`, {
-        headers: jsonBinAuthHeaders()
-      });
+      const upstream = await fetchJsonBin(`https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}/latest`);
 
       if (!upstream.ok) {
         const details = await readUpstreamError(upstream);
+        details.usedHeader = upstream.usedJsonBinHeader;
         logJsonBinError("GET", 0, details);
         return res.status(502).json(details);
       }
@@ -129,11 +158,10 @@ module.exports = async function handler(req, res) {
     if (req.method === "PUT") {
       const payload = typeof req.body === "string" ? req.body : JSON.stringify(req.body);
       const payloadLength = Buffer.byteLength(payload || "", "utf8");
-      const upstream = await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}`, {
+      const upstream = await fetchJsonBin(`https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
-          ...jsonBinAuthHeaders(),
           "X-Bin-Versioning": "false"
         },
         body: payload
@@ -141,6 +169,7 @@ module.exports = async function handler(req, res) {
 
       if (!upstream.ok) {
         const details = await readUpstreamError(upstream);
+        details.usedHeader = upstream.usedJsonBinHeader;
         logJsonBinError("PUT", payloadLength, details);
         return res.status(502).json(details);
       }
