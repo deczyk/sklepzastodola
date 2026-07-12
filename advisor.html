@@ -268,8 +268,6 @@ function calculate(){
   let max=0,pts=0;visibleQ.forEach(q=>{max+=q[2];pts+=(parseFloat(document.getElementById(q[0]).value)||0)*q[2];});
   let score=Math.round(pts/max*100);
 
-  // Lokalizacja to czynnik krytyczny dla sprzedaży bezpośredniej — jeśli nieznana/negatywna, ograniczamy wynik,
-  // żeby nie sugerować wysokiego potencjału zanim popyt zostanie realnie zweryfikowany.
   const locEl = document.getElementById("location");
   const locVal = locEl ? parseFloat(locEl.value) : 1;
   let scoreCapped = false;
@@ -307,7 +305,6 @@ function calculate(){
   document.getElementById("financeResult").innerHTML=`<b>Produkcja mleka:</b> ${Math.round(prod).toLocaleString("pl-PL")} l/dzień<br><b>Sprzedaż przez mlekomat (cel):</b> ${Math.round(targetLiters).toLocaleString("pl-PL")} l/dzień<br><b>Realna sprzedaż przy ${Math.round(sellThrough*100)}% wykorzystania:</b> ${Math.round(liters).toLocaleString("pl-PL")} l/dzień<br><b>Potencjał przed kosztami eksploatacyjnymi:</b> ${money(marginYear)}<br><b>Roczne koszty eksploatacyjne:</b> −${money(opCosts)}<br><b>Szacowany wynik po kosztach eksploatacyjnych:</b> ${money(netYear)}<br><b>Inwestycja brutto:</b> ${money(inv)}<br><b>Orientacyjny czas odzyskania inwestycji bez dofinansowania:</b> ${roi.toFixed(1)} lat<br><b>${financeLabel}:</b> ${money(payment)}/mies.<br><b>Cashflow roczny po finansowaniu:</b> ${money(cashAfterFinance)}`;
   document.getElementById("euResult").innerHTML=`<b>Szacowane dofinansowanie (orientacyjnie 50%):</b> ${money(euGrant)}<br><b>Inwestycja po dofinansowaniu / do sfinansowania:</b> ${money(ownAfterEu)}<br><b>Wkład własny przy finansowaniu:</b> ${money(ownAfterEu*v("down")/100)}<br><b>Orientacyjny czas odzyskania inwestycji z dofinansowaniem:</b> ${roiEu.toFixed(1)} lat`;
 
-  // --- Narracja i rekomendacja dopasowana do wybranego zakresu ---
   const showPawilon = interest==="sprzedazowy"||interest==="premium"||interest==="niezdecydowany";
   const showMlekomat = true;
   let narrative = `<p><strong>${farmName}</strong> jest zainteresowane opcją: <em>${INTEREST_LABELS[interest]}</em>. `;
@@ -342,95 +339,6 @@ function loadData(){const data=JSON.parse(localStorage.getItem("advisorDataEU")|
 function resetAll(){localStorage.removeItem("advisorDataEU");location.reload();}
 
 async function sendToUs(){
-  calculate(); // upewnij się, że wynik jest aktualny i tabela audytu odpowiada wyborowi
-  const statusEl = document.getElementById("sendStatus");
-  const farm = document.getElementById("farm").value || "(brak nazwy)";
-  const owner = document.getElementById("owner").value || "(brak osoby kontaktowej)";
-  const phone = document.getElementById("phone").value || "(brak telefonu)";
-  const region = document.getElementById("region").value;
-  const county = document.getElementById("county").value;
-  const interestVal = document.getElementById("interest").value;
-
-  const payload = {
-    _subject: `Advisor EU — wynik kalkulatora: ${farm} (${owner})`,
-    "── DANE GOSPODARSTWA": "──────────",
-    "Gospodarstwo": farm,
-    "Osoba kontaktowa": owner,
-    "Telefon": phone,
-    "Województwo / powiat": `${region} / ${county}`,
-    "Zainteresowanie": INTEREST_LABELS[interestVal],
-    "Liczba krów": document.getElementById("cows").value,
-    "Wydajność l/krowę/dzień": document.getElementById("yield").value,
-    "Powierzchnia ha": document.getElementById("ha").value,
-
-    "── WYNIK INWESTYCJI": "──────────",
-    "Potencjał projektu": document.getElementById("scoreTxt").innerText,
-    "Scenariusz bez dofinansowania (lata)": document.getElementById("roiTxt").innerText,
-    "Scenariusz z dofinansowaniem (lata)": document.getElementById("roiEuTxt").innerText,
-    "Potencjał przed kosztami eksploatacyjnymi": document.getElementById("profitYearTxt").innerText,
-  };
-
-  // --- Pełny audyt: pytanie + odpowiedź, tylko widoczne dla wybranego zakresu ---
-  payload["── AUDYT PROJEKTU"] = "──────────";
-  getVisibleQuestions(interestVal).forEach(q=>{
-    const sel = document.getElementById(q[0]);
-    if(sel) payload[q[1]] = sel.options[sel.selectedIndex].text;
-  });
-
-  // --- Ekonomia i finansowanie ---
-  payload["── EKONOMIA I FINANSOWANIE"] = "──────────";
-  payload["Cena mleka w skupie PLN/l"] = document.getElementById("priceDairy").value;
-  payload["Cena sprzedaży bezpośredniej PLN/l"] = document.getElementById("priceDirect").value;
-  payload["Sprzedaż przez mlekomat l/dzień (cel)"] = document.getElementById("litersDirect").value;
-  payload["Realny % sprzedaży zakładanej produkcji"] = document.getElementById("sellThrough").value;
-  payload["Roczne koszty eksploatacyjne PLN"] = document.getElementById("opCosts").value;
-  payload["Koszt inwestycji PLN"] = document.getElementById("investment").value;
-  payload["Dni sprzedaży w roku"] = document.getElementById("days").value;
-  payload["Wkład własny %"] = document.getElementById("down").value;
-  payload["Okres finansowania (lata)"] = document.getElementById("years").value;
-  payload["Oprocentowanie roczne %"] = document.getElementById("rate").value;
-  payload["Szczegóły finansowe (wyliczone)"] = document.getElementById("financeResult").innerText;
-
-  // --- Dofinansowanie ---
-  const euEnabled = document.getElementById("euEnable").checked;
-  payload["── DOFINANSOWANIE"] = "──────────";
-  payload["Czy uwzględniono dofinansowanie"] = euEnabled ? "TAK (orientacyjnie 50%)" : "NIE";
-  if(euEnabled){
-    payload["Szczegóły dofinansowania (wyliczone)"] = document.getElementById("euResult").innerText;
-  }
-
-  // --- Rekomendacja i harmonogram ---
-  payload["── REKOMENDACJA I HARMONOGRAM"] = "──────────";
-  payload["Rekomendowane rozwiązanie"] = document.getElementById("solutionNarrative").innerText + " " + document.getElementById("solution").innerText;
-  payload["Harmonogram wdrożenia"] = document.getElementById("timelineTable").innerText;
-  payload["Dokumenty do przygotowania"] = document.getElementById("documentsTable").innerText;
-
-  payload["── DODATKOWE UWAGI"] = "──────────";
-  payload["Dodatkowe uwagi klienta"] = document.getElementById("notes").value || "(brak)";
-
-  statusEl.textContent = "Wysyłanie...";
-  statusEl.style.color = "#666";
-  try{
-    const res = await fetch('https://formspree.io/f/xdarjozy', {
-      method: 'POST',
-      body: JSON.stringify(payload),
-      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' }
-    });
-    if(res.ok){
-      statusEl.textContent = "✅ Wynik wysłany! Skontaktujemy się z Tobą wkrótce, żeby dopasować ofertę.";
-      statusEl.style.color = "#2f7a45";
-    } else {
-      throw new Error("Błąd wysyłki");
-    }
-  } catch(e){
-    statusEl.textContent = "⚠ Nie udało się wysłać. Spróbuj ponownie albo napisz do nas bezpośrednio: kontakt@sklepzastodola.pl";
-    statusEl.style.color = "#b44";
-  }
-}
-renderAuditQuestions();calculate();
-</script>
-<script>
-async function sendToUs(){
   calculate();
   const statusEl = document.getElementById("sendStatus");
   const farm = document.getElementById("farm").value.trim();
@@ -457,48 +365,64 @@ async function sendToUs(){
     document.getElementById("notes").value.trim() ? `Uwagi klienta: ${document.getElementById("notes").value.trim()}` : ""
   ].filter(Boolean).join("\n");
 
-  const leadPayload = {
-    source: "advisor",
-    firma: farm,
-    osoba: owner,
-    telefon: phone,
-    email: "",
-    wojewodztwo: region,
-    miejscowosc: county,
-    zainteresowanie: INTEREST_LABELS[interestVal] || interestVal,
-    produkt: INTEREST_LABELS[interestVal] || interestVal,
-    interest: interestVal,
-    notes: document.getElementById("notes").value.trim(),
-    answersText,
-    website: ""
-  };
-
   statusEl.textContent = "Wysyłanie...";
   statusEl.style.color = "#666";
-  try{
-    const leadRes = await fetch('/api/leads', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-      body: JSON.stringify(leadPayload)
-    });
-    if(!leadRes.ok) throw new Error('lead');
+
+  // Formspree wysyłamy ZAWSZE i NIEZALEŻNIE od /api/leads — to niezawodny kanał,
+  // nie zależy od stanu backendu panelu.
+  let formspreeOk = false;
+  try {
     const mailPayload = {
       _subject: `Advisor EU — wynik kalkulatora: ${farm || "(brak nazwy)"} (${owner || "(brak kontaktu)"})`,
       "Dane formularza Advisor": answersText
     };
-    fetch('https://formspree.io/f/xdarjozy', {
+    const fsRes = await fetch('https://formspree.io/f/xdarjozy', {
       method: 'POST',
       body: JSON.stringify(mailPayload),
       headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' }
-    }).catch(()=>{});
-    statusEl.textContent = "Dziękujemy. Formularz doradczy został zapisany i trafił do zespołu.";
+    });
+    formspreeOk = fsRes.ok;
+  } catch(e) {
+    formspreeOk = false;
+  }
+
+  // /api/leads próbujemy dodatkowo dla CRM/panelu, ale NIE blokujemy sukcesu formularza,
+  // jeśli backend akurat nie działa.
+  try {
+    const leadPayload = {
+      source: "advisor",
+      firma: farm,
+      osoba: owner,
+      telefon: phone,
+      email: "",
+      wojewodztwo: region,
+      miejscowosc: county,
+      zainteresowanie: INTEREST_LABELS[interestVal] || interestVal,
+      produkt: INTEREST_LABELS[interestVal] || interestVal,
+      interest: interestVal,
+      notes: document.getElementById("notes").value.trim(),
+      answersText,
+      website: ""
+    };
+    await fetch('/api/leads', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify(leadPayload)
+    });
+  } catch(e) {
+    // ignorujemy błąd /api/leads - Formspree i tak zapisał zgłoszenie
+  }
+
+  if (formspreeOk) {
+    statusEl.textContent = "Dziękujemy. Wynik wysłany — skontaktujemy się z Tobą.";
     statusEl.style.color = "#2f7a45";
     window.location.href = "dziekujemy.html";
-  } catch(e){
-    statusEl.textContent = "Nie udało się zapisać zgłoszenia. Spróbuj ponownie albo skontaktuj się telefonicznie.";
+  } else {
+    statusEl.textContent = "Nie udało się wysłać. Zadzwoń: 735 115 427 albo napisz: kontakt@sklepzastodola.pl";
     statusEl.style.color = "#b44";
   }
 }
+renderAuditQuestions();calculate();
 </script>
 </body>
 </html>
