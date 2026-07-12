@@ -417,14 +417,28 @@
     .contact-card { background: white; color: var(--ink); border-radius: 22px; padding: 24px; }
     .contact-card .form-grid { gap: 16px; }
     .checkbox {
-      display: grid;
-      grid-template-columns: 20px 1fr;
+      display: flex;
+      align-items: flex-start;
       gap: 10px;
-      align-items: start;
       color: var(--muted);
       font-size: .82rem;
+      width: 100%;
     }
-    .checkbox input { width: 18px; min-height: 18px; margin-top: 2px; }
+    .checkbox input[type="checkbox"] {
+      appearance: auto;
+      -webkit-appearance: checkbox;
+      width: 18px;
+      height: 18px;
+      min-width: 18px;
+      min-height: 18px;
+      padding: 0;
+      margin: 2px 0 0;
+      flex: 0 0 18px;
+      opacity: 1;
+      position: static;
+      pointer-events: auto;
+    }
+    .checkbox span { flex: 1; min-width: 0; }
     .status-message { margin-top: 12px; min-height: 22px; color: var(--green-800); font-weight: 750; font-size: .9rem; }
 
     footer { padding: 34px 0 42px; color: var(--muted); font-size: .86rem; }
@@ -672,7 +686,7 @@
               </div>
               <input id="companyUrl" name="company_url" type="text" tabindex="-1" autocomplete="off" style="position:absolute;left:-9999px;opacity:0;pointer-events:none" aria-hidden="true">
               <label class="checkbox field full">
-                <input id="privacyConsent" type="checkbox" required>
+                <input id="privacyConsent" name="privacy_consent" type="checkbox" value="yes">
                 <span>Proszę o kontakt w sprawie kalkulacji i oferty. Administratorem danych jest Sklep za Stodołą Sp. z o.o. Dane zostaną wykorzystane do odpowiedzi na zapytanie i przygotowania oferty. Szczegóły znajdują się w <a href="/polityka.html" target="_blank" rel="noopener">Polityce prywatności</a>.</span>
               </label>
               <div class="field full">
@@ -914,6 +928,13 @@
           return;
         }
 
+        const privacyConsent = document.getElementById("privacyConsent");
+        if (!privacyConsent.checked) {
+          statusMessage.textContent = "Zaznacz zgodę na kontakt, aby wysłać formularz.";
+          privacyConsent.focus();
+          return;
+        }
+
         if (!leadForm.reportValidity()) return;
 
         const c = window.lastCalculation;
@@ -983,4 +1004,3 @@
   </script>
 </body>
 </html>
-tu i tu jest ten sam blad: An invalid form control with name='' is not focusable. <input id=​"privacyConsent" type=​"checkbox" required>​, napraw go
