@@ -27,6 +27,10 @@
     button.secondary{background:#6d745f}button.gold{background:var(--accent);color:#1d1d1d}
     table{width:100%;border-collapse:collapse;font-size:13px}th,td{border-bottom:1px solid var(--line);padding:9px;text-align:left}th{background:var(--light);color:var(--green)}
     .tag{display:inline-block;background:#edf2ed;border:1px solid #d9e2d9;padding:5px 8px;border-radius:99px;margin:3px;font-size:12px}
+    .package-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:10px 0 16px}
+    .package-card{border:1px solid var(--line);border-radius:12px;padding:14px;background:#fbfcfa}
+    .package-card.recommended{border-color:var(--accent);box-shadow:0 0 0 2px rgba(201,162,74,.16)}
+    .package-card b{display:block;color:var(--green);margin-bottom:6px}.package-card p{margin:0;color:#555;font-size:13px;line-height:1.45}
     .warn{background:#fff4df;border-left:4px solid var(--accent);padding:12px;border-radius:8px}.ok{background:#eaf6ed;border-left:4px solid #3d7d4e;padding:12px;border-radius:8px}.bad{background:#fdecec;border-left:4px solid #b44;padding:12px;border-radius:8px}
     .eu{background:#eef5ff;border-left:4px solid var(--blue);padding:12px;border-radius:8px}
     .switch-row{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:16px;border:1px solid var(--line);border-radius:12px;background:var(--light)}
@@ -59,7 +63,7 @@
 
 <div class="wrap">
   <div class="intro">
-    <p><strong>Do czego służy to narzędzie?</strong> To kalkulator doradczy przygotowany przez Sklep za Stodołą, który pomaga oszacować potencjał postawienia mlekomatu i punktu sprzedaży przy Twoim gospodarstwie — przykładowy scenariusz inwestycyjny, potencjał względem skupu i szacowany wynik po kosztach eksploatacyjnych oraz możliwości finansowania.</p>
+    <p><strong>Do czego służy to narzędzie?</strong> To kalkulator doradczy przygotowany przez Sklep za Stodołą, który pomaga oszacować potencjał uruchomienia sprzedaży bezpośredniej w jednym z trzech pakietów: START, SPRZEDAŻOWY albo PREMIUM.</p>
     <p>Wypełnij dane w polach poniżej (albo zostaw podpowiedzi jako orientacyjny przykład) i kliknij <strong>„Przelicz i wyślij wynik do Sklep za Stodołą”</strong> — zobaczysz wynik na ekranie, a my dostaniemy komplet danych do dopasowania oferty. Wynik możesz też zapisać jako PDF.</p>
   </div>
   <div class="card noPrint">
@@ -77,10 +81,10 @@
       <div class="row"><div><label>Nazwa gospodarstwa</label><input id="farm"></div><div><label>Osoba kontaktowa</label><input id="owner"></div></div>
       <div class="row3"><div><label>Województwo</label><input id="region"></div><div><label>Powiat</label><input id="county"></div><div><label>Telefon</label><input id="phone"></div></div>
       <div class="row"><div><label>Co Cię interesuje?</label><select id="interest" onchange="renderAuditQuestions()">
-        <option value="pakiet">Pawilon + mlekomat (kompletny punkt sprzedaży)</option>
-        <option value="mlekomat">Mlekomat / wariant podstawowy</option>
-        <option value="pawilon">Pawilon / punkt sprzedaży bez mlekomatu</option>
-        <option value="niezdecydowany">Jeszcze się zastanawiam — proszę o doradztwo</option>
+        <option value="sprzedazowy">Pakiet SPRZEDAŻOWY — mlekomat + pawilon + wdrożenie</option>
+        <option value="start">Pakiet START — mlekomat i podstawowe wdrożenie</option>
+        <option value="premium">Pakiet PREMIUM — pełny system i priorytetowa opieka</option>
+        <option value="niezdecydowany">Nie wiem jeszcze — proszę o dobór pakietu</option>
       </select></div></div>
       <div class="row3"><div><label>Liczba krów mlecznych</label><input type="number" id="cows" value="15"></div><div><label>Średnia wydajność l/krowę/dzień</label><input type="number" id="yield" value="25"></div><div><label>Powierzchnia gospodarstwa ha</label><input type="number" id="ha" value="20"></div></div>
     </section>
@@ -135,6 +139,11 @@
 
   <section class="card">
     <h2>6. Rekomendowane rozwiązanie</h2>
+    <div class="package-grid">
+      <div class="package-card"><b>START</b><p>Mlekomat, podstawowe uruchomienie i przygotowanie do późniejszej rozbudowy.</p></div>
+      <div class="package-card recommended"><b>SPRZEDAŻOWY</b><p>Mlekomat, pawilon, wdrożenie, dokumenty, finansowanie i prosty marketing lokalny.</p></div>
+      <div class="package-card"><b>PREMIUM</b><p>Pełny system sprzedaży z lepszą konfiguracją, rozbudowanym pawilonem i priorytetową opieką.</p></div>
+    </div>
     <div id="solutionNarrative" style="margin-bottom:12px;line-height:1.6;color:#333"></div>
     <div id="solution"></div>
   </section>
@@ -182,8 +191,8 @@ const MLEKOMAT_ONLY = ["milkProduction","vet"];
 const PAWILON_ONLY = ["ownProducts","coolerDisplay","retailExperience"];
 
 function getVisibleQuestions(interest){
-  const showMlekomat = interest==="pakiet"||interest==="mlekomat"||interest==="niezdecydowany";
-  const showPawilon = interest==="pakiet"||interest==="pawilon"||interest==="niezdecydowany";
+  const showMlekomat = interest==="start"||interest==="sprzedazowy"||interest==="premium"||interest==="niezdecydowany";
+  const showPawilon = interest==="sprzedazowy"||interest==="premium"||interest==="niezdecydowany";
   return auditQuestions.filter(q=>{
     if(MLEKOMAT_ONLY.includes(q[0])) return showMlekomat;
     if(PAWILON_ONLY.includes(q[0])) return showPawilon;
@@ -204,15 +213,15 @@ function renderAuditQuestions(){
 function v(id){return parseFloat(document.getElementById(id).value)||0;} function money(x){return Math.round(x).toLocaleString("pl-PL")+" zł";}
 
 const INTEREST_LABELS = {
-  pakiet: "kompletny punkt sprzedaży — pawilon razem z mlekomatem",
-  mlekomat: "mlekomat / wariant podstawowy, bez pawilonu",
-  pawilon: "pawilon / punkt sprzedaży bez mlekomatu",
-  niezdecydowany: "jeszcze niesprecyzowany zakres inwestycji"
+  start: "Pakiet START — mlekomat i podstawowe wdrożenie",
+  sprzedazowy: "Pakiet SPRZEDAŻOWY — mlekomat + pawilon + wdrożenie",
+  premium: "Pakiet PREMIUM — pełny system, rozbudowany pawilon i priorytetowa opieka",
+  niezdecydowany: "dobór pakietu po rozmowie doradczej"
 };
 
 function renderDocuments(interest){
-  const showPawilon = interest==="pakiet"||interest==="pawilon"||interest==="niezdecydowany";
-  const showMlekomat = interest==="pakiet"||interest==="mlekomat"||interest==="niezdecydowany";
+  const showPawilon = interest==="sprzedazowy"||interest==="premium"||interest==="niezdecydowany";
+  const showMlekomat = true;
   const rows = [];
   rows.push(["Numer producenta rolnego","Do weryfikacji","Podstawowy dokument identyfikacyjny"]);
   rows.push(["Biznesplan inwestycji","Wymagany", showPawilon&&showMlekomat?"Opis pawilonu i mlekomatu, ROI, harmonogram":showMlekomat?"Opis mlekomatu, ROI, harmonogram":"Opis pawilonu i sprzedaży, ROI, harmonogram"]);
@@ -227,8 +236,8 @@ function renderDocuments(interest){
 }
 
 function renderTimeline(interest){
-  const showPawilon = interest==="pakiet"||interest==="pawilon"||interest==="niezdecydowany";
-  const showMlekomat = interest==="pakiet"||interest==="mlekomat"||interest==="niezdecydowany";
+  const showPawilon = interest==="sprzedazowy"||interest==="premium"||interest==="niezdecydowany";
+  const showMlekomat = true;
   let koncepcja, realizacjaZakres, realizacjaCzas;
   if(showPawilon && showMlekomat){
     koncepcja = "Dobór pawilonu, mlekomatu, automatów i wyposażenia";
@@ -299,23 +308,27 @@ function calculate(){
   document.getElementById("euResult").innerHTML=`<b>Szacowane dofinansowanie (orientacyjnie 50%):</b> ${money(euGrant)}<br><b>Inwestycja po dofinansowaniu / do sfinansowania:</b> ${money(ownAfterEu)}<br><b>Wkład własny przy finansowaniu:</b> ${money(ownAfterEu*v("down")/100)}<br><b>Orientacyjny czas odzyskania inwestycji z dofinansowaniem:</b> ${roiEu.toFixed(1)} lat`;
 
   // --- Narracja i rekomendacja dopasowana do wybranego zakresu ---
-  const showPawilon = interest==="pakiet"||interest==="pawilon"||interest==="niezdecydowany";
-  const showMlekomat = interest==="pakiet"||interest==="mlekomat"||interest==="niezdecydowany";
+  const showPawilon = interest==="sprzedazowy"||interest==="premium"||interest==="niezdecydowany";
+  const showMlekomat = true;
   let narrative = `<p><strong>${farmName}</strong> jest zainteresowane opcją: <em>${INTEREST_LABELS[interest]}</em>. `;
   if(showMlekomat){
     narrative += `Przy ${v("cows")} krowach i wydajności ${v("yield")} l/krowę/dzień, gospodarstwo produkuje ok. ${Math.round(prod).toLocaleString("pl-PL")} l mleka dziennie — planowana sprzedaż przez mlekomat na poziomie ${Math.round(targetLiters).toLocaleString("pl-PL")} l/dzień jest ${targetLiters<=prod?"w pełni pokryta bieżącą produkcją":"wyższa niż obecna produkcja, więc warto zweryfikować możliwości zwiększenia stada lub skupu uzupełniającego"}. `;
   }
-  if(showPawilon && !showMlekomat){
-    narrative += `Sam pawilon farmerski, bez mlekomatu, sprawdzi się jako rozszerzenie istniejącej sprzedaży bezpośredniej (jaja, sery, miód, warzywa) o całodobowy punkt bez obsługi. `;
+  if(interest==="start"){
+    narrative += `Pakiet START traktujemy jako budżetowe wejście w sprzedaż bezpośrednią: mlekomat, podstawowe uruchomienie i możliwość późniejszej rozbudowy o pawilon oraz produkty dodatkowe. `;
+  } else if(interest==="sprzedazowy"){
+    narrative += `Pakiet SPRZEDAŻOWY jest rekomendowany jako logiczny środek: mlekomat, pawilon, wdrożenie, dokumenty, finansowanie i prosty marketing lokalny w jednym projekcie. `;
+  } else if(interest==="premium"){
+    narrative += `Pakiet PREMIUM ma sens, jeśli klient chce gotowy system sprzedaży z lepszą konfiguracją, rozbudowanym pawilonem i priorytetową opieką od startu. `;
   }
   narrative += `Przy tych założeniach potencjał przed kosztami eksploatacyjnymi szacujemy na <strong>${money(marginYear)}</strong> rocznie, a po odjęciu szacowanych kosztów eksploatacyjnych (${money(opCosts)}) na <strong>${money(netYear)}</strong>. Orientacyjny czas odzyskania inwestycji, liczony od wyniku po kosztach, to ${roi>0?roi.toFixed(1)+" lat bez dofinansowania":"trudny do oszacowania bez kompletu danych"}${euEnabled?` (${roiEu.toFixed(1)} lat z uwzględnieniem dofinansowania UE)`:""}.</p>`;
   document.getElementById("solutionNarrative").innerHTML = narrative;
 
   let sol=[];
-  if(interest==="pakiet") sol.push(v("cows")>=80 ? "Pawilon farmerski 24/7 + mlekomat Premium + automaty chłodnicze." : "Pakiet START: mlekomat + mały punkt sprzedaży + przygotowanie do rozbudowy.");
-  else if(interest==="mlekomat") sol.push("Mlekomat BRUNIMAT Premium DUO w wariancie podstawowym — szybka droga wejścia w sprzedaż bezpośrednią mleka, z możliwością późniejszej rozbudowy.");
-  else if(interest==="pawilon") sol.push("Pawilon / punkt sprzedaży bez mlekomatu — rozszerzenie sprzedaży jaj, serów, miodu i warzyw o całodobową dostępność.");
-  else sol.push("Rekomendujemy zacząć od mlekomatu jako najszybszego elementu do wdrożenia, z możliwością dobudowania pawilonu w kolejnym etapie.");
+  if(interest==="start") sol.push("Rekomendacja: Pakiet START — mlekomat BRUNIMAT, podstawowe wdrożenie, lista formalności i przygotowanie do rozbudowy.");
+  else if(interest==="sprzedazowy") sol.push("Rekomendacja: Pakiet SPRZEDAŻOWY — mlekomat + pawilon + wdrożenie + dokumenty + finansowanie + marketing lokalny.");
+  else if(interest==="premium") sol.push("Rekomendacja: Pakiet PREMIUM — pełny system sprzedaży bezpośredniej z rozbudowanym pawilonem, lepszą konfiguracją i priorytetową opieką.");
+  else sol.push("Rekomendacja: dobrać jeden z trzech pakietów po rozmowie — START, SPRZEDAŻOWY albo PREMIUM.");
   if(document.getElementById("ownProducts") && document.getElementById("ownProducts").value>0 && showPawilon) sol.push("Dodać jajomat / lodówkę na sery, masło, jogurty i produkty regionalne.");
   if(euEnabled) sol.push("Sprawdzić aktualny nabór UE oraz kwalifikowalność wybranych elementów inwestycji.");
   sol.push("Kolejny krok: indywidualna oferta, dokładny ROI i lista dokumentów do finansowania.");

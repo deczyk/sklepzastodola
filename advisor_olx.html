@@ -3,10 +3,10 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Bezpłatny kalkulator opłacalności mlekomatu i sprzedaży bezpośredniej mleka dla gospodarstw rolnych.">
+  <meta name="description" content="Bezpłatny kalkulator pakietów sprzedaży bezpośredniej START, SPRZEDAŻOWY i PREMIUM dla gospodarstw rolnych.">
   <meta name="robots" content="noindex, follow">
   <meta name="theme-color" content="#173a2f">
-  <title>Kalkulator opłacalności mlekomatu | Sklep za Stodołą</title>
+  <title>Kalkulator pakietów sprzedaży bezpośredniej | Sklep za Stodołą</title>
   <style>
     :root {
       --green-950: #102b23;
@@ -489,8 +489,8 @@
     <div class="container hero-grid">
       <div class="hero-copy">
         <span class="eyebrow">Bezpłatny kalkulator dla gospodarstw</span>
-        <h1>Sprawdź, czy mlekomat opłaci się w Twoim gospodarstwie.</h1>
-        <p>Wpisz kilka podstawowych danych. Najpierw zobaczysz orientacyjny wynik, a dopiero później zdecydujesz, czy chcesz przesłać go naszemu doradcy.</p>
+        <h1>Sprawdź, który pakiet sprzedaży bezpośredniej pasuje do Twojego gospodarstwa.</h1>
+        <p>Wpisz kilka podstawowych danych i wybierz pakiet START, SPRZEDAŻOWY albo PREMIUM. Najpierw zobaczysz orientacyjny wynik, a dopiero później zdecydujesz, czy chcesz przesłać go naszemu doradcy.</p>
         <div class="hero-points" aria-label="Korzyści">
           <span class="hero-point">bez zobowiązań</span>
           <span class="hero-point">wynik od razu</span>
@@ -502,7 +502,7 @@
         <h2>Jak to działa?</h2>
         <p>Prosto i bez podawania danych kontaktowych na początku.</p>
         <div class="steps">
-          <div class="step"><b>1</b><div><strong>Podajesz swoje liczby</strong><span>Ile mleka, jaka cena i jaki wariant inwestycji.</span></div></div>
+          <div class="step"><b>1</b><div><strong>Podajesz swoje liczby</strong><span>Ile mleka, jaka cena i który pakiet rozważasz.</span></div></div>
           <div class="step"><b>2</b><div><strong>Otrzymujesz kalkulację</strong><span>Szacowany potencjał, koszt po możliwym dofinansowaniu i scenariusz inwestycyjny.</span></div></div>
           <div class="step"><b>3</b><div><strong>Sam decydujesz</strong><span>Możesz wydrukować wynik albo poprosić o analizę.</span></div></div>
         </div>
@@ -516,7 +516,7 @@
         <div class="section-head">
           <div>
             <h2 id="calcTitle">Kalkulator opłacalności</h2>
-            <p>Podaj realistyczną ilość mleka, którą możesz sprzedawać bezpośrednio każdego dnia. Dane kontaktowe nie są wymagane do obliczenia wyniku.</p>
+            <p>Podaj realistyczną ilość mleka, którą możesz sprzedawać bezpośrednio każdego dnia, i wybierz jeden z trzech pakietów. Dane kontaktowe nie są wymagane do obliczenia wyniku.</p>
           </div>
           <span class="time-pill">około 2 min</span>
         </div>
@@ -540,10 +540,10 @@
               <div class="field">
                 <label for="package">Co Cię interesuje?</label>
                 <select id="package" name="package" required>
-                  <option value="120000">Mlekomat / wariant podstawowy</option>
-                  <option value="150000">Mlekomat z dodatkowym wyposażeniem</option>
-                  <option value="220000">Pawilon + mlekomat</option>
-                  <option value="150000">Jeszcze nie wiem — wariant orientacyjny</option>
+                  <option value="150000" data-package="sprzedazowy">Pakiet SPRZEDAŻOWY — mlekomat + pawilon + wdrożenie</option>
+                  <option value="120000" data-package="start">Pakiet START — mlekomat i podstawowe wdrożenie</option>
+                  <option value="220000" data-package="premium">Pakiet PREMIUM — pełny system i priorytetowa opieka</option>
+                  <option value="150000" data-package="dobor">Nie wiem jeszcze — proszę o dobór pakietu</option>
                 </select>
                 <span class="hint">Kwotę inwestycji możesz zmienić w ustawieniach rozszerzonych.</span>
               </div>
@@ -591,8 +591,8 @@
                 <summary>Ustawienia rozszerzone</summary>
                 <div class="advanced-grid">
                   <div class="field">
-                    <label for="investment">Koszt inwestycji</label>
-                    <div class="input-suffix"><input id="investment" name="investment" type="number" min="1000" max="5000000" step="1000" value="120000"><span>zł</span></div>
+                    <label for="investment">Koszt wybranego pakietu</label>
+                    <div class="input-suffix"><input id="investment" name="investment" type="number" min="1000" max="5000000" step="1000" value="150000"><span>zł</span></div>
                   </div>
                   <div class="field">
                     <label for="operatingCost">Dodatkowe koszty sprzedaży</label>
@@ -624,7 +624,7 @@
             <div class="metrics">
               <div class="metric"><span>Potencjał miesięczny</span><strong id="monthlyMargin">0 zł</strong></div>
               <div class="metric"><span>Potencjał roczny</span><strong id="annualMargin">0 zł</strong></div>
-              <div class="metric"><span>Koszt inwestycji po możliwym dofinansowaniu</span><strong id="netInvestment">0 zł</strong></div>
+              <div class="metric"><span>Koszt pakietu po możliwym dofinansowaniu</span><strong id="netInvestment">0 zł</strong></div>
               <div class="metric"><span>Orientacyjny czas odzyskania inwestycji</span><strong id="payback">—</strong></div>
             </div>
             <div class="result-bottom">
@@ -643,9 +643,9 @@
       <section id="contact" class="contact-section" aria-labelledby="contactTitle">
         <div class="contact-copy">
           <h2 id="contactTitle">Chcesz otrzymać analizę dopasowaną do gospodarstwa?</h2>
-          <p>Prześlij wynik. Sprawdzimy lokalizację, wariant urządzenia, możliwe finansowanie oraz kolejne kroki. Bezpłatnie i bez zobowiązań.</p>
+          <p>Prześlij wynik. Sprawdzimy lokalizację, dobierzemy pakiet, możliwe finansowanie oraz kolejne kroki. Bezpłatnie i bez zobowiązań.</p>
           <div class="mini-list">
-            <div class="mini-item"><span aria-hidden="true">✓</span><span>dobór mlekomatu i wyposażenia</span></div>
+            <div class="mini-item"><span aria-hidden="true">✓</span><span>dobór pakietu START / SPRZEDAŻOWY / PREMIUM</span></div>
             <div class="mini-item"><span aria-hidden="true">✓</span><span>wstępna ocena lokalizacji i sprzedaży</span></div>
             <div class="mini-item"><span aria-hidden="true">✓</span><span>możliwości leasingu lub dofinansowania</span></div>
           </div>
@@ -775,13 +775,13 @@
         }
 
         let recommendationTitle = "Projekt wymaga dokładniejszej analizy";
-        let recommendation = "Przy podanych wartościach potencjał sprzedaży jest zbyt niski lub ujemny. Sprawdź cenę sprzedaży, realny wolumen i koszt inwestycji.";
+        let recommendation = "Przy podanych wartościach potencjał sprzedaży jest zbyt niski lub ujemny. Sprawdź cenę sprzedaży, realny wolumen i koszt wybranego pakietu.";
         if (paybackMonths <= 24) {
           recommendationTitle = "Bardzo dobry potencjał";
-          recommendation = "Podane wartości wskazują na krótki orientacyjny czas odzyskania inwestycji. Warto sprawdzić lokalizację, wymagania techniczne i dobrać konkretny wariant punktu sprzedaży.";
+          recommendation = "Podane wartości wskazują na krótki orientacyjny czas odzyskania inwestycji. Warto sprawdzić lokalizację, wymagania techniczne i dobrać konkretny pakiet sprzedaży bezpośredniej.";
         } else if (paybackMonths <= 48) {
           recommendationTitle = "Dobry potencjał";
-          recommendation = "Projekt wygląda obiecująco. Największy wpływ na wynik będą miały rzeczywisty wolumen sprzedaży, lokalizacja i końcowa konfiguracja urządzenia.";
+          recommendation = "Projekt wygląda obiecująco. Największy wpływ na wynik będą miały rzeczywisty wolumen sprzedaży, lokalizacja i końcowa konfiguracja pakietu.";
         } else if (paybackMonths <= 72) {
           recommendationTitle = "Umiarkowany potencjał";
           recommendation = "Inwestycja może być uzasadniona, ale wymaga ostrożnego sprawdzenia popytu, kosztów i możliwości zwiększenia sprzedaży lub pozyskania dofinansowania.";
@@ -790,6 +790,7 @@
         lastCalculation = {
           region: $("#region").value || "nie podano",
           packageName: packageSelect.options[packageSelect.selectedIndex].text,
+          packageCode: packageSelect.options[packageSelect.selectedIndex].dataset.package || "",
           liters, days, collectionPrice, directPrice, operatingCost, investment,
           grantEnabled: grantEnabled.checked,
           grantRate: grantRate * 100,
@@ -828,18 +829,18 @@
         const c = lastCalculation;
         const paybackText = Number.isFinite(c.paybackMonths) ? `${c.paybackMonths} miesięcy` : "brak wyniku przy podanych założeniach";
         return [
-          "Proszę o kontakt w sprawie kalkulacji mlekomatu.",
+          "Proszę o kontakt w sprawie kalkulacji pakietu sprzedaży bezpośredniej.",
           "",
           `Imię i nazwisko: ${$("#name").value.trim()}`,
           `Telefon: ${$("#phone").value.trim()}`,
           `E-mail: ${$("#email").value.trim() || "nie podano"}`,
           `Województwo: ${c.region}`,
-          `Wariant: ${c.packageName}`,
+          `Pakiet: ${c.packageName}`,
           `Sprzedaż: ${c.liters} l/dzień przez ${c.days} dni w roku`,
           `Cena skupu: ${c.collectionPrice.toFixed(2)} zł/l`,
           `Cena bezpośrednia: ${c.directPrice.toFixed(2)} zł/l`,
           `Koszt sprzedaży: ${c.operatingCost.toFixed(2)} zł/l`,
-          `Koszt inwestycji: ${numberPLN.format(c.investment)}`,
+          `Koszt pakietu: ${numberPLN.format(c.investment)}`,
           `Dofinansowanie: ${c.grantEnabled ? `${c.grantRate}%` : "nie uwzględniono"}`,
           `Szacowany potencjał roczny: ${numberPLN.format(c.annualMargin)}`,
           `Koszt po możliwym dofinansowaniu: ${numberPLN.format(c.netInvestment)}`,
@@ -889,7 +890,7 @@
           return;
         }
 
-        const subject = encodeURIComponent("Kalkulacja mlekomatu — prośba o kontakt");
+        const subject = encodeURIComponent("Kalkulacja pakietu sprzedaży bezpośredniej — prośba o kontakt");
         const body = encodeURIComponent(message);
         window.location.href = `mailto:${CONTACT_EMAIL}?subject=${subject}&body=${body}`;
         statusMessage.textContent = "Otwieram gotową wiadomość w programie pocztowym.";
@@ -922,7 +923,7 @@
           `Telefon: ${document.getElementById("phone").value.trim()}`,
           `E-mail: ${document.getElementById("email").value.trim() || "nie podano"}`,
           `Województwo: ${c.region}`,
-          `Wariant: ${c.packageName}`,
+          `Pakiet: ${c.packageName}`,
           `Sprzedaż: ${c.liters} l/dzień przez ${c.days} dni w roku`,
           `Szacowany potencjał roczny: ${c.annualMargin}`,
           `Koszt po możliwym dofinansowaniu: ${c.netInvestment}`,
