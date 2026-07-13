@@ -1,24 +1,22 @@
-const JSONBIN_API_KEY = process.env.JSONBIN_API_KEY;
-const JSONBIN_BIN_ID = process.env.JSONBIN_BIN_ID;
 const PANEL_PASSWORD = process.env.PANEL_PASSWORD;
 const PANEL_BASIC_USER = process.env.PANEL_BASIC_USER;
 const PANEL_BASIC_PASSWORD = process.env.PANEL_BASIC_PASSWORD;
-const JSONBIN_KEY_HEADER = process.env.JSONBIN_KEY_HEADER;
+const {
+  hasPanelStoreConfig,
+  panelStoreConfigStatus,
+  readPanelStore,
+  savePanelStore
+} = require("./_panel-store");
 
 function getBasicAuth(req) {
   const header = req.headers.authorization || "";
   const [scheme, encoded] = header.split(" ");
 
-  if (scheme !== "Basic" || !encoded) {
-    return null;
-  }
+  if (scheme !== "Basic" || !encoded) return null;
 
   const decoded = Buffer.from(encoded, "base64").toString("utf8");
   const separator = decoded.indexOf(":");
-
-  if (separator === -1) {
-    return null;
-  }
+  if (separator === -1) return null;
 
   return {
     user: decoded.slice(0, separator),
@@ -30,9 +28,7 @@ function isAuthorized(req) {
   const password = req.headers["x-panel-password"];
   const allowed = [PANEL_PASSWORD, PANEL_BASIC_PASSWORD].filter(Boolean);
 
-  if (password && allowed.includes(password)) {
-    return true;
-  }
+  if (password && allowed.includes(password)) return true;
 
   const basic = getBasicAuth(req);
   return Boolean(
@@ -44,92 +40,26 @@ function isAuthorized(req) {
   );
 }
 
-function jsonBinAuthHeaderVariants() {
-  const preferred = JSONBIN_KEY_HEADER === "X-Access-Key" ? "X-Access-Key" : "X-Master-Key";
-  const variants = [{ name: preferred, headers: { [preferred]: JSONBIN_API_KEY } }];
-
-  if (!JSONBIN_KEY_HEADER) {
-    const fallback = preferred === "X-Master-Key" ? "X-Access-Key" : "X-Master-Key";
-    variants.push({ name: fallback, headers: { [fallback]: JSONBIN_API_KEY } });
-  }
-
-  return variants;
-}
-
-function jsonBinKeyHeaderName() {
-  return JSONBIN_KEY_HEADER === "X-Access-Key" ? "X-Access-Key" : "X-Master-Key";
-}
-
 function serverConfigStatus() {
   return {
-    hasJsonBinApiKey: Boolean(JSONBIN_API_KEY),
-    hasJsonBinBinId: Boolean(JSONBIN_BIN_ID),
     hasPanelPassword: Boolean(PANEL_PASSWORD),
-    hasPanelBasicPassword: Boolean(PANEL_BASIC_PASSWORD)
+    hasPanelBasicPassword: Boolean(PANEL_BASIC_PASSWORD),
+    supabase: panelStoreConfigStatus()
   };
 }
 
-async function readUpstreamError(upstream) {
-  let body = "";
-  try {
-    body = await upstream.text();
-  } catch (e) {}
-
-  const safeBody = body.slice(0, 500);
-  return {
-    status: upstream.status,
-    message: upstream.status === 401 || upstream.status === 403
-      ? "JSONBin authorization failed."
-      : "JSONBin request failed.",
-    body: safeBody
-  };
-}
-
-function logJsonBinError(method, payloadLength, details) {
-  console.error("JSONBin request failed", {
-    method,
-    jsonbinStatus: details && details.status,
-    hasBinId: Boolean(JSONBIN_BIN_ID),
-    hasApiKey: Boolean(JSONBIN_API_KEY),
-    keyHeader: jsonBinKeyHeaderName(),
-    payloadLength,
-    message: details && details.message,
-    bodyPreview: details && details.body ? details.body.slice(0, 240) : ""
-  });
-}
-
-async function fetchJsonBin(url, options = {}) {
-  let lastResponse = null;
-  const variants = jsonBinAuthHeaderVariants();
-
-  for (const variant of variants) {
-    const headers = {
-      ...(options.headers || {}),
-      ...variant.headers
-    };
-
-    const response = await fetch(url, {
-      ...options,
-      headers
-    });
-
-    response.usedJsonBinHeader = variant.name;
-    lastResponse = response;
-
-    if (response.ok || !(response.status === 401 || response.status === 403)) {
-      return response;
-    }
-  }
-
-  return lastResponse;
+function parseVersionHeader(req) {
+  const raw = req.headers["x-panel-version"];
+  const parsed = Number(raw);
+  return Number.isFinite(parsed) && parsed >= 0 ? parsed : null;
 }
 
 module.exports = async function handler(req, res) {
   res.setHeader("Cache-Control", "no-store");
 
-  if (!JSONBIN_API_KEY || !JSONBIN_BIN_ID || (!PANEL_PASSWORD && !PANEL_BASIC_PASSWORD)) {
+  if (!hasPanelStoreConfig() || (!PANEL_PASSWORD && !PANEL_BASIC_PASSWORD)) {
     return res.status(500).json({
-      error: "Panel server configuration is missing.",
+      error: "Panel Supabase configuration is missing.",
       config: serverConfigStatus()
     });
   }
@@ -140,48 +70,43 @@ module.exports = async function handler(req, res) {
 
   try {
     if (req.method === "GET") {
-      const upstream = await fetchJsonBin(`https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}/latest`);
-
-      if (!upstream.ok) {
-        const details = await readUpstreamError(upstream);
-        details.usedHeader = upstream.usedJsonBinHeader;
-        logJsonBinError("GET", 0, details);
-        return res.status(502).json(details);
-      }
-
-      const body = await upstream.text();
-      res.status(upstream.status);
-      res.setHeader("Content-Type", upstream.headers.get("content-type") || "application/json");
-      return res.send(body);
+      const store = await readPanelStore();
+      return res.status(200).json({
+        record: store.data || {},
+        version: store.version,
+        database: "supabase"
+      });
     }
 
     if (req.method === "PUT") {
-      const payload = typeof req.body === "string" ? req.body : JSON.stringify(req.body);
-      const payloadLength = Buffer.byteLength(payload || "", "utf8");
-      const upstream = await fetchJsonBin(`https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          "X-Bin-Versioning": "false"
-        },
-        body: payload
-      });
+      const payload = typeof req.body === "string" ? JSON.parse(req.body || "{}") : (req.body || {});
+      const expectedVersion = parseVersionHeader(req);
+      const current = expectedVersion === null ? await readPanelStore() : null;
+      const versionToSave = expectedVersion === null ? current.version : expectedVersion;
+      const ok = await savePanelStore(versionToSave, payload);
 
-      if (!upstream.ok) {
-        const details = await readUpstreamError(upstream);
-        details.usedHeader = upstream.usedJsonBinHeader;
-        logJsonBinError("PUT", payloadLength, details);
-        return res.status(502).json(details);
+      if (!ok) {
+        return res.status(409).json({
+          error: "Panel data version conflict.",
+          message: "Dane w Supabase zmienily sie w trakcie zapisu. Odswiez panel i sprobuj ponownie."
+        });
       }
 
-      const body = await upstream.text();
-      res.status(upstream.status);
-      res.setHeader("Content-Type", upstream.headers.get("content-type") || "application/json");
-      return res.send(body);
+      return res.status(200).json({
+        ok: true,
+        version: versionToSave + 1,
+        database: "supabase"
+      });
     }
   } catch (e) {
+    console.error("Panel Supabase API failed", {
+      method: req.method,
+      config: panelStoreConfigStatus(),
+      message: e && e.message ? e.message : "Unknown error"
+    });
+
     return res.status(500).json({
-      error: "Panel API failed before JSONBin response.",
+      error: "Panel Supabase API failed.",
       message: e && e.message ? e.message : "Unknown error"
     });
   }

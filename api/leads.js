@@ -1,6 +1,8 @@
-const JSONBIN_API_KEY = process.env.JSONBIN_API_KEY;
-const JSONBIN_BIN_ID = process.env.JSONBIN_BIN_ID;
-const JSONBIN_KEY_HEADER = process.env.JSONBIN_KEY_HEADER;
+const {
+  hasPanelStoreConfig,
+  panelStoreConfigStatus,
+  mutatePanelStore
+} = require("./_panel-store");
 
 const ALLOWED_SOURCES = {
   kontakt: {
@@ -25,72 +27,6 @@ const ALLOWED_SOURCES = {
     notificationTitle: "Nowy lead z Advisor OLX"
   }
 };
-
-function jsonBinAuthHeaderVariants() {
-  const preferred = JSONBIN_KEY_HEADER === "X-Access-Key" ? "X-Access-Key" : "X-Master-Key";
-  const variants = [{ name: preferred, headers: { [preferred]: JSONBIN_API_KEY } }];
-
-  if (!JSONBIN_KEY_HEADER) {
-    const fallback = preferred === "X-Master-Key" ? "X-Access-Key" : "X-Master-Key";
-    variants.push({ name: fallback, headers: { [fallback]: JSONBIN_API_KEY } });
-  }
-
-  return variants;
-}
-
-async function readUpstreamError(upstream) {
-  let body = "";
-  try {
-    body = await upstream.text();
-  } catch (e) {}
-
-  return {
-    status: upstream.status,
-    usedHeader: upstream.usedJsonBinHeader,
-    message: upstream.status === 401 || upstream.status === 403
-      ? "JSONBin authorization failed."
-      : "JSONBin request failed.",
-    body: body.slice(0, 500)
-  };
-}
-
-function logJsonBinError(method, details) {
-  console.error("Lead intake JSONBin request failed", {
-    method,
-    jsonbinStatus: details && details.status,
-    usedHeader: details && details.usedHeader,
-    hasBinId: Boolean(JSONBIN_BIN_ID),
-    hasApiKey: Boolean(JSONBIN_API_KEY),
-    message: details && details.message,
-    bodyPreview: details && details.body ? details.body.slice(0, 240) : ""
-  });
-}
-
-async function fetchJsonBin(url, options = {}) {
-  let lastResponse = null;
-  const variants = jsonBinAuthHeaderVariants();
-
-  for (const variant of variants) {
-    const headers = {
-      ...(options.headers || {}),
-      ...variant.headers
-    };
-
-    const response = await fetch(url, {
-      ...options,
-      headers
-    });
-
-    response.usedJsonBinHeader = variant.name;
-    lastResponse = response;
-
-    if (response.ok || !(response.status === 401 || response.status === 403)) {
-      return response;
-    }
-  }
-
-  return lastResponse;
-}
 
 function clampText(value, max) {
   return String(value || "").trim().slice(0, max);
@@ -253,8 +189,11 @@ module.exports = async function handler(req, res) {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
-  if (!JSONBIN_API_KEY || !JSONBIN_BIN_ID) {
-    return res.status(500).json({ error: "Lead intake is not configured." });
+  if (!hasPanelStoreConfig()) {
+    return res.status(500).json({
+      error: "Lead intake Supabase configuration is missing.",
+      config: panelStoreConfigStatus()
+    });
   }
 
   const payload = parseBody(req);
@@ -277,111 +216,74 @@ module.exports = async function handler(req, res) {
   }
 
   try {
-    const upstreamGet = await fetchJsonBin(`https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}/latest`);
+    const mutation = await mutatePanelStore((data) => {
+      if (!Array.isArray(data.klienci)) data.klienci = [];
+      if (!Array.isArray(data.powiadomienia)) data.powiadomienia = [];
 
-    if (!upstreamGet.ok) {
-      const details = await readUpstreamError(upstreamGet);
-      logJsonBinError("GET", details);
-      return res.status(502).json({ error: "Failed to read CRM data.", details });
-    }
+      const now = new Date().toISOString();
+      const existing = findExistingClient(data.klienci, lead);
 
-    const upstreamJson = await upstreamGet.json();
-    const data = upstreamJson.record || upstreamJson || {};
-    if (!Array.isArray(data.klienci)) data.klienci = [];
-    if (!Array.isArray(data.powiadomienia)) data.powiadomienia = [];
+      if (existing) {
+        if (!Array.isArray(existing.historia)) existing.historia = [];
+        if (!Array.isArray(existing.oferty)) existing.oferty = [];
+        existing.historia.push({ tekst: lead.historyText, kto: "System", data: now });
+        existing.zaktualizowano = now;
+        if (!existing.zrodloLeada) existing.zrodloLeada = lead.sourceCfg.zrodloLeada;
+        if (!existing.kategoriaLeada) existing.kategoriaLeada = lead.sourceCfg.kategoriaLeada;
+        if (!existing.telefon && lead.telefon) existing.telefon = lead.telefon;
+        if (!existing.email && lead.email) existing.email = lead.email;
+        if (!existing.firma && lead.firma) existing.firma = lead.firma;
+        if (!existing.osoba && lead.osoba) existing.osoba = lead.osoba;
+        if (!existing.wojewodztwo && lead.wojewodztwo) existing.wojewodztwo = lead.wojewodztwo;
+        if (!existing.miejscowosc && lead.miejscowosc) existing.miejscowosc = lead.miejscowosc;
+        if (!existing.ulica && lead.ulica) existing.ulica = lead.ulica;
+        if (!existing.zainteresowanie && lead.zainteresowanie) existing.zainteresowanie = lead.zainteresowanie;
+        if (!existing.produkt && lead.produkt) existing.produkt = lead.produkt;
+        if (!existing.obiekcje && lead.obiekcje) existing.obiekcje = lead.obiekcje;
+        existing.notatki = mergeNotes(existing.notatki, lead.notes);
+        if (existing.priorytet !== "A" && lead.priorytet === "A") existing.priorytet = "A";
+        if (!existing.status) existing.status = lead.sourceCfg.status;
 
-    const now = new Date().toISOString();
-    const existing = findExistingClient(data.klienci, lead);
+        data.powiadomienia.unshift(buildNotification(existing, lead, now, true));
 
-    if (existing) {
-      if (!Array.isArray(existing.historia)) existing.historia = [];
-      if (!Array.isArray(existing.oferty)) existing.oferty = [];
-      existing.historia.push({ tekst: lead.historyText, kto: "System", data: now });
-      existing.zaktualizowano = now;
-      if (!existing.zrodloLeada) existing.zrodloLeada = lead.sourceCfg.zrodloLeada;
-      if (!existing.kategoriaLeada) existing.kategoriaLeada = lead.sourceCfg.kategoriaLeada;
-      if (!existing.telefon && lead.telefon) existing.telefon = lead.telefon;
-      if (!existing.email && lead.email) existing.email = lead.email;
-      if (!existing.firma && lead.firma) existing.firma = lead.firma;
-      if (!existing.osoba && lead.osoba) existing.osoba = lead.osoba;
-      if (!existing.wojewodztwo && lead.wojewodztwo) existing.wojewodztwo = lead.wojewodztwo;
-      if (!existing.miejscowosc && lead.miejscowosc) existing.miejscowosc = lead.miejscowosc;
-      if (!existing.ulica && lead.ulica) existing.ulica = lead.ulica;
-      if (!existing.zainteresowanie && lead.zainteresowanie) existing.zainteresowanie = lead.zainteresowanie;
-      if (!existing.produkt && lead.produkt) existing.produkt = lead.produkt;
-      if (!existing.obiekcje && lead.obiekcje) existing.obiekcje = lead.obiekcje;
-      existing.notatki = mergeNotes(existing.notatki, lead.notes);
-      if (existing.priorytet !== "A" && lead.priorytet === "A") existing.priorytet = "A";
-      if (!existing.status) existing.status = lead.sourceCfg.status;
-
-      data.powiadomienia.unshift(buildNotification(existing, lead, now, true));
-
-      const upstreamPut = await fetchJsonBin(`https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          "X-Bin-Versioning": "false"
-        },
-        body: JSON.stringify(data)
-      });
-
-      if (!upstreamPut.ok) {
-        const details = await readUpstreamError(upstreamPut);
-        logJsonBinError("PUT existing", details);
-        return res.status(502).json({ error: "Failed to update existing client.", details });
+        return { updatedExisting: true, clientId: existing.id };
       }
 
-      return res.status(200).json({ ok: true, updatedExisting: true });
-    }
+      const client = {
+        id: `c_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
+        firma: lead.firma,
+        osoba: lead.osoba,
+        wojewodztwo: lead.wojewodztwo,
+        miejscowosc: lead.miejscowosc,
+        ulica: lead.ulica,
+        telefon: lead.telefon,
+        email: lead.email,
+        zainteresowanie: lead.zainteresowanie,
+        produkt: lead.produkt,
+        priorytet: lead.priorytet,
+        status: lead.sourceCfg.status,
+        zrodloLeada: lead.sourceCfg.zrodloLeada,
+        kategoriaLeada: lead.sourceCfg.kategoriaLeada,
+        obiekcje: lead.obiekcje,
+        notatki: lead.notes,
+        nastepnyFollowup: "",
+        utworzono: now,
+        zaktualizowano: now,
+        historia: [{ tekst: lead.historyText, kto: "System", data: now }],
+        oferty: []
+      };
 
-    const client = {
-      id: `c_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
-      firma: lead.firma,
-      osoba: lead.osoba,
-      wojewodztwo: lead.wojewodztwo,
-      miejscowosc: lead.miejscowosc,
-      ulica: lead.ulica,
-      telefon: lead.telefon,
-      email: lead.email,
-      zainteresowanie: lead.zainteresowanie,
-      produkt: lead.produkt,
-      priorytet: lead.priorytet,
-      status: lead.sourceCfg.status,
-      zrodloLeada: lead.sourceCfg.zrodloLeada,
-      kategoriaLeada: lead.sourceCfg.kategoriaLeada,
-      obiekcje: lead.obiekcje,
-      notatki: lead.notes,
-      nastepnyFollowup: "",
-      utworzono: now,
-      zaktualizowano: now,
-      historia: [{ tekst: lead.historyText, kto: "System", data: now }],
-      oferty: []
-    };
+      data.klienci.push(client);
+      data.powiadomienia.unshift(buildNotification(client, lead, now, false));
 
-    data.klienci.push(client);
-    data.powiadomienia.unshift(buildNotification(client, lead, now, false));
-
-    const upstreamPut = await fetchJsonBin(`https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        "X-Bin-Versioning": "false"
-      },
-      body: JSON.stringify(data)
+      return { created: true, clientId: client.id };
     });
 
-    if (!upstreamPut.ok) {
-      const details = await readUpstreamError(upstreamPut);
-      logJsonBinError("PUT new", details);
-      return res.status(502).json({ error: "Failed to save new client.", details });
-    }
-
-    return res.status(200).json({ ok: true, created: true });
+    return res.status(200).json({ ok: true, ...mutation.result });
   } catch (error) {
     console.error("Lead intake failed", {
       source,
-      hasBinId: Boolean(JSONBIN_BIN_ID),
-      hasApiKey: Boolean(JSONBIN_API_KEY),
+      supabase: panelStoreConfigStatus(),
       message: error && error.message ? error.message : "Unknown error"
     });
     return res.status(500).json({ error: "Lead intake failed." });

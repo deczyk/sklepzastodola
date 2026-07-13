@@ -1259,7 +1259,7 @@
       <div id="backupStats" class="backupStats"></div>
       <div class="backupActions">
         <button class="importBtn" onclick="exportPanelBackupJson()">Pobierz backup JSON</button>
-        <span class="backupHint">Eksport nie zmienia danych i nie wysyła nic do JSONBin.</span>
+        <span class="backupHint">Eksport nie zmienia danych i nie wysyła nic poza panel.</span>
       </div>
       <div class="backupPreview">
         <h3>Podgląd backupu JSON</h3>
@@ -2150,6 +2150,7 @@ function defaultData(){
 let data = null;
 let saveTimer = null;
 let initialRemoteData = null;
+let currentPanelVersion = null;
 let lastCloudSaveOk = true;
 let hasUnsyncedLocalChanges = false;
 
@@ -2170,6 +2171,7 @@ async function fetchRemote(password = getPanelPassword()){
   if(res.status === 401) throw new Error("AUTH");
   if(!res.ok) throw new Error(await syncErrorMessage(res));
   const json = await res.json();
+  currentPanelVersion = Number.isFinite(Number(json.version)) ? Number(json.version) : null;
   return json.record;
 }
 
@@ -2182,12 +2184,18 @@ async function pushRemote(payload){
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
-        "X-Panel-Password": password
+        "X-Panel-Password": password,
+        ...(currentPanelVersion !== null ? { "X-Panel-Version": String(currentPanelVersion) } : {})
       },
       body: JSON.stringify(payload)
     });
     if(res.status === 401) throw new Error("AUTH");
+    if(res.status === 409) throw new Error("VERSION_CONFLICT");
     if(!res.ok) throw new Error(await syncErrorMessage(res));
+    try{
+      const json = await res.json();
+      if(Number.isFinite(Number(json.version))) currentPanelVersion = Number(json.version);
+    }catch(e){}
     lastCloudSaveOk = true;
     hasUnsyncedLocalChanges = false;
     setSyncStatus("Zsynchronizowano ✓", false);
@@ -2219,8 +2227,9 @@ function syncErrorText(e){
   const msg = e && e.message ? e.message : "";
   if(msg === "NO_PASSWORD") return "Błąd synchronizacji: brak hasła";
   if(msg === "AUTH") return "Błąd synchronizacji: API zwróciło 401";
-  const jsonBinStatus = msg.match(/"status"\s*:\s*(\d{3})/) || msg.match(/status[^\d]*(\d{3})/i);
-  if(msg.includes("JSONBin")) return "Błąd synchronizacji: JSONBin odrzucił zapis" + (jsonBinStatus ? `: HTTP ${jsonBinStatus[1]}` : "");
+  const cloudStatus = msg.match(/"status"\s*:\s*(\d{3})/) || msg.match(/status[^\d]*(\d{3})/i);
+  if(msg.includes("Supabase")) return "Błąd synchronizacji: Supabase odrzucił zapis" + (cloudStatus ? `: HTTP ${cloudStatus[1]}` : "");
+  if(msg === "VERSION_CONFLICT") return "Błąd synchronizacji: dane w chmurze zmieniły się w trakcie zapisu. Odśwież panel i spróbuj ponownie.";
   if(msg.includes("HTTP 500")) return "Błąd synchronizacji: API zwróciło 500";
   if(msg.includes("HTTP ")) return "Błąd synchronizacji: API zwróciło " + msg.replace(/^HTTP\s*/, "");
   return "Zapisano lokalnie, ale nie zapisano w chmurze";
@@ -5946,7 +5955,7 @@ const AI_LIMIT_RULES = [
 const AI_SAFETY_RULES = [
   "Haseł.",
   "Kluczy API.",
-  "Danych JSONBin.",
+  "Danych Supabase.",
   "Prywatnych danych klientów.",
   "Cenników zakupowych bez potrzeby.",
   "Marż i kosztów zakupu.",
@@ -5984,7 +5993,7 @@ const AI_PROMPTS = [
     tytul:"Kontrola bezpieczeństwa",
     kategoria:"Bezpieczeństwo",
     opis:"Sprawdzenie, czy zmiana nadaje się do commita.",
-    tresc:"Sprawdź, czy w zmianach nie ma haseł, kluczy API, danych JSONBin, prywatnych cenników, marż, kosztów zakupu, danych klientów ani plików, które nie powinny trafić do repo. Wypisz ryzyka i powiedz, czy można robić commit."
+    tresc:"Sprawdź, czy w zmianach nie ma haseł, kluczy API, danych Supabase, prywatnych cenników, marż, kosztów zakupu, danych klientów ani plików, które nie powinny trafić do repo. Wypisz ryzyka i powiedz, czy można robić commit."
   },
   {
     tytul:"Decyzja biznesowa",
