@@ -3,6 +3,12 @@
 
   // ── GOOGLE ANALYTICS (ładowany tylko po zgodzie na cookies) ──
   const GA_ID = 'G-L5MHJSZZ19';
+  const FB_PIXEL_ID = '1372106511478428';
+
+  function hasMarketingConsent(){
+    const consent = localStorage.getItem('cookie_consent');
+    return consent === 'yes' || consent === 'accept' || consent === 'marketing';
+  }
 
   function loadGA(){
     if(window.__gaLoaded) return; // nie ładuj dwa razy
@@ -21,9 +27,35 @@
   }
   window.__loadGA = loadGA;
 
-  // Jeśli użytkownik już wcześniej zaakceptował — ładuj GA od razu
-  if(localStorage.getItem('cookie_consent') === 'yes'){
+  function loadMetaPixel(){
+    if(window.__fbPixelLoaded) return;
+    window.__fbPixelLoaded = true;
+
+    !function(f,b,e,v,n,t,s){
+      if(f.fbq) return;
+      n=f.fbq=function(){n.callMethod?
+      n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+      if(!f._fbq) f._fbq=n;
+      n.push=n;
+      n.loaded=!0;
+      n.version='2.0';
+      n.queue=[];
+      t=b.createElement(e);
+      t.async=!0;
+      t.src=v;
+      s=b.getElementsByTagName(e)[0];
+      s.parentNode.insertBefore(t,s);
+    }(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
+
+    window.fbq('init', FB_PIXEL_ID);
+    window.fbq('track', 'PageView');
+  }
+  window.__loadMetaPixel = loadMetaPixel;
+
+  // Jeśli użytkownik już wcześniej zaakceptował marketing/analitykę — ładuj narzędzia od razu.
+  if(hasMarketingConsent()){
     loadGA();
+    loadMetaPixel();
   }
 
   // ── ŚLEDZENIE KONWERSJI (telefon / e-mail / formularz) ──
@@ -102,7 +134,10 @@
     sessionStorage.setItem('cookie_seen', '1');
     const el = document.getElementById('cookie');
     if(el){ el.classList.remove('show'); }
-    if(v === 'yes'){ loadGA(); } // zgoda kliknięta teraz — odpal GA natychmiast
+    if(v === 'yes' || v === 'accept' || v === 'marketing'){
+      loadGA();
+      loadMetaPixel();
+    }
   }
   window.setCk = setCk;
 
