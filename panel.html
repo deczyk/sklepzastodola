@@ -287,6 +287,8 @@
   .linksGrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px}
   .linkCard{display:flex;align-items:center;justify-content:space-between;gap:8px;border:1px solid var(--line);
             border-radius:10px;padding:12px 14px;background:#fbfcfb;text-decoration:none;color:var(--ink);font-weight:bold}
+  .linkCardTitle{display:flex;flex-direction:column;gap:2px}
+  .linkCardTitle small{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:bold}
   .linkCard:hover{border-color:var(--green);box-shadow:0 3px 10px #0000001a}
   .linkCard .del{color:#c0392b;font-weight:normal;font-size:11px}
 
@@ -351,6 +353,35 @@
   .checkStep input{margin-top:2px}
   .checkActions{display:flex;gap:8px;justify-content:space-between;align-items:center;margin-top:10px}
 
+  /* --- Plan działania --- */
+  .actionPlanGrid{display:grid;gap:14px}
+  .actionBlock{border:1px solid var(--border);border-radius:14px;background:var(--surface);padding:16px;box-shadow:0 8px 20px #1d3b2408}
+  .actionBlock h3{margin:0 0 10px;color:var(--green)}
+  .actionTask{display:grid;grid-template-columns:auto 1fr minmax(160px,220px);gap:12px;align-items:start;border:1px solid var(--border);
+              border-radius:12px;background:var(--surface-soft);padding:12px;margin-bottom:10px}
+  .actionTask.urgent{border-color:#d55;background:#fff7f5}
+  .actionTask input[type="checkbox"]{width:auto;margin-top:3px}
+  .actionTaskTitle{font-weight:bold;color:var(--text)}
+  .actionMeta{display:flex;gap:6px;flex-wrap:wrap;margin-top:5px}
+  .actionBadge{display:inline-flex;align-items:center;border:1px solid var(--border);border-radius:999px;padding:3px 8px;font-size:11px;font-weight:bold;color:var(--text-muted);background:var(--surface)}
+  .actionBadge.urgent{border-color:#d55;color:#a32222;background:#fff0ee}
+  .actionTask textarea{width:100%;min-height:46px;border:1px solid var(--border);border-radius:8px;background:var(--input-bg);color:var(--text);padding:7px 9px;font:inherit;resize:vertical}
+  .actionTable{width:100%;border-collapse:collapse;font-size:13px}
+  .actionTable th,.actionTable td{border-bottom:1px solid var(--border);padding:9px;text-align:left;vertical-align:top}
+  .actionTable th{font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:var(--text-muted)}
+  .actionTable select{width:100%;min-width:140px;border:1px solid var(--border);border-radius:8px;background:var(--input-bg);color:var(--text);padding:7px 9px;font:inherit}
+  .capacityGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}
+  .capacityCard{border:1px solid var(--border);border-radius:12px;background:var(--surface-soft);padding:14px}
+  .capacityCard b{display:block;color:var(--green);font-size:20px;margin-bottom:5px}
+  .salesGoalBox{display:grid;gap:12px}
+  .salesGoalInput{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+  .salesGoalInput input{width:110px;border:1px solid var(--border);border-radius:8px;background:var(--input-bg);color:var(--text);padding:8px 10px;font:inherit}
+  .goalProgress{display:grid;grid-template-columns:150px 1fr 60px;gap:10px;align-items:center}
+  .goalBar{height:12px;border-radius:999px;background:#edf3ee;overflow:hidden;border:1px solid var(--border)}
+  .goalBar span{display:block;height:100%;background:linear-gradient(90deg,var(--green),#c9a24a);width:0%}
+  body.dark-theme .actionTask.urgent{background:rgba(239,83,80,.1);border-color:rgba(239,83,80,.35)}
+  body.dark-theme .actionBadge.urgent{background:rgba(239,83,80,.12);color:#ffb4b2;border-color:rgba(239,83,80,.35)}
+
   /* --- Dashboard --- */
   .dashGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px}
   .dashCard{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:20px 22px;
@@ -396,6 +427,24 @@
   .salesText{white-space:pre-wrap;line-height:1.55;font-size:13.5px;color:#222;background:white;border:1px solid #e8eee8;
              border-radius:12px;padding:16px;overflow:auto;max-height:65vh}
   .salesWarn{background:#fff8e1;border-left:4px solid var(--accent);border-radius:8px;padding:10px 12px;font-size:12.5px;color:#5d4b16;margin-bottom:14px}
+  .fbReminder{border:1px solid #ead99a;background:#fff8dc;color:#4f3b0b;border-radius:14px;padding:14px 16px;
+              box-shadow:0 8px 18px #1d3b2410;cursor:pointer}
+  .fbReminder strong{display:block;color:#5d4611;margin-bottom:3px}
+  .fbReminder span{font-size:13px;line-height:1.45}
+  .fbPlanHeader{display:flex;justify-content:space-between;gap:14px;align-items:flex-start;margin-bottom:14px;flex-wrap:wrap}
+  .fbPlanHeader p{margin:4px 0 0;color:var(--text-muted);font-size:13px;line-height:1.45}
+  .fbPlanGrid{display:grid;gap:12px}
+  .fbPostCard{border:1px solid var(--border);border-radius:14px;background:var(--surface-soft);padding:16px 18px;
+              box-shadow:0 4px 12px #1d3b2408}
+  .fbPostTop{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;margin-bottom:10px}
+  .fbPostDate{font-weight:bold;color:var(--green);font-size:13px}
+  .fbPostStatus{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--text-muted);font-weight:bold;white-space:nowrap}
+  .fbPostStatus input{width:auto}
+  .fbPostText{white-space:pre-wrap;font-size:13px;line-height:1.55;color:var(--text)}
+  .fbPostActions{display:flex;justify-content:flex-end;gap:8px;margin-top:12px;flex-wrap:wrap}
+  .fbPostActions button{border:1px solid var(--border);background:var(--surface);color:var(--green);border-radius:8px;
+                        padding:7px 10px;font-size:12px;font-weight:bold;cursor:pointer}
+  .fbPostCard.published{opacity:.72}
   @media(max-width:850px){.salesLayout{grid-template-columns:1fr}.salesMenu{position:static}.salesMenu{display:flex;overflow-x:auto}.salesMenu button{min-width:210px;margin:0 8px 0 0}}
 
   /* --- Podwykonawcy --- */
@@ -989,6 +1038,9 @@
     .commandSections,.commandCounters{grid-template-columns:1fr}
     .commandHeader{flex-direction:column}
     .clientActions,.clientMobileActions,.commandActions,.themeSwitchRow{flex-direction:column}
+    .actionTask{grid-template-columns:auto 1fr}
+    .actionTask textarea{grid-column:1/-1}
+    .goalProgress{grid-template-columns:1fr}
     .lockBtn{padding:6px 10px}
   }
   @media(max-width:900px){
@@ -1062,6 +1114,8 @@
             <div class="dashSyncPill" id="dashSyncPill">Status synchronizacji: sprawdzanie...</div>
           </div>
         </div>
+
+        <div id="fbContentReminder" class="fbReminder" style="display:none"></div>
 
         <div class="dashKpiRow" id="dashKpi"></div>
 
@@ -1155,6 +1209,31 @@
       <div id="checklistTemplates" class="checkGrid"></div>
       <h3>Aktywne checklisty</h3>
       <div id="activeChecklisty"></div>
+    </div>
+    </div>
+
+    <div class="tabPane" id="tabpane-planlipiec">
+    <div class="section">
+      <h2>Plan działania — Lipiec 2026</h2>
+      <div class="privateNotice"><b>Prywatnie:</b> plan zapisuje statusy, notatki i cel sprzedażowy w danych panelu. Blok przepustowości jest tylko referencją operacyjną.</div>
+      <div class="actionPlanGrid">
+        <div class="actionBlock">
+          <h3>Formalności — checklist z terminami</h3>
+          <div id="julyFormalities"></div>
+        </div>
+        <div class="actionBlock">
+          <h3>Kanały marketingowe — lipiec 2026</h3>
+          <div id="julyMarketingChannels"></div>
+        </div>
+        <div class="actionBlock">
+          <h3>Przepustowość operacyjna</h3>
+          <div id="julyCapacity"></div>
+        </div>
+        <div class="actionBlock">
+          <h3>Cel sprzedażowy — 2026</h3>
+          <div id="julySalesGoal"></div>
+        </div>
+      </div>
     </div>
     </div>
 
@@ -1644,9 +1723,14 @@
     </div>
     <div class="tabPane" id="tabpane-marketing">
       <div class="section">
-        <h2>Marketing</h2>
-        <div class="privateNotice"><b>Prywatnie:</b> plan marketingowy i robocze teksty nie sa juz zapisane w zrodle HTML. Przeniesiemy je do prywatnego magazynu przy przebudowie panelu.</div>
-        <div class="empty">Materialy marketingowe zostana odtworzone jako widok ladowany po zalogowaniu.</div>
+        <div class="fbPlanHeader">
+          <div>
+            <h2>Content plan Facebook</h2>
+            <p>Gotowe posty na start profilu firmowego. Status zapisuje się w danych panelu razem z resztą CRM.</p>
+          </div>
+          <button class="addBtn" onclick="renderFacebookContentPlan()">Odśwież listę</button>
+        </div>
+        <div id="facebookContentPlan" class="fbPlanGrid"></div>
       </div>
     </div>
     <div class="tabPane" id="tabpane-materialy">
@@ -1893,6 +1977,155 @@ function switchTab(name, options={}){
   if(!options.preserveSubView) syncNavigationFromTab(name);
 }
 
+function defaultFacebookContentPlan(){
+  return [
+    {
+      id:"fb_2026_07_13_opening",
+      data:"13-14.07.2026",
+      dataStart:"2026-07-13",
+      dataEnd:"2026-07-14",
+      status:"do wysłania",
+      tresc:`Dzień dobry!
+
+Coraz więcej rolników decyduje się na sprzedaż bezpośrednią mleka — i to nie bez powodu.
+
+Mlekomat + mały sklep przy gospodarstwie pozwala ominąć pośredników i sprzedawać mleko po znacznie lepszej cenie.
+
+My specjalizujemy się w kompleksowym uruchamianiu takich punktów:
+- drewniane pawilony pod klucz
+- szwajcarskie mlekomaty Brunimat (certyfikat CE-MID)
+- butelkowanie, etykiety, serwis
+- pomoc w formalnościach i finansowaniu
+
+Jeśli rozważacie taki krok — napiszcie do nas. Bezpłatnie ocenimy, czy u Was się opłaca i co będzie najlepszym rozwiązaniem.`
+    },
+    {
+      id:"fb_2026_07_16_value",
+      data:"16-17.07.2026",
+      dataStart:"2026-07-16",
+      dataEnd:"2026-07-17",
+      status:"do wysłania",
+      tresc:`Chcecie sprzedawać mleko bezpośrednio, ale boicie się formalności i kosztów?
+
+Wielu rolników myśli, że uruchomienie sprzedaży bezpośredniej to ogromna biurokracja i duże wydatki.
+
+W rzeczywistości da się to zrobić znacznie prościej — pod warunkiem, że ma się dobrego partnera.
+
+My zajmujemy się wszystkim od A do Z: od projektu pawilonu, przez dobór i montaż mlekomatu Brunimat, aż po butelkowanie i uruchomienie sprzedaży.
+
+Chcecie wiedzieć, ile realnie można na tym zarobić i jakie są koszty? Napiszcie — przygotujemy krótką, bezpłatną analizę pod Wasze gospodarstwo.`
+    },
+    {
+      id:"fb_2026_07_19_product",
+      data:"19-20.07.2026",
+      dataStart:"2026-07-19",
+      dataEnd:"2026-07-20",
+      status:"do wysłania",
+      tresc:`Dlaczego akurat Brunimat?
+
+To szwajcarskie mlekomaty, które pracują w Polsce od wielu lat.
+
+Mają certyfikat CE-MID (legalna sprzedaż), automatyczne mycie, chłodzenie i bardzo dobrą niezawodność.
+
+W przeciwieństwie do tanich chińskich automatów — są zaprojektowane z myślą o codziennej, intensywnej pracy.
+
+Jeśli planujecie mlekomat na lata, a nie na sezon — warto postawić na sprawdzone rozwiązanie.
+
+Chcecie zobaczyć, jak wygląda mlekomat od środka? Napiszcie, wyślemy więcej zdjęć i specyfikację.`
+    },
+    {
+      id:"fb_2026_07_22_numbers",
+      data:"22-23.07.2026",
+      dataStart:"2026-07-22",
+      dataEnd:"2026-07-23",
+      status:"do wysłania",
+      tresc:`Ile można zarobić na własnym mlekomacie?
+
+To pytanie zadaje nam prawie każdy rolnik.
+
+Odpowiedź brzmi: zależy od skali produkcji i lokalizacji.
+
+Przy dobrze dobranym rozwiązaniu wielu naszych klientów osiąga sprzedaż na poziomie, który realnie poprawia rentowność gospodarstwa — bez oddawania marży pośrednikom.
+
+Chcecie konkretne wyliczenia pod Waszą liczbę krów i lokalizację? Napiszcie do nas — zrobimy szybką kalkulację. Albo skorzystajcie z naszego kalkulatora: sklepzastodola.pl`
+    },
+    {
+      id:"fb_2026_07_25_complete",
+      data:"25-26.07.2026",
+      dataStart:"2026-07-25",
+      dataEnd:"2026-07-26",
+      status:"do wysłania",
+      tresc:`Nie sprzedajemy tylko mlekomatu.
+
+Robimy kompletny punkt sprzedaży bezpośredniej:
+- Projekt i budowa drewnianego pawilonu
+- Dostawa i montaż mlekomatu Brunimat
+- System butelkowania + etykiety
+- Pomoc przy RHD i formalnościach
+- Wsparcie w finansowaniu (leasing, ARiMR)
+- Serwis i opieka posprzedażowa
+
+Jeden kontakt = cała inwestycja. Nie musicie biegać po kilku firmach i sami wszystkiego koordynować.`
+    },
+    {
+      id:"fb_2026_07_28_trust",
+      data:"28-29.07.2026",
+      dataStart:"2026-07-28",
+      dataEnd:"2026-07-29",
+      status:"do wysłania",
+      tresc:`Dlaczego rolnicy wybierają właśnie nas?
+
+Bo nie obiecujemy złotych gór.
+
+Zawsze mówimy wprost:
+- czy w danym gospodarstwie taki punkt ma sens,
+- jakie są realne koszty,
+- ile czasu zajmie zwrot inwestycji.
+
+Nie wciskamy rozwiązania na siłę. Jeśli po rozmowie uznamy, że mlekomat nie jest dla Was najlepszym pomysłem — też to szczerze powiemy.
+
+Chcecie taką szczerą rozmowę? Napiszcie lub zadzwońcie: 735 115 427.`
+    }
+  ];
+}
+
+function defaultQuickLinks(){
+  return [
+    {
+      id:"quick_biuro29",
+      nazwa:"Biuro29",
+      opis:"WIRTUALNE BIURO",
+      url:"https://bok29.pl/"
+    }
+  ];
+}
+
+function defaultJulyActionPlan(){
+  return {
+    formalnosci: [
+      {id:"crbr", nazwa:"CRBR — sprawdzić czy można zgłosić profilem zaufanym bez e-US", termin:"21.07.2026", pilne:true, wykonane:false, notatka:""},
+      {id:"eus_upl1", nazwa:"Dostęp do e-Urząd Skarbowy (UPL-1 Jakuba) — sprawdzić status / zadzwonić KAS 801 055 055", termin:"ASAP", pilne:true, wykonane:false, notatka:""},
+      {id:"nip8", nazwa:"NIP-8", termin:"28.07.2026", pilne:false, wykonane:false, notatka:""},
+      {id:"vatr", nazwa:"VAT-R (przed pierwszą fakturą)", termin:"", pilne:false, wykonane:false, notatka:""},
+      {id:"mbank", nazwa:"Konto firmowe mBank", termin:"", pilne:false, wykonane:false, notatka:""},
+      {id:"ksiegowosc", nazwa:"Ustalenie systemu księgowości (robimy sami)", termin:"", pilne:false, wykonane:false, notatka:""}
+    ],
+    kanaly: [
+      {id:"fb_organic", kanal:"Facebook (posty organiczne)", status:"Aktywny", budzet:"0 zł", notatki:"Harmonogram 7 postów już w module Content Plan FB"},
+      {id:"fb_ads_likes", kanal:"Facebook Ads (polubienia strony)", status:"Do uruchomienia", budzet:"50 zł", notatki:"Test 1 kreacji, cel: sprawdzić konwersję, nie generować leadów bezpośrednio"},
+      {id:"olx", kanal:"OLX", status:"Aktywny", budzet:"0 zł", notatki:"Wymaga diagnozy treści ogłoszenia"},
+      {id:"fb_groups", kanal:"Grupy rolnicze FB", status:"Do rozpoczęcia", budzet:"0 zł", notatki:"Cel: 3-5 grup, 2-3 posty/tydzień z wartością, nie samą ofertą"},
+      {id:"odr", kanal:"ODR (Ośrodki Doradztwa Rolniczego)", status:"Do rozpoczęcia", budzet:"0 zł", notatki:"Pierwszy kontakt z 1-2 ODR w regionach z aktywnymi leadami"},
+      {id:"targi", kanal:"Targi rolnicze", status:"Do sprawdzenia", budzet:"0 zł", notatki:"Sprawdzić kalendarz na lipiec, bez płatnego stoiska na start"}
+    ],
+    sprzedaz: {
+      sprzedane: 0,
+      celZarzadu: 8,
+      celOstrozny: 4
+    }
+  };
+}
+
 function defaultData(){
   return {
     dokumenty: [],
@@ -1904,11 +2137,13 @@ function defaultData(){
     instalacje: [],
     finanse: [],
     budzetStartowy: [],
-    linki: [],
+    linki: defaultQuickLinks(),
     podwykonawcy: [],
     powiadomienia: [],
     zadania: [],
-    checklisty: []
+    checklisty: [],
+    planLipiec2026: defaultJulyActionPlan(),
+    contentPlanFacebook: defaultFacebookContentPlan()
   };
 }
 let data = null;
@@ -2093,9 +2328,40 @@ function fillMissingDefaults(d){
   if(!d.finanse){ d.finanse = []; changed = true; }
   if(!d.budzetStartowy){ d.budzetStartowy = []; changed = true; }
   if(!d.linki || d.linki.length===0){ d.linki = dflt.linki; changed = true; }
+  const missingQuickLinks = defaultQuickLinks().filter(link => !d.linki.some(existing => existing.id === link.id || existing.url === link.url || existing.nazwa === link.nazwa));
+  if(missingQuickLinks.length){
+    d.linki = d.linki.concat(missingQuickLinks);
+    changed = true;
+  }
   if(!d.podwykonawcy){ d.podwykonawcy = []; changed = true; }
   if(!d.powiadomienia){ d.powiadomienia = []; changed = true; }
   if(!d.checklisty){ d.checklisty = []; changed = true; }
+  if(!d.planLipiec2026){ d.planLipiec2026 = defaultJulyActionPlan(); changed = true; }
+  if(d.planLipiec2026){
+    const defaultPlan = defaultJulyActionPlan();
+    if(!Array.isArray(d.planLipiec2026.formalnosci)){ d.planLipiec2026.formalnosci = []; changed = true; }
+    const missingFormalities = defaultPlan.formalnosci.filter(item => !d.planLipiec2026.formalnosci.some(existing => existing.id === item.id));
+    if(missingFormalities.length){
+      d.planLipiec2026.formalnosci = d.planLipiec2026.formalnosci.concat(missingFormalities);
+      changed = true;
+    }
+    if(!Array.isArray(d.planLipiec2026.kanaly)){ d.planLipiec2026.kanaly = []; changed = true; }
+    const missingChannels = defaultPlan.kanaly.filter(item => !d.planLipiec2026.kanaly.some(existing => existing.id === item.id));
+    if(missingChannels.length){
+      d.planLipiec2026.kanaly = d.planLipiec2026.kanaly.concat(missingChannels);
+      changed = true;
+    }
+    if(!d.planLipiec2026.sprzedaz){ d.planLipiec2026.sprzedaz = defaultPlan.sprzedaz; changed = true; }
+    if(typeof d.planLipiec2026.sprzedaz.sprzedane === "undefined"){ d.planLipiec2026.sprzedaz.sprzedane = 0; changed = true; }
+    if(typeof d.planLipiec2026.sprzedaz.celZarzadu === "undefined"){ d.planLipiec2026.sprzedaz.celZarzadu = defaultPlan.sprzedaz.celZarzadu; changed = true; }
+    if(typeof d.planLipiec2026.sprzedaz.celOstrozny === "undefined"){ d.planLipiec2026.sprzedaz.celOstrozny = defaultPlan.sprzedaz.celOstrozny; changed = true; }
+  }
+  if(!d.contentPlanFacebook){ d.contentPlanFacebook = []; changed = true; }
+  const missingFbPosts = defaultFacebookContentPlan().filter(post => !d.contentPlanFacebook.some(existing => existing.id === post.id));
+  if(missingFbPosts.length){
+    d.contentPlanFacebook = d.contentPlanFacebook.concat(missingFbPosts);
+    changed = true;
+  }
   if(!d.zadania || d.zadania.length===0){
     d.zadania = dflt.zadania;
     changed = true;
@@ -2915,11 +3181,14 @@ function render(){
   renderPodwykonawcy();
   renderZadania();
   renderChecklisty();
+  renderJulyActionPlan();
   renderAIWorkflow();
+  renderFacebookContentPlan();
   renderBackupStats();
   renderPriceDocuments();
   renderLoanCalc();
   renderDashboard();
+  renderFacebookReminder();
   renderPanelSettings();
 }
 
@@ -3360,7 +3629,8 @@ const PANEL_NAV = {
       {key:"dashboard", label:"Dashboard", tab:"dashboard"},
       {key:"today-command", label:"Centrum dnia", tab:"dashboard", focusId:"dailyCommandCenter"},
       {key:"today-notifications", label:"Powiadomienia", tab:"dashboard", focusId:"dashNotifications"},
-      {key:"today-followups", label:"Najbliższe follow-upy", tab:"klienci", clientsView:"followups", priority:true}
+      {key:"today-followups", label:"Najbliższe follow-upy", tab:"klienci", clientsView:"followups", priority:true},
+      {key:"july-plan", label:"Plan Lipiec 2026", tab:"planlipiec", priority:true}
     ]
   },
   clients: {
@@ -4984,7 +5254,10 @@ function renderLinki(){
   }
   list.innerHTML = items.map(l=>`
     <a class="linkCard" href="${l.url}" target="_blank" rel="noopener">
-      <span>🔗 ${l.nazwa}</span>
+      <span class="linkCardTitle">
+        <span>🔗 ${l.nazwa}</span>
+        ${l.opis ? `<small>${l.opis}</small>` : ""}
+      </span>
       <span class="del" onclick="event.preventDefault();event.stopPropagation();deleteLink('${l.id}')">✕</span>
     </a>
   `).join("");
@@ -5401,6 +5674,124 @@ function deleteChecklist(checklistId){
   if(checklist) logActivity(`usunął(-ęła) checklistę „${checklist.nazwa}”`);
   saveData();
   renderChecklisty();
+}
+
+// ================= Plan działania — Lipiec 2026 =================
+const JULY_CHANNEL_STATUSES = ["Nieaktywny", "Do rozpoczęcia", "Aktywny", "Wstrzymany", "Do uruchomienia", "Do sprawdzenia"];
+
+function getJulyPlan(){
+  if(!data.planLipiec2026) data.planLipiec2026 = defaultJulyActionPlan();
+  return data.planLipiec2026;
+}
+
+function renderJulyActionPlan(){
+  const formalitiesEl = document.getElementById("julyFormalities");
+  const channelsEl = document.getElementById("julyMarketingChannels");
+  const capacityEl = document.getElementById("julyCapacity");
+  const salesEl = document.getElementById("julySalesGoal");
+  if(!formalitiesEl || !channelsEl || !capacityEl || !salesEl || !data) return;
+
+  const plan = getJulyPlan();
+  const formalities = plan.formalnosci || [];
+  formalitiesEl.innerHTML = formalities.map(item => `
+    <div class="actionTask ${item.pilne ? "urgent" : ""}">
+      <input type="checkbox" ${item.wykonane ? "checked" : ""} onchange="toggleJulyFormality('${crmEsc(item.id)}')">
+      <div>
+        <div class="actionTaskTitle">${crmEsc(item.nazwa)}</div>
+        <div class="actionMeta">
+          <span class="actionBadge">${item.wykonane ? "Zrobione" : "Do zrobienia"}</span>
+          ${item.termin ? `<span class="actionBadge">Termin: ${crmEsc(item.termin)}</span>` : ""}
+          ${item.pilne ? '<span class="actionBadge urgent">PILNE</span>' : ""}
+        </div>
+      </div>
+      <textarea placeholder="Notatka statusu..." onchange="updateJulyFormalityNote('${crmEsc(item.id)}', this.value)">${crmEsc(item.notatka || "")}</textarea>
+    </div>
+  `).join("");
+
+  channelsEl.innerHTML = `
+    <table class="actionTable">
+      <thead><tr><th>Kanał</th><th>Status</th><th>Budżet</th><th>Notatki</th></tr></thead>
+      <tbody>
+        ${(plan.kanaly || []).map(item => `
+          <tr>
+            <td><strong>${crmEsc(item.kanal)}</strong></td>
+            <td>
+              <select onchange="updateJulyChannelStatus('${crmEsc(item.id)}', this.value)">
+                ${JULY_CHANNEL_STATUSES.map(status => `<option value="${crmEsc(status)}" ${item.status === status ? "selected" : ""}>${crmEsc(status)}</option>`).join("")}
+              </select>
+            </td>
+            <td>${crmEsc(item.budzet)}</td>
+            <td>${crmEsc(item.notatki)}</td>
+          </tr>
+        `).join("")}
+      </tbody>
+    </table>
+  `;
+
+  capacityEl.innerHTML = `
+    <div class="capacityGrid">
+      <div class="capacityCard"><b>2-3 / tydz.</b><span>Realna przepustowość montażowa: Kuba + Jarosław</span></div>
+      <div class="capacityCard"><b>4-8 tyg.</b><span>Czas realizacji Brunimat od zamówienia: sam mlekomat</span></div>
+      <div class="capacityCard"><b>6-10 tyg.</b><span>Czas realizacji z pawilonem</span></div>
+      <div class="capacityCard"><b>Po zaliczce</b><span>Zamówienie u Brunimata dopiero po podpisaniu umowy i wpłacie zaliczki klienta, nie na zapas.</span></div>
+    </div>
+  `;
+
+  const sold = Math.max(0, parseInt(plan.sprzedaz?.sprzedane || 0, 10) || 0);
+  const cautiousGoal = parseInt(plan.sprzedaz?.celOstrozny || 4, 10) || 4;
+  const boardGoal = parseInt(plan.sprzedaz?.celZarzadu || 8, 10) || 8;
+  const cautiousPct = Math.round((sold / cautiousGoal) * 100);
+  const boardPct = Math.round((sold / boardGoal) * 100);
+  salesEl.innerHTML = `
+    <div class="salesGoalBox">
+      <label class="salesGoalInput">
+        <span>Sprzedanych dotychczas:</span>
+        <input type="number" min="0" step="1" value="${sold}" onchange="updateJulySalesSold(this.value)">
+      </label>
+      <div class="goalProgress">
+        <strong>Wariant ostrożny</strong>
+        <div class="goalBar"><span style="width:${Math.min(cautiousPct, 100)}%"></span></div>
+        <span>${cautiousPct}%</span>
+      </div>
+      <div class="goalProgress">
+        <strong>Cel zarządu</strong>
+        <div class="goalBar"><span style="width:${Math.min(boardPct, 100)}%"></span></div>
+        <span>${boardPct}%</span>
+      </div>
+      <div class="checkDesc">Cel zarządu 2026: ${boardGoal} szt. · wariant ostrożny: ${cautiousGoal} szt.</div>
+    </div>
+  `;
+}
+
+function toggleJulyFormality(id){
+  const item = (getJulyPlan().formalnosci || []).find(entry => entry.id === id);
+  if(!item) return;
+  item.wykonane = !item.wykonane;
+  saveData();
+  renderJulyActionPlan();
+}
+
+function updateJulyFormalityNote(id, value){
+  const item = (getJulyPlan().formalnosci || []).find(entry => entry.id === id);
+  if(!item) return;
+  item.notatka = value;
+  saveData();
+}
+
+function updateJulyChannelStatus(id, value){
+  const item = (getJulyPlan().kanaly || []).find(entry => entry.id === id);
+  if(!item) return;
+  item.status = value;
+  saveData();
+  renderJulyActionPlan();
+}
+
+function updateJulySalesSold(value){
+  const plan = getJulyPlan();
+  if(!plan.sprzedaz) plan.sprzedaz = defaultJulyActionPlan().sprzedaz;
+  plan.sprzedaz.sprzedane = Math.max(0, parseInt(value || 0, 10) || 0);
+  saveData();
+  renderJulyActionPlan();
 }
 
 // ================= AI Workflow =================
@@ -6659,6 +7050,7 @@ function renderDashboard(){
   dashActEl.innerHTML = logs.length ? logs.map(l=>
     `<div class="dashListRow"><span><strong>${l.who}</strong> ${l.text}</span><span style="color:#bbb">${l.when}</span></div>`
   ).join("") : '<div class="dashEmpty">Brak zapisanych zmian.</div>';
+  renderFacebookReminder();
 }
 
 
@@ -6714,17 +7106,121 @@ function downloadSalesPdf(){
   alert("PDF-y sprzedazowe nie sa juz wbudowane w zrodlo panelu.");
 }
 
-// Dopinamy render materiałów do istniejącego startu panelu, bez zmieniania logiki CRM.
+// ==== Content plan Facebook ====
+function fbDateOnly(value){
+  if(!value) return null;
+  const d = new Date(value + "T00:00:00");
+  return Number.isNaN(d.getTime()) ? null : d;
+}
+
+function fbToday(){
+  const now = new Date();
+  return new Date(now.getFullYear(), now.getMonth(), now.getDate());
+}
+
+function findDueFacebookPost(){
+  const today = fbToday();
+  const dayMs = 24 * 60 * 60 * 1000;
+  return (data.contentPlanFacebook || []).find(post=>{
+    if(post.status === "wysłane") return false;
+    const start = fbDateOnly(post.dataStart);
+    const end = fbDateOnly(post.dataEnd || post.dataStart);
+    if(!start || !end) return false;
+    return today >= new Date(start.getTime() - dayMs) && today <= new Date(end.getTime() + dayMs);
+  });
+}
+
+function renderFacebookReminder(){
+  const box = document.getElementById("fbContentReminder");
+  if(!box) return;
+  const post = findDueFacebookPost();
+  if(!post){
+    box.style.display = "none";
+    box.innerHTML = "";
+    box.onclick = null;
+    return;
+  }
+  const cleanText = (post.tresc || "").replace(/\s+/g, " ").trim();
+  const preview = cleanText.slice(0, 50) + (cleanText.length > 50 ? "..." : "");
+  box.style.display = "block";
+  box.innerHTML = `
+    <strong>Dziś zaplanowany post na FB</strong>
+    <span>${crmEsc(post.data)} — ${crmEsc(preview)} — kliknij, by zobaczyć całość.</span>
+  `;
+  box.onclick = ()=>openFacebookPost(post.id);
+}
+
+function renderFacebookContentPlan(){
+  const root = document.getElementById("facebookContentPlan");
+  if(!root) return;
+  const posts = data.contentPlanFacebook || [];
+  if(!posts.length){
+    root.innerHTML = '<div class="empty">Brak zaplanowanych postów.</div>';
+    return;
+  }
+  root.innerHTML = posts.map(post=>{
+    const sent = post.status === "wysłane";
+    return `
+      <article class="fbPostCard ${sent ? "published" : ""}" id="fbpost-${crmEsc(post.id)}">
+        <div class="fbPostTop">
+          <div>
+            <div class="fbPostDate">${crmEsc(post.data || "")}</div>
+            <div class="badge">${sent ? "wysłane" : "do wysłania"}</div>
+          </div>
+          <label class="fbPostStatus">
+            <input type="checkbox" ${sent ? "checked" : ""} onchange="toggleFacebookPostStatus('${crmEsc(post.id)}', this.checked)">
+            Opublikowane
+          </label>
+        </div>
+        <div class="fbPostText">${crmEsc(post.tresc || "")}</div>
+        <div class="fbPostActions">
+          <button type="button" onclick="copyFacebookPost('${crmEsc(post.id)}')">Kopiuj treść</button>
+          <button type="button" onclick="toggleFacebookPostStatus('${crmEsc(post.id)}', ${sent ? "false" : "true"})">${sent ? "Cofnij status" : "Oznacz jako wysłane"}</button>
+        </div>
+      </article>
+    `;
+  }).join("");
+}
+
+function toggleFacebookPostStatus(id, published){
+  const post = (data.contentPlanFacebook || []).find(item=>item.id === id);
+  if(!post) return;
+  post.status = published ? "wysłane" : "do wysłania";
+  logActivity(`${published ? "oznaczył(a) jako wysłany" : "cofnął/cofnęła status"} post FB: ${post.data}`);
+  saveData();
+  renderFacebookContentPlan();
+  renderFacebookReminder();
+}
+
+function copyFacebookPost(id){
+  const post = (data.contentPlanFacebook || []).find(item=>item.id === id);
+  if(!post) return;
+  navigator.clipboard.writeText(post.tresc || "").then(()=>alert("Skopiowano treść posta FB."));
+}
+
+function openFacebookPost(id){
+  switchTab("marketing", {push:false});
+  renderFacebookContentPlan();
+  setTimeout(()=>{
+    const el = document.getElementById("fbpost-" + id);
+    if(el) el.scrollIntoView({behavior:"smooth", block:"center"});
+  }, 50);
+}
+
+// Dopinamy render materiałów i planu Facebook do istniejącego startu panelu, bez zmieniania logiki CRM.
 const originalSwitchTabForSales = switchTab;
-switchTab = function(name){
-  originalSwitchTabForSales(name);
+switchTab = function(name, options){
+  originalSwitchTabForSales(name, options || {});
   if(name === "materialy") renderSalesMaterials();
+  if(name === "marketing") renderFacebookContentPlan();
 };
 
 const originalRenderForSales = render;
 render = function(){
   originalRenderForSales();
   renderSalesMaterials();
+  renderFacebookContentPlan();
+  renderFacebookReminder();
 };
 
 </script>
