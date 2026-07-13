@@ -57,15 +57,22 @@ function parseVersionHeader(req) {
 module.exports = async function handler(req, res) {
   res.setHeader("Cache-Control", "no-store");
 
-  if (!hasPanelStoreConfig() || (!PANEL_PASSWORD && !PANEL_BASIC_PASSWORD)) {
+  if (!PANEL_PASSWORD && !PANEL_BASIC_PASSWORD) {
     return res.status(500).json({
-      error: "Panel Supabase configuration is missing.",
+      error: "Panel password configuration is missing.",
       config: serverConfigStatus()
     });
   }
 
   if (!isAuthorized(req)) {
     return res.status(401).json({ error: "Unauthorized" });
+  }
+
+  if (!hasPanelStoreConfig()) {
+    return res.status(500).json({
+      error: "Panel Supabase configuration is missing.",
+      config: serverConfigStatus()
+    });
   }
 
   try {
