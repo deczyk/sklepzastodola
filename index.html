@@ -51,6 +51,12 @@
 .hero-scroll::after { content: ''; display: block; width: 1px; height: 2.8rem; background: linear-gradient(to bottom, var(--forest), transparent); animation: sc 2s ease-in-out infinite; }
 @keyframes sc { 0%,100%{opacity:.4} 50%{opacity:1} }
 
+/* EXCLUSIVE DISTRIBUTOR */
+.distributor-band { background: var(--bg2); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); padding: 2rem 5vw 2.2rem; text-align: center; }
+.distributor-label { font-size: clamp(.74rem, 1.4vw, .88rem); font-weight: 800; letter-spacing: .13em; line-height: 1.35; text-transform: uppercase; color: var(--forest); margin-bottom: 1rem; }
+.distributor-logo { display: inline-flex; align-items: center; justify-content: center; max-width: min(420px, 82vw); margin: 0 auto; }
+.distributor-logo img { width: 100%; height: auto; object-fit: contain; }
+
 /* STATEMENT */
 .stmt { padding: 5.5rem 5vw; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); background: var(--bg2); }
 .stmt-inner { max-width: 900px; }
@@ -265,6 +271,15 @@
     </div>
   </div>
   <div class="hero-scroll" aria-hidden="true">przewiń</div>
+</section>
+
+<section class="distributor-band" aria-label="Wyłączny dystrybutor BRUNIMAT w Polsce">
+  <div class="wrap">
+    <p class="distributor-label">WYŁĄCZNY DYSTRYBUTOR MLEKOMATÓW BRUNIMAT W POLSCE</p>
+    <div class="distributor-logo">
+      <img src="brunimat-logo.jpg" alt="BRUNIMAT" loading="eager" decoding="async">
+    </div>
+  </div>
 </section>
 
 <!-- ANIMOWANA SEKCJA: LICZBY -->
