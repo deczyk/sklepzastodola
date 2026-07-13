@@ -8,6 +8,8 @@ create table if not exists public.panel_store (
   updated_at timestamptz not null default now()
 );
 
+alter table public.panel_store enable row level security;
+
 insert into public.panel_store (id, data, version)
 values ('main', '{}'::jsonb, 1)
 on conflict (id) do nothing;
@@ -42,10 +44,10 @@ begin
   update public.panel_store
   set
     data = p_data,
-    version = version + 1,
+    version = public.panel_store.version + 1,
     updated_at = now()
   where id = p_id
-    and version = p_expected_version
+    and public.panel_store.version = p_expected_version
   returning public.panel_store.version into next_version;
 
   if next_version is null then
