@@ -2162,6 +2162,15 @@ function loadLocalCache(){
   return null;
 }
 
+function panelClientCount(payload){
+  return Array.isArray(payload && payload.klienci) ? payload.klienci.length : 0;
+}
+
+function shouldPreferLocalCache(remote, local){
+  if(!remote || !local) return false;
+  return panelClientCount(remote) === 0 && panelClientCount(local) > 0;
+}
+
 async function fetchRemote(password = getPanelPassword()){
   if(!SYNC_ENABLED) return null;
   if(!password) throw new Error("NO_PASSWORD");
@@ -2275,12 +2284,13 @@ async function initApp(){
     }
   }
   const local = loadLocalCache();
-  data = remote || local || defaultData();
+  const preferLocal = shouldPreferLocalCache(remote, local);
+  data = preferLocal ? local : (remote || local || defaultData());
   const wasIncomplete = fillMissingDefaults(data);
   localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
   if(SYNC_ENABLED){
-    setSyncStatus(remote ? "Dane z chmury ✓" : "Dane lokalne - chmura niedostępna ⚠", !remote);
-    if(wasIncomplete) pushRemote(data); // napraw brakujące dane w chmurze na stałe
+    setSyncStatus(preferLocal ? "Dane lokalne - chmura była pusta ⚠" : (remote ? "Dane z chmury ✓" : "Dane lokalne - chmura niedostępna ⚠"), !remote || preferLocal);
+    if(wasIncomplete || preferLocal) pushRemote(data); // napraw brakujące dane w chmurze na stałe
   }
   render();
   scheduleDriveAutoSync();
