@@ -57,6 +57,17 @@
 .distributor-logo { display: inline-flex; align-items: center; justify-content: center; max-width: min(420px, 82vw); margin: 0 auto; }
 .distributor-logo img { width: 100%; height: auto; object-fit: contain; }
 
+/* DEMO VIDEO */
+.demo-video-sec { padding: 5.5rem 5vw; background: var(--bg); border-bottom: 1px solid var(--line); }
+.demo-video-grid { display: grid; grid-template-columns: minmax(0,.82fr) minmax(0,1.18fr); gap: 2.2rem; align-items: center; }
+.demo-video-copy { max-width: 520px; }
+.demo-video-copy .sec-body { margin-bottom: 1.4rem; }
+.demo-video-points { display: grid; gap: .75rem; margin: 1.6rem 0 0; }
+.demo-video-points span { display: flex; align-items: flex-start; gap: .65rem; color: var(--muted); font-size: .92rem; line-height: 1.55; }
+.demo-video-points span::before { content: ''; width: .55rem; height: .55rem; margin-top: .48rem; border-radius: 50%; background: var(--forest); flex: 0 0 auto; }
+.demo-video-frame { position: relative; overflow: hidden; border-radius: var(--r-lg); background: var(--ink); border: 1px solid var(--line); box-shadow: var(--shadow-lg); }
+.demo-video-frame video { display: block; width: 100%; aspect-ratio: 16/9; object-fit: cover; background: #111; }
+
 /* STATEMENT */
 .stmt { padding: 5.5rem 5vw; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); background: var(--bg2); }
 .stmt-inner { max-width: 900px; }
@@ -156,6 +167,7 @@
 
 @media(max-width:860px){
   .scenario-grid { grid-template-columns: 1fr; gap: 2rem; }
+  .demo-video-grid { grid-template-columns: 1fr; }
   .practice-flow { grid-template-columns: 1fr; }
   .fit-grid { grid-template-columns: 1fr; }
 }
@@ -163,6 +175,7 @@
   .sc-val { min-width: 60px; font-size: .9rem; }
   .hero { min-height: auto; padding: 8.5rem 5vw 3rem; justify-content: flex-start; }
   .hero-actions { margin-bottom: 1rem; }
+  .demo-video-sec { padding: 4rem 5vw; }
   .practice-sec { padding: 4rem 5vw; }
   .practice-steps { grid-template-columns: 1fr; }
   .practice-card { min-height: auto; }
@@ -280,6 +293,29 @@
       <img src="brunimat-logo.png" alt="BRUNIMAT" loading="eager" decoding="async">
     </div>
   </div>
+</section>
+
+<section class="demo-video-sec" id="film-mlekomat">
+<div class="wrap">
+  <div class="demo-video-grid">
+    <div class="demo-video-copy" data-r>
+      <p class="sec-label">Zobacz w praktyce</p>
+      <h2 class="sec-title">Tak działa sprzedaż<br><em>mleka z automatu.</em></h2>
+      <p class="sec-body">Klient podjeżdża, wybiera płatność, podstawia butelkę i sam nalewa świeże mleko. Bez kolejki, bez sklepu i bez stałej obsługi przy każdej sprzedaży.</p>
+      <div class="demo-video-points" aria-label="Najważniejsze zalety">
+        <span>Sprzedaż może działać przez całą dobę, także poza godzinami pracy gospodarstwa.</span>
+        <span>Mlekomat odmierza, chłodzi i obsługuje płatność zależnie od konfiguracji.</span>
+        <span>To naturalny pierwszy krok do punktu sprzedaży bezpośredniej przy gospodarstwie.</span>
+      </div>
+    </div>
+    <div class="demo-video-frame" data-r data-d="1">
+      <video controls preload="metadata" playsinline poster="automat2.webp">
+        <source src="mlekomat-demo.mp4" type="video/mp4">
+        Twoja przeglądarka nie obsługuje odtwarzania wideo.
+      </video>
+    </div>
+  </div>
+</div>
 </section>
 
 <!-- ANIMOWANA SEKCJA: LICZBY -->
