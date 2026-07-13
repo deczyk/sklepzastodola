@@ -97,12 +97,14 @@
   });
 
   // ── STICKY MOBILE CTA (widoczny tylko na mobile, dodawany przez JS na każdej stronie) ──
-  document.body.insertAdjacentHTML('beforeend',
-    '<div class="sticky-mobile-cta" id="sticky-mobile-cta">' +
-      '<a href="tel:735115427" class="smc-call">📞 Zadzwoń</a>' +
-      '<a href="index.html#kalkulator" class="smc-calc">📊 Policz opłacalność</a>' +
-    '</div>'
-  );
+  if(document.getElementById('nav') && !document.getElementById('sticky-mobile-cta')){
+    document.body.insertAdjacentHTML('beforeend',
+      '<div class="sticky-mobile-cta" id="sticky-mobile-cta">' +
+        '<a href="tel:735115427" class="smc-call">📞 Zadzwoń</a>' +
+        '<a href="index.html#kalkulator" class="smc-calc">📊 Policz opłacalność</a>' +
+      '</div>'
+    );
+  }
 
   // ── NAV SCROLL ──
   const nav = document.getElementById('nav');
@@ -133,13 +135,28 @@
     localStorage.setItem('cookie_consent', v);
     sessionStorage.setItem('cookie_seen', '1');
     const el = document.getElementById('cookie');
-    if(el){ el.classList.remove('show'); }
+    if(el){
+      el.classList.remove('show');
+      el.style.display = 'none';
+    }
     if(v === 'yes' || v === 'accept' || v === 'marketing'){
       loadGA();
       loadMetaPixel();
     }
   }
   window.setCk = setCk;
+
+  if(!document.getElementById('cookie')){
+    document.body.insertAdjacentHTML('beforeend',
+      '<div class="cookie" id="cookie" style="position:fixed;left:16px;right:16px;bottom:16px;z-index:9999;max-width:760px;margin:auto;background:#173a2f;color:#fff;border:1px solid rgba(255,255,255,.18);border-radius:16px;box-shadow:0 18px 50px rgba(0,0,0,.24);padding:14px 16px;display:none;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap">' +
+        '<p style="margin:0;font-size:14px;line-height:1.45">Ta strona uzywa plikow cookies. Pixel Meta i analityka wlaczaja sie dopiero po zgodzie. <a href="polityka.html" style="color:#f1d18a;text-decoration:underline">Polityka prywatnosci</a></p>' +
+        '<div class="cookie-btns" style="display:flex;gap:8px;flex-wrap:wrap">' +
+          '<button class="ck-yes" onclick="setCk(&quot;yes&quot;)" style="border:0;border-radius:999px;padding:9px 13px;background:#d8a94f;color:#102b23;font-weight:800;cursor:pointer">Akceptuje</button>' +
+          '<button class="ck-no" onclick="setCk(&quot;no&quot;)" style="border:1px solid rgba(255,255,255,.35);border-radius:999px;padding:9px 13px;background:transparent;color:#fff;font-weight:800;cursor:pointer">Tylko niezbedne</button>' +
+        '</div>' +
+      '</div>'
+    );
+  }
 
   // Pokaż jeśli nigdy nie zaakceptował (brak cookie_consent w localStorage)
   // lub jeśli ta sesja jeszcze nie widziała banera
@@ -150,7 +167,10 @@
     sessionStorage.setItem('cookie_seen', '1'); // oznacz że już pokazano
     setTimeout(()=>{
       const el = document.getElementById('cookie');
-      if(el) el.classList.add('show');
+      if(el){
+        el.classList.add('show');
+        el.style.display = 'flex';
+      }
     }, 800);
   }
 
