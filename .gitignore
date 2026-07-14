@@ -1,5 +1,7 @@
 *.docx
 *.pdf
+!certyfikaty/
+!certyfikaty/*.pdf
 *.xlsx
 *.zip
 _pliki-*

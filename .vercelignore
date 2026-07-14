@@ -5,6 +5,8 @@ CODEX_CLAUDE_INSTRUKCJA.md
 DECYZJE_BIZNESOWE.md
 *.zip
 *.pdf
+!certyfikaty/
+!certyfikaty/*.pdf
 *.xlsx
 *.docx
 _pliki-*
