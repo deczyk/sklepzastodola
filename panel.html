@@ -410,6 +410,7 @@
   .dashListRow{font-size:12.5px;padding:6px 0;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;gap:8px}
   .dashListRow:last-child{border-bottom:none}
   .dashEmpty{color:var(--text-muted);font-size:12.5px;font-style:italic}
+  .dashHiddenOnHome{display:none}
 
 
   /* --- Materiały sprzedażowe --- */
@@ -1138,7 +1139,7 @@
           <div id="dashNotifications"></div>
         </div>
 
-        <div class="dashCard dashActivityCard">
+        <div class="dashCard dashActivityCard dashHiddenOnHome">
           <div class="dashCardTitle">Ostatnie działania</div>
           <div id="dashActivity"></div>
         </div>
@@ -1148,7 +1149,7 @@
           <div id="dashToday"></div>
         </div>
 
-        <div class="dashCard dashAi">
+        <div class="dashCard dashAi dashHiddenOnHome">
           <div class="dashCardTitle">AI Workflow</div>
           <div class="dashAiText">
             Placeholder roboczy: Gemini do szkiców, Claude do strategii i treści, Codex do technicznego wdrożenia w repo.
@@ -1159,22 +1160,22 @@
           <button class="doneBtn" onclick="switchTab('aiworkflow')" style="margin-top:12px">Otwórz AI Workflow</button>
         </div>
 
-        <div class="dashCard dashSecondary">
+        <div class="dashCard dashSecondary dashHiddenOnHome">
           <div class="dashCardTitle">👥 Lejek sprzedażowy</div>
           <div id="dashFunnel" class="dashFunnel"></div>
         </div>
 
-        <div class="dashCard dashSecondary">
+        <div class="dashCard dashSecondary dashHiddenOnHome">
           <div class="dashCardTitle">💰 Bilans finansowy</div>
           <div id="dashFinance" class="dashFinance"></div>
         </div>
 
-        <div class="dashCard dashSecondary">
+        <div class="dashCard dashSecondary dashHiddenOnHome">
           <div class="dashCardTitle">📅 Najbliższe terminy</div>
           <div id="dashTerminy"></div>
         </div>
 
-        <div class="dashCard dashSecondary">
+        <div class="dashCard dashSecondary dashHiddenOnHome">
           <div class="dashCardTitle">🥛 Instalacje</div>
           <div id="dashInstalacje" class="dashMiniStats"></div>
         </div>
@@ -2168,6 +2169,52 @@ function loadLocalCache(){
   return null;
 }
 
+const MOJIBAKE_REPLACEMENTS = [
+  ["Ä…","ą"],["Ä‡","ć"],["Ä™","ę"],["Ĺ‚","ł"],["Ĺ„","ń"],["Ăł","ó"],["Ĺ›","ś"],["Ĺş","ź"],["ĹĽ","ż"],
+  ["Ä„","Ą"],["Ä†","Ć"],["Ä","Ę"],["Ĺ","Ł"],["Ĺ","Ń"],["Ă“","Ó"],["Ĺš","Ś"],["Ĺą","Ź"],["Ĺ»","Ż"],
+  ["â€”","—"],["â€“","–"],["â†’","→"],["âś“","✓"],["âš ","⚠"],["â€ž","„"],["â€ť","”"],["â€™","’"],["Â©","©"],["Â",""]
+];
+
+function repairMojibakeString(value){
+  if(!/[ÄĹĂâÂ]/.test(value)) return value;
+  let fixed = value;
+  MOJIBAKE_REPLACEMENTS.forEach(([bad, good])=>{
+    fixed = fixed.split(bad).join(good);
+  });
+  return fixed;
+}
+
+function repairMojibakeDeep(root){
+  const seen = new WeakSet();
+  let changed = false;
+  function walk(node){
+    if(!node || typeof node !== "object" || seen.has(node)) return;
+    seen.add(node);
+    if(Array.isArray(node)){
+      node.forEach((item, index)=>{
+        if(typeof item === "string"){
+          const fixed = repairMojibakeString(item);
+          if(fixed !== item){ node[index] = fixed; changed = true; }
+        }else{
+          walk(item);
+        }
+      });
+      return;
+    }
+    Object.keys(node).forEach(key=>{
+      const item = node[key];
+      if(typeof item === "string"){
+        const fixed = repairMojibakeString(item);
+        if(fixed !== item){ node[key] = fixed; changed = true; }
+      }else{
+        walk(item);
+      }
+    });
+  }
+  walk(root);
+  return changed;
+}
+
 function panelClientCount(payload){
   return Array.isArray(payload && payload.klienci) ? payload.klienci.length : 0;
 }
@@ -2292,11 +2339,12 @@ async function initApp(){
   const local = loadLocalCache();
   const preferLocal = shouldPreferLocalCache(remote, local);
   data = preferLocal ? local : (remote || local || defaultData());
+  const repairedMojibake = repairMojibakeDeep(data);
   const wasIncomplete = fillMissingDefaults(data);
   localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
   if(SYNC_ENABLED){
     setSyncStatus(preferLocal ? "Dane lokalne - chmura była pusta ⚠" : (remote ? "Dane z chmury ✓" : "Dane lokalne - chmura niedostępna ⚠"), !remote || preferLocal);
-    if(wasIncomplete || preferLocal) pushRemote(data); // napraw brakujące dane w chmurze na stałe
+    if(wasIncomplete || preferLocal || repairedMojibake) pushRemote(data); // napraw brakujące dane w chmurze na stałe
   }
   render();
   scheduleDriveAutoSync();
@@ -3653,9 +3701,6 @@ const PANEL_NAV = {
     label: "START",
     views: [
       {key:"dashboard", label:"Dashboard", tab:"dashboard"},
-      {key:"today-command", label:"Centrum dnia", tab:"dashboard", focusId:"dailyCommandCenter"},
-      {key:"today-notifications", label:"Powiadomienia", tab:"dashboard", focusId:"dashNotifications"},
-      {key:"today-followups", label:"Najbliższe follow-upy", tab:"klienci", clientsView:"followups", priority:true},
       {key:"july-plan", label:"Plan Lipiec 2026", tab:"planlipiec", priority:true}
     ]
   },
@@ -3671,13 +3716,8 @@ const PANEL_NAV = {
   sales: {
     label: "SPRZEDAŻ",
     views: [
-      {key:"sales-table", label:"Baza klientów", tab:"klienci", clientsView:"table"},
-      {key:"sales-advisor", label:"Advisor", tab:"klienci", clientsView:"advisor"},
-      {key:"sales-advisorolx", label:"Advisor OLX", tab:"klienci", clientsView:"advisorolx"},
       {key:"sales-kanban", label:"Kanban CRM", tab:"klienci", clientsView:"kanban"},
-      {key:"sales-followups", label:"Do kontaktu", tab:"klienci", clientsView:"followups"},
-      {key:"sales-offers", label:"Oferty", tab:"klienci", clientsView:"table", focusId:"section-klienci"},
-      {key:"sales-history", label:"Historia działań", tab:"klienci", clientsView:"table", focusId:"section-klienci"}
+      {key:"sales-offers", label:"Oferty", tab:"klienci", clientsView:"table", focusId:"section-klienci"}
     ]
   },
   company: {
