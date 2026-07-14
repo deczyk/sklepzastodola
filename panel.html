@@ -428,10 +428,19 @@
   .salesText{white-space:pre-wrap;line-height:1.55;font-size:13.5px;color:#222;background:white;border:1px solid #e8eee8;
              border-radius:12px;padding:16px;overflow:auto;max-height:65vh}
   .salesWarn{background:#fff8e1;border-left:4px solid var(--accent);border-radius:8px;padding:10px 12px;font-size:12.5px;color:#5d4b16;margin-bottom:14px}
-  .fbReminder{border:1px solid #ead99a;background:#fff8dc;color:#4f3b0b;border-radius:14px;padding:14px 16px;
-              box-shadow:0 8px 18px #1d3b2410;cursor:pointer}
-  .fbReminder strong{display:block;color:#5d4611;margin-bottom:3px}
-  .fbReminder span{font-size:13px;line-height:1.45}
+  .fbReminder{grid-column:1/-1;border:1px solid rgba(201,162,74,.45);background:linear-gradient(135deg,#fff8dc,#fffdf1);
+              color:#4f3b0b;border-radius:14px;padding:16px 18px;box-shadow:0 8px 18px #1d3b2410;
+              display:flex;align-items:center;justify-content:space-between;gap:16px;cursor:default}
+  .fbReminder strong{display:block;color:#5d4611;margin-bottom:4px;font-size:16px}
+  .fbReminder span{display:block;font-size:13px;line-height:1.45;color:#6f5a1f}
+  .fbReminderActions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+  .fbReminderActions button{border:1px solid rgba(93,70,17,.2);border-radius:9px;padding:8px 11px;
+                            background:#ffffffcc;color:#5d4611;font-size:12px;font-weight:bold;cursor:pointer}
+  .fbReminderActions button.primary{background:var(--green);border-color:var(--green);color:white}
+  body.dark-theme .fbReminder{background:linear-gradient(135deg,rgba(214,179,90,.18),rgba(214,179,90,.08));color:#f5df9d}
+  body.dark-theme .fbReminder strong{color:#f5df9d}
+  body.dark-theme .fbReminder span{color:#d8c88e}
+  @media(max-width:720px){.fbReminder{align-items:flex-start;flex-direction:column}.fbReminderActions{justify-content:flex-start}}
   .fbPlanHeader{display:flex;justify-content:space-between;gap:14px;align-items:flex-start;margin-bottom:14px;flex-wrap:wrap}
   .fbPlanHeader p{margin:4px 0 0;color:var(--text-muted);font-size:13px;line-height:1.45}
   .fbPlanGrid{display:grid;gap:12px}
@@ -7338,12 +7347,16 @@ function renderFacebookReminder(){
     box.onclick = null;
     return;
   }
-  const cleanText = (post.tresc || "").replace(/\s+/g, " ").trim();
-  const preview = cleanText.slice(0, 50) + (cleanText.length > 50 ? "..." : "");
-  box.style.display = "block";
+  box.style.display = "flex";
   box.innerHTML = `
-    <strong>Dziś zaplanowany post na FB</strong>
-    <span>${crmEsc(post.data)} — ${crmEsc(preview)} — kliknij, by zobaczyć całość.</span>
+    <div>
+      <strong>Dziś zaplanowany post na Facebooka</strong>
+      <span>${crmEsc(post.data)} · Post otwierający kampanię organiczną. Treść i status są w module Content plan Facebook.</span>
+    </div>
+    <div class="fbReminderActions">
+      <button type="button" onclick="event.stopPropagation(); openFacebookPost('${crmEsc(post.id)}')">Zobacz treść</button>
+      <button type="button" class="primary" onclick="event.stopPropagation(); toggleFacebookPostStatus('${crmEsc(post.id)}', true)">Oznacz jako wysłany</button>
+    </div>
   `;
   box.onclick = ()=>openFacebookPost(post.id);
 }
