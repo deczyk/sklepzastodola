@@ -1828,7 +1828,7 @@ const PANEL_SESSION_KEY = "panel_session_password";
 const SYNC_ENABLED = true;
 
 function getPanelPassword(){
-  return sessionStorage.getItem(PANEL_SESSION_KEY) || "";
+  return localStorage.getItem(PANEL_SESSION_KEY) || sessionStorage.getItem(PANEL_SESSION_KEY) || "";
 }
 
 async function tryUnlock(){
@@ -1837,13 +1837,17 @@ async function tryUnlock(){
   err.textContent = "Sprawdzam dostęp...";
   try{
     initialRemoteData = await fetchRemote(val);
-    sessionStorage.setItem(PANEL_SESSION_KEY, val);
-    sessionStorage.setItem("panel_unlocked","1");
+    localStorage.setItem(PANEL_SESSION_KEY, val);
+    localStorage.setItem("panel_unlocked","1");
+    sessionStorage.removeItem(PANEL_SESSION_KEY);
+    sessionStorage.removeItem("panel_unlocked");
     document.getElementById("gate").style.display="none";
     document.getElementById("app").style.display="block";
     err.textContent = "";
     initApp();
   }catch(e){
+    localStorage.removeItem(PANEL_SESSION_KEY);
+    localStorage.removeItem("panel_unlocked");
     sessionStorage.removeItem(PANEL_SESSION_KEY);
     sessionStorage.removeItem("panel_unlocked");
     err.textContent = e && e.message === "AUTH" ? "Złe hasło, spróbuj ponownie." : "Nie udało się połączyć z panelem.";
@@ -1852,6 +1856,8 @@ async function tryUnlock(){
 document.getElementById("pwInput").addEventListener("keydown", e=>{ if(e.key==="Enter") tryUnlock(); });
 
 function lock(){
+  localStorage.removeItem("panel_unlocked");
+  localStorage.removeItem(PANEL_SESSION_KEY);
   sessionStorage.removeItem("panel_unlocked");
   sessionStorage.removeItem(PANEL_SESSION_KEY);
   document.getElementById("app").style.display="none";
@@ -2431,7 +2437,7 @@ function saveData(){
 
 initTheme();
 
-if(sessionStorage.getItem("panel_unlocked")==="1" && getPanelPassword()){
+if((localStorage.getItem("panel_unlocked")==="1" || sessionStorage.getItem("panel_unlocked")==="1") && getPanelPassword()){
   document.getElementById("gate").style.display="none";
   document.getElementById("app").style.display="block";
   initApp();
