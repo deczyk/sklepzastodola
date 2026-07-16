@@ -439,6 +439,26 @@
       pointer-events: auto;
     }
     .checkbox span { flex: 1; min-width: 0; }
+    #privacyConsent {
+      appearance: none;
+      -webkit-appearance: none;
+      width: 20px;
+      height: 20px;
+      min-width: 20px;
+      min-height: 20px;
+      margin: 2px 0 0;
+      padding: 0;
+      border: 2px solid #7d9186;
+      border-radius: 4px;
+      background: #fff;
+      cursor: pointer;
+      flex: 0 0 20px;
+    }
+    #privacyConsent:checked {
+      border-color: var(--green-700);
+      background: var(--green-700);
+      box-shadow: inset 0 0 0 3px #fff;
+    }
     .status-message { margin-top: 12px; min-height: 22px; color: var(--green-800); font-weight: 750; font-size: .9rem; }
 
     footer { padding: 34px 0 42px; color: var(--muted); font-size: .86rem; }
@@ -555,7 +575,7 @@
                 <label for="package">Co Cię interesuje?</label>
                 <select id="package" name="package" required>
                   <option value="150000" data-package="sprzedazowy">Pakiet SPRZEDAŻOWY — mlekomat + pawilon + wdrożenie</option>
-                  <option value="120000" data-package="start">Pakiet START — mlekomat i podstawowe wdrożenie</option>
+                  <option value="70000" data-package="start">Pakiet START — mlekomat i podstawowe wdrożenie</option>
                   <option value="220000" data-package="premium">Pakiet PREMIUM — pełny system i priorytetowa opieka</option>
                   <option value="150000" data-package="dobor">Nie wiem jeszcze — proszę o dobór pakietu</option>
                 </select>
