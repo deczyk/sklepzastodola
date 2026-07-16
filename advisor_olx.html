@@ -685,17 +685,18 @@
                 <textarea id="notes" name="notes" placeholder="Np. liczba krów, miejscowość, obecna sprzedaż bezpośrednia..."></textarea>
               </div>
               <input id="companyUrl" name="company_url" type="text" tabindex="-1" autocomplete="off" style="position:absolute;left:-9999px;opacity:0;pointer-events:none" aria-hidden="true">
-            <div class="field full" style="padding:14px 16px;border:1px solid #ccd6cf;border-radius:12px;background:#f8faf7;">
-              <label class="checkbox" style="margin:0; cursor:pointer; font-weight:600; color:var(--ink); line-height:1.45;">
-                <input 
-                  id="privacyConsent" 
-                  name="privacy_consent" 
-                  type="checkbox" 
-                  value="yes" 
-                  required>
-                <span>Wyrażam zgodę na kontakt w sprawie kalkulacji i oferty. Administratorem danych jest Sklep za Stodołą Sp. z o.o. Dane zostaną wykorzystane do odpowiedzi na zapytanie i przygotowania oferty. Szczegóły znajdują się w <a href="/polityka.html" target="_blank" rel="noopener">Polityce prywatności</a>.</span>
-              </label>
-            </div>
+              <div class="field full" style="padding:18px 20px; border:1px solid #ccd6cf; border-radius:12px; background:#f8faf7;">
+                <label style="display: flex; align-items: flex-start; gap: 14px; cursor: pointer; font-weight: 600; color: var(--ink); line-height: 1.48;">
+                  <input 
+                    id="privacyConsent" 
+                    name="privacy_consent" 
+                    type="checkbox" 
+                    value="yes"
+                    style="width: 22px; height: 22px; margin-top: 2px; accent-color: #2e6754; flex-shrink: 0;"
+                    required>
+                  <span>Wyrażam zgodę na kontakt w sprawie kalkulacji i oferty. Administratorem danych jest Sklep za Stodołą Sp. z o.o. Dane zostaną wykorzystane do odpowiedzi na zapytanie i przygotowania oferty. Szczegóły znajdują się w <a href="/polityka.html" target="_blank" rel="noopener">Polityce prywatności</a>.</span>
+                </label>
+              </div>
               <div class="field full">
                 <button class="btn btn-primary" type="submit">Wyślij wynik do doradcy →</button>
                 <div id="statusMessage" class="status-message" role="status"></div>
