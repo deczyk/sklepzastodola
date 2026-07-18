@@ -152,7 +152,13 @@
              font-size:12px;cursor:pointer;font-weight:bold}
   .importBtn:hover{opacity:0.9}
   .importBtn:disabled{opacity:0.5;cursor:default}
-  #importMsg{font-size:12px;color:var(--muted);align-self:center}
+  #importMsg,#doradcyImportMsg{font-size:12px;color:var(--muted);align-self:center}
+  .advisorDbStats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:12px 0}
+  .advisorDbNote{font-size:12px;color:var(--text-muted);margin:8px 0 12px;line-height:1.45}
+  .advisorContact{display:grid;gap:3px;font-size:12px;line-height:1.35}
+  .advisorContact a{color:var(--green);font-weight:bold;text-decoration:none}
+  .advisorMuted{color:var(--text-muted);font-size:12px}
+  .advisorStatusBadge{display:inline-flex;align-items:center;border:1px solid var(--border);border-radius:999px;padding:3px 8px;font-size:11px;font-weight:bold;background:var(--surface-soft);color:var(--text)}
 
   /* --- Stats bar --- */
   .statsBar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px}
@@ -1511,6 +1517,48 @@
     </div>
     </div>
 
+    <div class="tabPane" id="tabpane-doradcy">
+    <div class="section" id="section-doradcy">
+      <h2>Baza doradców rolnych</h2>
+      <div class="privateNotice"><b>Prywatnie:</b> to baza kontaktów do kampanii, partnerstw i współpracy z doradcami. Nie miesza się z klientami CRM.</div>
+      <div class="clientActions">
+        <input type="file" id="doradcyXlsxInput" accept=".xlsx,.xls,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel" style="display:none" onchange="importDoradcyFromSelectedXlsx(this)">
+        <button class="importBtn" id="doradcyImportBtn" onclick="importDoradcyFromXlsx()">⇩ Wczytaj bazę doradców XLSX</button>
+        <button class="importBtn" style="background:#3a6b4a" onclick="exportDoradcyToXlsx()">⇧ Eksportuj do XLSX</button>
+        <button class="importBtn" style="background:#a34747" onclick="clearDoradcyRolni()">Wyczyść bazę doradców</button>
+        <span id="doradcyImportMsg"></span>
+      </div>
+      <div class="advisorDbNote">Najlepszy plik do importu: arkusz <b>Baza_Z_KONTAKTAMI</b>. Panel czyta kolumny po kolejności, więc poradzi sobie też wtedy, gdy Excel ma problem z polskimi znakami w nagłówkach.</div>
+      <div class="filterRow">
+        <input type="text" id="searchDoradcy" placeholder="Szukaj po nazwisku, powiecie, województwie, ODR, telefonie, e-mailu..." oninput="renderDoradcyRolni()">
+        <select id="filterDoradcyWoj" onchange="renderDoradcyRolni()">
+          <option value="">Wszystkie województwa</option>
+        </select>
+        <select id="filterDoradcyTyp" onchange="renderDoradcyRolni()">
+          <option value="">Wszystkie typy</option>
+        </select>
+        <select id="filterDoradcyStatus" onchange="renderDoradcyRolni()">
+          <option value="">Wszystkie statusy kontaktu</option>
+        </select>
+      </div>
+      <div id="doradcyStats" class="advisorDbStats"></div>
+      <div class="tableWrap">
+        <table class="clients">
+          <colgroup>
+            <col class="osoba"><col class="woj"><col class="miejsc"><col class="firma"><col class="tel"><col class="zain"><col class="hist">
+          </colgroup>
+          <thead>
+            <tr>
+              <th>Doradca</th><th>Województwo</th><th>Powiat / miasto</th><th>Podmiot</th><th>Kontakt</th><th>Status / typ</th><th>Źródło</th>
+            </tr>
+          </thead>
+          <tbody id="doradcyBody"></tbody>
+        </table>
+      </div>
+      <div id="doradcyEmpty" class="empty" style="display:none"></div>
+    </div>
+    </div>
+
     <div class="tabPane" id="tabpane-sprawy">
     <div class="section" id="section-sprawy">
       <h2>Sprawy w toku <button class="addBtn" onclick="toggleForm('sprawy')">+ Dodaj</button></h2>
@@ -1937,6 +1985,7 @@ function syncNavigationFromTab(name){
     backup:"ai-backup",
     dokumenty:"docs-home",
     cenniki:"docs-price",
+    doradcy:"sales-advisors-db",
     sprawy:"ops-activity",
     terminy:"ops-deadlines",
     instalacje:"ops-installations",
@@ -2149,6 +2198,7 @@ function defaultData(){
     sprawy: [],
     klienci: [],
     klienciImported: false,
+    doradcyRolni: [],
     log: [],
     terminy: [],
     instalacje: [],
@@ -2405,6 +2455,7 @@ function fillMissingDefaults(d){
   if(normalizePanelDocuments(d)) changed = true;
   if(!d.sprawy || d.sprawy.length===0){ d.sprawy = dflt.sprawy; changed = true; }
   if(!d.klienci){ d.klienci = []; changed = true; }
+  if(!d.doradcyRolni){ d.doradcyRolni = []; changed = true; }
   if(!d.log){ d.log = []; changed = true; }
   if(!d.terminy || d.terminy.length===0){ d.terminy = dflt.terminy; changed = true; }
   if(!d.instalacje){ d.instalacje = []; changed = true; }
@@ -2884,8 +2935,10 @@ function renderStatsBar(){
   const wygrani = klienci.filter(c=>c.status==="wygrany").length;
   const sprawyOpen = (data.sprawy||[]).filter(s=>s.status!=="done").length;
   const dokLiczba = (data.dokumenty||[]).length;
+  const doradcyLiczba = (data.doradcyRolni||[]).length;
   const cards = [
     [klienci.length, "Klientów łącznie"],
+    [doradcyLiczba, "Doradców rolnych"],
     [wPipeline, "W toku (kontakt/oferta/negocjacje)"],
     [wygrani, "Wygranych"],
     [sprawyOpen, "Otwartych spraw"],
@@ -3203,6 +3256,7 @@ function render(){
   renderStatsBar();
   renderActivityLog();
   renderClients();
+  renderDoradcyRolni();
   fillDocumentClientOptions();
 
   // --- Dokumenty: grupowane wg kategorii, z wyszukiwarką ---
@@ -3725,6 +3779,7 @@ const PANEL_NAV = {
   sales: {
     label: "SPRZEDAŻ",
     views: [
+      {key:"sales-advisors-db", label:"Baza doradców", tab:"doradcy", priority:true},
       {key:"sales-kanban", label:"Kanban CRM", tab:"klienci", clientsView:"kanban"},
       {key:"sales-offers", label:"Oferty", tab:"klienci", clientsView:"table", focusId:"section-klienci"}
     ]
@@ -5181,6 +5236,254 @@ async function importClientsFromSelectedXlsx(input){
     if(input) input.value = "";
     if(btn) btn.disabled = false;
   }
+}
+
+// ================= Baza doradców rolnych =================
+function importDoradcyFromXlsx(){
+  const input = document.getElementById("doradcyXlsxInput");
+  const msg = document.getElementById("doradcyImportMsg");
+  if(msg) msg.textContent = "Wybierz plik Excel z bazą doradców.";
+  if(input) input.click();
+}
+
+function doradcySheetName(wb){
+  return wb.SheetNames.includes("Baza_Z_KONTAKTAMI")
+    ? "Baza_Z_KONTAKTAMI"
+    : (wb.SheetNames.find(name => normalizeXlsxHeader(name).includes("kontakt")) || wb.SheetNames[0]);
+}
+
+function doradcyCell(row, index){
+  const value = row && row[index] !== undefined && row[index] !== null ? row[index] : "";
+  if(value instanceof Date) return value.toISOString().slice(0,10);
+  return value.toString().trim();
+}
+
+function normalizeDoradcyDate(value){
+  const raw = (value || "").toString().trim();
+  if(!raw) return "";
+  if(/^\d{4}-\d{2}-\d{2}$/.test(raw)) return raw;
+  if(/^\d{1,2}[.-]\d{1,2}[.-]\d{4}$/.test(raw)){
+    const parts = raw.split(/[.-]/);
+    return `${parts[2]}-${parts[1].padStart(2,"0")}-${parts[0].padStart(2,"0")}`;
+  }
+  const numeric = Number(raw.replace(",", "."));
+  if(Number.isFinite(numeric) && numeric > 25000){
+    const date = new Date(Math.round((numeric - 25569) * 86400 * 1000));
+    if(!Number.isNaN(date.getTime())) return date.toISOString().slice(0,10);
+  }
+  return raw;
+}
+
+function doradcaKey(item){
+  return [
+    item.imie,
+    item.nazwisko,
+    item.miejsce,
+    item.powiat,
+    item.wojewodztwo,
+    (item.telefon || "").replace(/\D/g,""),
+    item.email
+  ].map(v => normalizeXlsxHeader(v)).join("|");
+}
+
+function mapDoradcaRow(row, index){
+  const imie = doradcyCell(row, 1);
+  const nazwisko = doradcyCell(row, 2);
+  const miejsce = doradcyCell(row, 3);
+  const powiat = doradcyCell(row, 4);
+  const wojewodztwo = doradcyCell(row, 5);
+  const telefon = doradcyCell(row, 7);
+  const email = doradcyCell(row, 8);
+  if(!imie && !nazwisko && !miejsce && !telefon && !email) return null;
+  return {
+    id:`dr_${Date.now()}_${index}`,
+    imie,
+    nazwisko,
+    miejsce,
+    powiat,
+    wojewodztwo,
+    typPodmiotu: doradcyCell(row, 6),
+    telefon,
+    email,
+    adres: doradcyCell(row, 9),
+    podmiotKontaktowy: doradcyCell(row, 10),
+    rodzajKontaktu: doradcyCell(row, 11),
+    statusKontaktu: doradcyCell(row, 12),
+    pelnyWpis: doradcyCell(row, 13),
+    stronaRejestru: doradcyCell(row, 14),
+    urlCdr: doradcyCell(row, 15),
+    zrodloKontaktu: doradcyCell(row, 16),
+    dataWeryfikacji: normalizeDoradcyDate(doradcyCell(row, 17)),
+    uwagi: doradcyCell(row, 18),
+    utworzono: new Date().toISOString(),
+    zaktualizowano: new Date().toISOString()
+  };
+}
+
+function rowsFromDoradcyWorkbook(wb){
+  const sheetName = doradcySheetName(wb);
+  const ws = wb.Sheets[sheetName];
+  const rows = XLSX.utils.sheet_to_json(ws, {header:1, defval:"", raw:false});
+  const firstDataRow = rows.findIndex(row => normalizeXlsxHeader(row && row[0]) === "lp");
+  return rows.slice((firstDataRow >= 0 ? firstDataRow : 0) + 1);
+}
+
+async function importDoradcyFromSelectedXlsx(input){
+  const btn = document.getElementById("doradcyImportBtn");
+  const msg = document.getElementById("doradcyImportMsg");
+  const file = input?.files?.[0];
+  if(!file) return;
+  if(btn) btn.disabled = true;
+  if(msg) msg.textContent = `Importuję: ${file.name}...`;
+  try{
+    const buf = await file.arrayBuffer();
+    const wb = XLSX.read(buf, {type:"array", cellDates:true});
+    const rows = rowsFromDoradcyWorkbook(wb);
+    if(!data.doradcyRolni) data.doradcyRolni = [];
+    const existingKeys = new Set(data.doradcyRolni.map(doradcaKey));
+    let added = 0, skipped = 0;
+    rows.forEach((row, index) => {
+      const item = mapDoradcaRow(row, index);
+      if(!item) return;
+      const key = doradcaKey(item);
+      if(existingKeys.has(key)){ skipped++; return; }
+      existingKeys.add(key);
+      data.doradcyRolni.push(item);
+      added++;
+    });
+    if(added){
+      logActivity(`zaimportował(a) ${added} doradców rolnych z Excela`);
+      saveData();
+    }
+    renderDoradcyRolni();
+    renderStatsBar();
+    if(msg){
+      msg.textContent = added > 0
+        ? `Zaimportowano ${added} doradców.${skipped>0?` Pominięto duplikaty: ${skipped}.`:""}`
+        : (skipped>0 ? `Nie dodano nowych doradców. Duplikaty: ${skipped}.` : "Nie znaleziono rekordów do importu.");
+    }
+  }catch(e){
+    if(msg) msg.textContent = "Błąd importu bazy doradców: " + (e.message || e);
+  }finally{
+    if(input) input.value = "";
+    if(btn) btn.disabled = false;
+  }
+}
+
+function updateDoradcyFilters(items){
+  const configs = [
+    ["filterDoradcyWoj", items.map(i=>i.wojewodztwo).filter(Boolean), "Wszystkie województwa"],
+    ["filterDoradcyTyp", items.map(i=>i.typPodmiotu).filter(Boolean), "Wszystkie typy"],
+    ["filterDoradcyStatus", items.map(i=>i.statusKontaktu).filter(Boolean), "Wszystkie statusy kontaktu"]
+  ];
+  configs.forEach(([id, values, emptyLabel]) => {
+    const el = document.getElementById(id);
+    if(!el) return;
+    const selected = el.value;
+    const unique = [...new Set(values)].sort((a,b)=>a.localeCompare(b, "pl"));
+    el.innerHTML = `<option value="">${emptyLabel}</option>` + unique.map(value => `<option value="${crmEsc(value)}">${crmEsc(value)}</option>`).join("");
+    if(unique.includes(selected)) el.value = selected;
+  });
+}
+
+function doradcyMatchesFilters(item){
+  const q = (document.getElementById("searchDoradcy")?.value || "").trim().toLowerCase();
+  const woj = document.getElementById("filterDoradcyWoj")?.value || "";
+  const typ = document.getElementById("filterDoradcyTyp")?.value || "";
+  const status = document.getElementById("filterDoradcyStatus")?.value || "";
+  if(woj && item.wojewodztwo !== woj) return false;
+  if(typ && item.typPodmiotu !== typ) return false;
+  if(status && item.statusKontaktu !== status) return false;
+  if(!q) return true;
+  const hay = [
+    item.imie, item.nazwisko, item.miejsce, item.powiat, item.wojewodztwo,
+    item.typPodmiotu, item.telefon, item.email, item.adres, item.podmiotKontaktowy,
+    item.rodzajKontaktu, item.statusKontaktu, item.pelnyWpis, item.zrodloKontaktu, item.uwagi
+  ].join(" ").toLowerCase();
+  return hay.includes(q);
+}
+
+function renderDoradcyRolni(){
+  const body = document.getElementById("doradcyBody");
+  const stats = document.getElementById("doradcyStats");
+  const empty = document.getElementById("doradcyEmpty");
+  if(!body || !stats) return;
+  const items = data?.doradcyRolni || [];
+  updateDoradcyFilters(items);
+  const filtered = items.filter(doradcyMatchesFilters);
+  const directContacts = items.filter(i => (i.telefon || i.email) && !(i.statusKontaktu || "").toLowerCase().includes("pośredni")).length;
+  const verified = items.filter(i => (i.statusKontaktu || "").toLowerCase().includes("zweryfik")).length;
+  const privateAdvisors = items.filter(i => (i.typPodmiotu || "").toLowerCase().includes("prywat")).length;
+  stats.innerHTML = [
+    ["W bazie", items.length],
+    ["Po filtrach", filtered.length],
+    ["Kontakt bezpośredni", directContacts],
+    ["Zweryfikowane", verified],
+    ["Prywatni doradcy", privateAdvisors]
+  ].map(([label, value]) => `<div class="statCard"><div class="num">${value}</div><div class="lbl">${crmEsc(label)}</div></div>`).join("");
+  const visible = filtered.slice(0, 250);
+  body.innerHTML = visible.map(item => {
+    const name = [item.imie, item.nazwisko].filter(Boolean).join(" ") || "Bez nazwiska";
+    const contact = [
+      item.telefon ? `<a href="${crmEsc(phoneHref(item.telefon) || "#")}">${crmEsc(item.telefon)}</a>` : "",
+      item.email ? `<a href="${crmEsc(emailHref(item.email) || "#")}">${crmEsc(item.email)}</a>` : "",
+      item.adres ? `<span>${crmEsc(item.adres)}</span>` : ""
+    ].filter(Boolean).join("");
+    const cdr = item.urlCdr ? `<a class="histBtn" href="${crmEsc(item.urlCdr)}" target="_blank" rel="noopener">CDR</a>` : "";
+    return `
+      <tr>
+        <td><b>${crmEsc(name)}</b><div class="advisorMuted">${crmEsc(item.miejsce || "")}</div></td>
+        <td>${crmEsc(item.wojewodztwo || "")}</td>
+        <td>${crmEsc(item.powiat || "")}</td>
+        <td>${crmEsc(item.podmiotKontaktowy || item.miejsce || "")}<div class="advisorMuted">${crmEsc(item.rodzajKontaktu || "")}</div></td>
+        <td><div class="advisorContact">${contact || '<span class="advisorMuted">Brak kontaktu</span>'}</div></td>
+        <td><span class="advisorStatusBadge">${crmEsc(item.statusKontaktu || "brak statusu")}</span><div class="advisorMuted">${crmEsc(item.typPodmiotu || "")}</div></td>
+        <td>${cdr}<div class="advisorMuted">${crmEsc(item.zrodloKontaktu || "")}${item.dataWeryfikacji ? `<br>${crmEsc(item.dataWeryfikacji)}` : ""}</div></td>
+      </tr>
+    `;
+  }).join("");
+  if(empty){
+    empty.style.display = filtered.length ? "block" : "block";
+    empty.textContent = filtered.length
+      ? `Pokazuję ${visible.length} z ${filtered.length} rekordów. Zawęź filtrami, jeśli szukasz konkretnego regionu.`
+      : "Brak doradców pasujących do filtrów.";
+  }
+}
+
+function exportDoradcyToXlsx(){
+  const rows = (data.doradcyRolni || []).map(item => ({
+    "Imię": item.imie,
+    "Nazwisko": item.nazwisko,
+    "Miejsce świadczenia usług": item.miejsce,
+    "Powiat / miasto": item.powiat,
+    "Województwo": item.wojewodztwo,
+    "Typ podmiotu": item.typPodmiotu,
+    "Telefon": item.telefon,
+    "E-mail": item.email,
+    "Adres": item.adres,
+    "Podmiot kontaktowy": item.podmiotKontaktowy,
+    "Rodzaj kontaktu": item.rodzajKontaktu,
+    "Status kontaktu": item.statusKontaktu,
+    "Pełny wpis CDR": item.pelnyWpis,
+    "URL wpisu CDR": item.urlCdr,
+    "Źródło kontaktu": item.zrodloKontaktu,
+    "Data weryfikacji": item.dataWeryfikacji,
+    "Uwagi": item.uwagi
+  }));
+  const ws = XLSX.utils.json_to_sheet(rows);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "Baza_doradcow");
+  XLSX.writeFile(wb, `Baza_doradcow_rolnych_${new Date().toISOString().slice(0,10)}.xlsx`);
+  logActivity("wyeksportował(a) bazę doradców rolnych do XLSX");
+}
+
+function clearDoradcyRolni(){
+  if(!confirm("Wyczyścić bazę doradców rolnych w panelu? Klienci CRM nie zostaną ruszeni.")) return;
+  data.doradcyRolni = [];
+  logActivity("wyczyścił(a) bazę doradców rolnych");
+  saveData();
+  renderDoradcyRolni();
+  renderStatsBar();
 }
 
 // ================= Terminy =================
