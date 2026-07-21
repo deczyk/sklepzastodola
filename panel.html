@@ -159,6 +159,16 @@
   .advisorContact a{color:var(--green);font-weight:bold;text-decoration:none}
   .advisorMuted{color:var(--text-muted);font-size:12px}
   .advisorStatusBadge{display:inline-flex;align-items:center;border:1px solid var(--border);border-radius:999px;padding:3px 8px;font-size:11px;font-weight:bold;background:var(--surface-soft);color:var(--text)}
+  .mailTemplateBuilder{border:1px solid var(--border);background:var(--surface-soft);border-radius:12px;padding:14px;margin-bottom:14px}
+  .mailTemplateFields{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px}
+  .mailTemplateFields input,.mailTemplateFields select{width:100%;border:1px solid var(--border);border-radius:8px;background:var(--input-bg);color:var(--text);padding:8px 10px;font-size:12.5px}
+  .mailTemplateGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(310px,1fr));gap:12px}
+  .mailTemplateCard{border:1px solid var(--border);background:var(--surface);border-radius:12px;padding:14px;box-shadow:var(--shadow-soft);display:grid;gap:10px}
+  .mailTemplateCard h3{margin:0;color:var(--green);font-size:15px}
+  .mailTemplateMeta{font-size:12px;color:var(--text-muted);line-height:1.4}
+  .mailTemplateSubject{border:1px solid var(--border);border-radius:8px;background:var(--surface-soft);padding:8px 10px;font-weight:bold;font-size:12.5px}
+  .mailTemplateBody{width:100%;min-height:260px;border:1px solid var(--border);border-radius:10px;background:var(--input-bg);color:var(--text);padding:10px;font-family:inherit;font-size:12.5px;line-height:1.45;resize:vertical}
+  .mailTemplateActions{display:flex;gap:8px;flex-wrap:wrap}
 
   /* --- Stats bar --- */
   .statsBar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px}
@@ -1801,6 +1811,32 @@
         <div id="salesText" class="empty">Materialy zostana odtworzone jako widok ladowany po zalogowaniu.</div>
       </div>
     </div>
+    <div class="tabPane" id="tabpane-mailtemplates">
+      <div class="section">
+        <h2>Szablony maili po Advisorze</h2>
+        <div class="privateNotice"><b>Prywatnie:</b> gotowe maile robocze po formularzach Advisor i Advisor OLX. Uzupełnij pola, wybierz wariant i skopiuj temat oraz treść do poczty.</div>
+        <div class="mailTemplateBuilder">
+          <div class="mailTemplateFields">
+            <input id="mailTplName" placeholder="Imię / Panie..." oninput="renderAdvisorMailTemplates()">
+            <input id="mailTplFarm" placeholder="Gospodarstwo / firma" oninput="renderAdvisorMailTemplates()">
+            <input id="mailTplLocation" placeholder="Lokalizacja" oninput="renderAdvisorMailTemplates()">
+            <select id="mailTplPackage" onchange="renderAdvisorMailTemplates()">
+              <option>Standard</option>
+              <option>Start</option>
+              <option>Premium</option>
+              <option>Do ustalenia po rozmowie</option>
+            </select>
+            <select id="mailTplResult" onchange="renderAdvisorMailTemplates()">
+              <option>temat wygląda sensownie</option>
+              <option>potrzebujemy doprecyzować dane</option>
+              <option>na razie podszedłbym ostrożnie</option>
+            </select>
+            <input id="mailTplNextStep" placeholder="Proponowany następny krok" value="krótka rozmowa telefoniczna i doprecyzowanie lokalizacji" oninput="renderAdvisorMailTemplates()">
+          </div>
+        </div>
+        <div id="advisorMailTemplates" class="mailTemplateGrid"></div>
+      </div>
+    </div>
     <div class="tabPane" id="tabpane-ustawienia">
       <div class="section">
         <h2>Ustawienia panelu</h2>
@@ -1993,6 +2029,7 @@ function syncNavigationFromTab(name){
     finanse:"fin-finance",
     linki:"marketing-links",
     podwykonawcy:"company-vendors",
+    mailtemplates:"sales-mail-templates",
     marketing:"marketing-home",
     materialy:"docs-materials",
     ustawienia:"ai-settings"
@@ -3781,7 +3818,8 @@ const PANEL_NAV = {
     views: [
       {key:"sales-advisors-db", label:"Baza doradców", tab:"doradcy", priority:true},
       {key:"sales-kanban", label:"Kanban CRM", tab:"klienci", clientsView:"kanban"},
-      {key:"sales-offers", label:"Oferty", tab:"klienci", clientsView:"table", focusId:"section-klienci"}
+      {key:"sales-offers", label:"Oferty", tab:"klienci", clientsView:"table", focusId:"section-klienci"},
+      {key:"sales-mail-templates", label:"Szablony maili", tab:"mailtemplates", priority:true}
     ]
   },
   company: {
@@ -7721,12 +7759,178 @@ function openFacebookPost(id){
   }, 50);
 }
 
-// Dopinamy render materiałów i planu Facebook do istniejącego startu panelu, bez zmieniania logiki CRM.
+// ================= Szablony maili po Advisorze =================
+const ADVISOR_MAIL_TEMPLATES = [
+  {
+    id:"advisor-sens",
+    title:"Advisor - temat wygląda sensownie",
+    meta:"Pierwsza odpowiedź po formularzu, gdy klient wygląda na realnie zainteresowanego.",
+    subject:v=>`Wstępna analiza sprzedaży bezpośredniej - ${v.farmOrLocation}`,
+    body:v=>`Dzień dobry ${v.name},
+
+dziękuję za wypełnienie formularza.
+
+Po wstępnej analizie wygląda na to, że temat sprzedaży bezpośredniej w Państwa gospodarstwie może mieć sens. Szczególnie ważne będą teraz: lokalizacja punktu, realny ruch klientów w okolicy oraz skala mleka, którą chcą Państwo sprzedawać poza pośrednikami.
+
+Na ten moment najrozsądniej rozważałbym wariant: ${v.packageName}.
+
+Nie chcę jednak wysyłać gotowej oferty bez krótkiej rozmowy, bo przy takim punkcie trzeba dopasować rozwiązanie do gospodarstwa, a nie wciskać jeden schemat każdemu.
+
+Proponowany następny krok: ${v.nextStep}.
+
+W rozmowie doprecyzujemy:
+- lokalizację i dostęp klientów,
+- czy lepszy będzie sam mlekomat, czy punkt z pawilonem,
+- formalności i możliwe finansowanie,
+- orientacyjny zakres inwestycji.
+
+Pozdrawiam
+Jakub Deczyński
+Sklep za Stodołą sp. z o.o.
+735 115 427
+www.sklepzastodola.pl`
+  },
+  {
+    id:"advisor-doprecyzowanie",
+    title:"Advisor - potrzebne doprecyzowanie",
+    meta:"Gdy formularz jest niepełny albo trzeba dopytać przed ofertą.",
+    subject:v=>`Dopytanie po formularzu - ${v.farmOrLocation}`,
+    body:v=>`Dzień dobry ${v.name},
+
+dziękuję za przesłanie formularza.
+
+Mam już podstawowe informacje, ale przed sensowną rekomendacją potrzebuję doprecyzować kilka rzeczy. Nie chcę od razu wysyłać ogólnej oferty, bo przy sprzedaży bezpośredniej najważniejsze jest dopasowanie punktu do lokalizacji i skali gospodarstwa.
+
+Na teraz wynik oceniam tak: ${v.result}.
+
+Proszę krótko odpisać albo najlepiej zadzwonić, żebyśmy ustalili:
+- ile mleka realnie chcą Państwo sprzedawać dziennie,
+- gdzie miałby stanąć punkt sprzedaży,
+- czy w okolicy jest ruch klientów,
+- czy interesuje Państwa sam mlekomat, czy pełny punkt z pawilonem,
+- czy rozważają Państwo finansowanie/leasing/dotację.
+
+Po tych informacjach przygotuję konkretniejszą rekomendację: Start, Standard albo Premium.
+
+Pozdrawiam
+Jakub Deczyński
+Sklep za Stodołą sp. z o.o.
+735 115 427
+www.sklepzastodola.pl`
+  },
+  {
+    id:"advisor-olx",
+    title:"Advisor OLX - odpowiedź do leada",
+    meta:"Krótka, konkretna odpowiedź do osoby z OLX po formularzu lub wiadomości.",
+    subject:v=>`Mlekomat / punkt sprzedaży przy gospodarstwie - ${v.farmOrLocation}`,
+    body:v=>`Dzień dobry ${v.name},
+
+dziękuję za kontakt w sprawie mlekomatu i sprzedaży bezpośredniej.
+
+W Sklepie za Stodołą nie podchodzimy do tego jak do sprzedaży samego urządzenia. Pomagamy uruchomić cały punkt sprzedaży przy gospodarstwie: mlekomat BRUNIMAT, pawilon, butelki, etykiety, podstawowe formalności, wdrożenie i start sprzedaży.
+
+Z informacji, które mam na ten moment, jako punkt wyjścia przyjąłbym wariant: ${v.packageName}.
+
+Żeby nie strzelać ofertą w ciemno, proponuję krótki telefon. W 10-15 minut ustalimy, czy u Państwa ma sens:
+- sam mlekomat,
+- mlekomat z pawilonem,
+- pełny punkt sprzedaży z dodatkowym wyposażeniem.
+
+Proponowany następny krok: ${v.nextStep}.
+
+Pozdrawiam
+Jakub Deczyński
+Sklep za Stodołą sp. z o.o.
+735 115 427
+www.sklepzastodola.pl`
+  },
+  {
+    id:"po-rozmowie",
+    title:"Po rozmowie - podsumowanie i kolejny krok",
+    meta:"Mail po telefonie, żeby klient miał uporządkowane ustalenia.",
+    subject:v=>`Podsumowanie rozmowy - punkt sprzedaży przy gospodarstwie`,
+    body:v=>`Dzień dobry ${v.name},
+
+dziękuję za rozmowę.
+
+Podsumowując: rozmawialiśmy o uruchomieniu sprzedaży bezpośredniej przy gospodarstwie${v.locationText}. Na tym etapie najbardziej logiczny wydaje się wariant: ${v.packageName}.
+
+Najważniejsze założenia do dalszego sprawdzenia:
+- lokalizacja punktu i dostęp dla klientów,
+- skala sprzedaży mleka poza pośrednikiem,
+- zakres: sam mlekomat czy punkt z pawilonem,
+- ewentualne butelki, etykiety i wyposażenie dodatkowe,
+- finansowanie oraz formalności.
+
+Kolejny krok: ${v.nextStep}.
+
+Po doprecyzowaniu tych informacji przygotuję propozycję dopasowaną do Państwa gospodarstwa.
+
+Pozdrawiam
+Jakub Deczyński
+Sklep za Stodołą sp. z o.o.
+735 115 427
+www.sklepzastodola.pl`
+  }
+];
+
+function advisorMailValues(){
+  const val = id => (document.getElementById(id)?.value || "").trim();
+  const name = val("mailTplName") || "Panie/Pani";
+  const farm = val("mailTplFarm");
+  const location = val("mailTplLocation");
+  const farmOrLocation = farm || location || "gospodarstwo";
+  return {
+    name,
+    farm,
+    location,
+    farmOrLocation,
+    locationText: location ? ` w lokalizacji: ${location}` : "",
+    packageName: val("mailTplPackage") || "Do ustalenia po rozmowie",
+    result: val("mailTplResult") || "potrzebujemy doprecyzować dane",
+    nextStep: val("mailTplNextStep") || "krótka rozmowa telefoniczna i doprecyzowanie danych"
+  };
+}
+
+function renderAdvisorMailTemplates(){
+  const root = document.getElementById("advisorMailTemplates");
+  if(!root) return;
+  const values = advisorMailValues();
+  root.innerHTML = ADVISOR_MAIL_TEMPLATES.map(template => {
+    const subject = template.subject(values);
+    const body = template.body(values);
+    return `
+      <div class="mailTemplateCard" id="mailtpl-${crmEsc(template.id)}">
+        <h3>${crmEsc(template.title)}</h3>
+        <div class="mailTemplateMeta">${crmEsc(template.meta)}</div>
+        <div class="mailTemplateSubject" id="mailtpl-subject-${crmEsc(template.id)}">${crmEsc(subject)}</div>
+        <textarea class="mailTemplateBody" id="mailtpl-body-${crmEsc(template.id)}">${crmEsc(body)}</textarea>
+        <div class="mailTemplateActions">
+          <button class="importBtn" onclick="copyAdvisorMailTemplate('${crmEsc(template.id)}', true)">Kopiuj temat + treść</button>
+          <button class="importBtn" style="background:#3a6b4a" onclick="copyAdvisorMailTemplate('${crmEsc(template.id)}', false)">Kopiuj samą treść</button>
+        </div>
+      </div>
+    `;
+  }).join("");
+}
+
+function copyAdvisorMailTemplate(id, includeSubject){
+  const subject = document.getElementById("mailtpl-subject-"+id)?.textContent || "";
+  const body = document.getElementById("mailtpl-body-"+id)?.value || "";
+  const text = includeSubject ? `Temat: ${subject}\n\n${body}` : body;
+  navigator.clipboard.writeText(text).then(
+    ()=>alert("Skopiowano szablon maila."),
+    ()=>alert("Nie udało się skopiować automatycznie. Zaznacz treść ręcznie.")
+  );
+}
+
+// Dopinamy render materiałów, planu Facebook i szablonów maili do istniejącego startu panelu, bez zmieniania logiki CRM.
 const originalSwitchTabForSales = switchTab;
 switchTab = function(name, options){
   originalSwitchTabForSales(name, options || {});
   if(name === "materialy") renderSalesMaterials();
   if(name === "marketing") renderFacebookContentPlan();
+  if(name === "mailtemplates") renderAdvisorMailTemplates();
 };
 
 const originalRenderForSales = render;
@@ -7735,6 +7939,7 @@ render = function(){
   renderSalesMaterials();
   renderFacebookContentPlan();
   renderFacebookReminder();
+  renderAdvisorMailTemplates();
 };
 
 </script>
