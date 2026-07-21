@@ -2847,6 +2847,128 @@ function clientActivitySummary(c, limit=120){
   return `${formatDT(last.data)} · ${last.kto || "brak autora"} · ${text}`;
 }
 
+function normalizeAutomationText(value){
+  return (value || "").toString().toLowerCase()
+    .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+    .replace(/[łŁ]/g, "l")
+    .replace(/[ąĄ]/g, "a")
+    .replace(/[ćĆ]/g, "c")
+    .replace(/[ęĘ]/g, "e")
+    .replace(/[ńŃ]/g, "n")
+    .replace(/[óÓ]/g, "o")
+    .replace(/[śŚ]/g, "s")
+    .replace(/[źŹżŻ]/g, "z")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function noteHas(text, patterns){
+  return patterns.some(pattern => pattern.test(text));
+}
+
+function noteNegates(text, word){
+  return new RegExp(`\\b(nie|bez|jeszcze nie)\\s+\\w*\\s*${word}`, "i").test(text);
+}
+
+function nextWeekdayDate(targetDay){
+  const today = startOfToday();
+  const currentDay = today.getDay();
+  let diff = (targetDay - currentDay + 7) % 7;
+  if(diff === 0) diff = 7;
+  return formatDateOnly(addDaysDate(today, diff));
+}
+
+function inferFollowupFromNote(text){
+  const explicit = text.match(/\b(\d{1,2})[.\-/](\d{1,2})(?:[.\-/](\d{2,4}))?\b/);
+  if(explicit){
+    const day = explicit[1].padStart(2, "0");
+    const month = explicit[2].padStart(2, "0");
+    const year = explicit[3] ? (explicit[3].length === 2 ? `20${explicit[3]}` : explicit[3]) : String(new Date().getFullYear());
+    return `${year}-${month}-${day}`;
+  }
+  if(noteHas(text, [/\bjutro\b/, /\bnastepnego dnia\b/])) return formatDateOnly(addDaysDate(startOfToday(), 1));
+  if(noteHas(text, [/\bpojutrze\b/])) return formatDateOnly(addDaysDate(startOfToday(), 2));
+  if(noteHas(text, [/\bza 2 dni\b/, /\bdwa dni\b/])) return formatDateOnly(addDaysDate(startOfToday(), 2));
+  if(noteHas(text, [/\bza 3 dni\b/, /\btrzy dni\b/])) return formatDateOnly(addDaysDate(startOfToday(), 3));
+  if(noteHas(text, [/\bza tydzien\b/, /\bza 7 dni\b/])) return formatDateOnly(addDaysDate(startOfToday(), 7));
+  if(noteHas(text, [/\bponiedzialek\b/])) return nextWeekdayDate(1);
+  if(noteHas(text, [/\bwtorek\b/])) return nextWeekdayDate(2);
+  if(noteHas(text, [/\bsrode\b/, /\bsroda\b/])) return nextWeekdayDate(3);
+  if(noteHas(text, [/\bczwartek\b/])) return nextWeekdayDate(4);
+  if(noteHas(text, [/\bpiatek\b/])) return nextWeekdayDate(5);
+  if(noteHas(text, [/\bsobote\b/, /\bsobota\b/])) return nextWeekdayDate(6);
+  if(noteHas(text, [/\bniedziele\b/, /\bniedziela\b/])) return nextWeekdayDate(0);
+  return "";
+}
+
+function inferClientAutomation(note, client){
+  const text = normalizeAutomationText(note);
+  const changes = [];
+  const set = (field, value, label) => {
+    if(value && client[field] !== value){
+      client[field] = value;
+      changes.push(label);
+    }
+  };
+
+  const explicitFollowup = inferFollowupFromNote(text);
+  if(explicitFollowup){
+    set("nastepnyFollowup", explicitFollowup, `follow-up: ${explicitFollowup}`);
+  }
+
+  if(noteHas(text, [/\b(rezygnuje|rezygnacja|nie zainteresowany|nieaktualne|odpada)\b/])){
+    set("status", "przegrany", "status: Przegrany");
+    if(client.nastepnyFollowup){
+      client.nastepnyFollowup = "";
+      changes.push("follow-up: wyczyszczony");
+    }
+    return changes;
+  }
+
+  if(noteHas(text, [/\b(podpisal|podpisana|umowa podpisana|wplacil|zaliczka|kupuje|bierze)\b/])){
+    set("status", "wygrany", "status: Wygrany");
+    set("priorytet", "A", "priorytet: A");
+    return changes;
+  }
+
+  if(noteHas(text, [/\b(oferta wyslana|wyslano oferte|wyslalem oferte|poszla oferta|mail z oferta)\b/]) && !noteNegates(text, "ofert")){
+    set("status", "oferta", "status: Oferta wysłana");
+    set("nastepnyFollowup", client.nastepnyFollowup || formatDateOnly(addDaysDate(startOfToday(), 2)), `follow-up: ${client.nastepnyFollowup || formatDateOnly(addDaysDate(startOfToday(), 2))}`);
+  } else if(noteHas(text, [/\b(advisor wyslany|wyslano advisor|wyslalem advisor|formularz doradczy wyslany)\b/]) && !noteNegates(text, "advisor")){
+    set("status", "kontakt", "status: Do kontaktu");
+    set("nastepnyFollowup", client.nastepnyFollowup || formatDateOnly(addDaysDate(startOfToday(), 2)), `follow-up: ${client.nastepnyFollowup || formatDateOnly(addDaysDate(startOfToday(), 2))}`);
+  } else if(noteHas(text, [/\b(mail wyslany|wyslalem mail|sms wyslany|wiadomosc wyslana)\b/]) && !noteNegates(text, "wysl")){
+    set("status", client.status === "nowy" ? "kontakt" : client.status, "status: Do kontaktu");
+    set("nastepnyFollowup", client.nastepnyFollowup || formatDateOnly(addDaysDate(startOfToday(), 2)), `follow-up: ${client.nastepnyFollowup || formatDateOnly(addDaysDate(startOfToday(), 2))}`);
+  }
+
+  if(noteHas(text, [/\b(brak odpowiedzi|nie odbiera|nie odpisuje|cisza)\b/])){
+    set("status", client.status === "nowy" ? "kontakt" : client.status, "status: Do kontaktu");
+    set("nastepnyFollowup", explicitFollowup || formatDateOnly(addDaysDate(startOfToday(), 1)), `follow-up: ${explicitFollowup || formatDateOnly(addDaysDate(startOfToday(), 1))}`);
+  }
+  if(noteHas(text, [/\b(czeka|czekamy|do decyzji|ma przemyslec|odezwie sie)\b/])){
+    set("status", "pozniej", "status: Decyzja później");
+    set("nastepnyFollowup", explicitFollowup || client.nastepnyFollowup || formatDateOnly(addDaysDate(startOfToday(), 7)), `follow-up: ${explicitFollowup || client.nastepnyFollowup || formatDateOnly(addDaysDate(startOfToday(), 7))}`);
+  }
+  if(noteHas(text, [/\b(rozmowa|rozmawialem|rozmawial|dzwonil|dzwonilem|gadalem|gadane|spotkanie)\b/])){
+    if(!["oferta","negocjacje","wygrany","przegrany"].includes(client.status)) set("status", "rozmowa", "status: Rozmowa odbyta");
+  }
+  if(noteHas(text, [/\b(zainteresowany|mocny lead|dobry lead|chce|konkretny)\b/]) && !noteHas(text, [/\bnie zainteresowany\b/])){
+    set("priorytet", "A", "priorytet: A");
+    if(client.status === "nowy") set("status", "zglosil_sie", "status: Zgłosił się sam");
+  }
+
+  if(noteHas(text, [/\bmlekomat\b/, /\bbrunimat\b/])) set("produkt", "BRUNIMAT / mlekomat", "produkt: BRUNIMAT / mlekomat");
+  if(noteHas(text, [/\bpawilon\b/, /\bpunkt sprzedazy\b/])) set("produkt", "Pawilon / punkt sprzedaży", "produkt: Pawilon / punkt sprzedaży");
+  if(noteHas(text, [/\bcaly system\b/, /\bpelny system\b/, /\bsklep przy gospodarstwie\b/])) set("produkt", "Cały system", "produkt: Cały system");
+  if(noteHas(text, [/\bfinansowanie\b/, /\bleasing\b/, /\bdotacj/, /\barimr\b/])) set("produkt", client.produkt || "Finansowanie / leasing / dotacja", `produkt: ${client.produkt || "Finansowanie / leasing / dotacja"}`);
+  if(noteHas(text, [/\bnie wie\b/, /\bnie wiadomo\b/, /\bdobor pakietu\b/, /\bdobór pakietu\b/])){
+    set("produkt", "Jeszcze nie wie", "produkt: Jeszcze nie wie");
+  }
+
+  return changes.filter(Boolean);
+}
+
 function renderQuickClientUpdate(c){
   const today = todayInputValue();
   return `
@@ -2883,8 +3005,9 @@ function saveQuickClientUpdate(clientId){
   if(!note) return alert("Wpisz notatkę do historii klienta.");
   if(!Array.isArray(c.historia)) c.historia = [];
   c.historia.push({tekst: note, kto: who, data: historyDateValue(date)});
+  const automation = inferClientAutomation(note, c);
   c.zaktualizowano = new Date().toISOString();
-  logActivity(`dodał(a) ręczną notatkę klienta „${c.firma||c.osoba||'bez nazwy'}”`);
+  logActivity(`dodał(a) ręczną notatkę klienta „${c.firma||c.osoba||'bez nazwy'}”${automation.length ? ` i panel ustawił: ${automation.join(", ")}` : ""}`);
   saveData();
   renderClients();
   openClientCard(clientId);
@@ -2900,8 +3023,9 @@ function addHistoryEntry(){
   if(!c) return;
   if(!c.historia) c.historia = [];
   c.historia.push({tekst, kto: (whoEl.value || getWhoAmI()).trim(), data: historyDateValue(dateEl.value)});
+  const automation = inferClientAutomation(tekst, c);
   c.zaktualizowano = new Date().toISOString();
-  logActivity(`dodał(a) notatkę w historii kontaktu klienta „${c.firma||c.osoba||'bez nazwy'}”`);
+  logActivity(`dodał(a) notatkę w historii kontaktu klienta „${c.firma||c.osoba||'bez nazwy'}”${automation.length ? ` i panel ustawił: ${automation.join(", ")}` : ""}`);
   saveData();
   ta.value = "";
   dateEl.value = todayInputValue();
