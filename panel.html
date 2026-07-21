@@ -694,9 +694,10 @@
   .quickUpdateHead{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:10px}
   .quickUpdateHead b{color:#755c15}
   .quickUpdateGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+  .quickUpdateNote{display:block;margin-top:8px}
   .quickUpdate label{font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em;font-weight:bold}
   .quickUpdate input,.quickUpdate select,.quickUpdate textarea{width:100%;box-sizing:border-box;border:1px solid var(--border);border-radius:8px;background:var(--input-bg);color:var(--text);padding:7px 9px;font:inherit;margin-top:4px}
-  .quickUpdate textarea{min-height:70px;resize:vertical}
+  .quickUpdate textarea{min-height:120px;resize:vertical;text-transform:none;letter-spacing:0;font-weight:normal}
   .quickUpdateActions{display:flex;justify-content:flex-end;margin-top:10px}
   .clientCardHistory{border:1px solid var(--line);border-radius:10px;padding:12px;margin-top:12px;background:var(--surface)}
   .clientCardHistoryHead{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:10px}
@@ -2843,28 +2844,20 @@ function clientActivitySummary(c, limit=120){
 }
 
 function renderQuickClientUpdate(c){
+  const today = new Date().toISOString().slice(0,10);
   return `
     <div class="quickUpdate">
       <div class="quickUpdateHead">
-        <b>Szybka aktualizacja klienta</b>
-        <span class="kanbanContact">Dopisuje wpis do historii i aktualizuje etap pracy</span>
+        <b>Ręczna notatka klienta</b>
+        <span class="kanbanContact">Dopisuje wpis do historii kontaktu</span>
       </div>
       <div class="quickUpdateGrid">
-        <label>Co zrobiono<select data-quick-field="action">
-          ${QUICK_ACTION_OPTS.map(v=>`<option value="${crmEsc(v)}">${crmEsc(v)}</option>`).join("")}
-        </select></label>
-        <label>Kto<select data-quick-field="who">
-          ${QUICK_WHO_OPTS.map(v=>`<option value="${crmEsc(v)}" ${v==="Ja"?"selected":""}>${crmEsc(v)}</option>`).join("")}
-        </select></label>
-        <label>Nowy status klienta<select data-quick-field="status">
-          <option value="">Bez zmiany</option>
-          ${STATUS_OPTS.map(([v,l])=>`<option value="${crmEsc(v)}">${crmEsc(l)}</option>`).join("")}
-        </select></label>
-        <label>Następny follow-up<input type="date" data-quick-field="followup" value="${crmEsc(c.nastepnyFollowup || "")}"></label>
+        <label>Data wpisu<input type="date" data-quick-field="date" value="${today}"></label>
+        <label>Kto<input data-quick-field="who" value="${crmEsc(getWhoAmI())}"></label>
       </div>
-      <label>Krótka notatka<textarea data-quick-field="note" placeholder="Np. tata wysłał link do advisora, klient ma oddzwonić."></textarea></label>
+      <label class="quickUpdateNote">Notatka<textarea data-quick-field="note" placeholder="Wpisz notatkę dokładnie tak, jak chcesz ją widzieć w historii kontaktu."></textarea></label>
       <div class="quickUpdateActions">
-        <button class="save" onclick="saveQuickClientUpdate('${crmEsc(c.id)}')">Zapisz aktualizację</button>
+        <button class="save" onclick="saveQuickClientUpdate('${crmEsc(c.id)}')">Dodaj notatkę</button>
       </div>
     </div>
   `;
@@ -2877,25 +2870,17 @@ function renderHistoryEntries(c){
 
 function saveQuickClientUpdate(clientId){
   const c = data.klienci.find(x=>x.id===clientId);
-  const form = document.querySelector(`.quickUpdate [data-quick-field="action"]`)?.closest(".quickUpdate");
+  const form = document.querySelector(`.quickUpdate [data-quick-field="note"]`)?.closest(".quickUpdate");
   if(!c || !form) return;
   const get = field => (form.querySelector(`[data-quick-field="${field}"]`)?.value || "").trim();
-  const action = get("action") || "Inne";
   const who = get("who") || getWhoAmI();
-  const status = get("status");
-  const followup = get("followup");
+  const date = get("date");
   const note = get("note");
-  const dateText = /^\d{4}-\d{2}-\d{2}$/.test(followup) ? followup : "";
-  const details = [];
-  if(dateText) details.push(`Następny kontakt: ${dateText}.`);
-  if(note) details.push(`Notatka: ${note}`);
-  const tekst = `[${action}] ${details.join(" ")}`.trim();
+  if(!note) return alert("Wpisz notatkę do historii klienta.");
   if(!Array.isArray(c.historia)) c.historia = [];
-  c.historia.push({tekst, kto: who, data: new Date().toISOString()});
-  if(status && STATUS_OPTS.some(([v])=>v===status)) c.status = status;
-  if(dateText) c.nastepnyFollowup = dateText;
+  c.historia.push({tekst: note, kto: who, data: historyDateValue(date)});
   c.zaktualizowano = new Date().toISOString();
-  logActivity(`dodał(a) szybką aktualizację klienta „${c.firma||c.osoba||'bez nazwy'}”`);
+  logActivity(`dodał(a) ręczną notatkę klienta „${c.firma||c.osoba||'bez nazwy'}”`);
   saveData();
   renderClients();
   openClientCard(clientId);
