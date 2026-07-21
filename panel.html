@@ -1105,7 +1105,7 @@
     </svg>
     <div>
       <h1>Panel — centrum pracy firmy</h1>
-      <p>Prywatne centrum CRM, dokumentów, follow-upów i operacji.</p>
+      <p>Prywatne centrum CRM, dokumentów, kontaktów i operacji.</p>
     </div>
     <span id="syncStatus" style="font-size:11px;color:#cfe8d6;margin-left:auto;margin-right:4px"></span>
     <a class="lockBtn" href="index.html">Strona główna</a>
@@ -1514,7 +1514,7 @@
           <thead>
             <tr>
               <th>Firma / gospodarstwo</th><th>Imię i nazwisko</th><th>Województwo</th><th>Miejscowość</th>
-              <th>Ulica</th><th>Telefon</th><th>E-mail</th><th>Czym zainteresowany</th><th>Następny kontakt</th>
+              <th>Ulica</th><th>Telefon</th><th>E-mail</th><th>Czym zainteresowany</th>
               <th>Priorytet</th><th>Status</th>
               <th>Historia</th><th>Usuń</th>
             </tr>
@@ -2913,14 +2913,14 @@ function inferClientAutomation(note, client){
 
   const explicitFollowup = inferFollowupFromNote(text);
   if(explicitFollowup){
-    set("nastepnyFollowup", explicitFollowup, `follow-up: ${explicitFollowup}`);
+    set("nastepnyFollowup", explicitFollowup, `kontakt: ${explicitFollowup}`);
   }
 
   if(noteHas(text, [/\b(rezygnuje|rezygnacja|nie zainteresowany|nieaktualne|odpada)\b/])){
     set("status", "przegrany", "status: Przegrany");
     if(client.nastepnyFollowup){
       client.nastepnyFollowup = "";
-      changes.push("follow-up: wyczyszczony");
+      changes.push("termin kontaktu: wyczyszczony");
     }
     return changes;
   }
@@ -2933,22 +2933,22 @@ function inferClientAutomation(note, client){
 
   if(noteHas(text, [/\b(oferta wyslana|wyslano oferte|wyslalem oferte|poszla oferta|mail z oferta)\b/]) && !noteNegates(text, "ofert")){
     set("status", "oferta", "status: Oferta wysłana");
-    set("nastepnyFollowup", client.nastepnyFollowup || formatDateOnly(addDaysDate(startOfToday(), 2)), `follow-up: ${client.nastepnyFollowup || formatDateOnly(addDaysDate(startOfToday(), 2))}`);
+    set("nastepnyFollowup", client.nastepnyFollowup || formatDateOnly(addDaysDate(startOfToday(), 2)), `kontakt: ${client.nastepnyFollowup || formatDateOnly(addDaysDate(startOfToday(), 2))}`);
   } else if(noteHas(text, [/\b(advisor wyslany|wyslano advisor|wyslalem advisor|formularz doradczy wyslany)\b/]) && !noteNegates(text, "advisor")){
     set("status", "kontakt", "status: Do kontaktu");
-    set("nastepnyFollowup", client.nastepnyFollowup || formatDateOnly(addDaysDate(startOfToday(), 2)), `follow-up: ${client.nastepnyFollowup || formatDateOnly(addDaysDate(startOfToday(), 2))}`);
+    set("nastepnyFollowup", client.nastepnyFollowup || formatDateOnly(addDaysDate(startOfToday(), 2)), `kontakt: ${client.nastepnyFollowup || formatDateOnly(addDaysDate(startOfToday(), 2))}`);
   } else if(noteHas(text, [/\b(mail wyslany|wyslalem mail|sms wyslany|wiadomosc wyslana)\b/]) && !noteNegates(text, "wysl")){
     set("status", client.status === "nowy" ? "kontakt" : client.status, "status: Do kontaktu");
-    set("nastepnyFollowup", client.nastepnyFollowup || formatDateOnly(addDaysDate(startOfToday(), 2)), `follow-up: ${client.nastepnyFollowup || formatDateOnly(addDaysDate(startOfToday(), 2))}`);
+    set("nastepnyFollowup", client.nastepnyFollowup || formatDateOnly(addDaysDate(startOfToday(), 2)), `kontakt: ${client.nastepnyFollowup || formatDateOnly(addDaysDate(startOfToday(), 2))}`);
   }
 
   if(noteHas(text, [/\b(brak odpowiedzi|nie odbiera|nie odpisuje|cisza)\b/])){
     set("status", client.status === "nowy" ? "kontakt" : client.status, "status: Do kontaktu");
-    set("nastepnyFollowup", explicitFollowup || formatDateOnly(addDaysDate(startOfToday(), 1)), `follow-up: ${explicitFollowup || formatDateOnly(addDaysDate(startOfToday(), 1))}`);
+    set("nastepnyFollowup", explicitFollowup || formatDateOnly(addDaysDate(startOfToday(), 1)), `kontakt: ${explicitFollowup || formatDateOnly(addDaysDate(startOfToday(), 1))}`);
   }
   if(noteHas(text, [/\b(czeka|czekamy|do decyzji|ma przemyslec|odezwie sie)\b/])){
     set("status", "pozniej", "status: Decyzja później");
-    set("nastepnyFollowup", explicitFollowup || client.nastepnyFollowup || formatDateOnly(addDaysDate(startOfToday(), 7)), `follow-up: ${explicitFollowup || client.nastepnyFollowup || formatDateOnly(addDaysDate(startOfToday(), 7))}`);
+    set("nastepnyFollowup", explicitFollowup || client.nastepnyFollowup || formatDateOnly(addDaysDate(startOfToday(), 7)), `kontakt: ${explicitFollowup || client.nastepnyFollowup || formatDateOnly(addDaysDate(startOfToday(), 7))}`);
   }
   if(noteHas(text, [/\b(rozmowa|rozmawialem|rozmawial|dzwonil|dzwonilem|gadalem|gadane|spotkanie)\b/])){
     if(!["oferta","negocjacje","wygrany","przegrany"].includes(client.status)) set("status", "rozmowa", "status: Rozmowa odbyta");
@@ -4145,7 +4145,6 @@ function commandReasonText(c){
 }
 
 function renderCommandClientCard(c, reason){
-  const followup = clientFollowup(c) || "brak follow-upu";
   const leadSource = clientLeadSource(c) || "brak źródła";
   const contact = renderClientContactLinks(c) || crmEsc(clientContact(c) || "brak telefonu i e-maila");
   const lastActivity = commandReasonText(c);
@@ -4167,7 +4166,6 @@ function renderCommandClientCard(c, reason){
         <span class="kanbanPill">${crmEsc(statusLabel)}</span>
         <span class="kanbanPill">${crmEsc(prioLabel)}</span>
         <span class="kanbanPill gold">${crmEsc(leadSource)}</span>
-        <span class="kanbanPill">${crmEsc(followup)}</span>
       </div>
       <div class="commandReason"><b>Powód:</b> ${crmEsc(reason)}</div>
       <div class="commandReason" style="margin-top:8px"><b>Ostatnie działanie:</b> ${crmEsc(lastActivity)}</div>
@@ -4176,7 +4174,6 @@ function renderCommandClientCard(c, reason){
         <button class="histBtn" onclick="addQuickClientActivity('${crmEsc(c.id)}','mail')">Mail wysłany</button>
         <button class="histBtn" onclick="addQuickClientActivity('${crmEsc(c.id)}','no-answer')">Brak odpowiedzi</button>
         <button class="histBtn" onclick="addQuickClientActivity('${crmEsc(c.id)}','advisor')">Advisor wysłany</button>
-        <button class="doneBtn" onclick="addQuickClientActivity('${crmEsc(c.id)}','followup-tomorrow')">Ustaw follow-up jutro</button>
       </div>
     </div>
   `;
@@ -4220,7 +4217,7 @@ function renderDailyCommandCenter(){
   const overdueClients = clients.filter(isOverdueFollowup);
 
   counters.innerHTML = [
-    ["Follow-upy dziś", followupTodayClients.length],
+    ["Do kontaktu dziś", followupTodayClients.length],
     ["Zaległe", overdueClients.length]
   ].map(([label, num]) => `
     <div class="commandCounter">
@@ -4230,8 +4227,8 @@ function renderDailyCommandCenter(){
   `).join("");
 
   const sections = [
-    renderCommandSection("Do kontaktu dziś", followupTodayClients.map(c => renderCommandClientCard(c, "Następny follow-up wypada dzisiaj.")), "Na dziś brak klientów z ustawionym follow-upem.", true),
-    renderCommandSection("Zaległe follow-upy", overdueClients.map(c => renderCommandClientCard(c, "Termin follow-upu już minął i wymaga reakcji.")), "Brak zaległych follow-upów.", true)
+    renderCommandSection("Do kontaktu dziś", followupTodayClients.map(c => renderCommandClientCard(c, "Klient jest zaplanowany do kontaktu dzisiaj.")), "Na dziś brak klientów do kontaktu.", true),
+    renderCommandSection("Zaległe kontakty", overdueClients.map(c => renderCommandClientCard(c, "Termin kontaktu już minął i wymaga reakcji.")), "Brak zaległych kontaktów.", true)
   ];
 
   const isEmpty = !followupTodayClients.length && !overdueClients.length;
@@ -4250,7 +4247,7 @@ function addQuickClientActivity(clientId, action){
     "mail": {tekst:"[Mail wysłany] Wysłano wiadomość do klienta.", kto:author},
     "no-answer": {tekst:"[Brak odpowiedzi] Próba kontaktu bez odpowiedzi.", kto:author},
     "advisor": {tekst:"[Advisor wysłany] Wysłano link do formularza doradczego.", kto:author},
-    "followup-tomorrow": {tekst:`[Follow-up] Ustawiono następny kontakt na ${tomorrow}.`, kto:author, followup:tomorrow}
+    "followup-tomorrow": {tekst:`[Kontakt] Ustawiono kontakt na ${tomorrow}.`, kto:author, followup:tomorrow}
   };
   const payload = actionMap[action];
   if(!payload) return;
@@ -4365,7 +4362,6 @@ function renderLeadViewCard(c){
         <button class="histBtn" onclick="addQuickClientActivity('${id}','tata-call')">Tata dzwonił</button>
         <button class="histBtn" onclick="addQuickClientActivity('${id}','mail')">Mail wysłany</button>
         <button class="histBtn" onclick="addQuickClientActivity('${id}','no-answer')">Brak odpowiedzi</button>
-        <button class="doneBtn" onclick="addQuickClientActivity('${id}','followup-tomorrow')">Ustaw follow-up jutro</button>
       </div>
     </div>
   `;
@@ -4391,9 +4387,9 @@ function renderLeadSourceView(list, mode){
 }
 
 function followupInfo(dateStr){
-  if(!dateStr) return {label:"brak follow-upu", group:"none", days:null};
+  if(!dateStr) return {label:"brak terminu", group:"none", days:null};
   const days = safeDaysUntil(dateStr);
-  if(days === null) return {label:"brak follow-upu", group:"none", days:null};
+  if(days === null) return {label:"brak terminu", group:"none", days:null};
   if(days <= 0) return {label:days < 0 ? "po terminie" : "dzisiaj", group:"today", days};
   if(days <= 7) return {label:`za ${days} dni`, group:"soon", days};
   return {label:`za ${days} dni`, group:"later", days};
@@ -4454,7 +4450,6 @@ function renderClientOffers(c){
           <label>Kwota<input type="text" data-offer-field="kwota" placeholder="np. 14500"></label>
           <label>Waluta<select data-offer-field="waluta">${renderOfferOptions(OFFER_CURRENCY_OPTS,"EUR")}</select></label>
           <label>Status<select data-offer-field="status">${renderOfferOptions(OFFER_STATUS_OPTS,"Robocza")}</select></label>
-          <label>Następny kontakt<input type="date" data-offer-field="nastepnyFollowup"></label>
           <label>Link do oferty<input type="text" data-offer-field="linkOferta" placeholder="https://..."></label>
           <label>Nazwa pliku<input type="text" data-offer-field="nazwaPliku" placeholder="np. oferta_premium.pdf"></label>
         </div>
@@ -4528,7 +4523,6 @@ function renderOfferCard(o, clientId, offerIndex){
             <label>Kwota<input type="text" data-offer-edit-field="kwota" value="${crmEsc(o.kwota || "")}"></label>
             <label>Waluta<select data-offer-edit-field="waluta">${renderOfferOptions(OFFER_CURRENCY_OPTS,o.waluta || "EUR")}</select></label>
             <label>Status<select data-offer-edit-field="status">${renderOfferOptions(OFFER_STATUS_OPTS,normalizeImportOfferStatus(o.status))}</select></label>
-            <label>Następny kontakt<input type="date" data-offer-edit-field="nastepnyFollowup" value="${crmEsc(o.nastepnyFollowup || "")}"></label>
             <label>Link do oferty<input type="text" data-offer-edit-field="linkOferta" value="${crmEsc(o.linkOferta || "")}" placeholder="https://..."></label>
             <label>Nazwa pliku<input type="text" data-offer-edit-field="nazwaPliku" value="${crmEsc(o.nazwaPliku || "")}"></label>
           </div>
@@ -4552,7 +4546,6 @@ function renderOfferCard(o, clientId, offerIndex){
           <div class="offerMeta">
             <span>Data wysłania: ${crmEsc(o.dataWyslania || "brak")}</span>
             ${amount ? `<span>Kwota: ${crmEsc(amount)}</span>` : ""}
-            <span>Następny kontakt: ${crmEsc(o.nastepnyFollowup || "brak")}</span>
           </div>
         </div>
         <span class="offerBadge">${crmEsc(o.status || "Robocza")}</span>
@@ -4574,7 +4567,7 @@ function updateClientsViewHint(){
     directory:"Lista klientów do szybkiego otwierania kart klienta i pracy po rozmowie.",
     table:"Baza klientów z szybką edycją pól CRM i ostatnim działaniem.",
     kanban:"Kolumny statusów pomagają szybko ocenić etap każdego klienta.",
-    followups:"Widok pracy na follow-upach oparty na realnym następnym kontakcie.",
+    followups:"Widok klientów, do których trzeba wrócić w pierwszej kolejności.",
     advisor:"Leady z formularza Advisor jako osobny roboczy widok sprzedażowy.",
     advisorolx:"Leady z formularza Advisor OLX jako osobny widok do szybkiego działania."
   };
@@ -4638,7 +4631,6 @@ function renderClientDirectory(list){
   }
   el.innerHTML = list.map(c => {
     const id = crmEsc(c.id);
-    const followup = followupInfo(clientFollowup(c));
     const product = clientProduct(c);
     const last = clientActivitySummary(c, 110) || "Brak historii działań";
     const contact = renderClientContactLinks(c) || crmEsc(clientContact(c) || "brak telefonu i e-maila");
@@ -4649,7 +4641,6 @@ function renderClientDirectory(list){
             <div class="clientDirectoryName">${crmEsc(clientName(c))}</div>
             <div class="clientDirectoryMeta">${crmEsc(clientLocation(c) || "brak lokalizacji")}</div>
           </div>
-          <span class="kanbanPill gold">${crmEsc(followup.label)}</span>
         </div>
         <div class="commandBadges">
           <span class="kanbanPill">${crmEsc(labelFrom(STATUS_OPTS, c.status))}</span>
@@ -4688,7 +4679,6 @@ function renderClientsKanban(list){
 function renderClientKanbanCard(c){
   const contact = clientContact(c);
   const product = clientProduct(c);
-  const followup = followupInfo(clientFollowup(c));
   const objection = crmShort(clientObjections(c), 90);
   const last = clientActivitySummary(c, 90);
   const id = crmEsc(c.id);
@@ -4702,7 +4692,6 @@ function renderClientKanbanCard(c){
         <span class="kanbanPill">${crmEsc(labelFrom(PRIO_OPTS, c.priorytet))}</span>
         <span class="kanbanPill">${crmEsc(labelFrom(STATUS_OPTS, c.status))}</span>
         ${product ? `<span class="kanbanPill">${crmEsc(product)}</span>` : ""}
-        <span class="kanbanPill gold">${crmEsc(followup.label)}</span>
       </div>
       ${contact ? `<div class="kanbanContact">${renderClientContactLinks(c) || crmEsc(contact)}</div>` : ""}
       ${objection ? `<div class="kanbanNote">Obiekcja: ${crmEsc(objection)}</div>` : ""}
@@ -4727,7 +4716,7 @@ function renderClientsFollowups(list){
     ["Dzisiaj / po terminie", sorted.filter(c=>followupInfo(clientFollowup(c)).group==="today")],
     ["Najbliższe 7 dni", sorted.filter(c=>followupInfo(clientFollowup(c)).group==="soon")],
     ["Wysoki priorytet bez terminu", sorted.filter(c=>!clientFollowup(c) && c.priorytet==="A")],
-    ["Bez ustawionego follow-upu", sorted.filter(c=>!clientFollowup(c) && c.priorytet!=="A")]
+    ["Bez terminu kontaktu", sorted.filter(c=>!clientFollowup(c) && c.priorytet!=="A")]
   ];
   el.innerHTML = sections.map(([title,items])=>`
     <div class="followGroup">
@@ -4765,7 +4754,6 @@ function renderClientsMobileCards(list){
         <div class="commandBadges">
           <span class="kanbanPill">${crmEsc(labelFrom(STATUS_OPTS, c.status))}</span>
           <span class="kanbanPill">${crmEsc(labelFrom(PRIO_OPTS, c.priorytet))}</span>
-          ${clientFollowup(c) ? `<span class="kanbanPill gold">${crmEsc(clientFollowup(c))}</span>` : ""}
         </div>
         <div class="clientMobileContact">${contact}</div>
         <div class="kanbanNote"><b>Ostatnie działanie:</b> ${crmEsc(last)}</div>
@@ -4779,7 +4767,6 @@ function renderClientsMobileCards(list){
 }
 
 function renderFollowupItem(c){
-  const followup = followupInfo(clientFollowup(c));
   const reason = clientObjections(c) || c.notatki || (c.historia || []).slice(-1)[0]?.tekst || "";
   const note = crmShort(reason, 110);
   const product = clientProduct(c);
@@ -4789,7 +4776,6 @@ function renderFollowupItem(c){
     <div class="followItem">
       <div><b>${crmEsc(clientName(c))}</b><br><span class="kanbanContact">${renderClientContactLinks(c) || crmEsc(clientContact(c) || clientLocation(c) || "brak kontaktu")}</span></div>
       <div>${crmEsc(product || labelFrom(STATUS_OPTS, c.status))}</div>
-      <div>${crmEsc(clientFollowup(c) ? `${clientFollowup(c)} (${followup.label})` : "brak follow-upu")}</div>
       <div class="followAction"><button class="histBtn" onclick="openClientCard('${crmEsc(c.id)}')">Karta klienta</button></div>
       ${last ? `<div class="kanbanNote" style="grid-column:1/-1"><b>Ostatnie działanie:</b> ${crmEsc(last)}</div>` : ""}
       ${note ? `<div class="kanbanNote" style="grid-column:1/-1">${crmEsc(note)}</div>` : ""}
@@ -4805,7 +4791,6 @@ function openClientCard(clientId){
   if(!c || !box) return;
   const hist = c.historia || [];
   const historyCount = hist.length + ((c.notatki || "").toString().trim() ? 1 : 0);
-  const followup = followupInfo(clientFollowup(c));
   const lastActivity = clientActivitySummary(c, 150);
   box.innerHTML = `
     <div class="clientCardTop">
@@ -4817,7 +4802,6 @@ function openClientCard(clientId){
       <div class="clientCardBadges">
         <span class="kanbanPill">${crmEsc(labelFrom(STATUS_OPTS, c.status))}</span>
         <span class="kanbanPill">${crmEsc(labelFrom(PRIO_OPTS, c.priorytet))}</span>
-        <span class="kanbanPill gold">${crmEsc(followup.label)}</span>
       </div>
     </div>
     <div class="clientCardGrid">
@@ -4828,7 +4812,6 @@ function openClientCard(clientId){
       <div class="clientCardField"><b>Adres / lokalizacja</b>${clientField(c,"ulica")}</div>
       <div class="clientCardField"><b>Skąd trafił</b>${clientField(c,null,"source")}</div>
       <div class="clientCardField"><b>Czym zainteresowany</b>${clientField(c,null,"product")}</div>
-      <div class="clientCardField"><b>Następny kontakt</b>${clientField(c,"nastepnyFollowup","date")}</div>
       <div class="clientCardField"><b>Zainteresowanie</b>${clientField(c,null,"zain")}</div>
       <div class="clientCardField"><b>Co go powstrzymuje</b>${clientField(c,null,"objection")}</div>
     </div>
@@ -5054,7 +5037,6 @@ function renderClients(){
       <td>${clientField(c,"telefon")}</td>
       <td>${clientField(c,"email")}</td>
       <td>${clientField(c,null,"product")}</td>
-      <td>${clientField(c,"nastepnyFollowup","date")}</td>
       <td>${clientField(c,null,"prio")}</td>
       <td>${clientField(c,null,"status")}</td>
       <td><button class="histBtn" onclick="openHistoryModal('${id}')">📜 ${(c.historia||[]).length}</button>${lastActivity ? `<div class="lastActivity">Ostatnie: ${crmEsc(lastActivity)}</div>` : ""}</td>
@@ -5189,7 +5171,6 @@ function exportClientsToXlsx(){
     "Zainteresowanie": c.zainteresowanie,
     "Skąd trafił": clientLeadSource(c),
     "Czym zainteresowany": clientProduct(c),
-    "Następny kontakt": clientFollowup(c),
     "Co go powstrzymuje": clientObjections(c),
     "Priorytet": PRIO_OPTS.find(p=>p[0]===c.priorytet)?.[1] || c.priorytet,
     "Status": STATUS_OPTS.find(s=>s[0]===c.status)?.[1] || c.status,
@@ -5245,7 +5226,7 @@ async function importClientsFromXlsx(){
         telefon: telefon,
         email: (r["E-mail"]||"").toString(),
         zainteresowanie: (r["Zainteresowanie"]||"").toString(),
-        nastepnyFollowup: xlsxVal(r, ["Następny kontakt","Nastepny kontakt","Następny follow-up","Nastepny follow-up","nastepnyFollowup"]).trim(),
+        nastepnyFollowup: xlsxVal(r, ["Termin kontaktu","termin kontaktu","nastepnyFollowup"]).trim(),
         zrodloLeada: xlsxVal(r, ["Skąd trafił","Skad trafil","Źródło leada","Zrodlo leada","zrodloLeada"]).trim(),
         produkt: xlsxVal(r, ["Czym zainteresowany","Produkt","produkt"]).trim(),
         obiekcje: xlsxVal(r, ["Co go powstrzymuje","Obiekcje","obiekcje"]).trim(),
@@ -5370,7 +5351,7 @@ async function importClientsFromSelectedXlsx(input){
         telefon,
         email,
         zainteresowanie: xlsxLooseVal(r, ["Zainteresowanie","Czym zainteresowany","Produkt","Pakiet"]),
-        nastepnyFollowup: xlsxLooseVal(r, ["Nastepny kontakt","Następny kontakt","Nastepny follow-up","Następny follow-up"]),
+        nastepnyFollowup: xlsxLooseVal(r, ["Termin kontaktu","termin kontaktu","nastepnyFollowup"]),
         zrodloLeada: xlsxLooseVal(r, ["Skad trafil","Skąd trafił","Zrodlo leada","Źródło leada","Zrodlo"]) || "Import Excel - potencjalni klienci",
         produkt: xlsxLooseVal(r, ["Czym zainteresowany","Produkt","Pakiet"]),
         obiekcje: xlsxLooseVal(r, ["Co go powstrzymuje","Obiekcje"]),
@@ -6123,7 +6104,7 @@ const CHECKLIST_TEMPLATES = [
       "Zapisać dane kontaktowe",
       "Ustalić produkt zainteresowania",
       "Ocenić priorytet A/B/C",
-      "Ustawić następny kontakt",
+      "Dopisać konkretny kolejny krok",
       "Dodać pierwszą notatkę"
     ]
   },
@@ -6140,7 +6121,7 @@ const CHECKLIST_TEMPLATES = [
       "Zapytać o sezonowość sprzedaży",
       "Zapytać o finansowanie",
       "Zapisać główne obiekcje",
-      "Ustawić follow-up"
+      "Dopisać termin kontaktu"
     ]
   },
   {
@@ -6154,12 +6135,12 @@ const CHECKLIST_TEMPLATES = [
       "Przygotować PDF / link do oferty",
       "Zapisać ofertę w karcie klienta",
       "Wysłać ofertę",
-      "Ustawić follow-up po ofercie"
+      "Dopisać kolejny krok po ofercie"
     ]
   },
   {
-    key:"follow-up-po-ofercie",
-    nazwa:"Follow-up po ofercie",
+    key:"kontakt-po-ofercie",
+    nazwa:"Kontakt po ofercie",
     kategoria:"Sprzedaż",
     opis:"Rozmowa po wysłaniu oferty i ustalenie kolejnego kroku.",
     kroki:[
@@ -6501,10 +6482,10 @@ const AI_PROMPTS = [
     tresc:"Przeanalizuj tego klienta pod kątem sprzedaży bezpośredniej z gospodarstwa. Oceń: potencjał, potrzeby, ryzyka, obiekcje, następny krok i najlepszy sposób rozmowy. Nie wymyślaj faktów. Oddziel fakty od założeń."
   },
   {
-    tytul:"Follow-up po ofercie",
+    tytul:"Kontakt po ofercie",
     kategoria:"Sprzedaż",
     opis:"Krótka wiadomość po wysłanej ofercie.",
-    tresc:"Przygotuj krótki follow-up do klienta po wysłaniu oferty. Ton: profesjonalny, spokojny, bez nacisku. Cel: sprawdzić, czy klient widział ofertę, zebrać obiekcje i ustalić kolejny krok."
+    tresc:"Przygotuj krótką wiadomość do klienta po wysłaniu oferty. Ton: profesjonalny, spokojny, bez nacisku. Cel: sprawdzić, czy klient widział ofertę, zebrać obiekcje i ustalić kolejny krok."
   },
   {
     tytul:"Codex — najpierw plan",
@@ -6540,7 +6521,7 @@ const AI_PROMPTS = [
     tytul:"Notatka do panelu",
     kategoria:"CRM",
     opis:"Zamiana rozmowy na wpis do CRM.",
-    tresc:"Zamień tę rozmowę lub notatkę na krótki wpis do CRM. Podziel na: fakty o kliencie, zainteresowanie, obiekcje, następny krok, termin follow-upu i krótką notatkę do panelu."
+    tresc:"Zamień tę rozmowę lub notatkę na krótki wpis do CRM. Podziel na: fakty o kliencie, zainteresowanie, obiekcje, kolejny krok, termin kontaktu i krótką notatkę do panelu."
   }
 ];
 
@@ -7646,7 +7627,7 @@ function renderDashboard(){
   const dashKpiEl = document.getElementById("dashKpi");
   if(dashKpiEl){
     dashKpiEl.innerHTML = `
-      <div class="dashKpiCard"><div class="num">${followupToday}</div><div class="lbl">Follow-upy dziś</div><div class="hint">Klienci do kontaktu dzisiaj</div></div>
+      <div class="dashKpiCard"><div class="num">${followupToday}</div><div class="lbl">Do kontaktu dziś</div><div class="hint">Klienci do kontaktu dzisiaj</div></div>
       <div class="dashKpiCard"><div class="num">${overdue}</div><div class="lbl">Zaległe</div><div class="hint">Kontakty po terminie</div></div>
       <div class="dashKpiCard"><div class="num">${zadaniaOtwarte.length}</div><div class="lbl">Otwarte zadania</div><div class="hint">Rzeczy do domknięcia</div></div>
       <div class="dashKpiCard"><div class="num">${terminyPilne}</div><div class="lbl">Pilne terminy</div><div class="hint">Najbliższe 14 dni</div></div>
