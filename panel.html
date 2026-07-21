@@ -2740,7 +2740,7 @@ function openHistoryModal(clientId){
   const c = data.klienci.find(x=>x.id===clientId);
   if(!c) return;
   document.getElementById("historyClientName").textContent = `Historia kontaktu — ${c.firma || c.osoba || "bez nazwy"}`;
-  document.getElementById("historyNewDate").value = new Date().toISOString().slice(0,10);
+  document.getElementById("historyNewDate").value = todayInputValue();
   document.getElementById("historyNewWho").value = getWhoAmI();
   renderHistoryEntries(c);
   document.getElementById("historyModal").classList.add("open");
@@ -2758,7 +2758,11 @@ function closeHistoryModal(){
 function historyDateValue(value){
   const raw = (value || "").toString().trim();
   if(!raw) return new Date().toISOString();
-  return /^\d{4}-\d{2}-\d{2}$/.test(raw) ? `${raw}T00:00:00.000Z` : raw;
+  return raw;
+}
+
+function todayInputValue(){
+  return formatDateOnly(new Date());
 }
 
 function historyDateInputValue(value){
@@ -2844,7 +2848,7 @@ function clientActivitySummary(c, limit=120){
 }
 
 function renderQuickClientUpdate(c){
-  const today = new Date().toISOString().slice(0,10);
+  const today = todayInputValue();
   return `
     <div class="quickUpdate">
       <div class="quickUpdateHead">
@@ -2900,7 +2904,7 @@ function addHistoryEntry(){
   logActivity(`dodał(a) notatkę w historii kontaktu klienta „${c.firma||c.osoba||'bez nazwy'}”`);
   saveData();
   ta.value = "";
-  dateEl.value = new Date().toISOString().slice(0,10);
+  dateEl.value = todayInputValue();
   whoEl.value = getWhoAmI();
   renderHistoryEntries(c);
   renderClients();
@@ -4938,7 +4942,17 @@ function renderClients(){
 }
 
 function formatDT(iso){
-  try{ return new Date(iso).toLocaleString("pl-PL", {day:"2-digit",month:"2-digit",year:"numeric",hour:"2-digit",minute:"2-digit"}); }
+  const raw = (iso || "").toString().trim();
+  if(!raw) return "—";
+  if(/^\d{4}-\d{2}-\d{2}$/.test(raw)){
+    const [year, month, day] = raw.split("-");
+    return `${day}.${month}.${year}`;
+  }
+  if(/^\d{4}-\d{2}-\d{2}T00:00:00\.000Z$/.test(raw)){
+    const [year, month, day] = raw.slice(0,10).split("-");
+    return `${day}.${month}.${year}`;
+  }
+  try{ return new Date(raw).toLocaleString("pl-PL", {day:"2-digit",month:"2-digit",year:"numeric",hour:"2-digit",minute:"2-digit"}); }
   catch(e){ return "—"; }
 }
 
