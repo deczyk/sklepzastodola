@@ -179,25 +179,25 @@
 
 <script>
 const auditQuestions = [
-  ["milkProduction","Czy gospodarstwo prowadzi produkcję mleka?",15],
-  ["producerNumber","Czy gospodarstwo posiada numer producenta?",10],
-  ["directSales","Czy rolnik planuje sprzedaż bezpośrednią?",12],
-  ["ownProducts","Czy gospodarstwo ma produkty dodatkowe: jaja, sery, miód, warzywa?",10],
-  ["location","Czy lokalizacja jest blisko miasta / osiedla / ruchliwej drogi?",12],
-  ["dairyExclusivity","Czy rolnik ma prawo sprzedawać mleko bezpośrednio pomimo umowy z mleczarnią (brak klauzuli wyłączności blokującej sprzedaż bezpośrednią)?",0],
-  ["competition","Czy w okolicy (powiecie) NIE działa jeszcze inny mlekomat lub silna konkurencja sprzedaży bezpośredniej?",4],
-  ["dailyOperator","Czy jest osoba dostępna do codziennego uzupełniania mleka i obsługi urządzenia?",4],
-  ["informalClients","Czy gospodarstwo ma już nieformalną bazę klientów (znajomi, sąsiedzi, polecenia)?",4],
-  ["parking","Czy jest miejsce na parking i bezpieczny dojazd?",8],
-  ["power","Czy jest dostęp do energii elektrycznej?",6],
-  ["water","Czy jest wygodny dostęp do wody w pobliżu (do ręcznego uzupełniania zbiornika)?",3],
-  ["internet","Czy jest internet / zasięg GSM?",5],
-  ["vet","Czy klient akceptuje wymogi weterynaryjne i rejestry?",10],
-  ["marketing","Czy klient jest gotów aktywnie prowadzić marketing lokalny (social media, tablica przy drodze, grupy rolnicze)?",10],
-  ["euExperience","Czy klient korzystał wcześniej z dofinansowania i ma dokumentację?",6],
-  ["businessPlan","Czy klient jest gotów przygotować biznesplan?",8],
-  ["coolerDisplay","Czy planowana jest witryna / lodówka chłodnicza w pawilonie?",8],
-  ["retailExperience","Czy rolnik ma już doświadczenie w sprzedaży detalicznej (targi, RHD, stoisko)?",8]
+  ["milkProduction","Czy prowadzisz produkcję mleka?",15],
+  ["producerNumber","Czy masz numer producenta rolnego?",10],
+  ["directSales","Czy planujesz sprzedaż bezpośrednią mleka lub produktów z gospodarstwa?",12],
+  ["ownProducts","Czy masz produkty dodatkowe: jaja, sery, miód, warzywa albo inne produkty lokalne?",10],
+  ["location","Czy Twoja lokalizacja jest blisko miasta, osiedla lub ruchliwej drogi?",12],
+  ["dairyExclusivity","Czy możesz sprzedawać mleko bezpośrednio mimo umowy z mleczarnią (brak klauzuli wyłączności blokującej sprzedaż bezpośrednią)?",0],
+  ["competition","Czy w Twojej okolicy (powiecie) NIE działa jeszcze inny mlekomat ani silna konkurencja sprzedaży bezpośredniej?",4],
+  ["dailyOperator","Czy masz osobę do codziennego uzupełniania mleka i obsługi urządzenia?",4],
+  ["informalClients","Czy masz już nieformalną bazę klientów (znajomi, sąsiedzi, polecenia)?",4],
+  ["parking","Czy masz miejsce na parking i bezpieczny dojazd?",8],
+  ["power","Czy masz dostęp do energii elektrycznej?",6],
+  ["water","Czy masz wygodny dostęp do wody w pobliżu (do ręcznego uzupełniania zbiornika)?",3],
+  ["internet","Czy masz internet lub zasięg GSM?",5],
+  ["vet","Czy akceptujesz wymogi weterynaryjne i prowadzenie rejestrów?",10],
+  ["marketing","Czy jesteś gotów aktywnie prowadzić marketing lokalny (social media, tablica przy drodze, grupy rolnicze)?",10],
+  ["euExperience","Czy korzystałeś wcześniej z dofinansowania i masz dokumentację?",6],
+  ["businessPlan","Czy jesteś gotów przygotować biznesplan?",8],
+  ["coolerDisplay","Czy planujesz witrynę lub lodówkę chłodniczą w pawilonie?",8],
+  ["retailExperience","Czy masz już doświadczenie w sprzedaży detalicznej (targi, RHD, stoisko)?",8]
 ];
 const MLEKOMAT_ONLY = ["milkProduction","vet","dairyExclusivity","dailyOperator"];
 const PAWILON_ONLY = ["ownProducts","coolerDisplay","retailExperience"];
