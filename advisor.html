@@ -148,23 +148,7 @@
     <div id="solution"></div>
   </section>
 
-  <section class="card">
-    <h2>7. Dokumenty do dofinansowania / finansowania</h2>
-    <table>
-      <thead><tr><th>Dokument / decyzja</th><th>Status</th><th>Uwagi</th></tr></thead>
-      <tbody id="documentsTable"></tbody>
-    </table>
-  </section>
-
-  <section class="card">
-    <h2>8. Harmonogram wdrożenia</h2>
-    <table>
-      <thead><tr><th>Etap</th><th>Zakres</th><th>Orientacyjny czas</th></tr></thead>
-      <tbody id="timelineTable"></tbody>
-    </table>
-  </section>
-
-  <section class="card"><h2>9. Dodatkowe uwagi</h2><textarea id="notes" placeholder="Miejsce na dodatkowe uwagi, pytania lub informacje dla nas..."></textarea></section>
+  <section class="card"><h2>7. Dodatkowe uwagi</h2><textarea id="notes" placeholder="Miejsce na dodatkowe uwagi, pytania lub informacje dla nas..."></textarea></section>
 </div>
 
 <footer><span class="brand">Sklep za Stodołą Sp. z o.o.</span> — narzędzie doradcze Advisor® EU · <a href="https://www.sklepzastodola.pl">sklepzastodola.pl</a> · kontakt@sklepzastodola.pl</footer>
@@ -219,48 +203,6 @@ const INTEREST_LABELS = {
   niezdecydowany: "dobór pakietu po rozmowie doradczej"
 };
 
-function renderDocuments(interest){
-  const showPawilon = interest==="sprzedazowy"||interest==="premium"||interest==="niezdecydowany";
-  const showMlekomat = true;
-  const rows = [];
-  rows.push(["Numer producenta rolnego","Do weryfikacji","Podstawowy dokument identyfikacyjny"]);
-  rows.push(["Biznesplan inwestycji","Wymagany", showPawilon&&showMlekomat?"Opis pawilonu i mlekomatu, ROI, harmonogram":showMlekomat?"Opis mlekomatu, ROI, harmonogram":"Opis pawilonu i sprzedaży, ROI, harmonogram"]);
-  if(showMlekomat) rows.push(["Oferta na mlekomat BRUNIMAT","Wymagana","Konfiguracja i wyposażenie dopasowane do gospodarstwa"]);
-  if(showPawilon) rows.push(["Oferta na pawilon / wyposażenie sklepu","Wymagana","Wybór modelu, wielkości i wykończenia"]);
-  if(showPawilon) rows.push(["Dokumenty własności / dzierżawy","Do sprawdzenia","Działka, budynek, miejsce inwestycji"]);
-  if(showPawilon) rows.push(["Zgody budowlane / zgłoszenie","Do sprawdzenia","Zależne od wybranego pawilonu i lokalizacji"]);
-  if(showMlekomat) rows.push(["Uzgodnienia weterynaryjne","Do sprawdzenia","Sprzedaż mleka i produktów pochodzenia zwierzęcego"]);
-  rows.push(["Oświadczenie o wkładzie własnym","Wymagane","Środki własne, leasing, kredyt pomostowy"]);
-  rows.push(["Historia wcześniejszej pomocy UE","Do sprawdzenia","Limity pomocy i kumulacja wsparcia"]);
-  document.getElementById("documentsTable").innerHTML = rows.map(r=>`<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td></tr>`).join("");
-}
-
-function renderTimeline(interest){
-  const showPawilon = interest==="sprzedazowy"||interest==="premium"||interest==="niezdecydowany";
-  const showMlekomat = true;
-  let koncepcja, realizacjaZakres, realizacjaCzas;
-  if(showPawilon && showMlekomat){
-    koncepcja = "Dobór pawilonu, mlekomatu, automatów i wyposażenia";
-    realizacjaZakres = "Produkcja mlekomatu, wykonanie pawilonu, transport, montaż obu elementów";
-    realizacjaCzas = "6–10 tygodni";
-  } else if(showMlekomat){
-    koncepcja = "Dobór konfiguracji mlekomatu BRUNIMAT do gospodarstwa";
-    realizacjaZakres = "Produkcja w Szwajcarii, transport, rozładunek, montaż i konfiguracja";
-    realizacjaCzas = "4–8 tygodni";
-  } else {
-    koncepcja = "Dobór modelu pawilonu, wielkości i wyposażenia sklepu";
-    realizacjaZakres = "Wykonanie / dostawa pawilonu, wykończenie, ustawienie na miejscu";
-    realizacjaCzas = "4–8 tygodni (zależnie od wybranego producenta pawilonu)";
-  }
-  const rows = [
-    ["1. Audyt","Analiza gospodarstwa i lokalizacji","1 dzień"],
-    ["2. Koncepcja", koncepcja, "3–7 dni"],
-    ["3. Dotacja / finansowanie","Sprawdzenie naboru, biznesplan, wniosek, leasing pomostowy","2–12 tygodni+"],
-    ["4. Realizacja", realizacjaZakres, realizacjaCzas],
-    ["5. Start sprzedaży","Szkolenie, marketing otwarcia, serwis","1–3 dni"]
-  ];
-  document.getElementById("timelineTable").innerHTML = rows.map(r=>`<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td></tr>`).join("");
-}
 function calculate(){
   renderAuditQuestions();
   const interest = document.getElementById("interest").value;
@@ -331,8 +273,6 @@ function calculate(){
   sol.push("Kolejny krok: indywidualna oferta, dokładny ROI i lista dokumentów do finansowania.");
   document.getElementById("solution").innerHTML=sol.map(s=>`<span class="tag">${s}</span>`).join("");
 
-  renderDocuments(interest);
-  renderTimeline(interest);
 }
 function saveData(){const data={};document.querySelectorAll("input,select,textarea").forEach(el=>data[el.id]=el.type==="checkbox"?el.checked:el.value);localStorage.setItem("advisorDataEU",JSON.stringify(data));alert("Dane zapisane.");}
 function loadData(){const data=JSON.parse(localStorage.getItem("advisorDataEU")||"{}");Object.entries(data).forEach(([k,val])=>{const el=document.getElementById(k);if(el){if(el.type==="checkbox")el.checked=!!val;else el.value=val;}});calculate();}
@@ -360,8 +300,6 @@ async function sendToUs(){
     `Ekonomia i finansowanie: ${document.getElementById("financeResult").innerText}`,
     document.getElementById("euEnable").checked ? `Dofinansowanie: ${document.getElementById("euResult").innerText}` : "Dofinansowanie nie uwzględnione",
     `Rekomendacja: ${document.getElementById("solutionNarrative").innerText} ${document.getElementById("solution").innerText}`,
-    `Dokumenty: ${document.getElementById("documentsTable").innerText}`,
-    `Harmonogram: ${document.getElementById("timelineTable").innerText}`,
     document.getElementById("notes").value.trim() ? `Uwagi klienta: ${document.getElementById("notes").value.trim()}` : ""
   ].filter(Boolean).join("\n");
 
