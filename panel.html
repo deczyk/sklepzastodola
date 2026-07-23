@@ -4805,6 +4805,8 @@ function openClientCard(clientId){
       </div>
     </div>
     <div class="clientCardGrid">
+      <div class="clientCardField"><b>Firma / gospodarstwo</b>${clientField(c,"firma")}</div>
+      <div class="clientCardField"><b>Osoba kontaktowa</b>${clientField(c,"osoba")}</div>
       <div class="clientCardField"><b>Telefon</b>${clientField(c,"telefon")}</div>
       <div class="clientCardField"><b>E-mail</b>${clientField(c,"email")}</div>
       <div class="clientCardField"><b>Województwo</b>${clientField(c,"wojewodztwo")}</div>
@@ -5134,7 +5136,7 @@ function updateClient(el){
     }
     saveData();
     if(field==="status" || field==="priorytet") renderStatsBar();
-    if(["telefon","email","wojewodztwo","miejscowosc","ulica","zainteresowanie","produkt","nastepnyFollowup","zrodloLeada","obiekcje"].includes(field)){
+    if(["firma","osoba","telefon","email","wojewodztwo","miejscowosc","ulica","zainteresowanie","produkt","nastepnyFollowup","zrodloLeada","obiekcje"].includes(field)){
       renderClients();
       if(currentClientCardId===id) openClientCard(id);
     }

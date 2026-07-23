@@ -104,6 +104,7 @@
       <h2>1. Dane gospodarstwa</h2>
       <div class="row"><div><label>Nazwa gospodarstwa</label><input id="farm"></div><div><label>Osoba kontaktowa</label><input id="owner"></div></div>
       <div class="row3"><div><label>Województwo</label><input id="region"></div><div><label>Powiat</label><input id="county"></div><div><label>Telefon</label><input id="phone"></div></div>
+      <div class="row"><div><label>E-mail klienta</label><input id="email" type="email" autocomplete="email"></div></div>
       <div class="row"><div><label>Co Cię interesuje?</label><select id="interest" onchange="renderAuditQuestions()">
         <option value="sprzedazowy">Pakiet SPRZEDAŻOWY — mlekomat + pawilon + wdrożenie</option>
         <option value="start">Pakiet START — mlekomat i podstawowe wdrożenie</option>
@@ -329,6 +330,7 @@ async function sendToUs(){
   const farm = document.getElementById("farm").value.trim();
   const owner = document.getElementById("owner").value.trim();
   const phone = document.getElementById("phone").value.trim();
+  const email = document.getElementById("email").value.trim();
   const region = document.getElementById("region").value.trim();
   const county = document.getElementById("county").value.trim();
   const interestVal = document.getElementById("interest").value;
@@ -337,6 +339,7 @@ async function sendToUs(){
     farm ? `Gospodarstwo: ${farm}` : "",
     owner ? `Osoba kontaktowa: ${owner}` : "",
     phone ? `Telefon: ${phone}` : "",
+    email ? `E-mail: ${email}` : "",
     region || county ? `Region: ${[region, county].filter(Boolean).join(" / ")}` : "",
     `Zainteresowanie: ${INTEREST_LABELS[interestVal] || interestVal}`,
     auditAnswers ? `Audyt:\n${auditAnswers}` : "",
@@ -359,6 +362,10 @@ async function sendToUs(){
   try {
     const mailPayload = {
       _subject: `Advisor EU — wynik kalkulatora: ${farm || "(brak nazwy)"} (${owner || "(brak kontaktu)"})`,
+      name: owner,
+      phone,
+      email,
+      _replyto: email,
       "Dane formularza Advisor": answersText
     };
     const fsRes = await fetch('https://formspree.io/f/xdarjozy', {
@@ -379,7 +386,7 @@ async function sendToUs(){
       firma: farm,
       osoba: owner,
       telefon: phone,
-      email: "",
+      email,
       wojewodztwo: region,
       miejscowosc: county,
       zainteresowanie: INTEREST_LABELS[interestVal] || interestVal,
