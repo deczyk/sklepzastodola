@@ -92,7 +92,7 @@
 /* PREVIEW CARDS */
 .preview { padding: 5.5rem 5vw; border-top: 1px solid var(--line); background: var(--bg); }
 .preview-inner { max-width: 1100px; }
-.preview-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.2rem; margin-top: 3rem; }
+.preview-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.2rem; margin-top: 3rem; }
 .pcard { background: var(--paper); border: 1px solid var(--line); border-radius: var(--r-lg); padding: 2rem; transition: border-color .25s, transform .22s; display: flex; flex-direction: column; }
 .pcard:hover { border-color: var(--forest); transform: translateY(-3px); }
 .pcard-icon { width: 44px; height: 44px; border-radius: var(--r); background: var(--sage); border: 1px solid rgba(45,90,39,.2); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; margin-bottom: 1.1rem; }
@@ -230,7 +230,7 @@
 
 <div class="ticker">
   <div class="ticker-inner">
-    <span>Kompleksowa obsługa farmera</span><span>🇨🇭 Oficjalny dystrybutor BRUNIMAT w Polsce</span><span>Drewniany pawilon pod klucz</span><span>Mlekomat Premium CE-MID</span><span>Pomoc przy finansowaniu inwestycji</span><span>Leasing rolniczy</span><span>Instalacja i serwis — cała Polska</span><span>Kompleksowa obsługa farmera</span><span>🇨🇭 Oficjalny dystrybutor BRUNIMAT w Polsce</span><span>Drewniany pawilon pod klucz</span><span>Mlekomat Premium CE-MID</span><span>Pomoc przy finansowaniu inwestycji</span><span>Leasing rolniczy</span><span>Instalacja i serwis — cała Polska</span>
+    <span>Kompleksowa obsługa farmera</span><span>🇨🇭 Oficjalny dystrybutor BRUNIMAT w Polsce</span><span>Drewniany pawilon pod klucz</span><span>Mlekomat Premium CE-MID</span><span>Automat chłodniczy 24/7</span><span>Pomoc przy finansowaniu inwestycji</span><span>Leasing rolniczy</span><span>Instalacja i serwis — cała Polska</span><span>Kompleksowa obsługa farmera</span><span>🇨🇭 Oficjalny dystrybutor BRUNIMAT w Polsce</span><span>Drewniany pawilon pod klucz</span><span>Mlekomat Premium CE-MID</span><span>Automat chłodniczy 24/7</span><span>Pomoc przy finansowaniu inwestycji</span><span>Leasing rolniczy</span><span>Instalacja i serwis — cała Polska</span>
   </div>
 </div>
 
@@ -664,12 +664,18 @@
         <a href="mlekomat.html" class="pcard-link">Poznaj mlekomat →</a>
       </div>
       <div class="pcard" data-r data-d="3">
+        <div class="pcard-icon">❄</div>
+        <h3>Automat chłodniczy</h3>
+        <p>Chłodzony automat 24/7 na sery, jaja, jogurty, masło, butelki i inne produkty z gospodarstwa — jako rozszerzenie punktu sprzedaży.</p>
+        <a href="automat-chlodniczy.html" class="pcard-link">Zobacz automat →</a>
+      </div>
+      <div class="pcard" data-r data-d="4">
         <div class="pcard-icon">📊</div>
         <h3>Kalkulator i finansowanie</h3>
         <p>Sprawdź potencjał sprzedaży względem skupu. Leasing, zakup lub program <a href="poradnik-dotacja-arimr-mlekomat.html" style="color:var(--forest);text-decoration:underline">ARiMR</a> — pomagamy przygotować dokumenty i dobrać finansowanie do Twojej sytuacji.</p>
         <a href="#kalkulator" class="pcard-link">Policz opłacalność →</a>
       </div>
-      <div class="pcard" data-r data-d="4">
+      <div class="pcard" data-r data-d="5">
         <div class="pcard-icon">🥛</div>
         <h3>Szklane butelki</h3>
         <p>Zwrotne butelki do świeżego mleka w pojemności 1 l i 0,5 l — z naszym nadrukiem albo indywidualnym oznaczeniem gospodarstwa.</p>
