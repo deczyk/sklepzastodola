@@ -51,16 +51,22 @@
 .package-list li::before{content:"✓";width:1.25rem;height:1.25rem;border-radius:50%;background:var(--sage);color:var(--forest);display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto;font-size:.72rem;font-weight:900}
 .package-card .btn{margin-top:auto;justify-content:center}
 .package-note{margin-top:2rem;background:var(--wheat-bg);border:1px solid rgba(155,122,58,.25);border-radius:var(--r-lg);padding:1.4rem 1.55rem;color:var(--muted);font-size:.92rem;line-height:1.75}
-.parts-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1rem;margin-top:3rem}
-.part-card{background:var(--paper);border:1px solid var(--line);border-radius:var(--r-lg);box-shadow:var(--shadow);overflow:hidden;display:flex;flex-direction:column}
-.part-card img{width:100%;height:210px;object-fit:cover;background:var(--bg3)}
-.part-body{padding:1.35rem;display:flex;flex-direction:column;gap:.7rem;flex:1}
-.part-body h3{font-size:1.08rem;color:var(--ink);line-height:1.22}
-.part-body p{font-size:.88rem;color:var(--muted);line-height:1.65}
-.part-body a{margin-top:auto;color:var(--forest);font-size:.85rem;font-weight:900}
-@media(max-width:1100px){.parts-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media(max-width:920px){.packages-grid{grid-template-columns:1fr}.package-card{padding:1.5rem}.part-card img{height:230px}}
-@media(max-width:640px){.parts-grid{grid-template-columns:1fr}}
+.offer-components{display:grid;gap:1.3rem;margin-top:3rem}
+.offer-component{display:grid;grid-template-columns:minmax(260px,.9fr) minmax(0,1.1fr);gap:2rem;align-items:center;background:var(--paper);border:1px solid var(--line);border-radius:var(--r-lg);box-shadow:var(--shadow);overflow:hidden}
+.offer-component:nth-child(even){grid-template-columns:minmax(0,1.1fr) minmax(260px,.9fr)}
+.offer-component:nth-child(even) .component-media{order:2}
+.component-media{min-height:360px;background:var(--bg3);display:flex;align-items:center;justify-content:center;overflow:hidden}
+.component-media img{width:100%;height:100%;min-height:360px;object-fit:cover}
+.component-media.contain img{object-fit:contain;padding:1.2rem;background:var(--bg)}
+.component-body{padding:2rem}
+.component-kicker{font-size:.68rem;font-weight:900;letter-spacing:.14em;text-transform:uppercase;color:var(--wheat);margin-bottom:.7rem}
+.component-body h3{font-size:clamp(1.55rem,3vw,2.3rem);line-height:1.08;color:var(--ink);margin-bottom:.85rem}
+.component-body p{color:var(--muted);font-size:.96rem;line-height:1.75;margin-bottom:1rem}
+.component-list{list-style:none;display:grid;gap:.65rem;margin:1.2rem 0 0;padding:0}
+.component-list li{display:flex;gap:.55rem;color:var(--ink2);font-size:.9rem;line-height:1.45}
+.component-list li::before{content:"✓";width:1.2rem;height:1.2rem;border-radius:50%;background:var(--sage);color:var(--forest);display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto;font-size:.7rem;font-weight:900}
+.component-note{margin-top:1.15rem;background:var(--wheat-bg);border:1px solid rgba(155,122,58,.25);border-radius:var(--r);padding:1rem 1.1rem;color:var(--muted);font-size:.88rem;line-height:1.6}
+@media(max-width:920px){.packages-grid{grid-template-columns:1fr}.package-card{padding:1.5rem}.offer-component,.offer-component:nth-child(even){grid-template-columns:1fr}.offer-component:nth-child(even) .component-media{order:0}.component-media,.component-media img{min-height:280px}.component-body{padding:1.45rem}}
 </style>
 </head>
 <body>
@@ -170,43 +176,79 @@
   <div data-r>
     <p class="sec-label">Co zawierają pakiety</p>
     <h2 class="sec-title">Elementy, z których budujemy<br><em>punkt sprzedaży.</em></h2>
-    <p class="sec-body">Poniżej są główne części systemu. W zależności od wybranego pakietu dobieramy je w prostszej albo pełniejszej wersji.</p>
+    <p class="sec-body">Poniżej masz całość w jednym miejscu: mlekomat, automat chłodniczy, pawilon i butelki. W zależności od wybranego pakietu dobieramy je w prostszej albo pełniejszej wersji.</p>
   </div>
 
-  <div class="parts-grid">
-    <article class="part-card" data-r data-d="1">
-      <img src="automat2.webp" alt="Mlekomat Brunimat jako element punktu sprzedaży">
-      <div class="part-body">
-        <h3>Mlekomat</h3>
-        <p>Centralny element punktu: sprzedaż świeżego mleka bez Twojej stałej obecności, z płatnościami i kontrolą pracy.</p>
-        <a href="mlekomat.html">Zobacz mlekomat →</a>
+  <div class="offer-components">
+    <article class="offer-component" id="mlekomat" data-r>
+      <figure class="component-media">
+        <img src="automat2.webp" alt="Mlekomat Brunimat jako centralny element punktu sprzedaży">
+      </figure>
+      <div class="component-body">
+        <p class="component-kicker">Element 01</p>
+        <h3>Mlekomat BRUNIMAT</h3>
+        <p>Mlekomat jest sercem punktu sprzedaży. Klient może samodzielnie kupić świeże mleko, a gospodarstwo nie musi obsługiwać każdej transakcji ręcznie. Urządzenie dobieramy do skali sprzedaży, lokalizacji i planu rozwoju gospodarstwa.</p>
+        <ul class="component-list">
+          <li>sprzedaż świeżego mleka bez stałej obecności przy urządzeniu,</li>
+          <li>chłodzenie, kontrola pracy i wygodna obsługa klienta,</li>
+          <li>możliwość połączenia z pawilonem, butelkami i dodatkowymi produktami,</li>
+          <li>wdrożenie, instrukcja pracy i opieka przy starcie sprzedaży.</li>
+        </ul>
+        <div class="component-note">To nie jest „sam automat do postawienia”. W praktyce liczy się cały model: miejsce, ruch klientów, formalności, butelki, oznaczenie i prosty marketing lokalny.</div>
       </div>
     </article>
 
-    <article class="part-card" data-r data-d="2">
-      <img src="pawilon-1.jpg" alt="Pawilon handlowy przy gospodarstwie">
-      <div class="part-body">
-        <h3>Pawilon</h3>
-        <p>Miejsce, które chroni urządzenie, porządkuje sprzedaż i sprawia, że punkt wygląda profesjonalnie dla klientów.</p>
-        <a href="pawilony.html">Zobacz pawilon →</a>
+    <article class="offer-component" id="automat-chlodniczy" data-r>
+      <figure class="component-media contain">
+        <img src="sielaff-combi-m.webp" alt="Chłodzony automat vendingowy do produktów z gospodarstwa">
+      </figure>
+      <div class="component-body">
+        <p class="component-kicker">Element 02</p>
+        <h3>Automat chłodniczy na produkty z gospodarstwa</h3>
+        <p>Jeśli gospodarstwo ma sery, jaja, jogurty, masło, butelki albo lokalne przetwory, chłodzony automat może stać się drugim filarem sprzedaży. Klient przyjeżdża po mleko, ale przy okazji może dobrać produkty dodatkowe.</p>
+        <ul class="component-list">
+          <li>sprzedaż produktów chłodzonych 24/7,</li>
+          <li>układ dobierany pod butelki, produkty stojące lub leżące,</li>
+          <li>dotykowy ekran i czytelny wybór produktów,</li>
+          <li>możliwość konfiguracji do ustawienia w pawilonie albo w wariancie zewnętrznym.</li>
+        </ul>
+        <div class="component-note">Ten automat rekomendujemy wtedy, gdy gospodarstwo ma realny asortyment dodatkowy i ruch klientów. Nie dokładamy go na siłę do każdego projektu.</div>
       </div>
     </article>
 
-    <article class="part-card" data-r data-d="3">
-      <img src="sielaff-combi-m.webp" alt="Automat chłodniczy do produktów z gospodarstwa">
-      <div class="part-body">
-        <h3>Automat chłodniczy</h3>
-        <p>Chłodzony automat 24/7 na sery, jaja, jogurty, masło, butelki i lokalne przetwory — jako drugi filar sprzedaży obok mlekomatu.</p>
-        <a href="automat-chlodniczy.html">Zobacz automat chłodniczy →</a>
+    <article class="offer-component" id="pawilon" data-r>
+      <figure class="component-media">
+        <img src="pawilon-1.jpg" alt="Drewniany pawilon handlowy przy gospodarstwie">
+      </figure>
+      <div class="component-body">
+        <p class="component-kicker">Element 03</p>
+        <h3>Pawilon sprzedażowy</h3>
+        <p>Pawilon porządkuje cały punkt: chroni urządzenia, tworzy miejsce dla klienta i sprawia, że sprzedaż wygląda profesjonalnie. Może być prostym zadaszeniem pod mlekomat albo pełniejszym sklepem przy gospodarstwie.</p>
+        <ul class="component-list">
+          <li>miejsce pod mlekomat i ewentualny automat chłodniczy,</li>
+          <li>estetyczny punkt sprzedaży widoczny dla klientów,</li>
+          <li>możliwość ekspozycji produktów dodatkowych,</li>
+          <li>dostosowanie do działki, dojazdu, zasilania i codziennej obsługi.</li>
+        </ul>
+        <div class="component-note">Pawilon nie jest dekoracją. Dobrze ustawiony punkt pomaga budować zaufanie, ułatwia zakupy i zwiększa szansę, że klient wróci.</div>
       </div>
     </article>
 
-    <article class="part-card" data-r data-d="4">
-      <img src="butelka-sklep-za-stodola.png" alt="Szklana butelka do mleka z logo Sklep za Stodołą">
-      <div class="part-body">
-        <h3>Butelki</h3>
-        <p>Szklane butelki zwrotne 1 l i 0,5 l z naszym oznaczeniem albo indywidualnym nadrukiem gospodarstwa.</p>
-        <a href="butelki.html">Zobacz butelki →</a>
+    <article class="offer-component" id="butelki" data-r>
+      <figure class="component-media contain">
+        <img src="butelka-sklep-za-stodola.png" alt="Szklana butelka zwrotna do mleka">
+      </figure>
+      <div class="component-body">
+        <p class="component-kicker">Element 04</p>
+        <h3>Szklane butelki do mleka</h3>
+        <p>Butelki są naturalnym uzupełnieniem mlekomatu. Klient może kupić mleko w estetycznej, zwrotnej butelce, a gospodarstwo buduje własne oznaczenie i bardziej profesjonalny odbiór sprzedaży.</p>
+        <ul class="component-list">
+          <li>dwie pojemności: 1 l oraz 0,5 l,</li>
+          <li>szkło odpowiednie do kontaktu z żywnością,</li>
+          <li>wersja zwrotna do wielokrotnego obiegu,</li>
+          <li>możliwość naszego oznaczenia albo indywidualnego nadruku gospodarstwa.</li>
+        </ul>
+        <div class="component-note">Butelki można potraktować jako prosty start albo jako element budowania marki gospodarstwa, szczególnie przy regularnych klientach.</div>
       </div>
     </article>
   </div>
