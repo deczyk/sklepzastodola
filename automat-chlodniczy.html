@@ -33,7 +33,7 @@
 <style>
 .cooler-hero-grid{display:grid;grid-template-columns:minmax(0,.95fr) minmax(320px,1.05fr);gap:4rem;align-items:center;margin-top:3rem}
 .cooler-photo{border-radius:var(--r-lg);overflow:hidden;border:1px solid var(--line);box-shadow:var(--shadow-lg);background:var(--bg3)}
-.cooler-photo img{width:100%;height:560px;object-fit:cover;object-position:center}
+.cooler-photo img{width:100%;height:560px;object-fit:contain;object-position:center;background:var(--bg)}
 .cooler-pills{display:flex;flex-wrap:wrap;gap:.65rem;margin-top:1.5rem}
 .cooler-pills span{display:inline-flex;align-items:center;padding:.45rem .78rem;border-radius:999px;background:var(--paper);border:1px solid var(--line);box-shadow:var(--shadow);color:var(--ink);font-size:.84rem;font-weight:700}
 .cooler-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:var(--r-lg);overflow:hidden;margin-top:3rem}
@@ -45,6 +45,11 @@
 .cooler-spec{background:var(--paper);border:1px solid var(--line);border-radius:var(--r);padding:1.15rem 1.25rem;box-shadow:var(--shadow)}
 .cooler-spec strong{display:block;color:var(--ink);font-size:.96rem;margin-bottom:.35rem}
 .cooler-spec span{display:block;color:var(--muted);font-size:.88rem;line-height:1.55}
+.cooler-capacity{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1rem;margin-top:2rem}
+.cooler-capacity-card{background:var(--paper);border:1px solid var(--line);border-radius:var(--r);padding:1.2rem;box-shadow:var(--shadow)}
+.cooler-capacity-card b{display:block;color:var(--forest);font-size:1.55rem;line-height:1;margin-bottom:.45rem}
+.cooler-capacity-card strong{display:block;color:var(--ink);font-size:.92rem;margin-bottom:.35rem}
+.cooler-capacity-card span{display:block;color:var(--muted);font-size:.82rem;line-height:1.55}
 .cooler-note{margin-top:2rem;background:var(--wheat-bg);border:1px solid rgba(155,122,58,.25);border-radius:var(--r-lg);padding:1.45rem 1.6rem;color:var(--muted);font-size:.94rem;line-height:1.72}
 .cooler-note strong{color:var(--ink)}
 @media(max-width:920px){
@@ -52,6 +57,7 @@
   .cooler-photo img{height:420px}
   .cooler-grid{grid-template-columns:1fr}
   .cooler-specs{grid-template-columns:1fr}
+  .cooler-capacity{grid-template-columns:1fr}
 }
 </style>
 <script type="application/ld+json">
@@ -102,8 +108,8 @@
 <header class="page-hero">
 <div class="wrap">
   <p class="page-hero-eyebrow" data-r="fade">Automat chłodniczy</p>
-  <h1 data-r>Sprzedaż produktów z gospodarstwa<br><em>także poza godzinami pracy.</em></h1>
-  <p class="page-hero-sub" data-r data-d="1">Jeśli klient przyjeżdża po mleko, może od razu kupić ser, jaja, jogurt, masło, butelki albo inne produkty lokalne. Chłodzony automat vendingowy pozwala rozszerzyć punkt sprzedaży bez stałej obsługi przy ladzie.</p>
+  <h1 data-r>Sprzedaż produktów z gospodarstwa<br><em>24 godziny na dobę.</em></h1>
+  <p class="page-hero-sub" data-r data-d="1">SiLine Combi-M to chłodzony automat vendingowy do produktów z gospodarstwa: serów, jaj, jogurtów, masła, butelek i lokalnych przetworów. Dobrze uzupełnia mlekomat i pawilon, bo klient przyjeżdżający po mleko może od razu kupić coś więcej.</p>
 </div>
 </header>
 
@@ -113,7 +119,7 @@
     <div data-r>
       <p class="sec-label">Dla kogo</p>
       <h2 class="sec-title">Gdy samo mleko<br><em>to dopiero początek.</em></h2>
-      <p class="sec-body">Automat chłodniczy ma sens tam, gdzie gospodarstwo prowadzi lub chce zacząć sprzedaż bezpośrednią i ma produkty dodatkowe. Mlekomat przyciąga klienta, a chłodzony automat zwiększa wartość koszyka bez konieczności obsługi każdej sprzedaży ręcznie.</p>
+      <p class="sec-body">Automat ma sens tam, gdzie gospodarstwo prowadzi lub chce zacząć sprzedaż bezpośrednią i ma produkty dodatkowe. W jednej maszynie można dobrać układ pod produkty stojące albo leżące, a punkt sprzedaży działa bez stałej obsługi przy każdej transakcji.</p>
       <div class="cooler-pills">
         <span>sery</span>
         <span>jaja</span>
@@ -124,7 +130,7 @@
       </div>
     </div>
     <figure class="cooler-photo" data-r="right">
-      <img src="sielaff-combi-m.webp" alt="Automat chłodniczy do produktów z gospodarstwa" loading="eager">
+      <img src="sielaff-combi-m.webp" alt="Chłodzony automat vendingowy Sielaff SiLine Combi-M do produktów z gospodarstwa" loading="eager">
     </figure>
   </div>
 </div>
@@ -135,7 +141,7 @@
   <div data-r>
     <p class="sec-label">Jak pomaga w sprzedaży</p>
     <h2 class="sec-title">Jeden punkt,<br><em>więcej produktów.</em></h2>
-    <p class="sec-body">To uzupełnienie pawilonu i mlekomatu dla gospodarstw, które chcą sprzedawać szerzej niż samo mleko.</p>
+    <p class="sec-body">To uzupełnienie pawilonu i mlekomatu dla gospodarstw, które chcą sprzedawać szerzej niż samo mleko: bez rozbudowy obsługi i bez konieczności otwierania sklepu tylko po jedną paczkę sera czy butelkę.</p>
   </div>
 
   <div class="cooler-grid">
@@ -146,8 +152,8 @@
     </article>
     <article class="cooler-card" data-r data-d="2">
       <div class="cooler-card-icon">❄</div>
-      <h2>Produkty chłodzone</h2>
-      <p>Automat jest przeznaczony do produktów wymagających chłodzenia, więc dobrze pasuje do nabiału i lokalnej żywności.</p>
+      <h2>Chłodzenie i wersja outdoor</h2>
+      <p>Dostępne są warianty do ustawienia wewnątrz oraz rozwiązania zewnętrzne z zabezpieczeniem elektroniki, ochroną przed bryzgami i funkcją ochrony przed mrozem.</p>
     </article>
     <article class="cooler-card" data-r data-d="3">
       <div class="cooler-card-icon">＋</div>
@@ -157,14 +163,20 @@
   </div>
 
   <div class="cooler-specs">
-    <div class="cooler-spec" data-r data-d="1"><strong>Układ pod butelki i produkty</strong><span>Możliwe konfiguracje pod butelki oraz produkty stojące lub leżące, zależnie od asortymentu gospodarstwa.</span></div>
-    <div class="cooler-spec" data-r data-d="2"><strong>Wariant indoor lub outdoor</strong><span>Dobór wariantu zależy od tego, czy automat stoi w pawilonie, pod zadaszeniem, czy jako bardziej samodzielny punkt.</span></div>
-    <div class="cooler-spec" data-r data-d="3"><strong>Dotykowy ekran</strong><span>Czytelny wybór produktów i możliwość pokazania podstawowych informacji dla klienta.</span></div>
-    <div class="cooler-spec" data-r data-d="4"><strong>Delikatne wydawanie produktu</strong><span>System wydawania jest dobrany do produktów, które nie powinny wypadać swobodnie z dużej wysokości.</span></div>
+    <div class="cooler-spec" data-r data-d="1"><strong>Konfiguracja spiralna lub z popychaczami</strong><span>Układ dobiera się pod asortyment: butelki PET, butelki szklane oraz produkty stojące lub leżące.</span></div>
+    <div class="cooler-spec" data-r data-d="2"><strong>Dotykowy ekran za szybą bezpieczną</strong><span>Ekran pomaga klientowi wybrać produkt, pokazuje informacje i może służyć do prostych komunikatów sprzedażowych.</span></div>
+    <div class="cooler-spec" data-r data-d="3"><strong>Delikatne wydawanie produktu</strong><span>Wariant z windą odbiera produkt z poziomu półki i przenosi go do odbioru, zamiast pozwalać mu swobodnie spadać.</span></div>
+    <div class="cooler-spec" data-r data-d="4"><strong>Zabezpieczony odbiór</strong><span>Silnikowo blokowana klapa i szeroki otwór odbioru pomagają ograniczać manipulacje i ułatwiają klientowi odebranie produktu.</span></div>
+  </div>
+
+  <div class="cooler-capacity" data-r>
+    <div class="cooler-capacity-card"><b>ok. 45</b><strong>butelek PET</strong><span>układ spiralny, orientacyjnie dla butelek do ok. 220 mm długości</span></div>
+    <div class="cooler-capacity-card"><b>ok. 80</b><strong>butelek szklanych</strong><span>układ z popychaczami, orientacyjnie dla butelek stojących</span></div>
+    <div class="cooler-capacity-card"><b>ok. 120</b><strong>butelek szklanych</strong><span>większa konfiguracja z popychaczami, zależnie od wymiarów butelki</span></div>
   </div>
 
   <div class="cooler-note" data-r>
-    <strong>Nie każdy punkt potrzebuje takiego automatu od razu.</strong> Najpierw sprawdzamy lokalizację, produkty, ruch klientów i plan sprzedaży. Jeśli gospodarstwo ma realny potencjał na szerszy asortyment, automat chłodniczy może być częścią pakietu sprzedażowego albo premium.
+    <strong>Pojemność i wariant trzeba dobrać do realnego asortymentu.</strong> Inaczej projektuje się automat pod butelki, inaczej pod jaja, sery, jogurty czy gotowe zestawy. Dlatego przed ofertą sprawdzamy produkty, wymiary opakowań, miejsce ustawienia i planowany ruch klientów.
   </div>
 </div>
 </section>
