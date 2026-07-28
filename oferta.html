@@ -46,6 +46,10 @@
 .package-card h2{font-size:1.45rem;line-height:1.12;color:var(--ink);margin-bottom:.8rem}
 .package-card p{font-size:.92rem;color:var(--muted);line-height:1.7;margin-bottom:1.2rem}
 .package-badge{display:inline-flex;align-self:flex-start;margin-bottom:1rem;padding:.28rem .72rem;border-radius:999px;background:var(--sage);border:1px solid rgba(45,90,39,.22);color:var(--forest);font-size:.68rem;font-weight:900;letter-spacing:.08em;text-transform:uppercase}
+.package-mini{display:grid;gap:.6rem;margin:.2rem 0 1.2rem}
+.package-mini-row{border:1px solid var(--line);border-radius:var(--r);background:rgba(255,255,255,.48);padding:.82rem .9rem}
+.package-mini-row strong{display:block;color:var(--ink);font-size:.78rem;letter-spacing:.08em;text-transform:uppercase;margin-bottom:.3rem}
+.package-mini-row span{display:block;color:var(--muted);font-size:.84rem;line-height:1.5}
 .package-list{list-style:none;display:grid;gap:.7rem;margin:1rem 0 1.4rem;padding:0}
 .package-list li{display:flex;gap:.55rem;font-size:.88rem;color:var(--ink2);line-height:1.45}
 .package-list li::before{content:"✓";width:1.25rem;height:1.25rem;border-radius:50%;background:var(--sage);color:var(--forest);display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto;font-size:.72rem;font-weight:900}
@@ -131,12 +135,17 @@
     <article class="package-card" data-r data-d="1">
       <span class="package-label">START</span>
       <h2>Mlekomat i podstawowe uruchomienie</h2>
-      <p>Dla gospodarstwa, które chce zacząć sprzedaż mleka możliwie prosto i ma już miejsce pod punkt.</p>
+      <p>Dla gospodarstwa, które ma już miejsce pod punkt i chce możliwie szybko sprawdzić sprzedaż mleka bez budowania pełnego sklepu od pierwszego dnia.</p>
+      <div class="package-mini">
+        <div class="package-mini-row"><strong>Dla kogo</strong><span>Gospodarstwo z dobrą lokalizacją, dostępem do klientów i miejscem, gdzie można bezpiecznie ustawić mlekomat.</span></div>
+        <div class="package-mini-row"><strong>Efekt</strong><span>Uruchamiasz podstawową sprzedaż bezpośrednią mleka i zbierasz pierwsze dane: ile schodzi, kiedy klienci kupują i czy punkt ma potencjał rozbudowy.</span></div>
+      </div>
       <ul class="package-list">
         <li>Dobór mlekomatu do skali sprzedaży.</li>
-        <li>Podstawowe wdrożenie i instrukcja pracy.</li>
-        <li>Pomoc w przygotowaniu do rozmów formalnych.</li>
-        <li>Minimalny zakres marketingu startowego.</li>
+        <li>Konfiguracja podstawowych funkcji sprzedaży i płatności.</li>
+        <li>Instrukcja codziennej obsługi, uzupełniania i kontroli urządzenia.</li>
+        <li>Pomoc w uporządkowaniu minimum formalności przed startem.</li>
+        <li>Podstawowe wskazówki, jak poinformować lokalnych klientów o punkcie.</li>
       </ul>
       <a href="kontakt.html" class="btn btn-outline">Zapytaj o wycenę</a>
     </article>
@@ -145,13 +154,18 @@
       <span class="package-badge">Najbardziej praktyczny</span>
       <span class="package-label">SPRZEDAŻOWY</span>
       <h2>Mlekomat, pawilon i start sprzedaży</h2>
-      <p>Dla gospodarstwa, które chce gotowy punkt przy gospodarstwie i spokojne przejście od pomysłu do pierwszych klientów.</p>
+      <p>Dla gospodarstwa, które chce wejść w sprzedaż bezpośrednią porządnie: z miejscem dla klienta, logicznym ustawieniem urządzeń i gotowym planem pierwszych tygodni sprzedaży.</p>
+      <div class="package-mini">
+        <div class="package-mini-row"><strong>Dla kogo</strong><span>Dla rolnika, który nie chce sam koordynować urządzenia, pawilonu, dokumentów, oznaczenia i startu sprzedaży.</span></div>
+        <div class="package-mini-row"><strong>Efekt</strong><span>Powstaje praktyczny punkt przy gospodarstwie: klient wie gdzie podjechać, jak kupić mleko i co jeszcze może dobrać na miejscu.</span></div>
+      </div>
       <ul class="package-list">
         <li>Mlekomat jako główny element sprzedaży.</li>
-        <li>Pawilon lub przygotowanie miejsca sprzedaży.</li>
-        <li>Wsparcie przy dokumentach i finansowaniu.</li>
-        <li>Prosty marketing lokalny na start.</li>
-        <li>Pomoc w ułożeniu asortymentu i obsługi punktu.</li>
+        <li>Pawilon albo przygotowanie miejsca sprzedaży pod klienta i urządzenie.</li>
+        <li>Wsparcie przy dokumentach, finansowaniu i logicznym harmonogramie wdrożenia.</li>
+        <li>Butelki, podstawowe oznaczenie punktu i komunikaty dla klientów.</li>
+        <li>Prosty marketing lokalny na start: informacja przy drodze, social media, grupy lokalne.</li>
+        <li>Pomoc w ułożeniu obsługi punktu: kiedy uzupełniać mleko, jak reagować na alarmy, jak prowadzić pierwsze rozmowy z klientami.</li>
       </ul>
       <a href="kontakt.html" class="btn btn-green">Omów pakiet sprzedażowy</a>
     </article>
@@ -159,14 +173,18 @@
     <article class="package-card" data-r data-d="3">
       <span class="package-label">PREMIUM</span>
       <h2>Pełny punkt sprzedaży z opieką</h2>
-      <p>Dla gospodarstwa, które chce wejść w sprzedaż bezpośrednią profesjonalnie i od razu budować lokalną markę.</p>
+      <p>Dla gospodarstwa, które chce od razu budować pełniejszy punkt sprzedaży: mleko, produkty dodatkowe, rozpoznawalny wygląd, wygoda klienta i opieka po starcie.</p>
+      <div class="package-mini">
+        <div class="package-mini-row"><strong>Dla kogo</strong><span>Dla gospodarstwa z większym potencjałem lokalizacji, produktami dodatkowymi albo ambicją zbudowania rozpoznawalnej marki w okolicy.</span></div>
+        <div class="package-mini-row"><strong>Efekt</strong><span>Powstaje kompletny punkt sprzedaży bezpośredniej, który może zarabiać nie tylko na mleku, ale też na butelkach, nabiale i produktach z gospodarstwa.</span></div>
+      </div>
       <ul class="package-list">
-        <li>Rozszerzony wariant urządzenia i konfiguracji.</li>
-        <li>Rozbudowany pawilon albo pełny punkt sprzedaży.</li>
-        <li>Możliwość doboru automatu chłodniczego na produkty dodatkowe.</li>
-        <li>Butelki, materiały startowe i oznaczenie punktu.</li>
-        <li>Priorytetowe wsparcie przy uruchomieniu.</li>
-        <li>Opieka po starcie i rozwój sprzedaży.</li>
+        <li>Rozszerzona konfiguracja mlekomatu i funkcji operacyjnych.</li>
+        <li>Rozbudowany pawilon albo pełny punkt sprzedaży pod kilka kategorii produktów.</li>
+        <li>Dobór automatu chłodniczego na sery, jaja, jogurty, masło, butelki i przetwory.</li>
+        <li>Butelki z oznaczeniem, materiały startowe, podstawowa identyfikacja i komunikacja punktu.</li>
+        <li>Priorytetowe wsparcie przy uruchomieniu i pierwszych tygodniach działania.</li>
+        <li>Pomoc w rozwoju sprzedaży po starcie: co poprawić, co dodać, jak zwiększyć koszyk klienta.</li>
       </ul>
       <a href="kontakt.html" class="btn btn-outline">Zapytaj o pełny pakiet</a>
     </article>
