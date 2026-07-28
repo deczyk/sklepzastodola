@@ -7,3 +7,51 @@
   body{padding-bottom:64px}
   .cookie{bottom:calc(64px + .8rem)}
 }
+
+/* Global motion polish */
+[data-r]{transition-delay:var(--reveal-delay,0ms)}
+[data-r="fade-up"]{transform:translateY(24px)}
+[data-r="zoom"]{transform:scale(.96)}
+
+.btn,.btn-green,.btn-outline,.nav-cta,.mob-nav a,.footer-col a,.soc-btn,.pcard-link,.package-card a,.cert-download a,.component-cta a,.hero-actions a{
+  transition:transform .18s ease,box-shadow .22s ease,background-color .22s ease,color .22s ease,border-color .22s ease,opacity .22s ease!important;
+}
+
+.card,.why-card,.step,.fin-item,.contact-card,.contact-form,.sc-item,.practice-card,.fit-card,.roi-card,.pcard,.faq-category,.faq-clean-item,.offer-component,.package-card,.package-mini,.feature-block,.component-feature,.component-spec,.component-use,.cert-download,.process-step,.how-step,.step-card,.machine-cta,.milk-cta,.product-cta,.quote-card,.roi-box,.roi-results{
+  transition:transform .28s ease,box-shadow .28s ease,border-color .28s ease,background-color .28s ease!important;
+}
+
+.photo img,.pavilion-photo img,.products-photo img,.assortment-photo img,.component-media img,.component-photo img,.offer-component-media img,.hero-media img,.hero-video,.demo-video-frame video,.machine-photo img,.milk-photo img,.cert-card img{
+  transition:transform .65s cubic-bezier(.22,1,.36,1),filter .65s ease!important;
+}
+
+@media (hover:hover){
+  .btn:hover,.btn-green:hover,.btn-outline:hover,.nav-cta:hover,.pcard-link:hover,.package-card a:hover,.cert-download a:hover,.component-cta a:hover,.hero-actions a:hover{
+    transform:translateY(-2px);
+  }
+
+  .card:hover,.why-card:hover,.fin-item:hover,.contact-card:hover,.contact-form:hover,.sc-item:hover,.practice-card:hover,.fit-card:hover,.roi-card:hover,.pcard:hover,.faq-category:hover,.faq-clean-item:hover,.package-card:hover,.package-mini:hover,.feature-block:hover,.component-feature:hover,.component-spec:hover,.component-use:hover,.cert-download:hover,.process-step:hover,.how-step:hover,.step-card:hover,.machine-cta:hover,.milk-cta:hover,.product-cta:hover,.quote-card:hover{
+    transform:translateY(-4px);
+    box-shadow:var(--shadow-lg)!important;
+    border-color:rgba(45,90,39,.26)!important;
+  }
+
+  .offer-component:hover{
+    box-shadow:0 14px 42px rgba(30,30,26,.13)!important;
+    border-color:rgba(45,90,39,.24)!important;
+  }
+
+  .photo:hover img,.pavilion-photo:hover img,.products-photo:hover img,.assortment-photo:hover img,.component-media:hover img,.component-photo:hover img,.offer-component-media:hover img,.hero-media:hover img,.demo-video-frame:hover video,.machine-photo:hover img,.milk-photo:hover img,.cert-card:hover img{
+    transform:scale(1.025);
+    filter:saturate(1.04) contrast(1.02);
+  }
+}
+
+.faq-clean-item.open .faq-clean-a{animation:faqReveal .26s ease both}
+@keyframes faqReveal{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
+
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto!important}
+  *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}
+  [data-r]{opacity:1!important;transform:none!important}
+}

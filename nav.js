@@ -123,10 +123,58 @@
   }
 
   // ── SCROLL REVEAL ──
-  const obs = new IntersectionObserver(entries=>{
-    entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('on'); obs.unobserve(e.target); }});
-  }, {threshold:0.1, rootMargin:'0px 0px -30px 0px'});
-  document.querySelectorAll('[data-r]').forEach(el=> obs.observe(el));
+  const autoRevealSelectors = [
+    '.card',
+    '.why-card',
+    '.step',
+    '.fin-item',
+    '.contact-card',
+    '.contact-form',
+    '.sc-item',
+    '.strip-grid > *',
+    '.practice-card',
+    '.fit-card',
+    '.roi-card',
+    '.pcard',
+    '.faq-category',
+    '.faq-clean-item',
+    '.offer-component',
+    '.package-card',
+    '.package-mini',
+    '.feature-block',
+    '.component-feature',
+    '.component-spec',
+    '.component-use',
+    '.cert-download',
+    '.process-step',
+    '.how-step',
+    '.step-card',
+    '.machine-cta',
+    '.milk-cta',
+    '.product-cta',
+    '.quote-card'
+  ].join(',');
+
+  document.querySelectorAll(autoRevealSelectors).forEach((el, index)=>{
+    if(!el.hasAttribute('data-r')) el.setAttribute('data-r', 'fade-up');
+    if(!el.hasAttribute('data-d')) el.style.setProperty('--reveal-delay', `${Math.min(index % 6, 5) * 55}ms`);
+  });
+
+  const revealItems = document.querySelectorAll('[data-r]');
+  const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if(reduceMotion || !('IntersectionObserver' in window)){
+    revealItems.forEach(el=> el.classList.add('on'));
+  } else {
+    const obs = new IntersectionObserver(entries=>{
+      entries.forEach(e=>{
+        if(e.isIntersecting){
+          e.target.classList.add('on');
+          obs.unobserve(e.target);
+        }
+      });
+    }, {threshold:0.12, rootMargin:'0px 0px -45px 0px'});
+    revealItems.forEach(el=> obs.observe(el));
+  }
 
   // ── COOKIE ──
   // Używamy sessionStorage zamiast localStorage — baner pokazuje się przy każdej sesji
