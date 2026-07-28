@@ -184,7 +184,7 @@ const auditQuestions = [
   ["producerNumber","Czy masz numer producenta rolnego?",10],
   ["directSales","Czy planujesz sprzedaż bezpośrednią mleka lub produktów z gospodarstwa?",12],
   ["ownProducts","Czy masz produkty dodatkowe: jaja, sery, miód, warzywa albo inne produkty lokalne?",10],
-  ["location","Czy Twoja lokalizacja jest blisko miasta, osiedla lub ruchliwej drogi?",12],
+  ["location","Czy punkt będzie łatwy do znalezienia, dobrze oznaczony i wygodny dla klientów, którzy przyjadą po świeży produkt?",12],
   ["dairyExclusivity","Czy możesz sprzedawać mleko bezpośrednio mimo umowy z mleczarnią (brak klauzuli wyłączności blokującej sprzedaż bezpośrednią)?",0],
   ["competition","Czy w Twojej okolicy (powiecie) NIE działa jeszcze inny mlekomat ani silna konkurencja sprzedaży bezpośredniej?",4],
   ["dailyOperator","Czy masz osobę do codziennego uzupełniania mleka i obsługi urządzenia?",4],
@@ -282,8 +282,8 @@ function calculate(){
   document.getElementById("scoreTxt").innerText=score+"%";document.getElementById("scoreBar").style.width=score+"%";
   document.getElementById("roiTxt").innerText=roi.toFixed(1);document.getElementById("roiEuTxt").innerText=roiEu.toFixed(1);document.getElementById("profitYearTxt").innerText=money(marginYear);
   const advice=document.getElementById("advice"); advice.className=`advice-box ${score>=80?"ok":score>=60?"warn":"bad"}`;
-  let adviceTxt = score>=80?`${farmName} ma wysoki potencjał dla tego projektu. Warto od razu przygotować konkretną ofertę, dokładny ROI i sprawdzić aktualny nabór UE.`:score>=60?`${farmName} ma realny potencjał, ale zanim przygotujemy ofertę, warto doprecyzować lokalizację, sposób finansowania i kwalifikowalność kosztów.`:`Na tym etapie ${farmName} wymaga dokładniejszej analizy, zanim przygotujemy konkretną ofertę i wniosek o finansowanie.`;
-  if(scoreCapped) adviceTxt += ` ⚠ Wynik ograniczony — lokalizacja (bliskość miasta/osiedla/ruchliwej drogi) nie jest potwierdzona, a to jeden z najważniejszych czynników przy sprzedaży bezpośredniej. Zanim wyślemy standardową ofertę, zadzwoń i ustal: dokładną lokalizację, liczbę potencjalnych klientów dziennie i czy popyt na ${Math.round(targetLiters).toLocaleString("pl-PL")} l/dzień jest realny.`;
+  let adviceTxt = score>=80?`${farmName} ma wysoki potencjał dla tego projektu. Warto od razu przygotować konkretną ofertę, dokładny ROI i sprawdzić aktualny nabór UE.`:score>=60?`${farmName} ma realny potencjał, ale zanim przygotujemy ofertę, warto doprecyzować sposób ustawienia punktu, oznaczenie, finansowanie i kwalifikowalność kosztów.`:`Na tym etapie ${farmName} wymaga dokładniejszej analizy, zanim przygotujemy konkretną ofertę i wniosek o finansowanie.`;
+  if(scoreCapped) adviceTxt += ` ⚠ Wynik ograniczony — nie potwierdzono jeszcze, czy punkt będzie łatwy do znalezienia i wygodny dla klientów. To nie przekreśla sprzedaży bezpośredniej, bo po dobre, świeże produkty ludzie potrafią przyjechać specjalnie, ale przed ofertą trzeba ustalić: oznaczenie, dojazd, sposób informowania klientów i czy popyt na ${Math.round(targetLiters).toLocaleString("pl-PL")} l/dzień jest realny.`;
   if(dairyVal===0) adviceTxt += " 🚫 Klient wskazuje, że umowa z mleczarnią zawiera klauzulę wyłączności blokującą sprzedaż bezpośrednią. To ważne ryzyko prawne — warto porozmawiać indywidualnie ze Sklep za Stodołą, żeby wspólnie ustalić, jak to wyjaśnić przed dalszymi krokami.";
   else if(dairyVal===0.5) adviceTxt += " ⚠ Nie potwierdzono, czy umowa z mleczarnią pozwala na sprzedaż bezpośrednią. Zalecamy indywidualną rozmowę ze Sklep za Stodołą, żeby to sprawdzić, zanim projekt pójdzie dalej.";
   if(fullProductionAssumed) adviceTxt += ` ⚠ Kalkulacja zakłada sprzedaż praktycznie całej bieżącej produkcji mleka bez przerw przez cały rok — to optymistyczne założenie (zasuszenie, choroby, wahania popytu). Warto ustalić z klientem plan uzupełnienia mleka z innego zatwierdzonego gospodarstwa albo powiększenia stada.`;

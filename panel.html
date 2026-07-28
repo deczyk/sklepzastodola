@@ -1832,7 +1832,7 @@
               <option>potrzebujemy doprecyzować dane</option>
               <option>na razie podszedłbym ostrożnie</option>
             </select>
-            <input id="mailTplNextStep" placeholder="Proponowany następny krok" value="krótka rozmowa telefoniczna i doprecyzowanie lokalizacji" oninput="renderAdvisorMailTemplates()">
+            <input id="mailTplNextStep" placeholder="Proponowany następny krok" value="krótka rozmowa telefoniczna i doprecyzowanie modelu sprzedaży" oninput="renderAdvisorMailTemplates()">
           </div>
         </div>
         <div id="advisorMailTemplates" class="mailTemplateGrid"></div>
@@ -2147,11 +2147,11 @@ Chcecie zobaczyć, jak wygląda mlekomat od środka? Napiszcie, wyślemy więcej
 
 To pytanie zadaje nam prawie każdy rolnik.
 
-Odpowiedź brzmi: zależy od skali produkcji i lokalizacji.
+Odpowiedź brzmi: zależy od skali produkcji, jakości produktu, regularności sprzedaży i tego, jak przygotujemy punkt dla klientów.
 
 Przy dobrze dobranym rozwiązaniu wielu naszych klientów osiąga sprzedaż na poziomie, który realnie poprawia rentowność gospodarstwa — bez oddawania marży pośrednikom.
 
-Chcecie konkretne wyliczenia pod Waszą liczbę krów i lokalizację? Napiszcie do nas — zrobimy szybką kalkulację. Albo skorzystajcie z naszego kalkulatora: sklepzastodola.pl`
+Chcecie konkretne wyliczenia pod Waszą liczbę krów i plan sprzedaży? Napiszcie do nas — zrobimy szybką kalkulację. Albo skorzystajcie z naszego kalkulatora: sklepzastodola.pl`
     },
     {
       id:"fb_2026_07_25_complete",
@@ -4398,7 +4398,7 @@ function followupInfo(dateStr){
 function objectionPrompt(objection){
   const prompts = {
     "Cena":"Wrócić do wartości: gotowy punkt sprzedaży, mniej pilnowania i możliwość finansowania.",
-    "Niepewność co do popytu":"Zapytać o lokalizację, ruch przy gospodarstwie i pomysł na lokalną promocję.",
+    "Niepewność co do popytu":"Zapytać o produkty, regularność sprzedaży, oznaczenie punktu i pomysł na lokalną promocję.",
     "Obawa o serwis / awarie":"Podkreślić wsparcie, wdrożenie i to, że nie zostaje sam z urządzeniem.",
     "Brak miejsca / lokalizacji":"Porozmawiać o pawilonie albo prostszym punkcie sprzedaży przy gospodarstwie.",
     "Chce zobaczyć przykład / referencje":"Zaproponować pokazanie przykładu, zdjęć albo rozmowę po pierwszych realizacjach.",
@@ -7876,7 +7876,7 @@ const ADVISOR_MAIL_TEMPLATES = [
 
 dziękuję za wypełnienie formularza.
 
-Po wstępnej analizie wygląda na to, że temat sprzedaży bezpośredniej w Państwa gospodarstwie może mieć sens. Szczególnie ważne będą teraz: lokalizacja punktu, realny ruch klientów w okolicy oraz skala mleka, którą chcą Państwo sprzedawać poza pośrednikami.
+Po wstępnej analizie wygląda na to, że temat sprzedaży bezpośredniej w Państwa gospodarstwie może mieć sens. Szczególnie ważne będą teraz: jakość produktu, regularność sprzedaży 24/7, czytelne przygotowanie punktu oraz skala mleka, którą chcą Państwo sprzedawać poza pośrednikami.
 
 Na ten moment najrozsądniej rozważałbym wariant: ${v.packageName}.
 
@@ -7885,7 +7885,7 @@ Nie chcę jednak wysyłać gotowej oferty bez krótkiej rozmowy, bo przy takim p
 Proponowany następny krok: ${v.nextStep}.
 
 W rozmowie doprecyzujemy:
-- lokalizację i dostęp klientów,
+- sposób ustawienia punktu, oznaczenie i wygodę zakupu dla klientów,
 - czy lepszy będzie sam mlekomat, czy punkt z pawilonem,
 - formalności i możliwe finansowanie,
 - orientacyjny zakres inwestycji.
@@ -7905,14 +7905,14 @@ www.sklepzastodola.pl`
 
 dziękuję za przesłanie formularza.
 
-Mam już podstawowe informacje, ale przed sensowną rekomendacją potrzebuję doprecyzować kilka rzeczy. Nie chcę od razu wysyłać ogólnej oferty, bo przy sprzedaży bezpośredniej najważniejsze jest dopasowanie punktu do lokalizacji i skali gospodarstwa.
+Mam już podstawowe informacje, ale przed sensowną rekomendacją potrzebuję doprecyzować kilka rzeczy. Nie chcę od razu wysyłać ogólnej oferty, bo przy sprzedaży bezpośredniej najważniejsze jest dopasowanie punktu do produktów, skali gospodarstwa i tego, jak klient ma wygodnie kupować 24/7.
 
 Na teraz wynik oceniam tak: ${v.result}.
 
 Proszę krótko odpisać albo najlepiej zadzwonić, żebyśmy ustalili:
 - ile mleka realnie chcą Państwo sprzedawać dziennie,
-- gdzie miałby stanąć punkt sprzedaży,
-- czy w okolicy jest ruch klientów,
+- gdzie miałby stanąć punkt sprzedaży i jak będzie oznaczony,
+- jak poinformować klientów, że mogą kupić świeży produkt 24/7,
 - czy interesuje Państwa sam mlekomat, czy pełny punkt z pawilonem,
 - czy rozważają Państwo finansowanie/leasing/dotację.
 
@@ -7962,7 +7962,7 @@ dziękuję za rozmowę.
 Podsumowując: rozmawialiśmy o uruchomieniu sprzedaży bezpośredniej przy gospodarstwie${v.locationText}. Na tym etapie najbardziej logiczny wydaje się wariant: ${v.packageName}.
 
 Najważniejsze założenia do dalszego sprawdzenia:
-- lokalizacja punktu i dostęp dla klientów,
+- jakość produktu, regularność sprzedaży i wygodę zakupu dla klientów,
 - skala sprzedaży mleka poza pośrednikiem,
 - zakres: sam mlekomat czy punkt z pawilonem,
 - ewentualne butelki, etykiety i wyposażenie dodatkowe,

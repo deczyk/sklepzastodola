@@ -666,7 +666,7 @@
                 <a class="btn btn-secondary" href="#contact">Poproś o bezpłatną analizę</a>
                 <button class="btn btn-ghost" type="button" id="printResult">Drukuj / zapisz jako PDF</button>
               </div>
-              <div class="disclaimer">To kalkulacja orientacyjna, nie gwarancja wyniku. Wynik zależy od ceny, lokalizacji, popytu, kosztów i organizacji sprzedaży. Pokazany potencjał oznacza różnicę między sprzedażą bezpośrednią a sprzedażą do skupu, pomniejszoną o wpisany koszt sprzedaży jednego litra. Nie obejmuje podatków, kosztu własnej pracy, kosztu produkcji mleka ani wszystkich możliwych kosztów serwisowych i finansowych.</div>
+              <div class="disclaimer">To kalkulacja orientacyjna, nie gwarancja wyniku. Wynik zależy od jakości produktu, ceny, regularności dostaw, popytu, kosztów, organizacji sprzedaży i rozpoznawalności punktu. Dobra lokalizacja pomaga, ale sprzedaż bezpośrednia nie opiera się wyłącznie na przypadkowym ruchu obok gospodarstwa. Pokazany potencjał oznacza różnicę między sprzedażą bezpośrednią a sprzedażą do skupu, pomniejszoną o wpisany koszt sprzedaży jednego litra. Nie obejmuje podatków, kosztu własnej pracy, kosztu produkcji mleka ani wszystkich możliwych kosztów serwisowych i finansowych.</div>
             </div>
           </section>
         </div>
@@ -675,10 +675,10 @@
       <section id="contact" class="contact-section" aria-labelledby="contactTitle">
         <div class="contact-copy">
           <h2 id="contactTitle">Chcesz otrzymać analizę dopasowaną do gospodarstwa?</h2>
-          <p>Prześlij wynik. Sprawdzimy lokalizację, dobierzemy pakiet, możliwe finansowanie oraz kolejne kroki. Bezpłatnie i bez zobowiązań.</p>
+          <p>Prześlij wynik. Sprawdzimy potencjał sprzedaży, dobierzemy pakiet, możliwe finansowanie oraz kolejne kroki. Bezpłatnie i bez zobowiązań.</p>
           <div class="mini-list">
             <div class="mini-item"><span aria-hidden="true">✓</span><span>dobór pakietu START / SPRZEDAŻOWY / PREMIUM</span></div>
-            <div class="mini-item"><span aria-hidden="true">✓</span><span>wstępna ocena lokalizacji i sprzedaży</span></div>
+            <div class="mini-item"><span aria-hidden="true">✓</span><span>wstępna ocena potencjału sprzedaży 24/7</span></div>
             <div class="mini-item"><span aria-hidden="true">✓</span><span>możliwości leasingu lub dofinansowania</span></div>
           </div>
         </div>
@@ -807,10 +807,10 @@
         let recommendation = "Przy podanych wartościach potencjał sprzedaży jest zbyt niski lub ujemny. Sprawdź cenę sprzedaży, realny wolumen i koszt wybranego pakietu.";
         if (paybackMonths <= 24) {
           recommendationTitle = "Bardzo dobry potencjał";
-          recommendation = "Podane wartości wskazują na krótki orientacyjny czas odzyskania inwestycji. Warto sprawdzić lokalizację, wymagania techniczne i dobrać konkretny pakiet sprzedaży bezpośredniej.";
+          recommendation = "Podane wartości wskazują na krótki orientacyjny czas odzyskania inwestycji. Warto sprawdzić model sprzedaży, wymagania techniczne, oznaczenie punktu i dobrać konkretny pakiet sprzedaży bezpośredniej.";
         } else if (paybackMonths <= 48) {
           recommendationTitle = "Dobry potencjał";
-          recommendation = "Projekt wygląda obiecująco. Największy wpływ na wynik będą miały rzeczywisty wolumen sprzedaży, lokalizacja i końcowa konfiguracja pakietu.";
+          recommendation = "Projekt wygląda obiecująco. Największy wpływ na wynik będą miały rzeczywisty wolumen sprzedaży, jakość produktu, regularność dostaw, komunikacja z klientami i końcowa konfiguracja pakietu.";
         } else if (paybackMonths <= 72) {
           recommendationTitle = "Umiarkowany potencjał";
           recommendation = "Inwestycja może być uzasadniona, ale wymaga ostrożnego sprawdzenia popytu, kosztów i możliwości zwiększenia sprzedaży lub pozyskania dofinansowania.";
