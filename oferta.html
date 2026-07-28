@@ -63,11 +63,18 @@
 .component-kicker{font-size:.68rem;font-weight:900;letter-spacing:.14em;text-transform:uppercase;color:var(--wheat);margin-bottom:.7rem}
 .component-body h3{font-size:clamp(1.55rem,3vw,2.3rem);line-height:1.08;color:var(--ink);margin-bottom:.85rem}
 .component-body p{color:var(--muted);font-size:.96rem;line-height:1.75;margin-bottom:1rem}
+.component-lead{max-width:760px}
 .component-list{list-style:none;display:grid;gap:.65rem;margin:1.2rem 0 0;padding:0}
 .component-list li{display:flex;gap:.55rem;color:var(--ink2);font-size:.9rem;line-height:1.45}
 .component-list li::before{content:"✓";width:1.2rem;height:1.2rem;border-radius:50%;background:var(--sage);color:var(--forest);display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto;font-size:.7rem;font-weight:900}
+.component-feature-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.8rem;margin-top:1.2rem}
+.feature-block{border:1px solid var(--line);border-radius:var(--r);background:var(--bg);padding:1rem}
+.feature-block strong{display:block;color:var(--ink);font-size:.9rem;line-height:1.25;margin-bottom:.45rem}
+.feature-block span{display:block;color:var(--muted);font-size:.82rem;line-height:1.55}
+.component-pills{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:1.15rem}
+.component-pills span{display:inline-flex;align-items:center;border:1px solid rgba(45,90,39,.18);background:var(--sage);color:var(--forest);border-radius:999px;padding:.34rem .62rem;font-size:.76rem;font-weight:800}
 .component-note{margin-top:1.15rem;background:var(--wheat-bg);border:1px solid rgba(155,122,58,.25);border-radius:var(--r);padding:1rem 1.1rem;color:var(--muted);font-size:.88rem;line-height:1.6}
-@media(max-width:920px){.packages-grid{grid-template-columns:1fr}.package-card{padding:1.5rem}.package-note{flex-direction:column;align-items:flex-start}.package-note .btn{width:100%;justify-content:center}.offer-component{grid-template-columns:1fr}.component-media{min-height:280px;border-right:0;border-bottom:1px solid var(--line)}.component-media img{max-height:260px}.component-body{padding:1.45rem}}
+@media(max-width:920px){.packages-grid{grid-template-columns:1fr}.package-card{padding:1.5rem}.package-note{flex-direction:column;align-items:flex-start}.package-note .btn{width:100%;justify-content:center}.offer-component{grid-template-columns:1fr}.component-media{min-height:280px;border-right:0;border-bottom:1px solid var(--line)}.component-media img{max-height:260px}.component-body{padding:1.45rem}.component-feature-grid{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -188,13 +195,20 @@
       <div class="component-body">
         <p class="component-kicker">Element 01</p>
         <h3>Mlekomat BRUNIMAT</h3>
-        <p>Mlekomat jest sercem punktu sprzedaży. Klient może samodzielnie kupić świeże mleko, a gospodarstwo nie musi obsługiwać każdej transakcji ręcznie. Urządzenie dobieramy do skali sprzedaży, lokalizacji i planu rozwoju gospodarstwa.</p>
-        <ul class="component-list">
-          <li>sprzedaż świeżego mleka bez stałej obecności przy urządzeniu,</li>
-          <li>chłodzenie, kontrola pracy i wygodna obsługa klienta,</li>
-          <li>możliwość połączenia z pawilonem, butelkami i dodatkowymi produktami,</li>
-          <li>wdrożenie, instrukcja pracy i opieka przy starcie sprzedaży.</li>
-        </ul>
+        <p class="component-lead">Mlekomat jest sercem punktu sprzedaży. Klient może samodzielnie kupić świeże mleko, a gospodarstwo nie musi obsługiwać każdej transakcji ręcznie. BRUNIMAT dobieramy do skali sprzedaży, lokalizacji i planu rozwoju gospodarstwa.</p>
+        <div class="component-feature-grid">
+          <div class="feature-block"><strong>Komunikaty GSM i panel sprzedaży</strong><span>Urządzenie może wysyłać komunikaty o poziomie mleka, np. alarm przy 50 l, informację o braku mleka oraz inne powiadomienia operacyjne.</span></div>
+          <div class="feature-block"><strong>Płatności dla klientów</strong><span>System monetarny na monety bez wydawania reszty, opcjonalny moduł wydawania reszty oraz możliwość konfiguracji czytnika banknotów, kart i bilonu.</span></div>
+          <div class="feature-block"><strong>Polski system językowy</strong><span>Obsługa klienta w języku polskim, czytelne komunikaty na urządzeniu i konfiguracja dopasowana do lokalnego punktu sprzedaży.</span></div>
+          <div class="feature-block"><strong>Potwierdzenia sprzedaży</strong><span>Możliwość zastosowania drukarki potwierdzeń sprzedaży, gdy punkt wymaga dodatkowej dokumentacji lub wygodniejszej obsługi rozliczeń.</span></div>
+          <div class="feature-block"><strong>Higiena nalewania</strong><span>Automatyczne płukanie strefy nalewania po każdej sprzedaży pomaga utrzymać porządek w najważniejszym miejscu kontaktu z produktem.</span></div>
+          <div class="feature-block"><strong>Praca zimą</strong><span>Ogrzewanie sterowane termostatem oraz system Anti-Frost pomagają zabezpieczyć urządzenie w niskich temperaturach.</span></div>
+          <div class="feature-block"><strong>Bezpieczeństwo punktu</strong><span>Syrena alarmowa i alarm SMS przy próbie włamania do skrzynki zwiększają kontrolę nad urządzeniem ustawionym poza budynkiem gospodarstwa.</span></div>
+          <div class="feature-block"><strong>Żetony i sprzedaż specjalna</strong><span>Możliwa konfiguracja żetonów, np. 1 żeton = 1 litr, jako dodatkowy sposób rozliczania sprzedaży lub obsługi stałych klientów.</span></div>
+        </div>
+        <div class="component-pills">
+          <span>GSM</span><span>alarm SMS</span><span>Anti-Frost</span><span>płatności</span><span>płukanie po sprzedaży</span><span>język polski</span>
+        </div>
         <div class="component-note">To nie jest „sam automat do postawienia”. W praktyce liczy się cały model: miejsce, ruch klientów, formalności, butelki, oznaczenie i prosty marketing lokalny.</div>
       </div>
     </article>
@@ -205,14 +219,23 @@
       </figure>
       <div class="component-body">
         <p class="component-kicker">Element 02</p>
-        <h3>Automat chłodniczy na produkty z gospodarstwa</h3>
-        <p>Jeśli gospodarstwo ma sery, jaja, jogurty, masło, butelki albo lokalne przetwory, chłodzony automat może stać się drugim filarem sprzedaży. Klient przyjeżdża po mleko, ale przy okazji może dobrać produkty dodatkowe.</p>
-        <ul class="component-list">
-          <li>sprzedaż produktów chłodzonych 24/7,</li>
-          <li>układ dobierany pod butelki, produkty stojące lub leżące,</li>
-          <li>dotykowy ekran i czytelny wybór produktów,</li>
-          <li>możliwość konfiguracji do ustawienia w pawilonie albo w wariancie zewnętrznym.</li>
-        </ul>
+        <h3>Automat chłodniczy Sielaff SiLine® SÜ M</h3>
+        <p class="component-lead">To chłodzony automat do sprzedaży pustych butelek na mleko oraz produktów z gospodarstwa: jaj, serów, jogurtów, masła i lokalnych przetworów. Działa jako drugi filar sprzedaży obok mlekomatu, gdy klient ma kupić więcej niż samo mleko.</p>
+        <div class="component-feature-grid">
+          <div class="feature-block"><strong>Układ pod butelki szklane</strong><span>Butelki szklane do maksymalnej długości ok. 260 mm, ustawiane pionowo, średnica ok. 90 mm. Konfiguracja może mieścić orientacyjnie do ok. 120 butelek.</span></div>
+          <div class="feature-block"><strong>Produkty z gospodarstwa</strong><span>Automat można dobrać pod produkty stojące lub leżące, dlatego nadaje się nie tylko do butelek, ale też do jaj, serów i gotowych produktów chłodzonych.</span></div>
+          <div class="feature-block"><strong>Design RA + pakiet A</strong><span>Lakierowane panele dekoracyjne w dolnym i górnym obszarze drzwi oraz zewnętrzne oświetlenie LED nad i pod frontem szklanym.</span></div>
+          <div class="feature-block"><strong>Wariant zewnętrzny</strong><span>Dach, ochrona przed uderzeniami, dodatkowa tylna ściana, zabezpieczone komponenty elektroniczne, wyłącznik FI i klasa ochrony IP24.</span></div>
+          <div class="feature-block"><strong>Ochrona i wandaloodporność</strong><span>Ramka antywłamaniowa z kieszenią zamka, bęben zwrotny, wzmocniona klapa blokująca i konstrukcja ograniczająca elementy podatne na manipulację.</span></div>
+          <div class="feature-block"><strong>Chłodzenie i mróz</strong><span>Chłodzenie z czujnikiem ochrony przed mrozem. Przy temperaturze zewnętrznej do ok. -20°C automat utrzymuje temperaturę wewnątrz powyżej zera.</span></div>
+          <div class="feature-block"><strong>Lift do delikatnego wydawania</strong><span>Winda odbiera produkt z poziomu półki i szybko, ale łagodnie przekazuje go do wydania. Jest standardem w wariantach outdoor i wymagana przy układach Combi od 2 poziomów popychaczy.</span></div>
+          <div class="feature-block"><strong>Bezpieczne wydanie produktu</strong><span>Motorowy system śluzy chroni przed manipulacją. Szeroki otwór odbioru jest wygodny dla klienta, a produkt pozostaje widoczny z zewnątrz.</span></div>
+          <div class="feature-block"><strong>Touch display</strong><span>Ekran 800×480 z podświetleniem LED, chroniony za szybą VSG. Nadaje się do zdjęć produktów, informacji, reklamy, programowania wyborów i trybu dla osób na wózku.</span></div>
+          <div class="feature-block"><strong>Czyszczenie i programowanie</strong><span>System może prowadzić operatora przez czyszczenie i pozwala szczegółowo programować wybory produktów: przez zdjęcia albo klasyczną klawiaturę alfanumeryczną.</span></div>
+        </div>
+        <div class="component-pills">
+          <span>butelki do ok. 260 mm</span><span>ok. 120 butelek</span><span>touch display</span><span>IP24</span><span>lift</span><span>outdoor</span>
+        </div>
         <div class="component-note">Ten automat rekomendujemy wtedy, gdy gospodarstwo ma realny asortyment dodatkowy i ruch klientów. Nie dokładamy go na siłę do każdego projektu.</div>
       </div>
     </article>
@@ -224,13 +247,18 @@
       <div class="component-body">
         <p class="component-kicker">Element 03</p>
         <h3>Pawilon sprzedażowy</h3>
-        <p>Pawilon porządkuje cały punkt: chroni urządzenia, tworzy miejsce dla klienta i sprawia, że sprzedaż wygląda profesjonalnie. Może być prostym zadaszeniem pod mlekomat albo pełniejszym sklepem przy gospodarstwie.</p>
+        <p class="component-lead">Pawilon porządkuje cały punkt: chroni urządzenia, tworzy miejsce dla klienta i sprawia, że sprzedaż wygląda profesjonalnie. Może być prostym miejscem pod mlekomat albo pełniejszym sklepem przy gospodarstwie.</p>
         <ul class="component-list">
-          <li>miejsce pod mlekomat i ewentualny automat chłodniczy,</li>
-          <li>estetyczny punkt sprzedaży widoczny dla klientów,</li>
-          <li>możliwość ekspozycji produktów dodatkowych,</li>
-          <li>dostosowanie do działki, dojazdu, zasilania i codziennej obsługi.</li>
+          <li>miejsce pod mlekomat, automat chłodniczy, butelki i prostą ekspozycję produktów,</li>
+          <li>czytelny, estetyczny punkt sprzedaży widoczny z drogi lub podjazdu,</li>
+          <li>ochrona urządzeń przed deszczem, słońcem i przypadkowym uszkodzeniem,</li>
+          <li>układ dopasowany do działki, dojazdu, zasilania, serwisu i codziennego uzupełniania,</li>
+          <li>możliwość oznaczenia punktem Sklep za Stodołą albo marką gospodarstwa,</li>
+          <li>miejsce na informacje dla klientów: godziny, zasady zakupu, RHD, kontakt i instrukcję obsługi.</li>
         </ul>
+        <div class="component-pills">
+          <span>pod mlekomat</span><span>pod sklepik</span><span>oznaczenie</span><span>ekspozycja</span><span>punkt przy gospodarstwie</span>
+        </div>
         <div class="component-note">Pawilon nie jest dekoracją. Dobrze ustawiony punkt pomaga budować zaufanie, ułatwia zakupy i zwiększa szansę, że klient wróci.</div>
       </div>
     </article>
@@ -242,13 +270,20 @@
       <div class="component-body">
         <p class="component-kicker">Element 04</p>
         <h3>Szklane butelki do mleka</h3>
-        <p>Butelki są naturalnym uzupełnieniem mlekomatu. Klient może kupić mleko w estetycznej, zwrotnej butelce, a gospodarstwo buduje własne oznaczenie i bardziej profesjonalny odbiór sprzedaży.</p>
+        <p class="component-lead">Butelki są naturalnym uzupełnieniem mlekomatu. Klient może kupić mleko w estetycznej, zwrotnej butelce, a gospodarstwo buduje własne oznaczenie i bardziej profesjonalny odbiór sprzedaży.</p>
         <ul class="component-list">
           <li>dwie pojemności: 1 l oraz 0,5 l,</li>
           <li>szkło odpowiednie do kontaktu z żywnością,</li>
           <li>wersja zwrotna do wielokrotnego obiegu,</li>
-          <li>możliwość naszego oznaczenia albo indywidualnego nadruku gospodarstwa.</li>
+          <li>możliwość naszego oznaczenia albo indywidualnego nadruku gospodarstwa,</li>
+          <li>zamknięcie wielokrotnego użytku typu TO48,</li>
+          <li>możliwość trwałego nadruku ceramicznego do 4 kolorów,</li>
+          <li>rozwiązanie pasujące do obiegu zwrotnego i profesjonalnego mycia,</li>
+          <li>dobry element startowy dla klientów, którzy pierwszy raz kupują mleko z automatu.</li>
         </ul>
+        <div class="component-pills">
+          <span>1 l</span><span>0,5 l</span><span>TO48</span><span>nadruk ceramiczny</span><span>obieg zwrotny</span>
+        </div>
         <div class="component-note">Butelki można potraktować jako prosty start albo jako element budowania marki gospodarstwa, szczególnie przy regularnych klientach.</div>
       </div>
     </article>
