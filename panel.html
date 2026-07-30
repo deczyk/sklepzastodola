@@ -254,13 +254,17 @@
   .historyEntry .who{font-weight:800;color:var(--green)}
   .historyEntry .when{color:var(--text-muted);font-size:12px;margin-left:6px}
   .historyEntry .txt{margin-top:8px;color:var(--text);line-height:1.48;white-space:normal}
+  .historyAudio{margin-top:10px;padding:9px;border:1px solid var(--line);border-radius:10px;background:var(--surface-soft)}
+  .historyAudioTitle{font-size:12px;font-weight:800;color:var(--green);margin-bottom:6px}
+  .historyAudio audio{width:100%;display:block}
+  .audioHint{display:block;margin-top:6px;color:var(--text-muted);font-size:11px;text-transform:none;letter-spacing:0;font-weight:normal}
   .historyMeta{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
   .historyTypeBadge{display:inline-flex;align-items:center;border:1px solid #ead99a;background:#fff8dc;color:#755c15;
                     border-radius:999px;padding:2px 7px;font-size:11px;font-weight:800}
   .historyActions{display:flex;gap:6px;justify-content:flex-end;margin-top:10px;flex-wrap:wrap}
   .historyEditForm{display:grid;gap:8px;margin-top:8px}
   .historyEditGrid,.historyAddGrid{display:grid;grid-template-columns:160px 1fr;gap:8px}
-  .historyEditForm input,.historyEditForm textarea,.historyAdd input,.historyAdd textarea{
+  .historyEditForm input,.historyEditForm textarea,.historyAdd input,.historyAdd textarea,.historyAdd input[type="file"]{
     border:1px solid var(--line);border-radius:8px;padding:8px 10px;font-family:inherit;font-size:13px;background:var(--input-bg);color:var(--text);box-sizing:border-box;width:100%
   }
   .historyEditForm textarea,.historyAdd textarea{min-height:96px;resize:vertical}
@@ -697,6 +701,7 @@
   .quickUpdateNote{display:block;margin-top:8px}
   .quickUpdate label{font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em;font-weight:bold}
   .quickUpdate input,.quickUpdate select,.quickUpdate textarea{width:100%;box-sizing:border-box;border:1px solid var(--border);border-radius:8px;background:var(--input-bg);color:var(--text);padding:7px 9px;font:inherit;margin-top:4px}
+  .quickUpdate input[type="file"]{padding:8px;background:var(--surface)}
   .quickUpdate textarea{min-height:120px;resize:vertical;text-transform:none;letter-spacing:0;font-weight:normal}
   .quickUpdateActions{display:flex;justify-content:flex-end;margin-top:10px}
   .clientCardHistory{border:1px solid var(--line);border-radius:10px;padding:12px;margin-top:12px;background:var(--surface)}
@@ -2052,6 +2057,10 @@
           <input type="text" id="historyNewWho" placeholder="Autor / kto">
         </div>
         <textarea id="historyNewEntry" placeholder="Np. [kontakt] Dzwoniłem, zainteresowany, oddzwaniam za tydzień..."></textarea>
+        <label>Notatka głosowa / nagranie z telefonu
+          <input type="file" id="historyNewAudio" accept="audio/*">
+          <span class="audioHint">Najlepiej krótki plik M4A/MP3 z telefonu. Limit: 2 MB, żeby synchronizacja panelu działała stabilnie.</span>
+        </label>
         <button class="save" onclick="addHistoryEntry()">Dodaj notatkę</button>
       </div>
     </div>
@@ -2925,6 +2934,7 @@ function openHistoryModal(clientId){
 function closeHistoryModal(){
   document.getElementById("historyModal").classList.remove("open");
   document.getElementById("historyNewEntry").value = "";
+  document.getElementById("historyNewAudio").value = "";
   document.getElementById("historyNewDate").value = "";
   document.getElementById("historyNewWho").value = "";
   currentHistoryEditIndex = null;
@@ -2954,6 +2964,44 @@ function parseHistoryText(value){
 
 function historyTextHtml(value){
   return crmEsc(value).replace(/\r?\n/g, "<br>");
+}
+
+const AUDIO_NOTE_MAX_BYTES = 2 * 1024 * 1024;
+
+function readAudioNoteFile(input){
+  const file = input?.files?.[0];
+  if(!file) return Promise.resolve(null);
+  if(!file.type.startsWith("audio/")){
+    input.value = "";
+    return Promise.reject(new Error("Dodaj plik audio, np. nagranie M4A albo MP3."));
+  }
+  if(file.size > AUDIO_NOTE_MAX_BYTES){
+    input.value = "";
+    return Promise.reject(new Error("Nagranie jest za duże. Maksymalny rozmiar notatki głosowej to 2 MB."));
+  }
+  return new Promise((resolve, reject)=>{
+    const reader = new FileReader();
+    reader.onload = () => resolve({
+      audioName: file.name,
+      audioType: file.type || "audio/mpeg",
+      audioSize: file.size,
+      audioData: reader.result
+    });
+    reader.onerror = () => reject(new Error("Nie udało się odczytać nagrania."));
+    reader.readAsDataURL(file);
+  });
+}
+
+function renderHistoryAudio(h){
+  if(!h || !h.audioData) return "";
+  const name = h.audioName || "notatka głosowa";
+  const size = h.audioSize ? ` · ${Math.round(h.audioSize / 1024)} KB` : "";
+  return `
+    <div class="historyAudio">
+      <div class="historyAudioTitle">Notatka głosowa: ${crmEsc(name)}${crmEsc(size)}</div>
+      <audio controls preload="metadata" src="${crmEsc(h.audioData)}"></audio>
+    </div>
+  `;
 }
 
 function renderHistoryTimeline(c, editable=false){
@@ -2989,6 +3037,7 @@ function renderHistoryTimeline(c, editable=false){
           <span class="when">${crmEsc(formatDT(h.data))}</span>
         </div>
         <div class="txt">${historyTextHtml(parsed.text || "")}</div>
+        ${renderHistoryAudio(h)}
         ${editable ? `<div class="historyActions">
           <button class="histBtn" onclick="editHistoryEntry(${index})">Edytuj</button>
           <button class="delBtn" onclick="deleteHistoryEntry(${index})">Usuń</button>
@@ -3158,6 +3207,10 @@ function renderQuickClientUpdate(c){
         <label>Kto<input data-quick-field="who" value="${crmEsc(getWhoAmI())}"></label>
       </div>
       <label class="quickUpdateNote">Notatka<textarea data-quick-field="note" placeholder="Wpisz notatkę dokładnie tak, jak chcesz ją widzieć w historii kontaktu."></textarea></label>
+      <label class="quickUpdateNote">Notatka głosowa / nagranie z telefonu
+        <input type="file" data-quick-field="audio" accept="audio/*">
+        <span class="audioHint">Możesz wkleić nagranie rozmowy z telefonu. Limit: 2 MB, żeby synchronizacja panelu działała stabilnie.</span>
+      </label>
       <div class="quickUpdateActions">
         <button class="save" onclick="saveQuickClientUpdate('${crmEsc(c.id)}')">Dodaj notatkę</button>
       </div>
@@ -3170,7 +3223,7 @@ function renderHistoryEntries(c){
   el.innerHTML = renderHistoryTimeline(c, true);
 }
 
-function saveQuickClientUpdate(clientId){
+async function saveQuickClientUpdate(clientId){
   const c = data.klienci.find(x=>x.id===clientId);
   const form = document.querySelector(`.quickUpdate [data-quick-field="note"]`)?.closest(".quickUpdate");
   if(!c || !form) return;
@@ -3178,9 +3231,16 @@ function saveQuickClientUpdate(clientId){
   const who = get("who") || getWhoAmI();
   const date = get("date");
   const note = get("note");
-  if(!note) return alert("Wpisz notatkę do historii klienta.");
+  const audioInput = form.querySelector(`[data-quick-field="audio"]`);
+  let audio = null;
+  try{
+    audio = await readAudioNoteFile(audioInput);
+  }catch(err){
+    return alert(err.message || "Nie udało się dodać nagrania.");
+  }
+  if(!note && !audio) return alert("Wpisz notatkę albo dodaj notatkę głosową.");
   if(!Array.isArray(c.historia)) c.historia = [];
-  c.historia.push({tekst: note, kto: who, data: historyDateValue(date)});
+  c.historia.push({tekst: note || "[notatka głosowa]", kto: who, data: historyDateValue(date), ...(audio || {})});
   const automation = inferClientAutomation(note, c);
   c.zaktualizowano = new Date().toISOString();
   logActivity(`dodał(a) ręczną notatkę klienta „${c.firma||c.osoba||'bez nazwy'}”${automation.length ? ` i panel ustawił: ${automation.join(", ")}` : ""}`);
@@ -3189,21 +3249,30 @@ function saveQuickClientUpdate(clientId){
   openClientCard(clientId);
 }
 
-function addHistoryEntry(){
+async function addHistoryEntry(){
   const ta = document.getElementById("historyNewEntry");
   const whoEl = document.getElementById("historyNewWho");
   const dateEl = document.getElementById("historyNewDate");
+  const audioEl = document.getElementById("historyNewAudio");
   const tekst = ta.value.trim();
-  if(!tekst || !currentHistoryClientId) return;
+  if(!currentHistoryClientId) return;
   const c = data.klienci.find(x=>x.id===currentHistoryClientId);
   if(!c) return;
+  let audio = null;
+  try{
+    audio = await readAudioNoteFile(audioEl);
+  }catch(err){
+    return alert(err.message || "Nie udało się dodać nagrania.");
+  }
+  if(!tekst && !audio) return alert("Wpisz notatkę albo dodaj notatkę głosową.");
   if(!c.historia) c.historia = [];
-  c.historia.push({tekst, kto: (whoEl.value || getWhoAmI()).trim(), data: historyDateValue(dateEl.value)});
+  c.historia.push({tekst: tekst || "[notatka głosowa]", kto: (whoEl.value || getWhoAmI()).trim(), data: historyDateValue(dateEl.value), ...(audio || {})});
   const automation = inferClientAutomation(tekst, c);
   c.zaktualizowano = new Date().toISOString();
   logActivity(`dodał(a) notatkę w historii kontaktu klienta „${c.firma||c.osoba||'bez nazwy'}”${automation.length ? ` i panel ustawił: ${automation.join(", ")}` : ""}`);
   saveData();
   ta.value = "";
+  audioEl.value = "";
   dateEl.value = todayInputValue();
   whoEl.value = getWhoAmI();
   renderHistoryEntries(c);
@@ -3230,7 +3299,7 @@ function saveHistoryEntryEdit(index){
   const who = document.getElementById(`historyEditWho-${index}`).value.trim();
   const date = document.getElementById(`historyEditDate-${index}`).value;
   if(!text) return;
-  c.historia[index] = {tekst:text, kto:who || "Import", data:historyDateValue(date)};
+  c.historia[index] = {...c.historia[index], tekst:text, kto:who || "Import", data:historyDateValue(date)};
   c.zaktualizowano = new Date().toISOString();
   currentHistoryEditIndex = null;
   saveData();
