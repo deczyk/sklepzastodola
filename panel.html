@@ -1075,6 +1075,182 @@
     .clientsMobileCards{display:grid;gap:10px}
   }
 
+  /* --- Mobile usability layer --- */
+  @media(max-width:760px){
+    html,body{width:100%;max-width:100%;overflow-x:hidden}
+    body{font-size:14px}
+    #gate{padding:16px}
+    .gateBox{width:min(100%,360px);padding:28px 22px}
+    header{display:grid;grid-template-columns:auto 1fr;gap:10px 12px;padding:14px 14px 12px}
+    header .logo{width:38px;height:38px}
+    header h1{font-size:18px;line-height:1.2}
+    header p{font-size:12px;line-height:1.35}
+    #syncStatus{grid-column:1/-1;margin:2px 0 0 !important;order:3;font-size:11px !important}
+    header .lockBtn,
+    header .themeToggleGroup{order:4}
+    header .lockBtn{justify-content:center;text-align:center;padding:7px 10px;font-size:12px}
+    header .themeToggleGroup{width:max-content}
+    .wrap{width:100%;padding:14px 10px 36px}
+    .statsBar{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+    .statCard{min-width:0;padding:10px 12px}
+    .section{padding:15px 12px;margin-bottom:14px;border-radius:12px}
+    .section h2{align-items:flex-start;gap:10px;flex-wrap:wrap;line-height:1.25}
+    .section h2 .addBtn{margin-left:auto}
+    .whoRow{width:100%;justify-content:space-between;gap:10px;margin-bottom:12px}
+    .whoRow select{min-width:120px}
+    .navShell{gap:8px;margin-bottom:12px}
+    .mainCategoryNav,
+    .subCategoryNav,
+    .crmViewToggle,
+    .salesMenu{
+      flex-wrap:nowrap;
+      overflow-x:auto;
+      -webkit-overflow-scrolling:touch;
+      scroll-snap-type:x proximity;
+      scrollbar-width:none;
+    }
+    .mainCategoryNav::-webkit-scrollbar,
+    .subCategoryNav::-webkit-scrollbar,
+    .crmViewToggle::-webkit-scrollbar,
+    .salesMenu::-webkit-scrollbar{display:none}
+    .mainCategoryBtn,
+    .subCategoryBtn,
+    .crmViewBtn{white-space:nowrap;scroll-snap-align:start}
+    .mainCategoryBtn{padding:9px 12px}
+    .subCategoryBtn,.crmViewBtn{padding:8px 10px}
+    .dashGrid{gap:10px}
+    .dashCard{min-height:auto;padding:14px}
+    .dashHero{min-height:112px}
+    .dashHero:after{right:-26px;top:22px;width:100px;height:100px}
+    .dashHeroTitle{font-size:24px;line-height:1.15;max-width:calc(100% - 54px)}
+    .dashHeroSub{font-size:13px}
+    .dashKpiRow{gap:10px}
+    .dashKpiCard{padding:13px 14px;min-height:84px}
+    .dashKpiCard .num{font-size:24px}
+    .dashKpiCard .hint{font-size:11.5px}
+    .fbReminder{width:100%;max-width:none;padding:14px}
+    .fbReminderTitle{font-size:15px}
+    .commandHeader{gap:10px}
+    .commandCounters{min-width:0;width:100%;grid-template-columns:repeat(2,minmax(0,1fr))}
+    .commandCounter{padding:9px 10px}
+    .commandClientTop,
+    .notifyTop,
+    .clientDirectoryTop,
+    .kanbanTop,
+    .clientMobileTop,
+    .clientCardTop,
+    .clientDocTop,
+    .offerTop{flex-direction:column}
+    .clientCardBadges{justify-content:flex-start}
+    .notifyHead,
+    .clientCardHistoryHead,
+    .clientDocsHead,
+    .clientOffersHead,
+    .quickUpdateHead{align-items:flex-start;flex-direction:column}
+    .clientsDirectory,
+    .clientsKanban,
+    .vendorGrid,
+    .priceGrid,
+    .mailTemplateGrid,
+    .linksGrid,
+    .docFilterBar,
+    .docQuickEdit,
+    .settingsGrid,
+    .backupStats,
+    .capacityGrid{grid-template-columns:1fr}
+    .clientsDirectory{gap:10px}
+    .clientDirectoryCard,
+    .clientMobileCard,
+    .kanbanCard,
+    .commandClientCard,
+    .notifyCard{padding:12px}
+    .crmViewBar{display:grid;gap:8px}
+    .crmViewToggle{width:100%}
+    .crmHint{line-height:1.4}
+    .filterRow,
+    .docToolbar,
+    .docDriveIntro,
+    .backupActions,
+    .newItemForm .row,
+    .newItemForm .actions,
+    .mailTemplateActions,
+    .offerActions,
+    .quickUpdateActions,
+    .clientDangerZone,
+    .themeSwitchRow,
+    .salesActions{flex-direction:column;align-items:stretch}
+    .filterRow select,
+    .filterRow input,
+    .docToolbar .docSearch,
+    .docSearch,
+    .newItemForm input,
+    .newItemForm select,
+    .loanCalcInputs input,
+    .backupActions input,
+    .salesGoalInput input{width:100%;min-width:0}
+    .docActionBtn,
+    .importBtn,
+    .histBtn,
+    .doneBtn,
+    .dangerBtn,
+    .priceBtn,
+    .salesActions button,
+    .quickUpdateActions button,
+    .offerActions button,
+    .newItemForm button{width:100%;justify-content:center;text-align:center}
+    .fileCard{display:flex;width:100%;padding:10px;align-items:flex-start}
+    .fileThumb{width:46px;height:56px}
+    .previewModal{align-items:stretch;justify-content:stretch;padding:0}
+    .previewBox,
+    .historyBox,
+    .clientCardBox{width:100vw;max-width:100vw;height:100dvh;max-height:100dvh;border-radius:0;padding:58px 12px 18px}
+    .previewClose{top:10px;right:10px}
+    .historyEditGrid,
+    .historyAddGrid,
+    .quickUpdateGrid,
+    .offerFormGrid,
+    .clientCardGrid{grid-template-columns:1fr}
+    .historyEntry,
+    .clientCardHistory,
+    .clientDocs,
+    .clientOffers,
+    .quickUpdate{padding:10px}
+    .historyMeta,
+    .clientDocMeta,
+    .offerMeta,
+    .commandBadges,
+    .clientMobileContact,
+    .clientMobileActions,
+    .clientDirectoryActions{gap:6px}
+    .followItem{gap:7px}
+    .actionTable{display:block;overflow-x:auto;-webkit-overflow-scrolling:touch}
+    .actionTable th,
+    .actionTable td{min-width:150px}
+    .goalProgress{gap:6px}
+    .pricePreview img{min-width:640px}
+    .salesLayout{gap:10px}
+    .salesDoc{max-height:none}
+  }
+  @media(max-width:430px){
+    header{grid-template-columns:1fr 1fr}
+    header .logo{display:none}
+    header > div:not(.themeToggleGroup){grid-column:1/-1}
+    header .themeToggleGroup{grid-column:1/-1}
+    header .lockBtn:last-child{grid-column:1/-1}
+    header .lockBtn,
+    header .themeToggleGroup{width:100%}
+    .themeToggleGroup button{flex:1}
+    .statsBar{grid-template-columns:1fr}
+    .dashHeroTitle{font-size:22px;max-width:100%}
+    .dashHero:after{display:none}
+    .dashKpiRow,
+    .commandCounters{grid-template-columns:1fr}
+    .mainCategoryNav,
+    .subCategoryNav{border-radius:12px;margin-left:-2px;margin-right:-2px}
+    .clientDirectoryName,
+    .clientMobileName{font-size:14px}
+  }
+
 </style>
 </head>
 <body>
