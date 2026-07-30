@@ -43,7 +43,17 @@
 .company-details h3 { font-size: .9rem; text-transform: uppercase; letter-spacing: .08em; color: var(--wheat); margin-bottom: .75rem; }
 .company-details p { font-size: .86rem; color: var(--muted); line-height: 1.7; margin: 0; }
 .company-details strong { color: var(--ink); font-weight: 800; }
+.regional-offices .sec-title { max-width: 760px; margin-left: auto; margin-right: auto; text-align: center; }
+.regional-offices .sec-body { max-width: 780px; margin: .9rem auto 0; text-align: center; }
+.regional-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; margin-top: 2.4rem; }
+.regional-card { min-height: 132px; padding: 1.2rem 1.25rem; background: var(--paper); border: 1px solid var(--line); border-radius: var(--r-lg); box-shadow: var(--shadow); }
+.regional-card h3 { font-size: .92rem; margin-bottom: .55rem; color: var(--forest); }
+.regional-card p { margin: 0; font-size: .84rem; line-height: 1.65; color: var(--dim); }
+.regional-source { max-width: 780px; margin: 1.4rem auto 0; text-align: center; font-size: .78rem; line-height: 1.6; color: var(--muted); }
+.regional-source a { color: var(--forest); font-weight: 800; text-decoration: underline; text-underline-offset: 3px; }
+@media(max-width:980px){ .regional-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media(max-width:860px){ .contact-layout { grid-template-columns: 1fr; gap: 3rem; } }
+@media(max-width:620px){ .regional-grid { grid-template-columns: 1fr; } .regional-card { min-height: auto; } }
 </style>
 <script type="application/ld+json">
 {
@@ -224,7 +234,62 @@
         Gadamy o Twoim gospodarstwie — ile mleka, co jeszcze chciałbyś sprzedawać, gdzie stoi działka. Sprawdzamy możliwości finansowania inwestycji. Nic nie podpisujesz. Zero zobowiązań.</p>
       </div>
     </div>
+</div>
+</section>
+
+<section class="sec sec-alt regional-offices" id="biura-regionalne">
+<div class="wrap">
+  <p class="sec-label" data-r="fade">Adresy regionalne</p>
+  <h2 class="sec-title" data-r>11 biur regionalnych w Polsce</h2>
+  <p class="sec-body" data-r data-d="1">Działamy ogólnopolsko. Poza głównym adresem spółki w Katowicach korzystamy z sieci adresów regionalnych, żeby wygodnie obsługiwać korespondencję i formalności z różnych części Polski.</p>
+  <div class="regional-grid" data-r data-d="2">
+    <article class="regional-card">
+      <h3>Katowice</h3>
+      <p>ul. Warszawska 40/2A<br>40-008 Katowice</p>
+    </article>
+    <article class="regional-card">
+      <h3>Warszawa</h3>
+      <p>ul. Hoża 86 lok. 410<br>00-682 Warszawa</p>
+    </article>
+    <article class="regional-card">
+      <h3>Wrocław</h3>
+      <p>ul. Marsz. Józefa Piłsudskiego 74 lok. 320<br>50-020 Wrocław</p>
+    </article>
+    <article class="regional-card">
+      <h3>Kraków</h3>
+      <p>ul. Szlak 77/222<br>31-153 Kraków</p>
+    </article>
+    <article class="regional-card">
+      <h3>Poznań</h3>
+      <p>ul. Św. Marcin 29/8, 61-806 Poznań<br>ul. Juliusza Słowackiego 42/2, 60-822 Poznań</p>
+    </article>
+    <article class="regional-card">
+      <h3>Gdańsk</h3>
+      <p>ul. Jana Heweliusza 11/811<br>80-890 Gdańsk</p>
+    </article>
+    <article class="regional-card">
+      <h3>Lublin</h3>
+      <p>ul. Kowalska 5/203<br>20-115 Lublin</p>
+    </article>
+    <article class="regional-card">
+      <h3>Rzeszów</h3>
+      <p>ul. Jana i Jędrzeja Śniadeckich 20D/7<br>35-006 Rzeszów</p>
+    </article>
+    <article class="regional-card">
+      <h3>Łódź</h3>
+      <p>ul. Prezydenta Gabriela Narutowicza 40/1<br>90-135 Łódź</p>
+    </article>
+    <article class="regional-card">
+      <h3>Szczecin</h3>
+      <p>ul. Władysława Łokietka 5/2<br>70-254 Szczecin</p>
+    </article>
+    <article class="regional-card">
+      <h3>Bydgoszcz</h3>
+      <p>ul. Warszawska 25/201<br>85-058 Bydgoszcz</p>
+    </article>
   </div>
+  <p class="regional-source" data-r data-d="3">Lista adresów regionalnych na podstawie sieci Biuro29. Aktualne dane źródłowe: <a href="https://biuro29.pl/" target="_blank" rel="noopener">biuro29.pl</a>.</p>
+</div>
 </section>
 
 <footer class="footer">
