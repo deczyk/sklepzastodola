@@ -258,6 +258,8 @@
   .historyAudioTitle{font-size:12px;font-weight:800;color:var(--green);margin-bottom:6px}
   .historyAudio audio{width:100%;display:block}
   .audioHint{display:block;margin-top:6px;color:var(--text-muted);font-size:11px;text-transform:none;letter-spacing:0;font-weight:normal}
+  .audioTools{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:8px}
+  .audioStatus{font-size:12px;color:var(--text-muted);text-transform:none;letter-spacing:0;font-weight:normal}
   .historyMeta{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
   .historyTypeBadge{display:inline-flex;align-items:center;border:1px solid #ead99a;background:#fff8dc;color:#755c15;
                     border-radius:999px;padding:2px 7px;font-size:11px;font-weight:800}
@@ -2061,6 +2063,10 @@
           <input type="file" id="historyNewAudio" accept="audio/*">
           <span class="audioHint">Najlepiej krótki plik M4A/MP3 z telefonu. Limit: 2 MB, żeby synchronizacja panelu działała stabilnie.</span>
         </label>
+        <div class="audioTools">
+          <button class="histBtn" type="button" onclick="transcribeHistoryAudio(this)">Transkrybuj nagranie</button>
+          <span class="audioStatus" id="historyAudioStatus"></span>
+        </div>
         <button class="save" onclick="addHistoryEntry()">Dodaj notatkę</button>
       </div>
     </div>
@@ -2935,6 +2941,7 @@ function closeHistoryModal(){
   document.getElementById("historyModal").classList.remove("open");
   document.getElementById("historyNewEntry").value = "";
   document.getElementById("historyNewAudio").value = "";
+  document.getElementById("historyAudioStatus").textContent = "";
   document.getElementById("historyNewDate").value = "";
   document.getElementById("historyNewWho").value = "";
   currentHistoryEditIndex = null;
@@ -2967,6 +2974,7 @@ function historyTextHtml(value){
 }
 
 const AUDIO_NOTE_MAX_BYTES = 2 * 1024 * 1024;
+const AUDIO_TRANSCRIPTION_MAX_BYTES = 8 * 1024 * 1024;
 
 function readAudioNoteFile(input){
   const file = input?.files?.[0];
@@ -2990,6 +2998,92 @@ function readAudioNoteFile(input){
     reader.onerror = () => reject(new Error("Nie udało się odczytać nagrania."));
     reader.readAsDataURL(file);
   });
+}
+
+function readAudioFileForTranscription(input){
+  const file = input?.files?.[0];
+  if(!file) return Promise.reject(new Error("Najpierw wybierz nagranie z telefonu."));
+  if(!file.type.startsWith("audio/")){
+    input.value = "";
+    return Promise.reject(new Error("Dodaj plik audio, np. nagranie M4A albo MP3."));
+  }
+  if(file.size > AUDIO_TRANSCRIPTION_MAX_BYTES){
+    return Promise.reject(new Error("Nagranie jest za duże do transkrypcji w panelu. Maksymalny rozmiar to 8 MB."));
+  }
+  return new Promise((resolve, reject)=>{
+    const reader = new FileReader();
+    reader.onload = () => resolve({
+      name: file.name,
+      mimeType: file.type || "audio/mpeg",
+      size: file.size,
+      contentBase64: reader.result
+    });
+    reader.onerror = () => reject(new Error("Nie udało się odczytać nagrania."));
+    reader.readAsDataURL(file);
+  });
+}
+
+function appendTranscriptionToTextarea(textarea, text){
+  const clean = String(text || "").trim();
+  if(!textarea || !clean) return;
+  const current = textarea.value.trim();
+  textarea.value = current ? `${current}\n\n[transkrypcja]\n${clean}` : clean;
+  textarea.focus();
+}
+
+async function transcribeAudioToTextarea(input, textarea, statusEl, button){
+  if(!input || !textarea) return;
+  const originalText = button ? button.textContent : "";
+  try{
+    if(statusEl) statusEl.textContent = "Transkrybuję nagranie...";
+    if(button){
+      button.disabled = true;
+      button.textContent = "Transkrypcja...";
+    }
+    const audio = await readAudioFileForTranscription(input);
+    const response = await fetch("/api/transcribe-audio", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Panel-Password": getPanelPassword()
+      },
+      body: JSON.stringify(audio)
+    });
+    const json = await response.json().catch(() => ({}));
+    if(!response.ok) throw new Error(json.message || json.error || "Nie udało się zrobić transkrypcji.");
+    appendTranscriptionToTextarea(textarea, json.text || "");
+    if(audio.size > AUDIO_NOTE_MAX_BYTES) input.value = "";
+    if(statusEl) statusEl.textContent = audio.size > AUDIO_NOTE_MAX_BYTES
+      ? "Gotowe. Tekst dopisany; dłuższy plik nie został zapisany jako audio."
+      : "Gotowe. Tekst dopisany do notatki.";
+  }catch(err){
+    if(statusEl) statusEl.textContent = err.message || "Nie udało się zrobić transkrypcji.";
+  }finally{
+    if(button){
+      button.disabled = false;
+      button.textContent = originalText || "Transkrybuj nagranie";
+    }
+  }
+}
+
+function transcribeHistoryAudio(button){
+  transcribeAudioToTextarea(
+    document.getElementById("historyNewAudio"),
+    document.getElementById("historyNewEntry"),
+    document.getElementById("historyAudioStatus"),
+    button
+  );
+}
+
+function transcribeQuickUpdateAudio(button){
+  const form = button?.closest(".quickUpdate");
+  if(!form) return;
+  transcribeAudioToTextarea(
+    form.querySelector(`[data-quick-field="audio"]`),
+    form.querySelector(`[data-quick-field="note"]`),
+    form.querySelector(`[data-quick-field="audioStatus"]`),
+    button
+  );
 }
 
 function renderHistoryAudio(h){
@@ -3211,6 +3305,10 @@ function renderQuickClientUpdate(c){
         <input type="file" data-quick-field="audio" accept="audio/*">
         <span class="audioHint">Możesz wkleić nagranie rozmowy z telefonu. Limit: 2 MB, żeby synchronizacja panelu działała stabilnie.</span>
       </label>
+      <div class="audioTools">
+        <button class="histBtn" type="button" onclick="transcribeQuickUpdateAudio(this)">Transkrybuj nagranie</button>
+        <span class="audioStatus" data-quick-field="audioStatus"></span>
+      </div>
       <div class="quickUpdateActions">
         <button class="save" onclick="saveQuickClientUpdate('${crmEsc(c.id)}')">Dodaj notatkę</button>
       </div>
