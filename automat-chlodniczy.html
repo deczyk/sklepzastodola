@@ -52,11 +52,19 @@
 .cooler-capacity-card span{display:block;color:var(--muted);font-size:.82rem;line-height:1.55}
 .cooler-note{margin-top:2rem;background:var(--wheat-bg);border:1px solid rgba(155,122,58,.25);border-radius:var(--r-lg);padding:1.45rem 1.6rem;color:var(--muted);font-size:.94rem;line-height:1.72}
 .cooler-note strong{color:var(--ink)}
-.sielaff-range{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem;margin-top:2.3rem}
-.sielaff-range-card{background:var(--paper);border:1px solid var(--line);border-radius:var(--r-lg);padding:1.35rem;box-shadow:var(--shadow)}
+.sielaff-range{display:grid;gap:1.25rem;margin-top:2.3rem}
+.sielaff-range-card{display:grid;grid-template-columns:minmax(260px,.75fr) minmax(0,1.25fr);background:var(--paper);border:1px solid var(--line);border-radius:var(--r-lg);box-shadow:var(--shadow);overflow:hidden}
+.sielaff-product-media{background:linear-gradient(180deg,#fff,var(--bg));border-right:1px solid var(--line);min-height:270px;display:flex;align-items:center;justify-content:center;padding:1rem}
+.sielaff-product-media img{width:100%;height:250px;object-fit:contain;object-position:center;display:block}
+.sielaff-product-body{padding:1.35rem 1.45rem}
 .sielaff-range-card b{display:inline-flex;margin-bottom:.7rem;padding:.26rem .68rem;border-radius:999px;background:var(--sage);color:var(--forest);font-size:.68rem;letter-spacing:.1em;text-transform:uppercase}
-.sielaff-range-card h3{font-size:1.15rem;color:var(--ink);line-height:1.2;margin-bottom:.55rem}
-.sielaff-range-card p{color:var(--muted);font-size:.9rem;line-height:1.68}
+.sielaff-range-card h3{font-size:1.3rem;color:var(--ink);line-height:1.2;margin-bottom:.6rem}
+.sielaff-range-card p{color:var(--muted);font-size:.92rem;line-height:1.7}
+.sielaff-range-card ul{display:grid;gap:.45rem;margin:1rem 0 0;padding:0;list-style:none}
+.sielaff-range-card li{position:relative;padding-left:1.15rem;color:var(--muted);font-size:.87rem;line-height:1.5}
+.sielaff-range-card li::before{content:"";position:absolute;left:0;top:.55rem;width:6px;height:6px;border-radius:50%;background:var(--forest)}
+.sielaff-product-fit{display:flex;flex-wrap:wrap;gap:.45rem;margin-top:1rem}
+.sielaff-product-fit span{display:inline-flex;align-items:center;border:1px solid rgba(45,90,39,.18);background:var(--sage);color:var(--forest);border-radius:999px;padding:.28rem .58rem;font-size:.74rem;font-weight:800}
 .sielaff-detail-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1rem;margin-top:2rem}
 .sielaff-detail-grid figure{background:var(--paper);border:1px solid var(--line);border-radius:var(--r-lg);overflow:hidden;box-shadow:var(--shadow)}
 .sielaff-detail-grid img{width:100%;height:240px;object-fit:cover;object-position:center}
@@ -67,7 +75,10 @@
   .cooler-grid{grid-template-columns:1fr}
   .cooler-specs{grid-template-columns:1fr}
   .cooler-capacity{grid-template-columns:1fr}
-  .sielaff-range,.sielaff-detail-grid{grid-template-columns:1fr}
+  .sielaff-range-card{grid-template-columns:1fr}
+  .sielaff-product-media{border-right:0;border-bottom:1px solid var(--line);min-height:230px}
+  .sielaff-product-media img{height:220px}
+  .sielaff-detail-grid{grid-template-columns:1fr}
 }
 </style>
 <script type="application/ld+json">
@@ -155,12 +166,110 @@
   </div>
 
   <div class="sielaff-range">
-    <article class="sielaff-range-card" data-r data-d="1"><b>SiLine Snack & Combi</b><h3>Nabiał, jaja, butelki i produkty paczkowane</h3><p>Najważniejsza rodzina dla sprzedaży bezpośredniej: produkty świeże, butelki, soki, jogurty, sery, masło, przetwory i gotowe zestawy w jednym punkcie 24/7.</p></article>
-    <article class="sielaff-range-card" data-r data-d="2"><b>SN48 / fresh food</b><h3>Produkty chłodzone i delikatne</h3><p>Warianty pod produkty wymagające kontrolowanej temperatury i ostrożnego wydania: sery, jogurty, masło, dania gotowe, produkty w pudełkach i opakowania delikatne.</p></article>
-    <article class="sielaff-range-card" data-r data-d="3"><b>Robimat X / napoje</b><h3>Zimne napoje, butelki i puszki</h3><p>Dobre rozszerzenie punktu, jeśli gospodarstwo ma większy ruch albo chce sprzedawać soki, napoje, wodę, kefiry lub produkty w butelkach i puszkach.</p></article>
-    <article class="sielaff-range-card" data-r data-d="4"><b>Outdoor / RO</b><h3>Automat do pracy przy gospodarstwie</h3><p>Rozwiązania do ustawienia w pawilonie lub na zewnątrz, z zabezpieczoną elektroniką, ochroną przed bryzgami, ochroną antywłamaniową i opcjami pracy całorocznej.</p></article>
-    <article class="sielaff-range-card" data-r data-d="5"><b>Hot drinks</b><h3>Kawa i gorące napoje</h3><p>Opcja przy większym ruchu: punkt przy gospodarstwie może sprzedawać nie tylko produkty na wynos, ale też prosty napój dla klientów w trasie.</p></article>
-    <article class="sielaff-range-card" data-r data-d="6"><b>SiLoop / zwroty</b><h3>Obieg opakowań i butelek</h3><p>Rozwiązania reverse vending mogą wspierać system zwrotów i powtarzalnych zakupów, jeśli gospodarstwo chce budować stały obieg butelek lub opakowań.</p></article>
+    <article class="sielaff-range-card" data-r data-d="1">
+      <figure class="sielaff-product-media"><img src="sielaff-combi-spiral.jpg" alt="Automat Sielaff SiLine Snack & Combi"></figure>
+      <div class="sielaff-product-body">
+        <b>SiLine Snack & Combi</b>
+        <h3>Najbardziej uniwersalny automat do produktów z gospodarstwa</h3>
+        <p>To pierwszy wariant, który zwykle warto rozważyć przy sprzedaży bezpośredniej. Pozwala łączyć różne formaty produktów: butelki, kubki, pudełka, paczki, gotowe zestawy i produkty chłodzone, jeśli konfiguracja jest dobrana pod konkretny asortyment.</p>
+        <ul>
+          <li>Dobre rozwiązanie na sery, jogurty, masło, jaja, soki, przetwory i butelki.</li>
+          <li>Możliwy układ spiralny albo z popychaczami, zależnie od opakowania.</li>
+          <li>Pasuje jako drugi automat obok mlekomatu BRUNIMAT.</li>
+        </ul>
+        <div class="sielaff-product-fit"><span>nabiał</span><span>jaja</span><span>butelki</span><span>przetwory</span><span>gotowe zestawy</span></div>
+      </div>
+    </article>
+
+    <article class="sielaff-range-card" data-r data-d="2">
+      <figure class="sielaff-product-media"><img src="sielaff-siline-line.jpg" alt="Automaty Sielaff SiLine"></figure>
+      <div class="sielaff-product-body">
+        <b>SiLine series</b>
+        <h3>Elegancka linia do widocznego punktu sprzedaży</h3>
+        <p>Rodzina SiLine jest dobrym kierunkiem, gdy automat ma stać w estetycznym pawilonie, być widoczny dla klientów i wyglądać jak część profesjonalnego sklepu przy gospodarstwie, a nie przypadkowe urządzenie ustawione obok budynku.</p>
+        <ul>
+          <li>Najlepsza do projektów, gdzie liczy się wygląd punktu i marka gospodarstwa.</li>
+          <li>Może wspierać sprzedaż produktów paczkowanych, napojów i produktów świeżych.</li>
+          <li>Dobrze pasuje do pawilonu z oznaczeniem, instrukcjami i monitoringiem.</li>
+        </ul>
+        <div class="sielaff-product-fit"><span>punkt premium</span><span>pawilon</span><span>ekspozycja</span><span>marka gospodarstwa</span></div>
+      </div>
+    </article>
+
+    <article class="sielaff-range-card" data-r data-d="3">
+      <figure class="sielaff-product-media"><img src="sielaff-cold-drinks.jpg" alt="Automaty Sielaff do zimnych napojów"></figure>
+      <div class="sielaff-product-body">
+        <b>Cold drinks / Robimat X / SiLine GF</b>
+        <h3>Zimne napoje, soki, kefiry, butelki i puszki</h3>
+        <p>Ten kierunek ma sens przy większym ruchu albo gdy gospodarstwo chce sprzedawać nie tylko mleko, ale też napoje i produkty w butelkach. Może być dodatkiem do punktu przy drodze, przy trasie rowerowej, przy gospodarstwie agroturystycznym albo w miejscu z ruchem lokalnym.</p>
+        <ul>
+          <li>Pod soki, wodę, napoje, kefiry, maślanki, produkty w butelkach i puszkach.</li>
+          <li>Duża ekspozycja pomaga klientowi szybko zobaczyć, co jest dostępne.</li>
+          <li>Może zwiększać koszyk zakupowy przy okazji zakupu mleka lub jaj.</li>
+        </ul>
+        <div class="sielaff-product-fit"><span>soki</span><span>napoje</span><span>kefiry</span><span>butelki</span><span>większy ruch</span></div>
+      </div>
+    </article>
+
+    <article class="sielaff-range-card" data-r data-d="4">
+      <figure class="sielaff-product-media"><img src="sielaff-outdoor-series.jpg" alt="Automaty Sielaff Outdoor"></figure>
+      <div class="sielaff-product-body">
+        <b>Outdoor series</b>
+        <h3>Automaty do pracy przy drodze i na zewnątrz</h3>
+        <p>Wariant outdoor jest ważny wtedy, gdy automat ma pracować w trudniejszych warunkach: przy drodze, pod zadaszeniem, w półotwartym punkcie albo tam, gdzie klient ma mieć dostęp 24/7 bez wchodzenia do budynku.</p>
+        <ul>
+          <li>Dach, zabezpieczenia, ochrona elektroniki i konstrukcja przygotowana pod warunki zewnętrzne.</li>
+          <li>Dobry wybór do pawilonu otwartego, wiaty albo punktu przy wjeździe.</li>
+          <li>Pomaga utrzymać sprzedaż także poza godzinami obecności gospodarza.</li>
+        </ul>
+        <div class="sielaff-product-fit"><span>outdoor</span><span>droga</span><span>pawilon</span><span>24/7</span><span>zabezpieczenia</span></div>
+      </div>
+    </article>
+
+    <article class="sielaff-range-card" data-r data-d="5">
+      <figure class="sielaff-product-media"><img src="sielaff-public-series.jpg" alt="Automaty Sielaff Public Series"></figure>
+      <div class="sielaff-product-body">
+        <b>SiLine Public series</b>
+        <h3>Wzmocnione automaty do miejsc bardziej narażonych</h3>
+        <p>Jeśli punkt ma stać w miejscu publicznym, przy ruchliwej drodze albo tam, gdzie urządzenie może być bardziej narażone na uszkodzenia, warto rozważyć serię o mocniejszej konstrukcji i większej odporności.</p>
+        <ul>
+          <li>Do lokalizacji z większym ruchem i mniejszą kontrolą właściciela.</li>
+          <li>Przydatne przy punktach ogólnodostępnych przez całą dobę.</li>
+          <li>Dobór zależy od miejsca, ryzyka wandalizmu i sposobu zabezpieczenia pawilonu.</li>
+        </ul>
+        <div class="sielaff-product-fit"><span>ruch publiczny</span><span>wzmocnienie</span><span>bezpieczeństwo</span><span>całodobowo</span></div>
+      </div>
+    </article>
+
+    <article class="sielaff-range-card" data-r data-d="6">
+      <figure class="sielaff-product-media"><img src="sielaff-hot-drinks.jpg" alt="Automaty Sielaff do gorących napojów"></figure>
+      <div class="sielaff-product-body">
+        <b>Hot drinks</b>
+        <h3>Kawa i gorące napoje jako rozszerzenie punktu</h3>
+        <p>To nie jest pierwszy wybór dla każdego gospodarstwa, ale przy miejscu z większym ruchem może być ciekawym dodatkiem. Klient kupuje mleko, jaja albo sery, a przy okazji może wziąć kawę lub gorący napój.</p>
+        <ul>
+          <li>Najbardziej sensowne przy punktach z ruchem porannym albo turystycznym.</li>
+          <li>Może działać jako dodatek do większego sklepu farmerskiego 24/7.</li>
+          <li>Nie dobieramy go automatycznie — tylko jeśli pasuje do miejsca i klientów.</li>
+        </ul>
+        <div class="sielaff-product-fit"><span>kawa</span><span>ruch poranny</span><span>agroturystyka</span><span>większy punkt</span></div>
+      </div>
+    </article>
+
+    <article class="sielaff-range-card" data-r data-d="7">
+      <figure class="sielaff-product-media"><img src="sielaff-sione.jpg" alt="Automaty zwrotne Sielaff SiOne"></figure>
+      <div class="sielaff-product-body">
+        <b>SiOne / reverse vending</b>
+        <h3>Zwroty opakowań i wsparcie obiegu butelek</h3>
+        <p>Rozwiązania zwrotne są ciekawym kierunkiem dla gospodarstw, które chcą budować powtarzalny obieg opakowań albo w przyszłości pracować mocniej na butelkach zwrotnych. To element bardziej zaawansowanego punktu, nie obowiązkowy start.</p>
+        <ul>
+          <li>Pomaga porządkować zwroty butelek, puszek lub opakowań w zależności od systemu.</li>
+          <li>Może wspierać stałych klientów i powtarzalne zakupy.</li>
+          <li>Ma sens dopiero po ustaleniu modelu sprzedaży, opakowań i logistyki zwrotów.</li>
+        </ul>
+        <div class="sielaff-product-fit"><span>zwroty</span><span>butelki</span><span>obieg opakowań</span><span>stali klienci</span></div>
+      </div>
+    </article>
   </div>
 
   <div class="sielaff-detail-grid" data-r>
@@ -175,8 +284,8 @@
 <div class="wrap">
   <div data-r>
     <p class="sec-label">Jak pomaga w sprzedaży</p>
-    <h2 class="sec-title">Jeden punkt,<br><em>więcej produktów.</em></h2>
-    <p class="sec-body">To uzupełnienie pawilonu i mlekomatu dla gospodarstw, które chcą sprzedawać szerzej niż samo mleko: bez rozbudowy obsługi i bez konieczności otwierania sklepu tylko po jedną paczkę sera czy butelkę.</p>
+    <h2 class="sec-title">Jeden punkt,<br><em>więcej produktów i scenariuszy.</em></h2>
+    <p class="sec-body">To uzupełnienie pawilonu i mlekomatu dla gospodarstw, które chcą sprzedawać szerzej niż samo mleko: produkty świeże, napoje, opakowania, zestawy, produkty paczkowane albo zwroty. Dobieramy automat do tego, co realnie ma zarabiać.</p>
   </div>
 
   <div class="cooler-grid">
@@ -219,8 +328,8 @@
 <section class="cta-band">
 <div class="wrap">
   <div class="cta-band-inner" data-r>
-    <h2>Masz sery, jaja albo inne produkty?<br><em>Sprawdźmy, czy automat ma sens.</em></h2>
-    <p>Opowiedz nam, co chcesz sprzedawać i gdzie ma stać punkt. Dobierzemy rozwiązanie do gospodarstwa, zamiast wciskać urządzenie na siłę.</p>
+    <h2>Masz produkty do sprzedaży 24/7?<br><em>Dobierzmy właściwy automat Sielaff.</em></h2>
+    <p>Opowiedz nam, co chcesz sprzedawać: nabiał, jaja, soki, przetwory, napoje, produkty paczkowane albo opakowania zwrotne. Dobierzemy rozwiązanie do gospodarstwa, zamiast wciskać jeden model na siłę.</p>
     <div class="cta-actions">
       <a href="advisor.html" class="btn btn-green">Wypełnij Advisor →</a>
       <a href="kontakt.html" class="btn btn-outline">Porozmawiajmy</a>
