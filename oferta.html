@@ -46,10 +46,6 @@
 .package-card h2{font-size:1.45rem;line-height:1.12;color:var(--ink);margin-bottom:.8rem}
 .package-card p{font-size:.92rem;color:var(--muted);line-height:1.7;margin-bottom:1.2rem}
 .package-badge{display:inline-flex;align-self:flex-start;margin-bottom:1rem;padding:.28rem .72rem;border-radius:999px;background:var(--sage);border:1px solid rgba(45,90,39,.22);color:var(--forest);font-size:.68rem;font-weight:900;letter-spacing:.08em;text-transform:uppercase}
-.package-mini{display:grid;gap:.6rem;margin:.2rem 0 1.2rem}
-.package-mini-row{border:1px solid var(--line);border-radius:var(--r);background:rgba(255,255,255,.48);padding:.82rem .9rem}
-.package-mini-row strong{display:block;color:var(--ink);font-size:.78rem;letter-spacing:.08em;text-transform:uppercase;margin-bottom:.3rem}
-.package-mini-row span{display:block;color:var(--muted);font-size:.84rem;line-height:1.5}
 .package-list{list-style:none;display:grid;gap:.7rem;margin:1rem 0 1.4rem;padding:0}
 .package-list li{display:flex;gap:.55rem;font-size:.88rem;color:var(--ink2);line-height:1.45}
 .package-list li::before{content:"✓";width:1.25rem;height:1.25rem;border-radius:50%;background:var(--sage);color:var(--forest);display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto;font-size:.72rem;font-weight:900}
@@ -73,26 +69,16 @@
 .component-list{list-style:none;display:grid;gap:.65rem;margin:1.2rem 0 0;padding:0}
 .component-list li{display:flex;gap:.55rem;color:var(--ink2);font-size:.9rem;line-height:1.45}
 .component-list li::before{content:"✓";width:1.2rem;height:1.2rem;border-radius:50%;background:var(--sage);color:var(--forest);display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto;font-size:.7rem;font-weight:900}
-.component-feature-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.8rem;margin-top:1.2rem}
-.feature-block{border:1px solid var(--line);border-radius:var(--r);background:var(--bg);padding:1rem}
-.feature-block strong{display:block;color:var(--ink);font-size:.9rem;line-height:1.25;margin-bottom:.45rem}
-.feature-block span{display:block;color:var(--muted);font-size:.82rem;line-height:1.55}
+.component-actions{display:flex;flex-wrap:wrap;gap:.8rem;margin-top:1.35rem}
+.component-actions .btn{justify-content:center}
+.component-note{margin-top:1.15rem;color:var(--muted);font-size:.84rem;line-height:1.55}
 .system-strip{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:var(--r-lg);overflow:hidden;margin-top:2.3rem}
 .system-strip-card{background:var(--paper);padding:1.35rem 1.45rem;min-height:100%}
 .system-strip-card strong{display:block;color:var(--ink);font-size:1rem;margin-bottom:.45rem}
 .system-strip-card span{display:block;color:var(--muted);font-size:.88rem;line-height:1.6}
-.sielaff-family-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.8rem;margin-top:1.2rem}
-.sielaff-family{border:1px solid var(--line);border-radius:var(--r);background:#fff;padding:1rem}
-.sielaff-family b{display:block;color:var(--forest);font-size:.78rem;letter-spacing:.08em;text-transform:uppercase;margin-bottom:.35rem}
-.sielaff-family strong{display:block;color:var(--ink);font-size:1rem;line-height:1.25;margin-bottom:.4rem}
-.sielaff-family span{display:block;color:var(--muted);font-size:.84rem;line-height:1.55}
-.sielaff-proof{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1rem;margin-top:1.25rem}
-.sielaff-proof figure{background:#fff;border:1px solid var(--line);border-radius:var(--r);overflow:hidden;box-shadow:var(--shadow)}
-.sielaff-proof img{width:100%;height:210px;object-fit:cover;object-position:center}
-.sielaff-proof figcaption{padding:.75rem .85rem;color:var(--muted);font-size:.8rem;line-height:1.45}
 .brand-note{display:inline-flex;align-items:center;gap:.5rem;margin-top:1rem;padding:.45rem .75rem;border:1px solid rgba(45,90,39,.22);border-radius:999px;background:var(--sage);color:var(--forest);font-size:.78rem;font-weight:900}
-@media(max-width:920px){.packages-grid{grid-template-columns:1fr}.package-card{padding:1.5rem}.package-note{flex-direction:column;align-items:flex-start}.package-note .btn{width:100%;justify-content:center}.offer-component{grid-template-columns:1fr}.component-media{min-height:360px;border-right:0;border-bottom:1px solid var(--line)}.component-media img{max-height:330px}.component-media.device{min-height:380px}.component-media.device img{max-height:350px}.component-body{padding:1.45rem}.component-feature-grid{grid-template-columns:1fr}}
-@media(max-width:920px){.system-strip,.sielaff-family-grid,.sielaff-proof{grid-template-columns:1fr}.sielaff-proof img{height:230px}}
+@media(max-width:920px){.packages-grid{grid-template-columns:1fr}.package-card{padding:1.5rem}.package-note{flex-direction:column;align-items:flex-start}.package-note .btn{width:100%;justify-content:center}.offer-component{grid-template-columns:1fr}.component-media{min-height:360px;border-right:0;border-bottom:1px solid var(--line)}.component-media img{max-height:330px}.component-media.device{min-height:380px}.component-media.device img{max-height:350px}.component-body{padding:1.45rem}.component-actions .btn{width:100%}}
+@media(max-width:920px){.system-strip{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -155,17 +141,11 @@
     <article class="package-card" data-r data-d="1">
       <span class="package-label">START</span>
       <h2>Mlekomat i podstawowe uruchomienie</h2>
-      <p>Dla gospodarstwa, które ma już miejsce pod punkt i chce możliwie szybko sprawdzić sprzedaż mleka bez budowania pełnego sklepu od pierwszego dnia.</p>
-      <div class="package-mini">
-        <div class="package-mini-row"><strong>Dla kogo</strong><span>Gospodarstwo, które ma świeże mleko, chce sprzedawać bezpośrednio i może przygotować proste, czytelne miejsce zakupu 24/7.</span></div>
-        <div class="package-mini-row"><strong>Efekt</strong><span>Uruchamiasz podstawową sprzedaż bezpośrednią mleka i zbierasz pierwsze dane: ile schodzi, kiedy klienci kupują i czy punkt ma potencjał rozbudowy.</span></div>
-      </div>
+      <p>Dla gospodarstwa, które chce zacząć od sprzedaży świeżego mleka 24/7 i ma już przygotowane lub łatwe do przygotowania miejsce pod urządzenie.</p>
       <ul class="package-list">
         <li>Dobór mlekomatu do skali sprzedaży.</li>
-        <li>Konfiguracja podstawowych funkcji sprzedaży i płatności.</li>
-        <li>Instrukcja codziennej obsługi, uzupełniania i kontroli urządzenia.</li>
-        <li>Pomoc w uporządkowaniu minimum formalności przed startem.</li>
-        <li>Podstawowe wskazówki, jak poinformować lokalnych klientów o punkcie.</li>
+        <li>Podstawowe wdrożenie i instrukcja obsługi.</li>
+        <li>Pomoc w najważniejszych formalnościach startowych.</li>
       </ul>
       <a href="kontakt.html" class="btn btn-outline">Zapytaj o wycenę</a>
     </article>
@@ -174,18 +154,11 @@
       <span class="package-badge">Najbardziej praktyczny</span>
       <span class="package-label">SPRZEDAŻOWY</span>
       <h2>Mlekomat, pawilon i start sprzedaży</h2>
-      <p>Dla gospodarstwa, które chce wejść w sprzedaż bezpośrednią porządnie: z miejscem dla klienta, logicznym ustawieniem urządzeń i gotowym planem pierwszych tygodni sprzedaży.</p>
-      <div class="package-mini">
-        <div class="package-mini-row"><strong>Dla kogo</strong><span>Dla rolnika, który nie chce sam koordynować urządzenia, pawilonu, dokumentów, oznaczenia i startu sprzedaży.</span></div>
-        <div class="package-mini-row"><strong>Efekt</strong><span>Powstaje praktyczny punkt przy gospodarstwie: klient wie gdzie podjechać, jak kupić mleko i co jeszcze może dobrać na miejscu.</span></div>
-      </div>
+      <p>Dla rolnika, który chce gotowy, czytelny punkt przy gospodarstwie: urządzenie, miejsce dla klienta, oznaczenie i spokojny start sprzedaży.</p>
       <ul class="package-list">
         <li>Mlekomat jako główny element sprzedaży.</li>
-        <li>Pawilon albo przygotowanie miejsca sprzedaży pod klienta i urządzenie.</li>
-        <li>Wsparcie przy dokumentach, finansowaniu i logicznym harmonogramie wdrożenia.</li>
-        <li>Butelki, podstawowe oznaczenie punktu i komunikaty dla klientów.</li>
-        <li>Prosty marketing lokalny na start: informacja przy drodze, social media, grupy lokalne.</li>
-        <li>Pomoc w ułożeniu obsługi punktu: kiedy uzupełniać mleko, jak reagować na alarmy, jak prowadzić pierwsze rozmowy z klientami.</li>
+        <li>Pawilon albo przygotowanie miejsca sprzedaży.</li>
+        <li>Butelki, oznaczenie, dokumenty i prosty marketing startowy.</li>
       </ul>
       <a href="kontakt.html" class="btn btn-green">Omów pakiet sprzedażowy</a>
     </article>
@@ -193,18 +166,11 @@
     <article class="package-card" data-r data-d="3">
       <span class="package-label">PREMIUM</span>
       <h2>Pełny punkt sprzedaży z opieką</h2>
-      <p>Dla gospodarstwa, które chce od razu budować pełniejszy punkt sprzedaży: mleko, produkty dodatkowe, rozpoznawalny wygląd, wygoda klienta i opieka po starcie.</p>
-      <div class="package-mini">
-        <div class="package-mini-row"><strong>Dla kogo</strong><span>Dla gospodarstwa z produktami dodatkowymi albo ambicją zbudowania rozpoznawalnej marki, po którą klienci będą wracać specjalnie.</span></div>
-        <div class="package-mini-row"><strong>Efekt</strong><span>Powstaje kompletny punkt sprzedaży bezpośredniej, który może zarabiać nie tylko na mleku, ale też na butelkach, nabiale i produktach z gospodarstwa.</span></div>
-      </div>
+      <p>Dla gospodarstwa, które chce sprzedawać szerzej: mleko, produkty świeże, butelki, gotowe zestawy i lokalną markę w jednym punkcie 24/7.</p>
       <ul class="package-list">
-        <li>Rozszerzona konfiguracja mlekomatu i funkcji operacyjnych.</li>
-        <li>Rozbudowany pawilon albo pełny punkt sprzedaży pod kilka kategorii produktów.</li>
-        <li>Dobór automatu Sielaff pod realny asortyment: produkty świeże, napoje, produkty paczkowane, outdoor albo rozwiązania zwrotne.</li>
-        <li>Butelki z oznaczeniem, materiały startowe, podstawowa identyfikacja i komunikacja punktu.</li>
-        <li>Priorytetowe wsparcie przy uruchomieniu i pierwszych tygodniach działania.</li>
-        <li>Pomoc w rozwoju sprzedaży po starcie: co poprawić, co dodać, jak zwiększyć koszyk klienta.</li>
+        <li>BRUNIMAT + dobrany automat Sielaff.</li>
+        <li>Pawilon pod kilka kategorii produktów.</li>
+        <li>Materiały startowe, wdrożenie i opieka po uruchomieniu.</li>
       </ul>
       <a href="kontakt.html" class="btn btn-outline">Zapytaj o pełny pakiet</a>
     </article>
@@ -223,7 +189,7 @@
   <div data-r>
     <p class="sec-label">Co zawierają pakiety</p>
     <h2 class="sec-title">Elementy, z których budujemy<br><em>punkt sprzedaży.</em></h2>
-    <p class="sec-body">Poniżej masz całość w jednym miejscu: BRUNIMAT do mleka, Sielaff do produktów świeżych i dodatkowych, pawilon jako estetyczna i bezpieczna zabudowa oraz butelki. W zależności od wybranego pakietu dobieramy je w prostszej albo pełniejszej wersji.</p>
+    <p class="sec-body">Tutaj pokazujemy ofertę krótko i przejrzyście. Szczegóły techniczne, zdjęcia i szersze opisy są na osobnych podstronach, żeby rolnik mógł najpierw zrozumieć całość, a dopiero potem wejść głębiej w konkretny element.</p>
   </div>
 
   <div class="offer-components">
@@ -234,17 +200,17 @@
       <div class="component-body">
         <p class="component-kicker">Element 01</p>
         <h3>Mlekomat BRUNIMAT</h3>
-        <p class="component-lead">Mlekomat jest sercem punktu sprzedaży. Klient może samodzielnie kupić świeże mleko 24/7, a gospodarstwo nie musi obsługiwać każdej transakcji ręcznie. BRUNIMAT dobieramy do skali sprzedaży, jakości obsługi klienta, oznaczenia punktu i planu rozwoju gospodarstwa.</p>
-        <div class="component-feature-grid">
-          <div class="feature-block"><strong>Komunikaty GSM i panel sprzedaży</strong><span>Urządzenie może wysyłać komunikaty o poziomie mleka, np. alarm przy 50 l, informację o braku mleka oraz inne powiadomienia operacyjne.</span></div>
-          <div class="feature-block"><strong>Płatności dla klientów</strong><span>System monetarny na monety bez wydawania reszty, opcjonalny moduł wydawania reszty oraz możliwość konfiguracji czytnika banknotów, kart i bilonu.</span></div>
-          <div class="feature-block"><strong>Polski system językowy</strong><span>Obsługa klienta w języku polskim, czytelne komunikaty na urządzeniu i konfiguracja dopasowana do lokalnego punktu sprzedaży.</span></div>
-          <div class="feature-block"><strong>Potwierdzenia sprzedaży</strong><span>Możliwość zastosowania drukarki potwierdzeń sprzedaży, gdy punkt wymaga dodatkowej dokumentacji lub wygodniejszej obsługi rozliczeń.</span></div>
-          <div class="feature-block"><strong>Higiena nalewania</strong><span>Automatyczne płukanie strefy nalewania po każdej sprzedaży pomaga utrzymać porządek w najważniejszym miejscu kontaktu z produktem.</span></div>
-          <div class="feature-block"><strong>Praca zimą</strong><span>Ogrzewanie sterowane termostatem oraz system Anti-Frost pomagają zabezpieczyć urządzenie w niskich temperaturach.</span></div>
-          <div class="feature-block"><strong>Bezpieczeństwo punktu</strong><span>Syrena alarmowa i alarm SMS przy próbie włamania do skrzynki zwiększają kontrolę nad urządzeniem ustawionym poza budynkiem gospodarstwa.</span></div>
-          <div class="feature-block"><strong>Żetony i sprzedaż specjalna</strong><span>Możliwa konfiguracja żetonów, np. 1 żeton = 1 litr, jako dodatkowy sposób rozliczania sprzedaży lub obsługi stałych klientów.</span></div>
+        <p class="component-lead">Serce punktu dla gospodarstw sprzedających świeże mleko bezpośrednio klientom. BRUNIMAT pozwala sprzedawać 24/7, bez obsługi każdej transakcji ręcznie.</p>
+        <ul class="component-list">
+          <li>sprzedaż świeżego mleka prosto z gospodarstwa,</li>
+          <li>płatności, komunikaty, alarmy i funkcje higieniczne,</li>
+          <li>dobór konfiguracji pod skalę sprzedaży i miejsce ustawienia.</li>
+        </ul>
+        <div class="component-actions">
+          <a class="btn btn-green" href="mlekomat.html">Zobacz mlekomat BRUNIMAT</a>
+          <a class="btn btn-outline" href="certyfikaty.html">Certyfikaty BRUNIMAT</a>
         </div>
+        <p class="component-note">Na podstronie znajdziesz więcej informacji o funkcjach, bezpieczeństwie, pracy urządzenia i legalnej sprzedaży.</p>
       </div>
     </article>
 
@@ -255,39 +221,17 @@
       <div class="component-body">
         <p class="component-kicker">Element 02</p>
         <h3>Automaty Sielaff do sprzedaży 24/7</h3>
-        <p class="component-lead">Sielaff to nie jeden model, tylko szeroka gama automatów vendingowych. Dla gospodarstw najczęściej zaczynamy od wariantów chłodniczych i combi, ale możemy dobrać też automaty na napoje, produkty suche, układy outdoor albo rozwiązania zwrotne — zależnie od asortymentu i miejsca.</p>
+        <p class="component-lead">Drugi automat rozszerza punkt poza samo mleko. Dzięki niemu można sprzedawać jaja, sery, jogurty, masło, soki, przetwory, butelki i inne produkty z gospodarstwa przez całą dobę.</p>
         <span class="brand-note">Dystrybuujemy automaty Sielaff i dobieramy je pod realny produkt</span>
-        <div class="sielaff-family-grid">
-          <div class="sielaff-family"><b>SiLine Snack & Combi</b><strong>Produkty świeże i paczkowane</strong><span>Najważniejszy kierunek dla gospodarstw: nabiał, jaja, butelki, soki, przetwory, gotowe zestawy oraz produkty w różnych opakowaniach.</span></div>
-          <div class="sielaff-family"><b>SN48 / fresh food</b><strong>Jedzenie i produkty chłodzone</strong><span>Rozwiązania pod produkty wymagające kontrolowanej temperatury: sery, jogurty, masło, dania gotowe, opakowania delikatne i produkty o krótszym terminie.</span></div>
-          <div class="sielaff-family"><b>Robimat X</b><strong>Zimne napoje, butelki i puszki</strong><span>Automaty z dużą szklaną ekspozycją do napojów, butelek PET, szklanych butelek i puszek. Dobre jako rozszerzenie punktu przy większym ruchu.</span></div>
-          <div class="sielaff-family"><b>Outdoor / RO</b><strong>Sprzedaż na zewnątrz</strong><span>Warianty z dachem, zabezpieczeniami, ochroną elektroniki i rozwiązaniami pod pracę przy drodze, przy pawilonie albo w półotwartej zabudowie.</span></div>
-          <div class="sielaff-family"><b>Hot drinks</b><strong>Kawa i gorące napoje</strong><span>Opcja dla miejsc z większym ruchem: kawa, herbata i gorące napoje jako dodatek do punktu farmerskiego, szczególnie przy ruchu porannym.</span></div>
-          <div class="sielaff-family"><b>SiLoop / reverse vending</b><strong>Zwroty i obieg opakowań</strong><span>Rozwiązania zwrotne mogą wspierać obieg butelek i opakowań, jeśli projekt ma iść w stronę systemu kaucyjnego lub powtarzalnych zakupów.</span></div>
-          <div class="sielaff-family"><b>Układy spiralne i popychacze</b><strong>Dobór pod kształt produktu</strong><span>Inaczej układa się butelki, inaczej jajka, sery, kubki, paczki albo pudełka. Automat dobieramy do produktu, nie odwrotnie.</span></div>
-          <div class="sielaff-family"><b>Personalizacja punktu</b><strong>Wygląd i komunikacja</strong><span>Front, ekspozycja, ekran, grafiki i komunikaty mogą być dopasowane do gospodarstwa, żeby punkt wyglądał jak część marki rolnika.</span></div>
+        <ul class="component-list">
+          <li>automaty chłodnicze, combi, outdoor i napojowe,</li>
+          <li>dobór półek, spirali i układu pod realne opakowania,</li>
+          <li>dużo więcej modeli i zdjęć na podstronie szczegółowej.</li>
+        </ul>
+        <div class="component-actions">
+          <a class="btn btn-green" href="automat-chlodniczy.html">Zobacz automaty Sielaff</a>
         </div>
-        <div class="component-feature-grid">
-          <div class="feature-block"><strong>Wymiary zewnętrzne</strong><span>Szerokość ok. 990 mm, głębokość ok. 895 mm, wysokość ok. 1773 mm. To pozwala zaplanować miejsce w pawilonie albo przy punkcie sprzedaży.</span></div>
-          <div class="feature-block"><strong>Strefa ekspozycji</strong><span>Widoczna część sprzedażowa ma ok. 889 mm szerokości i ok. 1309 mm wysokości, dzięki czemu klient dobrze widzi produkty przed zakupem.</span></div>
-          <div class="feature-block"><strong>Drzwi i obsługa</strong><span>Przy ustawieniu trzeba zostawić miejsce na otwarcie drzwi pod kątem ok. 130° oraz wygodny dostęp serwisowy do uzupełniania towaru.</span></div>
-          <div class="feature-block"><strong>Układ pod butelki szklane</strong><span>Butelki szklane do maksymalnej długości ok. 260 mm, ustawiane pionowo, średnica ok. 90 mm. Konfiguracja może mieścić orientacyjnie do ok. 120 butelek.</span></div>
-          <div class="feature-block"><strong>Produkty z gospodarstwa</strong><span>Automat można dobrać pod produkty stojące lub leżące, dlatego nadaje się nie tylko do butelek, ale też do jaj, serów i gotowych produktów chłodzonych.</span></div>
-          <div class="feature-block"><strong>Design RA + pakiet A</strong><span>Lakierowane panele dekoracyjne w dolnym i górnym obszarze drzwi oraz zewnętrzne oświetlenie LED nad i pod frontem szklanym.</span></div>
-          <div class="feature-block"><strong>Wariant zewnętrzny</strong><span>Dach, ochrona przed uderzeniami, dodatkowa tylna ściana, zabezpieczone komponenty elektroniczne, wyłącznik FI i klasa ochrony IP24.</span></div>
-          <div class="feature-block"><strong>Ochrona i wandaloodporność</strong><span>Ramka antywłamaniowa z kieszenią zamka, bęben zwrotny, wzmocniona klapa blokująca i konstrukcja ograniczająca elementy podatne na manipulację.</span></div>
-          <div class="feature-block"><strong>Chłodzenie i mróz</strong><span>Chłodzenie z czujnikiem ochrony przed mrozem. Przy temperaturze zewnętrznej do ok. -20°C automat utrzymuje temperaturę wewnątrz powyżej zera.</span></div>
-          <div class="feature-block"><strong>Lift do delikatnego wydawania</strong><span>Winda odbiera produkt z poziomu półki i szybko, ale łagodnie przekazuje go do wydania. Jest standardem w wariantach outdoor i wymagana przy układach Combi od 2 poziomów popychaczy.</span></div>
-          <div class="feature-block"><strong>Bezpieczne wydanie produktu</strong><span>Motorowy system śluzy chroni przed manipulacją. Szeroki otwór odbioru jest wygodny dla klienta, a produkt pozostaje widoczny z zewnątrz.</span></div>
-          <div class="feature-block"><strong>Touch display</strong><span>Ekran 800×480 z podświetleniem LED, chroniony za szybą VSG. Nadaje się do zdjęć produktów, informacji, reklamy, programowania wyborów i trybu dla osób na wózku.</span></div>
-          <div class="feature-block"><strong>Czyszczenie i programowanie</strong><span>System może prowadzić operatora przez czyszczenie i pozwala szczegółowo programować wybory produktów: przez zdjęcia albo klasyczną klawiaturę alfanumeryczną.</span></div>
-        </div>
-          <div class="sielaff-proof">
-            <figure><img src="sielaff-touch-display.png" alt="Panel dotykowy Sielaff"><figcaption>Dotykowy ekran do wyboru produktu, informacji i prostych komunikatów sprzedażowych.</figcaption></figure>
-            <figure><img src="sielaff-lift.png" alt="Winda produktu w automacie Sielaff"><figcaption>Wariant z windą delikatnie odbiera produkt z poziomu półki i przenosi go do odbioru.</figcaption></figure>
-            <figure><img src="sielaff-wydanie.png" alt="System wydawania produktu Sielaff"><figcaption>Szerokie, wygodne wydanie produktu ogranicza manipulacje i poprawia komfort klienta.</figcaption></figure>
-          </div>
-          <a class="btn btn-outline" href="automat-chlodniczy.html">Zobacz szczegóły automatów Sielaff</a>
+        <p class="component-note">Na podstronie znajdziesz przegląd wielu rodzin automatów Sielaff, zdjęcia prawdziwych modeli i opis zastosowań.</p>
       </div>
     </article>
 
@@ -298,15 +242,15 @@
       <div class="component-body">
         <p class="component-kicker">Element 03</p>
         <h3>Pawilon sprzedażowy</h3>
-        <p class="component-lead">Pawilon porządkuje cały punkt: chroni urządzenia, tworzy miejsce dla klienta i sprawia, że sprzedaż wygląda profesjonalnie. Może być prostym miejscem pod mlekomat albo pełniejszym sklepem przy gospodarstwie.</p>
+        <p class="component-lead">Pawilon porządkuje cały punkt: chroni urządzenia, poprawia wygląd sprzedaży i daje klientowi jasne miejsce zakupu. Może być prostym zadaszeniem pod mlekomat albo pełniejszym sklepem przy gospodarstwie.</p>
         <ul class="component-list">
-          <li>miejsce pod mlekomat, automat Sielaff, butelki i prostą ekspozycję produktów,</li>
-          <li>czytelny, estetyczny punkt sprzedaży widoczny z drogi lub podjazdu,</li>
-          <li>ochrona urządzeń przed deszczem, słońcem i przypadkowym uszkodzeniem,</li>
-          <li>układ dopasowany do działki, dojazdu, zasilania, serwisu i codziennego uzupełniania,</li>
-          <li>możliwość oznaczenia punktem Sklep za Stodołą albo marką gospodarstwa,</li>
-          <li>miejsce na informacje dla klientów: godziny, zasady zakupu, RHD, kontakt i instrukcję obsługi.</li>
+          <li>miejsce pod mlekomat, automat Sielaff i butelki,</li>
+          <li>estetyczna zabudowa, oznaczenie i porządek dla klienta,</li>
+          <li>układ dopasowany do działki, dojazdu i codziennej obsługi.</li>
         </ul>
+        <div class="component-actions">
+          <a class="btn btn-green" href="pawilony.html">Zobacz pawilony</a>
+        </div>
       </div>
     </article>
 
@@ -317,17 +261,15 @@
       <div class="component-body">
         <p class="component-kicker">Element 04</p>
         <h3>Szklane butelki do mleka</h3>
-        <p class="component-lead">Butelki są naturalnym uzupełnieniem mlekomatu. Klient może kupić mleko w estetycznej, zwrotnej butelce, a gospodarstwo buduje własne oznaczenie i bardziej profesjonalny odbiór sprzedaży.</p>
+        <p class="component-lead">Butelki są naturalnym uzupełnieniem mlekomatu. Pomagają sprzedawać świeże mleko wygodnie, estetycznie i w bardziej profesjonalnym obiegu zwrotnym.</p>
         <ul class="component-list">
-          <li>dwie pojemności: 1 l oraz 0,5 l,</li>
-          <li>szkło odpowiednie do kontaktu z żywnością,</li>
-          <li>wersja zwrotna do wielokrotnego obiegu,</li>
-          <li>możliwość naszego oznaczenia albo indywidualnego nadruku gospodarstwa,</li>
-          <li>zamknięcie wielokrotnego użytku typu TO48,</li>
-          <li>możliwość trwałego nadruku ceramicznego do 4 kolorów,</li>
-          <li>rozwiązanie pasujące do obiegu zwrotnego i profesjonalnego mycia,</li>
-          <li>dobry element startowy dla klientów, którzy pierwszy raz kupują mleko z automatu.</li>
+          <li>pojemności 1 l i 0,5 l,</li>
+          <li>wersje z naszym oznaczeniem albo nadrukiem gospodarstwa,</li>
+          <li>rozwiązanie pod sprzedaż i obieg zwrotny.</li>
         </ul>
+        <div class="component-actions">
+          <a class="btn btn-green" href="butelki.html">Zobacz butelki</a>
+        </div>
       </div>
     </article>
   </div>
