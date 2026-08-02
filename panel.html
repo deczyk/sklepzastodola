@@ -2763,13 +2763,17 @@ async function refreshFromRemote(){
   }
 }
 
-function saveData(){
+function saveData(options = {}){
   localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-  if(!SYNC_ENABLED) return;
+  if(!SYNC_ENABLED) return Promise.resolve(false);
   hasUnsyncedLocalChanges = true;
   setSyncStatus("Zapisywanie...", false);
   clearTimeout(saveTimer);
+  if(options.immediate){
+    return pushRemote(data);
+  }
   saveTimer = setTimeout(()=>pushRemote(data), 500); // debounce
+  return Promise.resolve(true);
 }
 
 initTheme();
@@ -3342,7 +3346,10 @@ async function saveQuickClientUpdate(clientId){
   const automation = inferClientAutomation(note, c);
   c.zaktualizowano = new Date().toISOString();
   logActivity(`dodał(a) ręczną notatkę klienta „${c.firma||c.osoba||'bez nazwy'}”${automation.length ? ` i panel ustawił: ${automation.join(", ")}` : ""}`);
-  saveData();
+  await saveData({immediate: Boolean(audio)});
+  if(audio && !lastCloudSaveOk){
+    alert("Notatka głosowa została zapisana lokalnie, ale nie zsynchronizowała się z chmurą. Nie zamykaj panelu i spróbuj odświeżyć / zapisać ponownie.");
+  }
   renderClients();
   openClientCard(clientId);
 }
@@ -3368,7 +3375,10 @@ async function addHistoryEntry(){
   const automation = inferClientAutomation(tekst, c);
   c.zaktualizowano = new Date().toISOString();
   logActivity(`dodał(a) notatkę w historii kontaktu klienta „${c.firma||c.osoba||'bez nazwy'}”${automation.length ? ` i panel ustawił: ${automation.join(", ")}` : ""}`);
-  saveData();
+  await saveData({immediate: Boolean(audio)});
+  if(audio && !lastCloudSaveOk){
+    alert("Notatka głosowa została zapisana lokalnie, ale nie zsynchronizowała się z chmurą. Nie zamykaj panelu i spróbuj odświeżyć / zapisać ponownie.");
+  }
   ta.value = "";
   audioEl.value = "";
   dateEl.value = todayInputValue();
