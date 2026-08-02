@@ -18,7 +18,14 @@ function unauthorized() {
 }
 
 export function middleware(request) {
-  const { pathname } = new URL(request.url);
+  const url = new URL(request.url);
+  const { pathname } = url;
+  const host = request.headers.get("host") || "";
+
+  if (host === "brunimat.pl" || host === "www.brunimat.pl") {
+    url.hostname = "www.sklepzastodola.pl";
+    return Response.redirect(url, 301);
+  }
 
   if (!isProtectedPath(pathname)) {
     return;
@@ -49,5 +56,5 @@ export function middleware(request) {
 }
 
 export const config = {
-  matcher: ["/panel.html", "/_pliki-0xyqdz4t/:path*"]
+  matcher: ["/:path*"]
 };

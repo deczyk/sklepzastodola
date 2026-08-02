@@ -1,14 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="https://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://www.sklepzastodola.pl/</loc>
-    <lastmod>2026-07-27</lastmod>
+    <lastmod>2026-08-02</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
+    <loc>https://www.sklepzastodola.pl/oferta.html</loc>
+    <lastmod>2026-08-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://www.sklepzastodola.pl/mlekomat.html</loc>
+    <lastmod>2026-08-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://www.sklepzastodola.pl/automat-chlodniczy.html</loc>
+    <lastmod>2026-08-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://www.sklepzastodola.pl/jak-dzialamy.html</loc>
-    <lastmod>2026-07-03</lastmod>
+    <lastmod>2026-08-02</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -19,20 +37,14 @@
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://www.sklepzastodola.pl/oferta.html</loc>
-    <lastmod>2026-07-27</lastmod>
+    <loc>https://www.sklepzastodola.pl/pawilony.html</loc>
+    <lastmod>2026-07-03</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.9</priority>
+    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://www.sklepzastodola.pl/butelki.html</loc>
     <lastmod>2026-07-10</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://www.sklepzastodola.pl/automat-chlodniczy.html</loc>
-    <lastmod>2026-07-27</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -43,16 +55,10 @@
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://www.sklepzastodola.pl/pawilony.html</loc>
-    <lastmod>2026-07-03</lastmod>
+    <loc>https://www.sklepzastodola.pl/advisor.html</loc>
+    <lastmod>2026-08-02</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://www.sklepzastodola.pl/mlekomat.html</loc>
-    <lastmod>2026-07-03</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.9</priority>
+    <priority>0.8</priority>
   </url>
   <url>
     <loc>https://www.sklepzastodola.pl/kontakt.html</loc>
@@ -62,8 +68,32 @@
   </url>
   <url>
     <loc>https://www.sklepzastodola.pl/poradnik.html</loc>
-    <lastmod>2026-07-03</lastmod>
+    <lastmod>2026-08-02</lastmod>
     <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.sklepzastodola.pl/poradnik-ile-kosztuje-mlekomat.html</loc>
+    <lastmod>2026-08-02</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://www.sklepzastodola.pl/poradnik-czy-mlekomat-jest-legalny.html</loc>
+    <lastmod>2026-08-02</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://www.sklepzastodola.pl/poradnik-mlekomat-a-rhd.html</loc>
+    <lastmod>2026-08-02</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://www.sklepzastodola.pl/poradnik-jak-uruchomic-mlekomat.html</loc>
+    <lastmod>2026-08-02</lastmod>
+    <changefreq>yearly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
@@ -92,13 +122,13 @@
   </url>
   <url>
     <loc>https://www.sklepzastodola.pl/poradnik-mlekomat-czy-skup-oplacalnosc.html</loc>
-    <lastmod>2026-07-03</lastmod>
+    <lastmod>2026-08-02</lastmod>
     <changefreq>yearly</changefreq>
-    <priority>0.5</priority>
+    <priority>0.6</priority>
   </url>
   <url>
     <loc>https://www.sklepzastodola.pl/faq.html</loc>
-    <lastmod>2026-07-04</lastmod>
+    <lastmod>2026-08-02</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
