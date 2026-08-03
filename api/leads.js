@@ -25,6 +25,13 @@ const ALLOWED_SOURCES = {
     status: "nowy",
     priorytet: "B",
     notificationTitle: "Nowy lead z Advisor OLX"
+  },
+  brief: {
+    zrodloLeada: "Brief konfiguracja",
+    kategoriaLeada: "Brief",
+    status: "nowy",
+    priorytet: "B",
+    notificationTitle: "Nowa konfiguracja z brief"
   }
 };
 
