@@ -603,6 +603,7 @@ async function sendBrief() {
   const opts = [...selected].map(k => OPT_LABELS[k]).join(', ') || 'brak';
 
   const data = {
+    source: 'brief',
     imie:       document.getElementById('f-name').value,
     telefon:    document.getElementById('f-tel').value,
     email:      document.getElementById('f-email').value,
@@ -615,17 +616,22 @@ async function sendBrief() {
     cena_netto:  fmt(netto),
     cena_brutto: fmt(brutto),
     po_dotacji:  fmt(arimr),
-    zrodlo: 'brief-konfiguracja',
+    website:     document.getElementById('f-website') ? document.getElementById('f-website').value : ''
   };
 
-  const fd = new FormData();
-  Object.entries(data).forEach(([k,v]) => fd.append(k,v));
-
   try {
-    await fetch('https://formspree.io/f/mqeogyjd', {
-      method: 'POST', body: fd, headers: {Accept: 'application/json'}
+    const res = await fetch('/api/leads', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(data)
     });
-  } catch(e) {}
+    if (!res.ok) throw new Error('Serwer zwrócił błąd: ' + res.status);
+  } catch(e) {
+    btn.disabled = false;
+    btn.textContent = 'Wyślij zapytanie — oddzwonimy w 24h';
+    alert('Nie udało się wysłać formularza. Spróbuj ponownie za chwilę albo zadzwoń: 533 200 652.');
+    return;
+  }
 
   document.getElementById('brief-form') && (document.getElementById('brief-form').style.display='none');
   document.getElementById('send-btn').style.display='none';
