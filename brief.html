@@ -742,9 +742,16 @@ function calcPrice() {
 function fmt(n) { return n.toLocaleString('pl-PL') + ' zł'; }
 
 function updateBadge() {
+  if (currentProduct !== 'mlekomat') {
+    document.getElementById('badge-price').textContent = 'wycena indywidualna';
+    document.getElementById('badge-sub').textContent = 'netto — po kontakcie';
+    return;
+  }
   const { netto, brutto, arimr } = calcPrice();
   document.getElementById('badge-price').textContent = fmt(netto);
-  document.getElementById('badge-sub').textContent = `brutto ${fmt(brutto)} · po dotacji ${fmt(arimr)}`;
+  const dot = document.getElementById('f-dotacja').value;
+  document.getElementById('badge-sub').textContent =
+    dot === 'tak' ? `brutto ${fmt(brutto)} · po dotacji ${fmt(arimr)}` : `brutto ${fmt(brutto)}`;
 }
 
 // ── KANNY ─────────────────────────────────────────────────────────────────────
@@ -752,6 +759,33 @@ function changeKanny(d) {
   kanny = Math.max(2, Math.min(4, kanny + d));
   document.getElementById('kanny-display').textContent = kanny;
   updateBadge();
+}
+
+// ── BUTELKI ───────────────────────────────────────────────────────────────────
+function changeButelki(d) {
+  butelki = Math.max(50, Math.min(1000, butelki + d));
+  document.getElementById('butelki-display').textContent = butelki;
+}
+
+// ── PRODUCT SELECT ────────────────────────────────────────────────────────────
+function selectProduct(key) {
+  currentProduct = key;
+  document.querySelectorAll('#step1 > div[id^="config-"]').forEach(el => el.style.display = 'none');
+  document.getElementById('config-' + key).style.display = 'block';
+  updateBadge();
+  goStep(1);
+}
+
+function selectSielaff(el, key) {
+  sielaffKey = key;
+  document.querySelectorAll('#sielaff-grid .opt-item').forEach(e => e.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+function selectPawilon(el, key) {
+  pawilonKey = key;
+  document.querySelectorAll('#pawilon-grid .opt-item').forEach(e => e.classList.remove('selected'));
+  el.classList.add('selected');
 }
 
 // ── OPTIONS ───────────────────────────────────────────────────────────────────
