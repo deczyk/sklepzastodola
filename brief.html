@@ -40,9 +40,23 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--cr);color:var(
 /* ── MODEL CARD ── */
 .model-card{background:#fff;border:2px solid var(--g);border-radius:var(--r);padding:1.4rem 1.5rem;margin-bottom:1.5rem;display:flex;align-items:center;gap:1.2rem}
 .mc-icon{font-size:2.2rem;flex-shrink:0}
+.mc-photo{width:72px;height:72px;border-radius:var(--r);object-fit:cover;flex-shrink:0;border:1px solid var(--line)}
 .mc-name{font-size:1.05rem;font-weight:700;color:var(--g)}
 .mc-desc{font-size:.83rem;color:var(--mid);margin-top:.2rem}
 .mc-dims{font-size:.75rem;color:var(--lt);margin-top:.3rem;font-family:monospace}
+.price-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem}
+@media(max-width:640px){.price-grid{grid-template-columns:1fr}}
+.price-card{background:#fff;border:2px solid var(--line);border-radius:var(--r);padding:1.1rem 1.2rem;cursor:pointer;transition:.15s}
+.price-card:hover{border-color:var(--g)}
+.price-card.selected{border-color:var(--g);background:var(--gl)}
+.price-card-top{display:flex;align-items:center;gap:.8rem;margin-bottom:.8rem}
+.price-card-name{font-size:.95rem;font-weight:700;color:var(--ink)}
+.price-card-variant{font-size:.78rem;color:var(--mid);margin-top:.15rem}
+.price-card-rows{border-top:1px solid var(--line);padding-top:.7rem;display:grid;gap:.3rem}
+.price-card-row{display:flex;justify-content:space-between;font-size:.85rem}
+.price-card-row .k{color:var(--mid)}
+.price-card-row .v{font-weight:700;color:var(--ink)}
+.price-card-row.brutto .v{color:var(--g)}
 
 /* ── WYMAGANE OPCJE ── */
 .required-list{background:#fff;border:1px solid var(--line);border-radius:var(--r);overflow:hidden;margin-bottom:1.5rem}
@@ -297,7 +311,16 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--cr);color:var(
       window.scrollTo(0,0);
     };
     function detailFor(k){
-      if(k==='sielaff'){var s=document.querySelector('#sielaff-grid .opt-item.selected');return s&&s.querySelector('.opt-name')?s.querySelector('.opt-name').textContent:'';}
+      if(k==='sielaff'){
+        var pc=document.querySelector('#config-sielaff .price-card.selected');
+        if(pc){
+          var nm=pc.querySelector('.price-card-name'),vr=pc.querySelector('.price-card-variant');
+          var addons=[];
+          document.querySelectorAll('#sielaff-addons .opt-item.selected .opt-name').forEach(function(n){addons.push(n.textContent);});
+          return (nm?nm.textContent:'')+(vr?' ('+vr.textContent+')':'')+(addons.length?' + '+addons.join(', '):'');
+        }
+        var s=document.querySelector('#sielaff-grid .opt-item.selected');return s&&s.querySelector('.opt-name')?s.querySelector('.opt-name').textContent:'';
+      }
       if(k==='butelki'){
         var b=document.getElementById('butelki-display');
         var lbl=etykietaLabel();
@@ -496,7 +519,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--cr);color:var(
 
     <!-- MODEL INFO -->
     <div class="model-card">
-      <div class="mc-icon">🥛</div>
+      <img class="mc-photo" src="automat2.webp" alt="Mlekomat BRUNIMAT 650 Premium DUO" loading="lazy">
       <div>
         <div class="mc-name">BRUNIMAT 650 Premium DUO</div>
         <div class="mc-desc">Automatyczne przełączanie między 2 zbiornikami · Schładzanie do +4°C · 24h bez obsługi</div>
@@ -636,7 +659,57 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--cr);color:var(
         <div class="step-sub">Automaty na jaja, sery, napoje i produkty świeże. Wybierz serię — wycenę przygotujemy indywidualnie.</div>
       </div>
 
-      <div class="opt-section-label">Który typ Cię interesuje?</div>
+      <div class="opt-section-label">Sielaff SiLine SÜ Combi-M — dostępne konfiguracje, cena katalogowa</div>
+      <div class="price-grid">
+        <div class="price-card selected" onclick="selectSielaffPrice(this,'combi_m_1ro')" data-key="combi_m_1ro">
+          <div class="price-card-top">
+            <img class="mc-photo" src="sielaff-combi-m.webp" alt="Sielaff SiLine SÜ Combi-M" loading="lazy">
+            <div>
+              <div class="price-card-name">Oferta 1 RO</div>
+              <div class="price-card-variant">Outdoor, butelki</div>
+            </div>
+          </div>
+          <div class="price-card-rows">
+            <div class="price-card-row"><span class="k">Cena katalogowa netto</span><span class="v">53 570 zł</span></div>
+            <div class="price-card-row brutto"><span class="k">Cena katalogowa brutto</span><span class="v">65 891 zł</span></div>
+          </div>
+        </div>
+        <div class="price-card" onclick="selectSielaffPrice(this,'combi_m_3rb')" data-key="combi_m_3rb">
+          <div class="price-card-top">
+            <img class="mc-photo" src="sielaff-combi-m.webp" alt="Sielaff SiLine SÜ Combi-M" loading="lazy">
+            <div>
+              <div class="price-card-name">Oferta 3 RB</div>
+              <div class="price-card-variant">Indoor, direct + bandwarenfach</div>
+            </div>
+          </div>
+          <div class="price-card-rows">
+            <div class="price-card-row"><span class="k">Cena katalogowa netto</span><span class="v">54 470 zł</span></div>
+            <div class="price-card-row brutto"><span class="k">Cena katalogowa brutto</span><span class="v">66 998 zł</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="opt-section-label">Opcje dodatkowe (ceny katalogowe)</div>
+      <div class="opt-grid" id="sielaff-addons">
+        <div class="opt-item" onclick="toggleOpt(this,'banknoty')" data-key="banknoty">
+          <div class="opt-check"></div>
+          <div class="opt-label">
+            <div class="opt-name">System banknotów</div>
+            <div class="opt-desc">Płatność banknotami, obok standardowej wrzutki monet</div>
+          </div>
+          <div class="opt-price">2 590 zł</div>
+        </div>
+        <div class="opt-item" onclick="toggleOpt(this,'cashless')" data-key="cashless">
+          <div class="opt-check"></div>
+          <div class="opt-label">
+            <div class="opt-name">Cashless / Nayax</div>
+            <div class="opt-desc">Płatność kartą i BLIK-iem</div>
+          </div>
+          <div class="opt-price">2 590 zł</div>
+        </div>
+      </div>
+
+      <div class="opt-section-label">Inny typ — wycena indywidualna</div>
       <div class="opt-grid" id="sielaff-grid">
 
         <div class="opt-item selected" onclick="selectSielaff(this,'sielaff_chlodniczy')" data-key="sielaff_chlodniczy">
@@ -959,7 +1032,7 @@ let butelki = 200;
 let selected = new Set();
 let currentStep = 0;
 let currentProduct = 'mlekomat';
-let sielaffKey = 'sielaff_chlodniczy';
+let sielaffKey = 'combi_m_1ro';
 let pawilonKey = 'pawilon_s';
 
 const PRODUCT_NAMES = {
@@ -970,6 +1043,8 @@ const PRODUCT_NAMES = {
 };
 
 const SIELAFF_NAMES = {
+  combi_m_1ro:        'SiLine SÜ Combi-M — Oferta 1 RO (outdoor, butelki)',
+  combi_m_3rb:         'SiLine SÜ Combi-M — Oferta 3 RB (indoor, direct + bandwarenfach)',
   sielaff_chlodniczy: 'Automat chłodniczy — napoje i produkty świeże',
   sielaff_combi:      'Combi — chłodzenie + część sucha',
   sielaff_napoje:     'Napoje zimne (Cold Drinks)',
@@ -1035,6 +1110,12 @@ function selectProduct(key) {
 function selectSielaff(el, key) {
   sielaffKey = key;
   document.querySelectorAll('#sielaff-grid .opt-item').forEach(e => e.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+function selectSielaffPrice(el, key) {
+  sielaffKey = key;
+  document.querySelectorAll('#config-sielaff .price-card').forEach(e => e.classList.remove('selected'));
   el.classList.add('selected');
 }
 
