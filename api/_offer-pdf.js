@@ -43,8 +43,10 @@ async function buildOfferPdf(data) {
     productDesc = "",
     recommendation = "",
     configLines = [],
-    priceNetto = "",
-    priceBrutto = "",
+    priceLines = [],
+    totalNetto = "",
+    totalBrutto = "",
+    individualQuoteItems = ["Transport i dostawa", "Rozładunek, ustawienie i uruchomienie", "Serwis pogwarancyjny"],
   } = data;
 
   const doc = await PDFDocument.create();
@@ -143,18 +145,47 @@ async function buildOfferPdf(data) {
     y -= 12;
   }
 
-  // Pricing block
-  if (priceNetto) {
-    const priceBoxH = 74;
-    page.drawRectangle({ x: MARGIN, y: y - priceBoxH, width: PAGE_W - MARGIN * 2, height: priceBoxH, color: SAGE });
-    page.drawText("CENA KATALOGOWA NETTO", { x: MARGIN + 18, y: y - 24, size: 8.5, font: fontBold, color: rgb(0.24, 0.4, 0.22) });
-    page.drawText(priceNetto, { x: MARGIN + 18, y: y - 52, size: 24, font: fontBold, color: FOREST });
-    if (priceBrutto) {
-      const bruttoLabel = `Brutto: ${priceBrutto}`;
-      const bw = font.widthOfTextAtSize(bruttoLabel, 10.5);
-      page.drawText(bruttoLabel, { x: PAGE_W - MARGIN - 18 - bw, y: y - 40, size: 10.5, font, color: MUTED });
+  // Price breakdown (per product) + total
+  if (priceLines.length) {
+    page.drawText("Cena katalogowa", { x: MARGIN, y, size: 13, font: fontBold, color: INK });
+    y -= 18;
+    for (const item of priceLines) {
+      page.drawText(item.label, { x: MARGIN, y, size: 9.5, font, color: MUTED });
+      const nettoTxt = `${item.netto} netto`;
+      const nw = fontBold.widthOfTextAtSize(nettoTxt, 10);
+      page.drawText(nettoTxt, { x: PAGE_W - MARGIN - nw, y, size: 10, font: fontBold, color: INK });
+      y -= 14;
     }
-    y -= priceBoxH + 20;
+    y -= 6;
+    page.drawLine({ start: { x: MARGIN, y }, end: { x: PAGE_W - MARGIN, y }, thickness: 0.75, color: LINE });
+    y -= 4;
+  }
+
+  if (totalNetto) {
+    const priceBoxH = 40;
+    page.drawRectangle({ x: MARGIN, y: y - priceBoxH, width: PAGE_W - MARGIN * 2, height: priceBoxH, color: SAGE });
+    page.drawText("RAZEM — CENA KATALOGOWA NETTO", { x: MARGIN + 14, y: y - 15, size: 8, font: fontBold, color: rgb(0.24, 0.4, 0.22) });
+    page.drawText(String(totalNetto), { x: MARGIN + 14, y: y - 31, size: 19, font: fontBold, color: FOREST });
+    if (totalBrutto) {
+      const bruttoLabel = `Brutto: ${totalBrutto}`;
+      const bw = font.widthOfTextAtSize(bruttoLabel, 10);
+      page.drawText(bruttoLabel, { x: PAGE_W - MARGIN - 14 - bw, y: y - 23, size: 10, font, color: MUTED });
+    }
+    y -= priceBoxH + 16;
+  }
+
+  // Elements quoted individually
+  if (individualQuoteItems.length) {
+    page.drawText("Do osobnej wyceny", { x: MARGIN, y, size: 11, font: fontBold, color: INK });
+    y -= 4;
+    page.drawText("(nie wliczone w cenę powyżej — wyceniamy indywidualnie po rozmowie)", { x: MARGIN, y: y - 8, size: 8, font, color: DIM });
+    y -= 20;
+    individualQuoteItems.forEach(label => {
+      page.drawText("—", { x: MARGIN, y, size: 9.5, font, color: GOLD });
+      page.drawText(label, { x: MARGIN + 12, y, size: 9.5, font, color: INK });
+      y -= 13;
+    });
+    y -= 8;
   }
 
   // Footer

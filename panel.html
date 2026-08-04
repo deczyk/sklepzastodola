@@ -5338,11 +5338,25 @@ async function generateOfferPdf(clientId){
     const priceBoxH = 22;
     doc.setFillColor(...SAGE); doc.roundedRect(margin, y, pageWidth-margin*2, priceBoxH, 1.5, 1.5, "F");
     F("bold"); doc.setFontSize(7.5); doc.setTextColor(61,101,56);
-    doc.text("CENA KATALOGOWA", margin+6, y+7);
+    doc.text("RAZEM — CENA KATALOGOWA NETTO", margin+6, y+7);
     F("bold"); doc.setFontSize(17); doc.setTextColor(...FOREST);
     doc.text(kwota + " zł", margin+6, y+16);
-    y += priceBoxH + 8;
+    y += priceBoxH + 10;
   }
+
+  // Elements quoted individually
+  const individualQuoteItems = ["Transport i dostawa", "Rozładunek, ustawienie i uruchomienie", "Serwis pogwarancyjny"];
+  F("bold"); doc.setFontSize(11); doc.setTextColor(...INK);
+  doc.text("Do osobnej wyceny", margin, y); y += 5;
+  F("normal"); doc.setFontSize(8); doc.setTextColor(...DIM);
+  doc.text("(nie wliczone w cenę powyżej — wyceniamy indywidualnie po rozmowie)", margin, y+3); y += 12;
+  F("normal"); doc.setFontSize(9.5); doc.setTextColor(...INK);
+  individualQuoteItems.forEach(label => {
+    doc.setTextColor(...GOLD); doc.text("—", margin, y);
+    doc.setTextColor(...INK); doc.text(label, margin+7, y);
+    y += 6.5;
+  });
+  y += 6;
 
   // Footer
   const footerY = 272;

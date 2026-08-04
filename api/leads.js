@@ -16,8 +16,19 @@ function briefConfigLines(payload) {
   return raw.split(/\s*\|\s*/).filter(Boolean);
 }
 
+function fmtZl(n) {
+  const num = Number(n);
+  return num > 0 ? `${num.toLocaleString("pl-PL")} zł` : "";
+}
+
 async function buildBriefPdfAttachment(payload, lead) {
   try {
+    const priceLines = [];
+    const mNetto = Number(payload.mlekomat_netto) || 0;
+    const sNetto = Number(payload.sielaff_netto) || 0;
+    if (mNetto > 0) priceLines.push({ label: "Mlekomat BRUNIMAT 650 Premium DUO", netto: fmtZl(mNetto) });
+    if (sNetto > 0) priceLines.push({ label: "Automat chłodniczy Sielaff SiLine SÜ Combi-M", netto: fmtZl(sNetto) });
+
     const pdfBuffer = await buildOfferPdf({
       clientName: lead.osoba || lead.firma || "",
       location: [lead.miejscowosc, lead.wojewodztwo].filter(Boolean).join(", "),
@@ -25,8 +36,9 @@ async function buildBriefPdfAttachment(payload, lead) {
       productDesc: "Oferta wstępna przygotowana na podstawie konfiguracji wybranej w konfiguratorze.",
       recommendation: "Poniżej znajdziesz wybraną konfigurację i orientacyjną cenę katalogową. Skontaktujemy się, żeby dopiąć szczegóły i potwierdzić dostępność.",
       configLines: briefConfigLines(payload),
-      priceNetto: payload.cena_netto && payload.cena_netto !== "—" ? payload.cena_netto : "",
-      priceBrutto: payload.cena_brutto && payload.cena_brutto !== "—" ? payload.cena_brutto : ""
+      priceLines,
+      totalNetto: priceLines.length ? (payload.cena_netto && payload.cena_netto !== "—" ? payload.cena_netto : "") : "",
+      totalBrutto: priceLines.length ? (payload.cena_brutto && payload.cena_brutto !== "—" ? payload.cena_brutto : "") : ""
     });
     const safeName = (lead.osoba || lead.firma || "klient").toLowerCase()
       .replace(/[^a-z0-9]+/gi, "-").replace(/^-+|-+$/g, "").slice(0, 40) || "klient";

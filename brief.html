@@ -423,6 +423,26 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--cr);color:var(
       var priceHead=document.getElementById('price-summary-head');
       if(priceHead)priceHead.textContent=hasExtra?'Szacunkowa wycena — sam mlekomat':'Szacunkowa wycena';
     }
+    function parsePriceNumber(text){
+      var m=(text||'').replace(/[^\d]/g,'');
+      return m ? parseInt(m,10) : 0;
+    }
+    function fmtPrice(n){ return n.toLocaleString('pl-PL')+' zł'; }
+    function calcSielaffPrice(){
+      var pc=document.querySelector('#config-sielaff .price-card.selected');
+      if(!pc) return null;
+      var rows=pc.querySelectorAll('.price-card-rows .v');
+      var netto=rows[0]?parsePriceNumber(rows[0].textContent):0;
+      var addonsNetto=0,addonNames=[];
+      document.querySelectorAll('#sielaff-addons .opt-item.selected').forEach(function(el){
+        var p=el.querySelector('.opt-price'),nm=el.querySelector('.opt-name');
+        if(p)addonsNetto+=parsePriceNumber(p.textContent);
+        if(nm)addonNames.push(nm.textContent);
+      });
+      var totalNetto=netto+addonsNetto;
+      return {netto:totalNetto, brutto:Math.round(totalNetto*1.23), addonNames:addonNames};
+    }
+
     window.sendBrief=function(){
       var name=readVal('f-name'),tel=readVal('f-tel'),woj=readVal('f-woj'),krowy=readVal('f-krowy'),litry=readVal('f-litry');
       var missing=[];
@@ -436,17 +456,29 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--cr);color:var(
       var id='BRF-'+new Date().toISOString().slice(0,10).replace(/-/g,'')+'-'+Math.random().toString(36).slice(2,7).toUpperCase();
       var konfiguracja='['+id+'] '+buildKonfiguracjaText();
       var uwagi=readVal('f-uwagi');
-      var netto='—',brutto='—',poDotacji='';
+
+      var mlekomatNetto=0, mlekomatBrutto=0, poDotacji='';
       if(sel('mlekomat')){
         var ne=document.getElementById('sum-netto'),br=document.getElementById('sum-brutto');
-        if(ne)netto=ne.textContent;if(br)brutto=br.textContent;
+        mlekomatNetto=ne?parsePriceNumber(ne.textContent):0;
+        mlekomatBrutto=br?parsePriceNumber(br.textContent):0;
         var row=document.getElementById('sum-arimr-row');
         if(row&&row.style.display!=='none'){var v=row.querySelector('.val');if(v)poDotacji=v.textContent;}
-      }else{netto='wycena indywidualna';brutto='wycena indywidualna';}
+      }
+      var sielaffPrice = sel('sielaff') ? calcSielaffPrice() : null;
+
+      var totalNetto = mlekomatNetto + (sielaffPrice?sielaffPrice.netto:0);
+      var totalBrutto = mlekomatBrutto + (sielaffPrice?sielaffPrice.brutto:0);
+      var hasPricedProduct = mlekomatNetto>0 || (sielaffPrice&&sielaffPrice.netto>0);
+      var netto = hasPricedProduct ? fmtPrice(totalNetto) : 'wycena indywidualna';
+      var brutto = hasPricedProduct ? fmtPrice(totalBrutto) : 'wycena indywidualna';
+
       var payload={
         source:'brief',osoba:name,telefon:tel,email:readVal('f-email'),wojewodztwo:readVal('f-woj'),
         krowy:readVal('f-krowy'),litry:readVal('f-litry'),pawilon:readVal('f-pawilon'),dotacja:readVal('f-dotacja'),
         konfiguracja:konfiguracja,cena_netto:netto,cena_brutto:brutto,po_dotacji:poDotacji,
+        mlekomat_netto: mlekomatNetto || '', mlekomat_brutto: mlekomatBrutto || '',
+        sielaff_netto: sielaffPrice ? sielaffPrice.netto : '', sielaff_brutto: sielaffPrice ? sielaffPrice.brutto : '',
         notes:uwagi?'['+id+'] '+uwagi:'['+id+']',website:honeypot,brief_id:id
       };
       var btn=document.getElementById('btn-step0-next'),subBtn=document.querySelector('.btn-submit'),disable=btn?btn:subBtn;

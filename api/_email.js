@@ -38,8 +38,21 @@ function esc(value) {
   }[ch]));
 }
 
+// Belt-and-suspenders fix for Polish diacritics arriving garbled in some
+// clients despite a correct charset meta tag: encode every non-ASCII
+// character as a numeric HTML entity, so rendering never depends on the
+// mail pipeline (Resend, intermediate relays, the client) honoring UTF-8.
+function encodeNonAscii(html) {
+  let out = "";
+  for (const ch of html) {
+    const code = ch.codePointAt(0);
+    out += code > 127 ? `&#${code};` : ch;
+  }
+  return out;
+}
+
 function wrapEmail(bodyHtml) {
-  return `<!doctype html>
+  const html = `<!doctype html>
 <html lang="pl">
 <head>
 <meta charset="utf-8">
@@ -49,7 +62,7 @@ function wrapEmail(bodyHtml) {
 <body style="margin:0;padding:0;background:#f7f4ee;font-family:Arial,Helvetica,sans-serif;color:#1e1e1a">
 <div style="max-width:560px;margin:0 auto;padding:32px 24px">
   <div style="text-align:center;margin-bottom:20px">
-    <img src="${LOGO_URL}" width="40" height="40" alt="Sklep za Stodołą" style="display:block;margin:0 auto 8px">
+    <img src="${LOGO_URL}" width="48" height="48" alt="Sklep za Stodołą" style="display:block;margin:0 auto 8px">
     <span style="font-size:20px;font-weight:bold;color:#2d5a27">Sklep za Stodołą</span>
   </div>
   <div style="background:#ffffff;border:1px solid #e4ddd1;border-top:3px solid #2d5a27;border-radius:12px;padding:28px 26px">
@@ -60,6 +73,7 @@ function wrapEmail(bodyHtml) {
   </div>
 </div>
 </body></html>`;
+  return encodeNonAscii(html);
 }
 
 function ctaButton(href, label) {
@@ -72,7 +86,7 @@ function buildAdvisorEmailHtml(payload) {
   const owner = esc(payload.osoba || payload.owner || "");
   const wynik = esc(payload.wynikPotencjalu || "");
   return wrapEmail(`
-    <h1 style="font-size:20px;margin:0 0 12px;color:#1e1e1a">Cześć${owner ? " " + owner : ""}, obliczyliśmy Twój potencjał</h1>
+    <h1 style="font-size:20px;margin:0 0 12px;color:#1e1e1a">Dzień dobry${owner ? " " + owner : ""}, obliczyliśmy Twój potencjał</h1>
     <p style="line-height:1.6;font-size:14px;color:#3d3b35">Dziękujemy za wypełnienie kalkulatora Advisor. Oto wynik:</p>
     <div style="background:#f5eddb;border-radius:10px;padding:16px 18px;margin:18px 0;text-align:center">
       <div style="font-size:13px;color:#6b6454;text-transform:uppercase;letter-spacing:.05em;font-weight:bold">Potencjał projektu</div>
@@ -87,7 +101,7 @@ function buildAdvisorEmailHtml(payload) {
 function buildBriefEmailHtml(payload) {
   const owner = esc(payload.osoba || "");
   return wrapEmail(`
-    <h1 style="font-size:20px;margin:0 0 12px;color:#1e1e1a">Cześć${owner ? " " + owner : ""}, Twoja oferta jest gotowa</h1>
+    <h1 style="font-size:20px;margin:0 0 12px;color:#1e1e1a">Dzień dobry${owner ? " " + owner : ""}, Twoja oferta jest gotowa</h1>
     <p style="line-height:1.6;font-size:14px;color:#3d3b35">Dziękujemy za wypełnienie konfiguratora. W załączniku znajdziesz ofertę PDF przygotowaną na podstawie Twojej konfiguracji.</p>
     <p style="line-height:1.6;font-size:14px;color:#3d3b35">To wycena orientacyjna na podstawie cen katalogowych. Oddzwonimy w ciągu jednego dnia roboczego, żeby dopiąć szczegóły.</p>
     <div style="text-align:center;margin-top:22px">
