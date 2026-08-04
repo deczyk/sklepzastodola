@@ -287,6 +287,44 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--cr);color:var(
       if(k==='pawilon'){var p=document.querySelector('#pawilon-grid .opt-item.selected');return p&&p.querySelector('.opt-name')?p.querySelector('.opt-name').textContent:'';}
       return '';
     }
+    function etykietaLabel(){
+      var els=document.querySelectorAll('#config-butelki .opt-item[data-etykieta]');
+      for(var i=0;i<els.length;i++){
+        if(els[i].classList.contains('selected')){
+          var nm=els[i].querySelector('.opt-name');
+          return nm?nm.textContent:'';
+        }
+      }
+      return '';
+    }
+    function injectEtykietaUI(){
+      var target=document.getElementById('butelki-display');
+      if(!target||document.getElementById('etykieta-block'))return;
+      var row=target;
+      while(row&&row!==document.body&&!(row.className&&String(row.className).indexOf('kanny-row')!==-1)){row=row.parentNode;}
+      if(!row||row===document.body)return;
+      var block=document.createElement('div');
+      block.id='etykieta-block';
+      block.innerHTML='<div class="opt-section-label">Etykieta na butelkach</div>'+
+        '<div class="opt-grid">'+
+        '<div class="opt-item selected" data-etykieta="nasza" onclick="selectEtykieta(this)">'+
+        '<div class="opt-check"></div><div class="opt-label">'+
+        '<div class="opt-name">Nasza etykieta</div>'+
+        '<div class="opt-desc">Gotowy projekt z logo Sklepu za Stodołą i danymi Twojego punktu</div>'+
+        '</div></div>'+
+        '<div class="opt-item" data-etykieta="wlasna" onclick="selectEtykieta(this)">'+
+        '<div class="opt-check"></div><div class="opt-label">'+
+        '<div class="opt-name">Własna etykieta</div>'+
+        '<div class="opt-desc">Masz własny projekt — doradzimy format i nadruk</div>'+
+        '</div></div>'+
+        '</div>';
+      row.insertAdjacentElement('afterend',block);
+    }
+    window.selectEtykieta=function(el){
+      var all=document.querySelectorAll('#etykieta-block .opt-item');
+      for(var i=0;i<all.length;i++){all[i].classList.remove('selected');}
+      el.classList.add('selected');
+    };
     function buildKonfiguracjaText(){
       var parts=[];
       for(var i=0;i<window._selProducts.length;i++){
