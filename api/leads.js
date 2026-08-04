@@ -21,13 +21,113 @@ function fmtZl(n) {
   return num > 0 ? `${num.toLocaleString("pl-PL")} zł` : "";
 }
 
-async function buildBriefPdfAttachment(payload, lead) {
+const ROLLOUT_STAGES = [
+  { tag: "START", name: "Mlekomat BRUNIMAT", desc: "Uruchomienie sprzedaży mleka i sprawdzenie realnego popytu." },
+  { tag: "WYGODA", name: "Automat na butelki", desc: "Ułatwienie zakupu klientom i zwiększenie wygody obsługi." },
+  { tag: "ROZWÓJ", name: "Automaty na inne produkty", desc: "Budowa stałego punktu sprzedaży bezpośredniej gospodarstwa." }
+];
+
+function mlekomatIncludedItems(konfigText) {
+  const items = [
+    "Certyfikat CE-MID — legalizowany pomiar wydawanej ilości",
+    "System gotówkowy — monety i banknoty z automatycznym wydawaniem reszty",
+    "Drukarka paragonów po każdej transakcji",
+    "Ogrzewanie termostatyczne Anti-Frost"
+  ];
+  const t = (konfigText || "").toLowerCase();
+  if (t.includes("gsm")) items.push("Monitoring GSM — zdalny podgląd i kontrola poziomu mleka");
+  if (t.includes("płukanie") || t.includes("plukanie")) items.push("Automatyczne płukanie strefy dozowania");
+  if (t.includes("alarm")) items.push("Alarm i syrena antywłamaniowa");
+  if (t.includes("kartą") || t.includes("karta") || t.includes("nayax")) items.push("Płatność kartą (terminal Nayax)");
+  return items;
+}
+
+function sielaffIncludedItems() {
+  return [
+    "Chłodzenie zapewniające świeżość produktów przez cały dzień",
+    "Ekran dotykowy z czytelną prezentacją oferty",
+    "Płatność gotówką i/lub kartą, w zależności od wybranej opcji"
+  ];
+}
+
+function buildInsightCards(payload, priorHistoria) {
+  const cards = [];
+  const krowy = String(payload.krowy || "");
+  const litry = String(payload.litry || "");
+  const pawilon = String(payload.pawilon || "");
+
+  if (litry && !/^do 50/i.test(litry)) {
+    cards.push({
+      title: "Wystarczająca produkcja",
+      desc: `Zadeklarowana produkcja (${litry}) daje realny wolumen do sprzedaży bezpośredniej bez ryzyka pustego punktu.`
+    });
+  }
+  if (/tak/i.test(pawilon)) {
+    cards.push({
+      title: "Gotowe miejsce na start",
+      desc: "Masz już miejsce pod automat — to skraca czas wdrożenia, bo nie czekamy na budowę pawilonu."
+    });
+  } else if (/nie/i.test(pawilon)) {
+    cards.push({
+      title: "Pawilon do zaplanowania",
+      desc: "Nie masz jeszcze gotowego miejsca — pomożemy dobrać i wycenić drewniany pawilon pod automat."
+    });
+  }
+
+  // Enrich from a prior Advisor submission on the same client, if present.
+  const advisorEntry = (priorHistoria || []).find(h => /^\[advisor\]/i.test(String(h.tekst || "")));
+  if (advisorEntry) {
+    const text = String(advisorEntry.tekst || "");
+    if (/nieformaln[aą] baz[eę] klient[oó]w.*TAK/i.test(text)) {
+      cards.push({
+        title: "Stała grupa odbiorców",
+        desc: "Z ankiety Advisor wynika, że masz już nieformalną bazę klientów — to zmniejsza ryzyko startu."
+      });
+    }
+    if (/dost[eę]p do energii elektrycznej.*TAK/i.test(text) && /dost[eę]p do wody.*TAK/i.test(text)) {
+      cards.push({
+        title: "Media na miejscu",
+        desc: "Masz już dostęp do prądu i wody w lokalizacji — instalacja będzie prostsza i szybsza."
+      });
+    }
+  }
+
+  cards.push({
+    title: "Sprzedaż przez cały rok",
+    desc: "Konfiguracja z ogrzewaniem Anti-Frost pozwala sprzedawać bez przerw również zimą."
+  });
+  cards.push({
+    title: "Rozbudowa w kolejnych etapach",
+    desc: "Automat na butelki i urządzenia na inne produkty można dołączyć po uruchomieniu mlekomatu."
+  });
+  return cards.slice(0, 6);
+}
+
+function buildPhotos(konfigText) {
+  const t = (konfigText || "").toLowerCase();
+  const photos = [];
+  if (t.includes("mlekomat") || t.includes("brunimat")) {
+    photos.push({ file: "automat2.jpg", caption: "Mlekomat BRUNIMAT — front z dozownikiem" });
+  }
+  if (t.includes("sielaff")) {
+    photos.push({ file: "sielaff-combi-m.jpg", caption: "Automat chłodniczy Sielaff SiLine SÜ Combi-M" });
+  }
+  return photos;
+}
+
+async function buildBriefPdfAttachment(payload, lead, priorHistoria) {
   try {
     const priceLines = [];
     const mNetto = Number(payload.mlekomat_netto) || 0;
     const sNetto = Number(payload.sielaff_netto) || 0;
     if (mNetto > 0) priceLines.push({ label: "Mlekomat BRUNIMAT 650 Premium DUO", netto: fmtZl(mNetto) });
     if (sNetto > 0) priceLines.push({ label: "Automat chłodniczy Sielaff SiLine SÜ Combi-M", netto: fmtZl(sNetto) });
+
+    const konfigText = String(payload.konfiguracja || "");
+    const includedItems = [
+      ...(mNetto > 0 ? mlekomatIncludedItems(konfigText) : []),
+      ...(sNetto > 0 ? sielaffIncludedItems() : [])
+    ];
 
     const pdfBuffer = await buildOfferPdf({
       clientName: lead.osoba || lead.firma || "",
@@ -38,7 +138,11 @@ async function buildBriefPdfAttachment(payload, lead) {
       configLines: briefConfigLines(payload),
       priceLines,
       totalNetto: priceLines.length ? (payload.cena_netto && payload.cena_netto !== "—" ? payload.cena_netto : "") : "",
-      totalBrutto: priceLines.length ? (payload.cena_brutto && payload.cena_brutto !== "—" ? payload.cena_brutto : "") : ""
+      totalBrutto: priceLines.length ? (payload.cena_brutto && payload.cena_brutto !== "—" ? payload.cena_brutto : "") : "",
+      insightCards: buildInsightCards(payload, priorHistoria),
+      includedItems,
+      rolloutStages: ROLLOUT_STAGES,
+      photos: buildPhotos(konfigText)
     });
     const safeName = (lead.osoba || lead.firma || "klient").toLowerCase()
       .replace(/[^a-z0-9]+/gi, "-").replace(/^-+|-+$/g, "").slice(0, 40) || "klient";
@@ -295,6 +399,7 @@ module.exports = async function handler(req, res) {
       if (existing) {
         if (!Array.isArray(existing.historia)) existing.historia = [];
         if (!Array.isArray(existing.oferty)) existing.oferty = [];
+        const priorHistoria = existing.historia.slice();
         existing.historia.push({ tekst: lead.historyText, kto: "System", data: now });
         existing.zaktualizowano = now;
         if (!existing.zrodloLeada) existing.zrodloLeada = lead.sourceCfg.zrodloLeada;
@@ -315,7 +420,7 @@ module.exports = async function handler(req, res) {
 
         data.powiadomienia.unshift(buildNotification(existing, lead, now, true));
 
-        return { updatedExisting: true, clientId: existing.id };
+        return { updatedExisting: true, clientId: existing.id, priorHistoria };
       }
 
       const client = {
@@ -357,7 +462,7 @@ module.exports = async function handler(req, res) {
             html: buildAdvisorEmailHtml(payload)
           });
         } else {
-          const attachments = await buildBriefPdfAttachment(payload, lead);
+          const attachments = await buildBriefPdfAttachment(payload, lead, mutation.result.priorHistoria || []);
           await sendEmail({
             to: lead.email,
             subject: "Twoja oferta — Sklep za Stodołą",

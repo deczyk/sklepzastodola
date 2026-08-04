@@ -4,6 +4,7 @@ const { PDFDocument, rgb } = require("pdf-lib");
 const fontkit = require("@pdf-lib/fontkit");
 
 const FOREST = rgb(0x2d / 255, 0x5a / 255, 0x27 / 255);
+const FOREST_DARK = rgb(0x24 / 255, 0x40 / 255, 0x22 / 255);
 const GOLD = rgb(0xb8 / 255, 0x90 / 255, 0x2a / 255);
 const CREAM = rgb(0xf7 / 255, 0xf4 / 255, 0xee / 255);
 const SAGE = rgb(0xe8 / 255, 0xf0 / 255, 0xe6 / 255);
@@ -16,6 +17,8 @@ const WHITE = rgb(1, 1, 1);
 const PAGE_W = 595.28;
 const PAGE_H = 841.89;
 const MARGIN = 44;
+const BOTTOM = 60;
+const CONTENT_W = PAGE_W - MARGIN * 2;
 
 function wrapText(font, size, text, maxWidth) {
   const words = String(text || "").split(/\s+/).filter(Boolean);
@@ -34,6 +37,10 @@ function wrapText(font, size, text, maxWidth) {
   return lines;
 }
 
+function loadImage(name) {
+  return fs.readFileSync(path.join(__dirname, "images", name));
+}
+
 async function buildOfferPdf(data) {
   const {
     clientName = "",
@@ -47,158 +54,283 @@ async function buildOfferPdf(data) {
     totalNetto = "",
     totalBrutto = "",
     individualQuoteItems = ["Transport i dostawa", "Rozładunek, ustawienie i uruchomienie", "Serwis pogwarancyjny"],
+    insightCards = [],
+    includedItems = [],
+    rolloutStages = [],
+    photos = [],
+    docTitle = "BRUNIMAT 650 Premium DUO",
   } = data;
 
   const doc = await PDFDocument.create();
   doc.registerFontkit(fontkit);
 
-  const regularBytes = fs.readFileSync(path.join(__dirname, "fonts", "NotoSans-Regular.ttf"));
-  const boldBytes = fs.readFileSync(path.join(__dirname, "fonts", "NotoSans-Bold.ttf"));
-  const font = await doc.embedFont(regularBytes, { subset: true });
-  const fontBold = await doc.embedFont(boldBytes, { subset: true });
+  const font = await doc.embedFont(fs.readFileSync(path.join(__dirname, "fonts", "NotoSans-Regular.ttf")), { subset: true });
+  const fontBold = await doc.embedFont(fs.readFileSync(path.join(__dirname, "fonts", "NotoSans-Bold.ttf")), { subset: true });
 
-  const page = doc.addPage([PAGE_W, PAGE_H]);
-  let y = PAGE_H;
+  let sectionCounter = 0;
+  let pageIndex = 0;
 
-  // Header band
-  const headerH = 96;
-  page.drawRectangle({ x: 0, y: PAGE_H - headerH, width: PAGE_W, height: headerH, color: FOREST });
-  page.drawText("SKLEP ZA STODOŁĄ", { x: MARGIN, y: PAGE_H - 40, size: 17, font: fontBold, color: WHITE });
-  page.drawText("Dystrybucja, instalacja i serwis mlekomatów BRUNIMAT w Polsce", {
-    x: MARGIN, y: PAGE_H - 58, size: 9, font, color: rgb(0.85, 0.9, 0.85)
-  });
-  const badgeText = "OFERTA WSTĘPNA";
-  const badgeSize = 9;
-  const badgeTextW = fontBold.widthOfTextAtSize(badgeText, badgeSize);
-  const badgeW = badgeTextW + 26;
-  const badgeH = 24;
-  const badgeX = PAGE_W - MARGIN - badgeW;
-  const badgeY = PAGE_H - 46;
-  page.drawRectangle({ x: badgeX, y: badgeY, width: badgeW, height: badgeH, color: GOLD });
-  page.drawText(badgeText, { x: badgeX + 13, y: badgeY + 8, size: badgeSize, font: fontBold, color: WHITE });
+  function drawMainHeader(page) {
+    const headerH = 96;
+    page.drawRectangle({ x: 0, y: PAGE_H - headerH, width: PAGE_W, height: headerH, color: FOREST });
+    page.drawText("SKLEP ZA STODOŁĄ", { x: MARGIN, y: PAGE_H - 40, size: 17, font: fontBold, color: WHITE });
+    page.drawText("Dystrybucja, instalacja i serwis mlekomatów BRUNIMAT w Polsce", {
+      x: MARGIN, y: PAGE_H - 58, size: 9, font, color: rgb(0.85, 0.9, 0.85)
+    });
+    const badgeText = "OFERTA WSTĘPNA";
+    const badgeSize = 9;
+    const badgeW = fontBold.widthOfTextAtSize(badgeText, badgeSize) + 26;
+    const badgeH = 24;
+    const badgeX = PAGE_W - MARGIN - badgeW;
+    const badgeY = PAGE_H - 46;
+    page.drawRectangle({ x: badgeX, y: badgeY, width: badgeW, height: badgeH, color: GOLD });
+    page.drawText(badgeText, { x: badgeX + 13, y: badgeY + 8, size: badgeSize, font: fontBold, color: WHITE });
+    return PAGE_H - headerH - 40;
+  }
 
-  y = PAGE_H - headerH - 44;
+  function drawContinuationHeader(page) {
+    page.drawRectangle({ x: 0, y: PAGE_H - 36, width: PAGE_W, height: 36, color: FOREST });
+    page.drawText("SKLEP ZA STODOŁĄ", { x: MARGIN, y: PAGE_H - 23, size: 10, font: fontBold, color: WHITE });
+    const right = `Oferta | ${docTitle}`;
+    const rw = font.widthOfTextAtSize(right, 8.5);
+    page.drawText(right, { x: PAGE_W - MARGIN - rw, y: PAGE_H - 22, size: 8.5, font, color: rgb(0.85, 0.9, 0.85) });
+    return PAGE_H - 36 - 28;
+  }
 
-  // Product title + description
-  const titleLines = wrapText(fontBold, 22, productTitle, PAGE_W - MARGIN * 2);
+  function newPage() {
+    const page = doc.addPage([PAGE_W, PAGE_H]);
+    pageIndex++;
+    const y = pageIndex === 1 ? drawMainHeader(page) : drawContinuationHeader(page);
+    return { page, y };
+  }
+
+  let ctx = newPage();
+
+  function ensureSpace(needed) {
+    if (ctx.y - needed < BOTTOM) ctx = newPage();
+  }
+
+  function sectionTitle(title) {
+    sectionCounter++;
+    ensureSpace(30);
+    const badgeR = 8;
+    page().drawCircle({ x: MARGIN + badgeR, y: ctx.y - badgeR + 3, size: badgeR, color: FOREST });
+    const numTxt = String(sectionCounter);
+    const nw = fontBold.widthOfTextAtSize(numTxt, 8.5);
+    page().drawText(numTxt, { x: MARGIN + badgeR - nw / 2, y: ctx.y - badgeR - 1, size: 8.5, font: fontBold, color: WHITE });
+    page().drawText(title, { x: MARGIN + badgeR * 2 + 8, y: ctx.y - 4, size: 13.5, font: fontBold, color: INK });
+    ctx.y -= 22;
+    page().drawLine({ start: { x: MARGIN, y: ctx.y }, end: { x: PAGE_W - MARGIN, y: ctx.y }, thickness: 0.75, color: LINE });
+    ctx.y -= 16;
+  }
+
+  function page() { return ctx.page; }
+
+  // Font glyph coverage for "✓" is unreliable across subsets — draw it as two
+  // short vector strokes instead of relying on a text glyph.
+  function drawCheckmark(x, y) {
+    page().drawLine({ start: { x, y: y - 2 }, end: { x: x + 3, y: y - 5 }, thickness: 1.3, color: FOREST });
+    page().drawLine({ start: { x: x + 3, y: y - 5 }, end: { x: x + 8, y: y + 3 }, thickness: 1.3, color: FOREST });
+  }
+
+  // ── Title + description ─────────────────────────────────────
+  ensureSpace(60);
+  const titleLines = wrapText(fontBold, 20, productTitle, CONTENT_W);
   titleLines.forEach(line => {
-    page.drawText(line, { x: MARGIN, y, size: 22, font: fontBold, color: INK });
-    y -= 27;
+    page().drawText(line, { x: MARGIN, y: ctx.y, size: 20, font: fontBold, color: INK });
+    ctx.y -= 24;
   });
-  y -= 6;
   if (productDesc) {
-    const descLines = wrapText(font, 11, productDesc, PAGE_W - MARGIN * 2);
+    const descLines = wrapText(font, 10.5, productDesc, CONTENT_W);
     descLines.forEach(line => {
-      page.drawText(line, { x: MARGIN, y, size: 11, font, color: MUTED });
-      y -= 15;
+      page().drawText(line, { x: MARGIN, y: ctx.y, size: 10.5, font, color: MUTED });
+      ctx.y -= 14;
     });
   }
-  y -= 20;
+  ctx.y -= 12;
 
-  // Client info bar
-  const barH = 54;
-  page.drawRectangle({
-    x: MARGIN, y: y - barH, width: PAGE_W - MARGIN * 2, height: barH,
-    color: CREAM, borderColor: LINE, borderWidth: 1
-  });
-  const cols = [
-    ["KLIENT", clientName || "—"],
-    ["LOKALIZACJA", location || "—"],
-    ["DATA", dateStr],
-  ];
-  const colW = (PAGE_W - MARGIN * 2 - 32) / cols.length;
+  // ── Client info bar ─────────────────────────────────────────
+  ensureSpace(60);
+  const barH = 46;
+  page().drawRectangle({ x: MARGIN, y: ctx.y - barH, width: CONTENT_W, height: barH, color: CREAM, borderColor: LINE, borderWidth: 1 });
+  const cols = [["KLIENT", clientName || "—"], ["LOKALIZACJA", location || "—"], ["DATA", dateStr]];
+  const colW = (CONTENT_W - 32) / cols.length;
   cols.forEach(([label, value], i) => {
     const cx = MARGIN + 16 + i * colW;
-    page.drawText(label, { x: cx, y: y - 22, size: 8, font: fontBold, color: DIM });
-    const valueLines = wrapText(fontBold, 11, value, colW - 12);
-    page.drawText(valueLines[0] || "—", { x: cx, y: y - 38, size: 11, font: fontBold, color: INK });
+    page().drawText(label, { x: cx, y: ctx.y - 16, size: 7.5, font: fontBold, color: DIM });
+    page().drawText(wrapText(fontBold, 11, value, colW - 12)[0] || "—", { x: cx, y: ctx.y - 32, size: 11, font: fontBold, color: INK });
   });
-  y -= barH + 26;
+  ctx.y -= barH + 20;
 
-  // Recommendation box
+  // ── Recommendation box ──────────────────────────────────────
   if (recommendation) {
-    const recLines = wrapText(font, 10.5, recommendation, PAGE_W - MARGIN * 2 - 32);
-    const recBoxH = 26 + recLines.length * 14 + 14;
-    page.drawRectangle({ x: MARGIN, y: y - recBoxH, width: PAGE_W - MARGIN * 2, height: recBoxH, color: FOREST });
-    page.drawText("REKOMENDACJA", { x: MARGIN + 16, y: y - 22, size: 8.5, font: fontBold, color: GOLD });
-    let ry = y - 38;
-    recLines.forEach(line => {
-      page.drawText(line, { x: MARGIN + 16, y: ry, size: 10.5, font, color: WHITE });
-      ry -= 14;
+    const recLines = wrapText(font, 10, recommendation, CONTENT_W - 32);
+    const recBoxH = 22 + recLines.length * 13.5;
+    ensureSpace(recBoxH + 14);
+    page().drawRectangle({ x: MARGIN, y: ctx.y - recBoxH, width: CONTENT_W, height: recBoxH, color: FOREST });
+    page().drawText("REKOMENDACJA", { x: MARGIN + 16, y: ctx.y - 18, size: 8, font: fontBold, color: GOLD });
+    let ry = ctx.y - 33;
+    recLines.forEach(line => { page().drawText(line, { x: MARGIN + 16, y: ry, size: 10, font, color: WHITE }); ry -= 13.5; });
+    ctx.y -= recBoxH + 20;
+  }
+
+  // ── 1. Dlaczego ten wariant pasuje (insight cards, 2 col) ───
+  if (insightCards.length) {
+    sectionTitle("Dlaczego ten wariant pasuje do Twojego planu");
+    const gap = 12;
+    const cardW = (CONTENT_W - gap) / 2;
+    let colX = [MARGIN, MARGIN + cardW + gap];
+    let colY = [ctx.y, ctx.y];
+    insightCards.forEach((card, i) => {
+      const col = i % 2;
+      const descLines = wrapText(font, 8.8, card.desc, cardW - 20);
+      const cardH = 34 + descLines.length * 11.5;
+      if (colY[col] - cardH < BOTTOM) {
+        ctx = newPage();
+        colY = [ctx.y, ctx.y];
+      }
+      const cx = colX[col], cy = colY[col];
+      page().drawRectangle({ x: cx, y: cy - cardH, width: cardW, height: cardH, borderColor: LINE, borderWidth: 1, color: WHITE });
+      page().drawText(card.title, { x: cx + 12, y: cy - 18, size: 9.5, font: fontBold, color: INK });
+      let dy = cy - 32;
+      descLines.forEach(line => { page().drawText(line, { x: cx + 12, y: dy, size: 8.8, font, color: MUTED }); dy -= 11.5; });
+      colY[col] = cy - cardH - 10;
     });
-    y -= recBoxH + 26;
+    ctx.y = Math.min(colY[0], colY[1]) - 10;
   }
 
-  // Configuration
-  if (configLines.length) {
-    page.drawText("Wybrana konfiguracja", { x: MARGIN, y, size: 13, font: fontBold, color: INK });
-    y -= 20;
-    for (const raw of configLines) {
-      const lines = wrapText(font, 10.5, raw, PAGE_W - MARGIN * 2 - 16);
-      lines.forEach((line, idx) => {
-        const bullet = idx === 0 ? "•" : " ";
-        page.drawText(bullet, { x: MARGIN, y, size: 10.5, font: fontBold, color: FOREST });
-        page.drawText(line, { x: MARGIN + 14, y, size: 10.5, font, color: INK });
-        y -= 15;
+  // ── 2. Co jest w zestawie (checklist, 2 col) ────────────────
+  if (includedItems.length) {
+    sectionTitle("Co jest w zestawie");
+    const gap = 20;
+    const colW2 = (CONTENT_W - gap) / 2;
+    const half = Math.ceil(includedItems.length / 2);
+    const leftItems = includedItems.slice(0, half);
+    const rightItems = includedItems.slice(half);
+    const startY = ctx.y;
+    function drawChecklist(items, x, topY) {
+      let yy = topY;
+      items.forEach(label => {
+        const lines = wrapText(font, 9, label, colW2 - 20);
+        drawCheckmark(x + 1, yy + 3);
+        lines.forEach((line, idx) => {
+          page().drawText(line, { x: x + 14, y: yy - idx * 11, size: 9, font, color: INK });
+        });
+        yy -= lines.length * 11 + 5;
       });
+      return yy;
     }
-    y -= 12;
+    ensureSpace(20);
+    const leftEnd = drawChecklist(leftItems, MARGIN, startY);
+    const rightEnd = drawChecklist(rightItems, MARGIN + colW2 + gap, startY);
+    ctx.y = Math.min(leftEnd, rightEnd) - 8;
   }
 
-  // Price breakdown (per product) + total
-  if (priceLines.length) {
-    page.drawText("Cena katalogowa", { x: MARGIN, y, size: 13, font: fontBold, color: INK });
-    y -= 18;
+  // ── 3. Cena i zakres wyceny ──────────────────────────────────
+  if (priceLines.length || totalNetto) {
+    sectionTitle("Cena i zakres wyceny");
     for (const item of priceLines) {
-      page.drawText(item.label, { x: MARGIN, y, size: 9.5, font, color: MUTED });
+      ensureSpace(16);
+      page().drawText(item.label, { x: MARGIN, y: ctx.y, size: 9.5, font, color: MUTED });
       const nettoTxt = `${item.netto} netto`;
       const nw = fontBold.widthOfTextAtSize(nettoTxt, 10);
-      page.drawText(nettoTxt, { x: PAGE_W - MARGIN - nw, y, size: 10, font: fontBold, color: INK });
-      y -= 14;
+      page().drawText(nettoTxt, { x: PAGE_W - MARGIN - nw, y: ctx.y, size: 10, font: fontBold, color: INK });
+      ctx.y -= 15;
     }
-    y -= 6;
-    page.drawLine({ start: { x: MARGIN, y }, end: { x: PAGE_W - MARGIN, y }, thickness: 0.75, color: LINE });
-    y -= 4;
+    if (priceLines.length) {
+      ctx.y -= 4;
+      ensureSpace(8);
+      page().drawLine({ start: { x: MARGIN, y: ctx.y }, end: { x: PAGE_W - MARGIN, y: ctx.y }, thickness: 0.75, color: LINE });
+      ctx.y -= 12;
+    }
+    if (totalNetto) {
+      const priceBoxH = 42;
+      ensureSpace(priceBoxH + 10);
+      page().drawRectangle({ x: MARGIN, y: ctx.y - priceBoxH, width: CONTENT_W, height: priceBoxH, color: SAGE });
+      page().drawText("RAZEM — CENA KATALOGOWA NETTO", { x: MARGIN + 14, y: ctx.y - 16, size: 8, font: fontBold, color: FOREST_DARK });
+      page().drawText(String(totalNetto), { x: MARGIN + 14, y: ctx.y - 33, size: 19, font: fontBold, color: FOREST });
+      if (totalBrutto) {
+        const bruttoLabel = `Brutto: ${totalBrutto}`;
+        const bw = font.widthOfTextAtSize(bruttoLabel, 10);
+        page().drawText(bruttoLabel, { x: PAGE_W - MARGIN - 14 - bw, y: ctx.y - 25, size: 10, font, color: MUTED });
+      }
+      ctx.y -= priceBoxH + 18;
+    }
+    if (individualQuoteItems.length) {
+      ensureSpace(20 + individualQuoteItems.length * 13);
+      page().drawText("Do osobnej wyceny", { x: MARGIN, y: ctx.y, size: 10.5, font: fontBold, color: INK });
+      page().drawText("(nie wliczone w cenę powyżej — wyceniamy indywidualnie po rozmowie)", { x: MARGIN, y: ctx.y - 11, size: 7.8, font, color: DIM });
+      ctx.y -= 26;
+      individualQuoteItems.forEach(label => {
+        page().drawText("—", { x: MARGIN, y: ctx.y, size: 9.5, font, color: GOLD });
+        page().drawText(label, { x: MARGIN + 12, y: ctx.y, size: 9.5, font, color: INK });
+        ctx.y -= 13;
+      });
+    }
+    ctx.y -= 10;
   }
 
-  if (totalNetto) {
-    const priceBoxH = 40;
-    page.drawRectangle({ x: MARGIN, y: y - priceBoxH, width: PAGE_W - MARGIN * 2, height: priceBoxH, color: SAGE });
-    page.drawText("RAZEM — CENA KATALOGOWA NETTO", { x: MARGIN + 14, y: y - 15, size: 8, font: fontBold, color: rgb(0.24, 0.4, 0.22) });
-    page.drawText(String(totalNetto), { x: MARGIN + 14, y: y - 31, size: 19, font: fontBold, color: FOREST });
-    if (totalBrutto) {
-      const bruttoLabel = `Brutto: ${totalBrutto}`;
-      const bw = font.widthOfTextAtSize(bruttoLabel, 10);
-      page.drawText(bruttoLabel, { x: PAGE_W - MARGIN - 14 - bw, y: y - 23, size: 10, font, color: MUTED });
-    }
-    y -= priceBoxH + 16;
-  }
-
-  // Elements quoted individually
-  if (individualQuoteItems.length) {
-    page.drawText("Do osobnej wyceny", { x: MARGIN, y, size: 11, font: fontBold, color: INK });
-    y -= 4;
-    page.drawText("(nie wliczone w cenę powyżej — wyceniamy indywidualnie po rozmowie)", { x: MARGIN, y: y - 8, size: 8, font, color: DIM });
-    y -= 20;
-    individualQuoteItems.forEach(label => {
-      page.drawText("—", { x: MARGIN, y, size: 9.5, font, color: GOLD });
-      page.drawText(label, { x: MARGIN + 12, y, size: 9.5, font, color: INK });
-      y -= 13;
+  // ── 4. Proponowane wdrożenie etapowe ─────────────────────────
+  if (rolloutStages.length) {
+    sectionTitle("Proponowane wdrożenie etapowe");
+    const gap = 12;
+    const cardW = (CONTENT_W - gap * (rolloutStages.length - 1)) / rolloutStages.length;
+    const cardH = 92;
+    ensureSpace(cardH + 10);
+    rolloutStages.forEach((stage, i) => {
+      const cx = MARGIN + i * (cardW + gap);
+      page().drawRectangle({ x: cx, y: ctx.y - cardH, width: cardW, height: cardH, borderColor: LINE, borderWidth: 1, color: WHITE });
+      page().drawCircle({ x: cx + 20, y: ctx.y - 22, size: 11, color: FOREST });
+      const numTxt = String(i + 1);
+      const nw = fontBold.widthOfTextAtSize(numTxt, 10);
+      page().drawText(numTxt, { x: cx + 20 - nw / 2, y: ctx.y - 25.5, size: 10, font: fontBold, color: WHITE });
+      const tagW = fontBold.widthOfTextAtSize(stage.tag, 7.5);
+      page().drawText(stage.tag, { x: cx + cardW - 14 - tagW, y: ctx.y - 19, size: 7.5, font: fontBold, color: GOLD });
+      const nameLines = wrapText(fontBold, 9.5, stage.name, cardW - 24);
+      let ny = ctx.y - 42;
+      nameLines.forEach(line => { page().drawText(line, { x: cx + 14, y: ny, size: 9.5, font: fontBold, color: INK }); ny -= 12; });
+      const descLines = wrapText(font, 8, stage.desc, cardW - 24);
+      descLines.forEach(line => { page().drawText(line, { x: cx + 14, y: ny, size: 8, font, color: MUTED }); ny -= 10.5; });
     });
-    y -= 8;
+    ctx.y -= cardH + 20;
   }
 
-  // Footer
-  const footerY = 64;
-  page.drawLine({ start: { x: MARGIN, y: footerY + 18 }, end: { x: PAGE_W - MARGIN, y: footerY + 18 }, thickness: 1, color: LINE });
+  // ── 5. Zdjęcia urządzenia ────────────────────────────────────
+  if (photos.length) {
+    sectionTitle("Zdjęcia urządzenia");
+    const gap = 16;
+    const photoW = (CONTENT_W - gap * (photos.length - 1)) / photos.length;
+    const photoH = photoW * 1.3;
+    ensureSpace(photoH + 30);
+    for (let i = 0; i < photos.length; i++) {
+      const ph = photos[i];
+      try {
+        const bytes = loadImage(ph.file);
+        const img = ph.file.toLowerCase().endsWith(".png") ? await doc.embedPng(bytes) : await doc.embedJpg(bytes);
+        const dims = img.scaleToFit(photoW, photoH);
+        const px = MARGIN + i * (photoW + gap) + (photoW - dims.width) / 2;
+        page().drawImage(img, { x: px, y: ctx.y - photoH + (photoH - dims.height), width: dims.width, height: dims.height });
+        page().drawRectangle({ x: MARGIN + i * (photoW + gap), y: ctx.y - photoH, width: photoW, height: photoH, borderColor: LINE, borderWidth: 1 });
+        if (ph.caption) {
+          page().drawText(wrapText(font, 8, ph.caption, photoW)[0] || "", { x: MARGIN + i * (photoW + gap), y: ctx.y - photoH - 13, size: 8, font, color: MUTED });
+        }
+      } catch (e) {
+        console.error("Photo embed failed", ph.file, e && e.message);
+      }
+    }
+    ctx.y -= photoH + 26;
+  }
+
+  // ── Footer (right after content — no forced bottom placement, so it
+  //    never strands itself alone on an otherwise-empty new page) ──
+  ensureSpace(50);
+  const footerY = ctx.y - 10;
+  page().drawLine({ start: { x: MARGIN, y: footerY + 18 }, end: { x: PAGE_W - MARGIN, y: footerY + 18 }, thickness: 1, color: LINE });
   const disclaimer = "Oferta ma charakter wstępny i niewiążący. Cena, dostępność, VAT, warunki dostawy oraz zakres instalacji wymagają potwierdzenia po ocenie lokalizacji. Ważność oferty: 14 dni.";
-  const discLines = wrapText(font, 8, disclaimer, PAGE_W - MARGIN * 2);
+  const discLines = wrapText(font, 8, disclaimer, CONTENT_W);
   let fy = footerY;
-  discLines.forEach(line => {
-    page.drawText(line, { x: MARGIN, y: fy, size: 8, font, color: DIM });
-    fy -= 11;
-  });
-  page.drawText("735 115 427  ·  kontakt@sklepzastodola.pl  ·  sklepzastodola.pl", {
+  discLines.forEach(line => { page().drawText(line, { x: MARGIN, y: fy, size: 8, font, color: DIM }); fy -= 11; });
+  page().drawText("735 115 427  ·  kontakt@sklepzastodola.pl  ·  sklepzastodola.pl", {
     x: MARGIN, y: fy - 8, size: 9, font: fontBold, color: FOREST
   });
 

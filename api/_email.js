@@ -82,11 +82,16 @@ function ctaButton(href, label) {
   </div>`;
 }
 
+function firstName(value) {
+  return esc(String(value || "").trim().split(/\s+/)[0] || "");
+}
+
 function buildAdvisorEmailHtml(payload) {
-  const owner = esc(payload.osoba || payload.owner || "");
+  const name = firstName(payload.osoba || payload.owner);
   const wynik = esc(payload.wynikPotencjalu || "");
   return wrapEmail(`
-    <h1 style="font-size:20px;margin:0 0 12px;color:#1e1e1a">Dzień dobry${owner ? " " + owner : ""}, obliczyliśmy Twój potencjał</h1>
+    <p style="font-size:13px;color:#6b6454;margin:0 0 4px">Dzień dobry${name ? ", " + name : ""},</p>
+    <h1 style="font-size:20px;margin:0 0 12px;color:#1e1e1a">Obliczyliśmy Twój potencjał</h1>
     <p style="line-height:1.6;font-size:14px;color:#3d3b35">Dziękujemy za wypełnienie kalkulatora Advisor. Oto wynik:</p>
     <div style="background:#f5eddb;border-radius:10px;padding:16px 18px;margin:18px 0;text-align:center">
       <div style="font-size:13px;color:#6b6454;text-transform:uppercase;letter-spacing:.05em;font-weight:bold">Potencjał projektu</div>
@@ -99,9 +104,10 @@ function buildAdvisorEmailHtml(payload) {
 }
 
 function buildBriefEmailHtml(payload) {
-  const owner = esc(payload.osoba || "");
+  const name = firstName(payload.osoba);
   return wrapEmail(`
-    <h1 style="font-size:20px;margin:0 0 12px;color:#1e1e1a">Dzień dobry${owner ? " " + owner : ""}, Twoja oferta jest gotowa</h1>
+    <p style="font-size:13px;color:#6b6454;margin:0 0 4px">Dzień dobry${name ? ", " + name : ""},</p>
+    <h1 style="font-size:20px;margin:0 0 12px;color:#1e1e1a">Twoja oferta jest gotowa</h1>
     <p style="line-height:1.6;font-size:14px;color:#3d3b35">Dziękujemy za wypełnienie konfiguratora. W załączniku znajdziesz ofertę PDF przygotowaną na podstawie Twojej konfiguracji.</p>
     <p style="line-height:1.6;font-size:14px;color:#3d3b35">To wycena orientacyjna na podstawie cen katalogowych. Oddzwonimy w ciągu jednego dnia roboczego, żeby dopiąć szczegóły.</p>
     <div style="text-align:center;margin-top:22px">
