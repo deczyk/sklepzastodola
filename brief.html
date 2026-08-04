@@ -278,7 +278,12 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--cr);color:var(
     };
     function detailFor(k){
       if(k==='sielaff'){var s=document.querySelector('#sielaff-grid .opt-item.selected');return s&&s.querySelector('.opt-name')?s.querySelector('.opt-name').textContent:'';}
-      if(k==='butelki'){var b=document.getElementById('butelki-display');return b?(parseInt(b.textContent,10)||200)+' szt.':'';}
+      if(k==='butelki'){
+        var b=document.getElementById('butelki-display');
+        var lbl=etykietaLabel();
+        var qty=b?(parseInt(b.textContent,10)||200)+' szt.':'';
+        return qty+(lbl?' — etykieta: '+lbl:'');
+      }
       if(k==='pawilon'){var p=document.querySelector('#pawilon-grid .opt-item.selected');return p&&p.querySelector('.opt-name')?p.querySelector('.opt-name').textContent:'';}
       return '';
     }
