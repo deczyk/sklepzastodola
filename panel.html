@@ -229,6 +229,7 @@
   .subCategoryBtn.active{background:var(--surface-muted);color:var(--green);border-color:var(--border)}
   .subCategoryBtn[data-priority="true"]{border-color:#ead99a;background:#fff8df;color:#755c15}
   body.dark-theme .subCategoryBtn[data-priority="true"]{background:#3a3120;border-color:#6a5631;color:#f0d991}
+  .subNavBadge{display:inline-flex;align-items:center;justify-content:center;min-width:18px;height:18px;padding:0 5px;margin-left:6px;border-radius:999px;background:var(--todo);color:#fff;font-size:11px;font-weight:bold;vertical-align:middle}
   .tabPane{display:none}
   .tabPane.active{display:block}
 
@@ -346,12 +347,12 @@
   .loanRow .v{font-weight:bold}
 
   /* --- Do zrobienia --- */
-  .zadanieItem{display:flex;align-items:center;gap:12px;border:1px solid var(--line);border-radius:10px;
-               padding:10px 14px;margin-bottom:8px;background:#fbfcfb}
-  .zadanieItem.done{opacity:0.55}
+  .zadanieItem{display:flex;align-items:center;gap:12px;border:1px solid var(--line);border-left:3px solid var(--progress);border-radius:10px;
+               padding:10px 14px;margin-bottom:8px;background:#fbfcfb;box-shadow:var(--shadow-soft)}
+  .zadanieItem.done{opacity:0.55;border-left-color:var(--done)}
   .zadanieItem.done .zadanieTekst{text-decoration:line-through}
   .zadanieItem input[type="checkbox"]{width:18px;height:18px;flex-shrink:0;cursor:pointer}
-  .zadanieTekst{flex:1;font-size:14px}
+  .zadanieTekst{flex:1;font-size:14.5px;font-weight:600}
   .ktoBadge{font-size:11px;font-weight:bold;padding:3px 10px;border-radius:12px;background:var(--light);
             color:var(--green);border:1px solid #d8eadb;white-space:nowrap}
   .doneBtn{background:#eaf5ec;border:1px solid #bfe0c6;color:var(--done);border-radius:8px;
@@ -2108,6 +2109,7 @@
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script>
 const STORAGE_KEY = "panel_items_v2";
 const PANEL_SESSION_KEY = "panel_session_password";
@@ -2191,9 +2193,12 @@ function renderNavigation(){
     <button class="mainCategoryBtn ${currentMainCategory===key?"active":""}" onclick="setMainCategory('${key}')">${crmEsc(section.label)}</button>
   `).join("");
   const activeSection = PANEL_NAV[currentMainCategory] || PANEL_NAV.start;
-  subNav.innerHTML = activeSection.views.map(view => `
-    <button class="subCategoryBtn ${currentSubView===view.key?"active":""}" data-priority="${view.priority ? "true" : "false"}" onclick="setSubView('${view.key}')">${crmEsc(view.label)}</button>
-  `).join("");
+  const openZadania = (data.zadania||[]).filter(z=>!z.zrobione).length;
+  subNav.innerHTML = activeSection.views.map(view => {
+    const badge = view.tab === "zadania" && openZadania > 0
+      ? `<span class="subNavBadge">${openZadania}</span>` : "";
+    return `<button class="subCategoryBtn ${currentSubView===view.key?"active":""}" data-priority="${view.priority ? "true" : "false"}" onclick="setSubView('${view.key}')">${crmEsc(view.label)}${badge}</button>`;
+  }).join("");
 }
 
 function setMainCategory(categoryKey){
@@ -4799,6 +4804,7 @@ function renderClientOffers(c){
     <div class="clientOffers">
       <div class="clientOffersHead">
         <b>Oferty (${offers.length})</b>
+        <button class="histBtn" onclick="generateOfferPdf('${crmEsc(c.id)}')">📄 Generuj ofertę PDF</button>
         <button class="histBtn" onclick="toggleOfferForm('${crmEsc(c.id)}')">+ Dodaj ofertę</button>
       </div>
       <div class="offerForm" data-offer-form-for="${crmEsc(c.id)}">
@@ -5202,6 +5208,109 @@ function closeClientCard(){
 function toggleOfferForm(clientId){
   const form = document.querySelector(`.offerForm[data-offer-form-for="${clientId}"]`);
   if(form) form.classList.toggle("open");
+}
+
+function findLatestBriefHistory(c){
+  const hist = Array.isArray(c.historia) ? c.historia : [];
+  const briefEntries = hist.filter(h => parseHistoryText(h.tekst || "").type.toLowerCase() === "brief");
+  if(!briefEntries.length) return null;
+  return briefEntries.slice().sort((a,b) => new Date(b.data||0) - new Date(a.data||0))[0];
+}
+
+function guessOfferAmount(text){
+  const m = (text || "").match(/([\d][\d\s]{2,})\s*zł/);
+  return m ? m[1].replace(/\s+/g,"") : "";
+}
+
+async function generateOfferPdf(clientId){
+  const c = data.klienci.find(x=>x.id===clientId);
+  if(!c) return;
+  if(!(window.jspdf && window.jspdf.jsPDF)){
+    alert("Biblioteka PDF nie wczytała się. Sprawdź połączenie z internetem i odśwież panel.");
+    return;
+  }
+  const briefEntry = findLatestBriefHistory(c);
+  const briefText = briefEntry ? parseHistoryText(briefEntry.tekst || "").text : "";
+  const configLines = briefText
+    ? briefText.replace(/^Klient skonfigurował mlekomat w konfiguratorze\.\s*/,"").split(/;\s*/).filter(Boolean)
+    : [];
+
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({unit:"mm", format:"a4"});
+  const pageWidth = doc.internal.pageSize.getWidth();
+  const margin = 18;
+  let y = 22;
+
+  doc.setFont("helvetica","bold"); doc.setFontSize(18); doc.setTextColor(45,90,39);
+  doc.text("Sklep za Stodołą", margin, y);
+  doc.setFont("helvetica","normal"); doc.setFontSize(10); doc.setTextColor(90,90,90);
+  doc.text("Oferta — punkt sprzedaży bezpośredniej przy gospodarstwie", margin, y+6);
+  doc.text(new Date().toLocaleDateString("pl-PL"), pageWidth-margin, y, {align:"right"});
+  y += 16;
+  doc.setDrawColor(220,220,220); doc.line(margin, y, pageWidth-margin, y);
+  y += 10;
+
+  doc.setFont("helvetica","bold"); doc.setFontSize(12); doc.setTextColor(20,20,20);
+  doc.text("Dla:", margin, y); y += 6;
+  doc.setFont("helvetica","normal"); doc.setFontSize(11);
+  const clientLines = [
+    getClientDisplayName(c),
+    clientContact(c),
+    clientLocation(c)
+  ].filter(Boolean);
+  clientLines.forEach(line => { doc.text(line, margin, y); y += 6; });
+  y += 6;
+
+  doc.setFont("helvetica","bold"); doc.setFontSize(12);
+  doc.text("Wybrana konfiguracja:", margin, y); y += 7;
+  doc.setFont("helvetica","normal"); doc.setFontSize(10.5);
+  if(configLines.length){
+    configLines.forEach(line => {
+      const wrapped = doc.splitTextToSize("• " + line, pageWidth - margin*2);
+      wrapped.forEach(w => { doc.text(w, margin, y); y += 5.5; });
+    });
+  } else {
+    const fallback = [c.zainteresowanie, c.produkt].filter(Boolean).join(" — ") || "Brak zapisanej konfiguracji z konfiguratora — uzupełnij ręcznie przed wysyłką.";
+    doc.text(doc.splitTextToSize(fallback, pageWidth - margin*2), margin, y);
+    y += 10;
+  }
+  y += 8;
+
+  doc.setDrawColor(220,220,220); doc.line(margin, y, pageWidth-margin, y);
+  y += 8;
+  doc.setFont("helvetica","normal"); doc.setFontSize(9); doc.setTextColor(120,120,120);
+  const disclaimer = "Oferta orientacyjna na podstawie danych z konfiguratora. Ceny katalogowe mogą ulec zmianie; ostateczne warunki ustalamy podczas rozmowy. Ważność oferty: 14 dni.";
+  doc.text(doc.splitTextToSize(disclaimer, pageWidth - margin*2), margin, y);
+  y += 14;
+  doc.setTextColor(45,90,39); doc.setFont("helvetica","bold"); doc.setFontSize(10);
+  doc.text("735 115 427  ·  kontakt@sklepzastodola.pl  ·  sklepzastodola.pl", margin, y);
+
+  const safeName = (c.firma || c.osoba || "klient").toString().toLowerCase()
+    .replace(/[^a-z0-9]+/gi,"-").replace(/^-+|-+$/g,"").slice(0,40) || "klient";
+  const filename = `oferta-${safeName}-${new Date().toISOString().slice(0,10)}.pdf`;
+  doc.save(filename);
+
+  if(!Array.isArray(c.oferty)) c.oferty = [];
+  const now = new Date().toISOString();
+  c.oferty.push({
+    id:"o_"+Date.now(),
+    dataWyslania:"",
+    wariant: configLines[0] ? configLines[0].slice(0,120) : (c.zainteresowanie || ""),
+    kwota: guessOfferAmount(briefText),
+    waluta:"PLN",
+    status:"Robocza",
+    linkOferta:"",
+    nazwaPliku: filename,
+    nastepnyFollowup:"",
+    notatka:"Wygenerowano automatycznie z danych konfiguratora (brief.html). Pobrano na komputer — wyślij ręcznie mailem.",
+    dataUtworzenia: now,
+    dataAktualizacji: now
+  });
+  c.zaktualizowano = now;
+  logActivity(`wygenerował(a) ofertę PDF dla klienta „${c.firma||c.osoba||'bez nazwy'}”`);
+  await saveData();
+  renderClients();
+  openClientCard(clientId);
 }
 
 function addClientOffer(clientId){
@@ -7887,6 +7996,7 @@ function importNotesSectionFromPackage(){
 // ================= Do zrobienia =================
 function renderZadania(){
   const list = document.getElementById("list-zadania");
+  if(typeof renderNavigation === "function") renderNavigation();
   if(!list) return;
   const all = data.zadania||[];
   const aktywne = all.filter(z=>!z.zrobione);
