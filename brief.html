@@ -161,6 +161,19 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--cr);color:var(
 .product-card.selected .pc-check{background:var(--g);border-color:var(--g)}
 .sel-info{font-size:.82rem;color:var(--mid);margin-bottom:1rem}
 .btn-next:disabled{background:#b9b9b9;cursor:not-allowed;transform:none;box-shadow:none}
+
+/* ── USUNIĘCIE ZIELONYCH KÓŁEK NAD NAGŁÓWKAMI ── */
+.brief-wrap .step-head::before,.brief-wrap .step-head::after,
+.brief-wrap .step-title::before,.brief-wrap .step-title::after,
+.brief-wrap .step-num::before,.brief-wrap .step-num::after,
+.brief-wrap .step-sub::before,.brief-wrap .step-sub::after,
+.brief-wrap .model-card::before,.brief-wrap .model-card::after,
+.brief-wrap .mc-name::before,.brief-wrap .mc-name::after,
+.brief-wrap .req-header::before,.brief-wrap .req-header::after,
+.brief-wrap .req-name::before,.brief-wrap .req-name::after,
+.brief-wrap .kanny-row::before,.brief-wrap .kanny-row::after,
+.brief-wrap .opt-section-label::before,.brief-wrap .opt-section-label::after,
+.brief-wrap .summary-card .sh::before,.brief-wrap .summary-card .sh::after{content:none!important;display:none!important}
 </style>
 </head>
 <body>
