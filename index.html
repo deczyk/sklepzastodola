@@ -53,12 +53,15 @@
 
 /* EXCLUSIVE DISTRIBUTOR */
 .distributor-band { background: var(--wheat-bg); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); padding: 2rem 5vw 2.4rem; text-align: center; }
-.distributor-label { font-size: clamp(.74rem, 1.4vw, .88rem); font-weight: 800; letter-spacing: .13em; line-height: 1.35; text-transform: uppercase; color: var(--forest); margin-bottom: 1rem; }
-.distributor-logo { display: inline-flex; align-items: center; justify-content: center; max-width: min(420px, 82vw); margin: 0 auto; }
+.distributor-inner { display: flex; flex-direction: column; align-items: center; gap: 1.2rem; }
+.distributor-label { font-size: clamp(.74rem, 1.4vw, .88rem); font-weight: 800; letter-spacing: .13em; line-height: 1.35; text-transform: uppercase; color: var(--forest); margin-bottom: 0; }
+.distributor-logo { display: flex; align-items: center; justify-content: center; max-width: min(420px, 82vw); }
 .distributor-logo img { width: 100%; height: auto; object-fit: contain; }
-.distributor-swiss { display: inline-flex; align-items: center; gap: .45rem; margin-top: 1.2rem; padding: .4rem .9rem; border-radius: 999px; background: var(--paper); border: 1px solid rgba(184,144,42,.35); color: var(--wheat); font-size: .78rem; font-weight: 800; letter-spacing: .04em; }
-.distributor-trust { display: flex; flex-wrap: wrap; justify-content: center; gap: .6rem .7rem; margin-top: 1.3rem; }
-.distributor-trust span { display: inline-flex; align-items: center; gap: .4rem; padding: .5rem .85rem; border-radius: 999px; background: var(--paper); border: 1px solid var(--line); box-shadow: var(--shadow); color: var(--ink); font-size: .82rem; font-weight: 700; }
+.distributor-swiss { display: inline-flex; align-items: center; gap: .45rem; padding: .4rem .9rem; border-radius: 999px; background: var(--paper); border: 1px solid rgba(184,144,42,.35); color: var(--wheat); font-size: .78rem; font-weight: 800; letter-spacing: .04em; }
+.distributor-trust { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .7rem; width: 100%; max-width: 760px; }
+.distributor-trust span { display: flex; align-items: center; justify-content: center; gap: .4rem; padding: .5rem .85rem; border-radius: 999px; background: var(--paper); border: 1px solid var(--line); box-shadow: var(--shadow); color: var(--ink); font-size: .82rem; font-weight: 700; text-align: center; }
+@media (max-width: 760px) { .distributor-trust { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 480px) { .distributor-trust { grid-template-columns: 1fr; } }
 
 /* DEMO VIDEO */
 .demo-video-sec { padding: 5.5rem 5vw; background: var(--bg); border-bottom: 1px solid var(--line); }
@@ -292,7 +295,7 @@
 </section>
 
 <section class="distributor-band" aria-label="Wyłączny dystrybutor BRUNIMAT w Polsce">
-  <div class="wrap">
+  <div class="wrap distributor-inner">
     <p class="distributor-label">WYŁĄCZNY DYSTRYBUTOR MLEKOMATÓW BRUNIMAT W POLSCE</p>
     <div class="distributor-logo">
       <img src="brunimat-logo.webp" width="1068" height="264" alt="BRUNIMAT" loading="lazy" decoding="async">
