@@ -317,7 +317,9 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--cr);color:var(
           var nm=pc.querySelector('.price-card-name'),vr=pc.querySelector('.price-card-variant');
           var addons=[];
           document.querySelectorAll('#sielaff-addons .opt-item.selected .opt-name').forEach(function(n){addons.push(n.textContent);});
-          return (nm?nm.textContent:'')+(vr?' ('+vr.textContent+')':'')+(addons.length?' + '+addons.join(', '):'');
+          var priceVals=pc.querySelectorAll('.price-card-row .v');
+          var priceTxt=priceVals.length===2?(' — '+priceVals[0].textContent+' netto / '+priceVals[1].textContent+' brutto'):'';
+          return (nm?nm.textContent:'')+(vr?' ('+vr.textContent+')':'')+(addons.length?' + '+addons.join(', '):'')+priceTxt;
         }
         var s=document.querySelector('#sielaff-grid .opt-item.selected');return s&&s.querySelector('.opt-name')?s.querySelector('.opt-name').textContent:'';
       }
@@ -411,11 +413,15 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--cr);color:var(
     function appendExtraRows(){
       var head=document.getElementById('summary-head');if(head)head.textContent='Twoja konfiguracja';
       var rows=document.getElementById('summary-rows');if(!rows)return;
+      var hasExtra=false;
       for(var i=0;i<window._selProducts.length;i++){
         var k=window._selProducts[i];if(k==='mlekomat')continue;
+        hasExtra=true;
         var det=detailFor(k);
         rows.insertAdjacentHTML('beforeend','<div class="summary-row"><span class="key">'+NAMES[k]+'</span><span class="val">'+(det||'wycena indywidualna')+'</span></div>');
       }
+      var priceHead=document.getElementById('price-summary-head');
+      if(priceHead)priceHead.textContent=hasExtra?'Szacunkowa wycena — sam mlekomat':'Szacunkowa wycena';
     }
     window.sendBrief=function(){
       var name=readVal('f-name'),tel=readVal('f-tel'),woj=readVal('f-woj'),krowy=readVal('f-krowy'),litry=readVal('f-litry');
@@ -665,8 +671,8 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--cr);color:var(
           <div class="price-card-top">
             <img class="mc-photo" src="sielaff-combi-m.webp" alt="Sielaff SiLine SÜ Combi-M" loading="lazy">
             <div>
-              <div class="price-card-name">Oferta 1 RO</div>
-              <div class="price-card-variant">Na zewnątrz, pod butelki</div>
+              <div class="price-card-name">SiLine SÜ Combi-M</div>
+              <div class="price-card-variant">1 RO — na zewnątrz, pod butelki</div>
             </div>
           </div>
           <div class="price-card-rows">
@@ -678,8 +684,8 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--cr);color:var(
           <div class="price-card-top">
             <img class="mc-photo" src="sielaff-combi-m.webp" alt="Sielaff SiLine SÜ Combi-M" loading="lazy">
             <div>
-              <div class="price-card-name">Oferta 3 RB</div>
-              <div class="price-card-variant">Do wnętrza, wydawanie bezpośrednie + schowek na towary gabarytowe</div>
+              <div class="price-card-name">SiLine SÜ Combi-M</div>
+              <div class="price-card-variant">3 RB — do wnętrza, wydawanie bezpośrednie + schowek na towary gabarytowe</div>
             </div>
           </div>
           <div class="price-card-rows">
@@ -948,7 +954,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--cr);color:var(
 
     <!-- PRICE SUMMARY -->
     <div class="summary-card">
-      <div class="sh">Szacunkowa wycena</div>
+      <div class="sh" id="price-summary-head">Szacunkowa wycena</div>
       <div class="summary-row">
         <span class="key">Cena netto</span>
         <span class="val" id="sum-netto">—</span>
@@ -1043,8 +1049,8 @@ const PRODUCT_NAMES = {
 };
 
 const SIELAFF_NAMES = {
-  combi_m_1ro:        'SiLine SÜ Combi-M — Oferta 1 RO (na zewnątrz, pod butelki)',
-  combi_m_3rb:         'SiLine SÜ Combi-M — Oferta 3 RB (do wnętrza, wydawanie bezpośrednie + schowek na towary gabarytowe)',
+  combi_m_1ro:        'SiLine SÜ Combi-M — wariant 1 RO (na zewnątrz, pod butelki)',
+  combi_m_3rb:         'SiLine SÜ Combi-M — wariant 3 RB (do wnętrza, wydawanie bezpośrednie + schowek na towary gabarytowe)',
   sielaff_chlodniczy: 'Automat chłodniczy — napoje i produkty świeże',
   sielaff_combi:      'Combi — chłodzenie + część sucha',
   sielaff_napoje:     'Napoje zimne (Cold Drinks)',
@@ -1190,7 +1196,10 @@ function buildSummary() {
       ['Ogrzewanie Anti-Frost', '✓ w zestawie'],
       ['Kanny 50 L', kanny + ' szt.'],
     );
-    selected.forEach(k => rows.push([OPT_LABELS[k], '✓ wybrano']));
+    document.querySelectorAll('#config-mlekomat .opt-item.selected').forEach(function(el){
+      var nm=el.querySelector('.opt-name');
+      if(nm) rows.push([nm.textContent, '✓ wybrano']);
+    });
   } else if (currentProduct === 'sielaff') {
     rows.push(
       ['Produkt', 'Automat chłodniczy Sielaff'],
