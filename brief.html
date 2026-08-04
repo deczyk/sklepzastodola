@@ -186,35 +186,211 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--cr);color:var(
     <div class="step-head">
       <div class="step-num">Krok 1 z 4 — Wybór produktu</div>
       <div class="step-title">Co chcesz skonfigurować?</div>
-      <div class="step-sub">Wybierz produkt — konfigurator pokaże opcje i wycenę dopasowane do Twojego wyboru.</div>
+      <div class="step-sub">Wybierz jeden lub kilka produktów — możesz skonfigurować cały punkt sprzedaży albo tylko samo urządzenie. Konfigurator pokaże opcje i wycenę dla każdego wybranego produktu.</div>
     </div>
-    <div class="product-grid">
-      <div class="product-card" onclick="selectProduct('mlekomat')">
+    <div class="product-grid" id="product-grid">
+      <div class="product-card" onclick="toggleProduct('mlekomat')" data-product="mlekomat">
+        <div class="pc-check">✓</div>
         <div class="pc-icon">🥛</div>
         <div class="pc-name">Mlekomat BRUNIMAT</div>
         <div class="pc-desc">Automat do świeżego mleka z wyceną online — kanny, płatności, higiena.</div>
         <div class="pc-tag">wycena online</div>
       </div>
-      <div class="product-card" onclick="selectProduct('sielaff')">
+      <div class="product-card" onclick="toggleProduct('sielaff')" data-product="sielaff">
+        <div class="pc-check">✓</div>
         <div class="pc-icon">🥤</div>
         <div class="pc-name">Automat chłodniczy Sielaff</div>
         <div class="pc-desc">Automaty na jaja, sery, napoje i produkty świeże — seria do wyboru.</div>
         <div class="pc-tag">wycena indywidualna</div>
       </div>
-      <div class="product-card" onclick="selectProduct('butelki')">
+      <div class="product-card" onclick="toggleProduct('butelki')" data-product="butelki">
+        <div class="pc-check">✓</div>
         <div class="pc-icon">🍾</div>
         <div class="pc-name">Szklane butelki z etykietą</div>
         <div class="pc-desc">Butelki pod Twój punkt sprzedaży — ilość i etykieta.</div>
         <div class="pc-tag">wycena indywidualna</div>
       </div>
-      <div class="product-card" onclick="selectProduct('pawilon')">
+      <div class="product-card" onclick="toggleProduct('pawilon')" data-product="pawilon">
+        <div class="pc-check">✓</div>
         <div class="pc-icon">🏠</div>
         <div class="pc-name">Pawilon drewniany</div>
         <div class="pc-desc">Pawilon pod punkt sprzedaży — rozmiar i wykończenie.</div>
         <div class="pc-tag">wycena indywidualna</div>
       </div>
     </div>
+    <div class="sel-info" id="sel-info">Wybrano: 0 z 4</div>
+    <div class="btn-row">
+      <button class="btn-next" id="btn-step0-next" onclick="continueConfig()" disabled>Dalej — konfiguracja →</button>
+    </div>
   </div>
+
+  <script>
+  /* ── MULTI-WYBÓR PRODUKTÓW — nadkład na konfigurator ── */
+  (function(){
+    if(window.__multiInit) return; window.__multiInit=true;
+    var NAMES={mlekomat:'Mlekomat BRUNIMAT',sielaff:'Automat chłodniczy Sielaff',butelki:'Szklane butelki z etykietą',pawilon:'Pawilon drewniany'};
+    var SECTIONS={mlekomat:'config-mlekomat',sielaff:'config-sielaff',butelki:'config-butelki',pawilon:'config-pawilon'};
+    window._selProducts=window._selProducts||[];
+    function sel(k){return window._selProducts.indexOf(k)!==-1;}
+    function readVal(id){var el=document.getElementById(id);return el?el.value.trim():'';}
+
+    function updateSelUI(){
+      var cards=document.querySelectorAll('#product-grid .product-card');
+      for(var i=0;i<cards.length;i++){var p=cards[i].getAttribute('data-product');cards[i].classList.toggle('selected',sel(p));}
+      var info=document.getElementById('sel-info');if(info)info.textContent='Wybrano: '+window._selProducts.length+' z 4';
+      var btn=document.getElementById('btn-step0-next');if(btn)btn.disabled=window._selProducts.length===0;
+    }
+    window.toggleProduct=function(p){
+      var i=window._selProducts.indexOf(p);
+      if(i===-1)window._selProducts.push(p);else window._selProducts.splice(i,1);
+      updateSelUI();
+    };
+    function applyConfigVisibility(){
+      for(var k in SECTIONS){var sec=document.getElementById(SECTIONS[k]);if(sec)sec.style.display=sel(k)?'':'none';}
+    }
+    function setProgress(activeIdx,text){
+      for(var i=0;i<4;i++){var ps=document.getElementById('ps'+i);if(ps)ps.className='ps '+(i<activeIdx?'done':(i===activeIdx?'active':''));}
+      var pt=document.getElementById('progress-text');if(pt)pt.textContent=text;
+    }
+    window.continueConfig=function(){
+      if(!window._selProducts.length)return;
+      if(sel('mlekomat')){
+        if(window.__origSelectProduct){window.__origSelectProduct('mlekomat');}
+        else{document.getElementById('step0').classList.remove('active');document.getElementById('step1').classList.add('active');setProgress(1,'Krok 2 z 4 — Konfiguracja');}
+      }else{
+        document.getElementById('step0').classList.remove('active');
+        document.getElementById('step1').classList.add('active');
+        setProgress(1,'Krok 2 z 4 — Konfiguracja');
+        var bp=document.getElementById('badge-price'),bs=document.getElementById('badge-sub');
+        if(bp)bp.textContent='indywidualnie';
+        if(bs)bs.textContent='po kontakcie';
+      }
+      applyConfigVisibility();
+      window.scrollTo(0,0);
+    };
+    function detailFor(k){
+      if(k==='sielaff'){var s=document.querySelector('#sielaff-grid .opt-item.selected');return s&&s.querySelector('.opt-name')?s.querySelector('.opt-name').textContent:'';}
+      if(k==='butelki'){var b=document.getElementById('butelki-display');return b?(parseInt(b.textContent,10)||200)+' szt.':'';}
+      if(k==='pawilon'){var p=document.querySelector('#pawilon-grid .opt-item.selected');return p&&p.querySelector('.opt-name')?p.querySelector('.opt-name').textContent:'';}
+      return '';
+    }
+    function buildKonfiguracjaText(){
+      var parts=[];
+      for(var i=0;i<window._selProducts.length;i++){
+        var k=window._selProducts[i],det=detailFor(k);
+        parts.push(NAMES[k]+(det?' — '+det:''));
+      }
+      if(sel('mlekomat')){
+        var kn=document.getElementById('kanny-display');
+        if(kn)parts.push('Kanny: '+(parseInt(kn.textContent,10)||2)+' szt.');
+        var opts=document.querySelectorAll('#config-mlekomat .opt-item.selected'),optNames=[];
+        for(var j=0;j<opts.length;j++){var nm=opts[j].querySelector('.opt-name');if(nm)optNames.push(nm.textContent);}
+        if(optNames.length)parts.push('Opcje: '+optNames.join(', '));
+      }
+      return parts.join(' | ');
+    }
+    function updateArimrRow(){
+      var row=document.getElementById('sum-arimr-row');if(!row)return;
+      var dot=readVal('f-dotacja');
+      if(dot==='tak'&&sel('mlekomat')){
+        var bt=document.getElementById('sum-brutto'),txt=bt?bt.textContent:'';
+        var num=parseFloat(txt.replace(/[^\d,.]/g,'').replace(',','.'));
+        var v=row.querySelector('.val');
+        if(v&&num&&!parseFloat(v.textContent.replace(/[^\d,.]/g,'').replace(',','.')))v.textContent='~'+Math.round(num/2).toLocaleString('pl-PL')+' zł';
+        row.style.display='';
+      }else{row.style.display='none';}
+    }
+    function renderNonMlekomatSummary(){
+      var head=document.getElementById('summary-head');if(head)head.textContent='Wybrane produkty';
+      var rows=document.getElementById('summary-rows');
+      if(rows){
+        rows.innerHTML='';
+        for(var i=0;i<window._selProducts.length;i++){
+          var k=window._selProducts[i],det=detailFor(k);
+          rows.insertAdjacentHTML('beforeend','<div class="summary-row"><span class="key">'+NAMES[k]+'</span><span class="val">'+(det||'wycena indywidualna')+'</span></div>');
+        }
+      }
+      var netto=document.getElementById('sum-netto'),vat=document.getElementById('sum-vat'),brutto=document.getElementById('sum-brutto');
+      if(netto)netto.textContent='—';if(vat)vat.textContent='—';if(brutto)brutto.textContent='wycena indywidualna';
+      var ar=document.getElementById('sum-arimr-row');if(ar)ar.style.display='none';
+    }
+    function appendExtraRows(){
+      var head=document.getElementById('summary-head');if(head)head.textContent='Twoja konfiguracja';
+      var rows=document.getElementById('summary-rows');if(!rows)return;
+      for(var i=0;i<window._selProducts.length;i++){
+        var k=window._selProducts[i];if(k==='mlekomat')continue;
+        var det=detailFor(k);
+        rows.insertAdjacentHTML('beforeend','<div class="summary-row"><span class="key">'+NAMES[k]+'</span><span class="val">'+(det||'wycena indywidualna')+'</span></div>');
+      }
+    }
+    window.sendBrief=function(){
+      var name=readVal('f-name'),tel=readVal('f-tel');
+      if(!name||!tel){alert('Uzupełnij imię i nazwisko oraz numer telefonu.');return;}
+      var honeypot=readVal('f-website');if(honeypot)return;
+      var id='BRF-'+new Date().toISOString().slice(0,10).replace(/-/g,'')+'-'+Math.random().toString(36).slice(2,7).toUpperCase();
+      var konfiguracja='['+id+'] '+buildKonfiguracjaText();
+      var uwagi=readVal('f-uwagi');
+      var netto='—',brutto='—',poDotacji='';
+      if(sel('mlekomat')){
+        var ne=document.getElementById('sum-netto'),br=document.getElementById('sum-brutto');
+        if(ne)netto=ne.textContent;if(br)brutto=br.textContent;
+        var row=document.getElementById('sum-arimr-row');
+        if(row&&row.style.display!=='none'){var v=row.querySelector('.val');if(v)poDotacji=v.textContent;}
+      }else{netto='wycena indywidualna';brutto='wycena indywidualna';}
+      var payload={
+        source:'brief',osoba:name,telefon:tel,email:readVal('f-email'),wojewodztwo:readVal('f-woj'),
+        krowy:readVal('f-krowy'),litry:readVal('f-litry'),pawilon:readVal('f-pawilon'),dotacja:readVal('f-dotacja'),
+        konfiguracja:konfiguracja,cena_netto:netto,cena_brutto:brutto,po_dotacji:poDotacji,
+        notes:uwagi?'['+id+'] '+uwagi:'['+id+']',website:honeypot,brief_id:id
+      };
+      var btn=document.getElementById('btn-step0-next'),subBtn=document.querySelector('.btn-submit'),disable=btn?btn:subBtn;
+      if(disable)disable.disabled=true;
+      fetch('/api/leads',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)})
+        .then(function(r){return r.json();})
+        .then(function(data){
+          if(data&&data.ok){showSuccess();}
+          else{alert('Nie udało się wysłać formularza. Spróbuj ponownie albo zadzwoń: 533 200 652.');if(disable)disable.disabled=false;}
+        })
+        .catch(function(){alert('Błąd wysyłki. Spróbuj ponownie albo zadzwoń: 533 200 652.');if(disable)disable.disabled=false;});
+    };
+    function showSuccess(){
+      var step3=document.getElementById('step3');if(!step3)return;
+      var kids=step3.children;
+      for(var i=kids.length-1;i>=0;i--)kids[i].style.display='none';
+      var box=document.createElement('div');
+      box.className='success-msg show';
+      box.innerHTML='<div class="success-icon">✅</div><h2>Dziękujemy!</h2><p>Twoja konfiguracja została wysłana. Oddzwonimy w ciągu jednego dnia roboczego.</p>';
+      step3.appendChild(box);
+      setProgress(3,'Krok 4 z 4 — Podsumowanie');
+      window.scrollTo(0,0);
+    }
+    document.addEventListener('DOMContentLoaded',function(){
+      window.__origGoStep=window.goStep;
+      window.__origSelectProduct=window.selectProduct;
+      window.goStep=function(n){
+        if(n===0||n===1||n===2){
+          if(window.__origGoStep)window.__origGoStep(n);
+          if(n===1)applyConfigVisibility();
+          return;
+        }
+        if(n===3){
+          if(window.__origGoStep)window.__origGoStep(3);
+          if(sel('mlekomat')){appendExtraRows();updateArimrRow();}
+          else{renderNonMlekomatSummary();}
+          window.scrollTo(0,0);
+        }
+      };
+      var sub=document.querySelector('.btn-submit');
+      if(sub){
+        var clone=sub.cloneNode(false);
+        clone.onclick=function(){window.sendBrief();};
+        if(sub.parentNode)sub.parentNode.replaceChild(clone,sub);
+      }
+      var dot=document.getElementById('f-dotacja');
+      if(dot)dot.addEventListener('change',function(){if(sel('mlekomat'))updateArimrRow();});
+    });
+  })();
+  </script>
 
   <!-- ═══ KROK 1 — KONFIGURACJA ═══ -->
   <div class="step" id="step1">
