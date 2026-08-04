@@ -9,10 +9,10 @@
 <style>
 :root{--g:#1a5c2a;--gl:#e8f4ec;--ink:#141414;--mid:#4a4a4a;--lt:#888;--line:#e2d9cd;--cr:#faf7f2;--amber:#b07d2a;--al:#fdf5e6;--r:8px}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--cr);color:var(--ink);line-height:1.6}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--cr);color:var(--ink);line-height:1.6;padding-top:4.2rem}
 
 /* ── PROGRESS BAR ── */
-.progress-bar{position:sticky;top:0;z-index:100;background:#fff;border-bottom:1px solid var(--line);padding:.6rem 1.5rem;display:flex;align-items:center;gap:1rem}
+.progress-bar{position:relative;background:#fff;border-bottom:1px solid var(--line);padding:.6rem 1.5rem;display:flex;align-items:center;gap:1rem}
 .progress-steps{display:flex;gap:.5rem;flex:1}
 .ps{flex:1;height:4px;background:var(--line);border-radius:2px;transition:background .3s}
 .ps.done{background:var(--g)}
