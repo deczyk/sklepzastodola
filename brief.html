@@ -811,8 +811,8 @@ function toggleOpt(el, key) {
 
 // ── STEPS ─────────────────────────────────────────────────────────────────────
 function goStep(n) {
-  if (n === 2) {
-    // validate step 1 — nothing required here
+  if (n === 1 && currentStep === 0) {
+    // przejście z wyboru produktu — konfiguracja już ustawiona przez selectProduct
   }
   if (n === 3) {
     const name = document.getElementById('f-name').value.trim();
@@ -830,11 +830,11 @@ function goStep(n) {
   document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
   document.getElementById('step' + n).classList.add('active');
   // update progress
-  for (let i = 1; i <= 3; i++) {
+  for (let i = 0; i <= 3; i++) {
     const ps = document.getElementById('ps' + i);
     ps.className = 'ps' + (i < n ? ' done' : i === n ? ' active' : '');
   }
-  const labels = ['', 'Krok 1 z 3 — Model', 'Krok 2 z 3 — Dane', 'Krok 3 z 3 — Podsumowanie'];
+  const labels = ['', 'Krok 1 z 4 — Wybór produktu', 'Krok 2 z 4 — Konfiguracja', 'Krok 3 z 4 — Dane', 'Krok 4 z 4 — Podsumowanie'];
   document.getElementById('progress-text').textContent = labels[n];
   window.scrollTo({top:0, behavior:'smooth'});
 }
