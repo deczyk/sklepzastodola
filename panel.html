@@ -5222,6 +5222,28 @@ function guessOfferAmount(text){
   return m ? m[1].replace(/\s+/g,"") : "";
 }
 
+let _pdfFontsCache = null;
+async function loadPdfFonts(doc){
+  if(!_pdfFontsCache){
+    const toBase64 = buf => {
+      let binary = "";
+      const bytes = new Uint8Array(buf);
+      for(let i=0;i<bytes.byteLength;i++) binary += String.fromCharCode(bytes[i]);
+      return btoa(binary);
+    };
+    const [regRes, boldRes] = await Promise.all([
+      fetch("fonts/NotoSans-Regular.ttf"),
+      fetch("fonts/NotoSans-Bold.ttf")
+    ]);
+    const [regBuf, boldBuf] = await Promise.all([regRes.arrayBuffer(), boldRes.arrayBuffer()]);
+    _pdfFontsCache = { regular: toBase64(regBuf), bold: toBase64(boldBuf) };
+  }
+  doc.addFileToVFS("NotoSans-Regular.ttf", _pdfFontsCache.regular);
+  doc.addFont("NotoSans-Regular.ttf", "NotoSans", "normal");
+  doc.addFileToVFS("NotoSans-Bold.ttf", _pdfFontsCache.bold);
+  doc.addFont("NotoSans-Bold.ttf", "NotoSans", "bold");
+}
+
 async function generateOfferPdf(clientId){
   const c = data.klienci.find(x=>x.id===clientId);
   if(!c) return;
@@ -5237,53 +5259,99 @@ async function generateOfferPdf(clientId){
 
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF({unit:"mm", format:"a4"});
+  try{ await loadPdfFonts(doc); }
+  catch(e){ alert("Nie udało się wczytać czcionki z polskimi znakami. Sprawdź połączenie i spróbuj ponownie."); return; }
+  const F = (style) => doc.setFont("NotoSans", style);
   const pageWidth = doc.internal.pageSize.getWidth();
   const margin = 18;
-  let y = 22;
+  let y;
 
-  doc.setFont("helvetica","bold"); doc.setFontSize(18); doc.setTextColor(45,90,39);
-  doc.text("Sklep za Stodołą", margin, y);
-  doc.setFont("helvetica","normal"); doc.setFontSize(10); doc.setTextColor(90,90,90);
-  doc.text("Oferta — punkt sprzedaży bezpośredniej przy gospodarstwie", margin, y+6);
-  doc.text(new Date().toLocaleDateString("pl-PL"), pageWidth-margin, y, {align:"right"});
-  y += 16;
-  doc.setDrawColor(220,220,220); doc.line(margin, y, pageWidth-margin, y);
-  y += 10;
+  const FOREST = [45,90,39], GOLD = [184,144,42], CREAM = [247,244,238],
+        SAGE = [232,240,230], INK = [30,30,26], MUTED = [107,100,84], DIM = [138,128,112], LINE = [228,221,209];
 
-  doc.setFont("helvetica","bold"); doc.setFontSize(12); doc.setTextColor(20,20,20);
-  doc.text("Dla:", margin, y); y += 6;
-  doc.setFont("helvetica","normal"); doc.setFontSize(11);
-  const clientLines = [
-    getClientDisplayName(c),
-    clientContact(c),
-    clientLocation(c)
-  ].filter(Boolean);
-  clientLines.forEach(line => { doc.text(line, margin, y); y += 6; });
-  y += 6;
+  // Header band
+  doc.setFillColor(...FOREST); doc.rect(0, 0, pageWidth, 34, "F");
+  F("bold"); doc.setFontSize(16); doc.setTextColor(255,255,255);
+  doc.text("Sklep za Stodołą", margin, 16);
+  F("normal"); doc.setFontSize(8.5); doc.setTextColor(225,235,224);
+  doc.text("Dystrybucja, instalacja i serwis mlekomatów BRUNIMAT w Polsce", margin, 22);
+  F("bold"); doc.setFontSize(8.5);
+  const badgeText = "OFERTA WSTĘPNA";
+  const badgeW = doc.getTextWidth(badgeText) + 10;
+  doc.setFillColor(...GOLD); doc.roundedRect(pageWidth-margin-badgeW, 9, badgeW, 8, 1.5, 1.5, "F");
+  doc.setTextColor(255,255,255); doc.text(badgeText, pageWidth-margin-badgeW+5, 14.5);
 
-  doc.setFont("helvetica","bold"); doc.setFontSize(12);
-  doc.text("Wybrana konfiguracja:", margin, y); y += 7;
-  doc.setFont("helvetica","normal"); doc.setFontSize(10.5);
+  y = 46;
+  F("bold"); doc.setFontSize(18); doc.setTextColor(...INK);
+  const titleText = c.produkt || c.zainteresowanie || "Oferta dla Twojego gospodarstwa";
+  doc.text(doc.splitTextToSize(titleText, pageWidth - margin*2), margin, y);
+  y += 12;
+
+  // Client info bar
+  const barH = 20;
+  doc.setFillColor(...CREAM); doc.setDrawColor(...LINE);
+  doc.roundedRect(margin, y, pageWidth-margin*2, barH, 1.5, 1.5, "FD");
+  const cols = [["KLIENT", getClientDisplayName(c)], ["LOKALIZACJA", clientLocation(c) || "—"], ["DATA", new Date().toLocaleDateString("pl-PL")]];
+  const colW = (pageWidth - margin*2 - 12) / cols.length;
+  cols.forEach(([label, value], i) => {
+    const cx = margin + 6 + i*colW;
+    F("bold"); doc.setFontSize(7); doc.setTextColor(...DIM);
+    doc.text(label, cx, y+8);
+    F("bold"); doc.setFontSize(10.5); doc.setTextColor(...INK);
+    doc.text(doc.splitTextToSize(value, colW-6)[0] || "—", cx, y+15);
+  });
+  y += barH + 10;
+
+  // Recommendation box
+  const recText = "Oferta przygotowana na podstawie wybranej konfiguracji w naszym konfiguratorze. Poniżej znajdziesz szczegóły i orientacyjną cenę katalogową.";
+  F("normal"); doc.setFontSize(9.5);
+  const recLines = doc.splitTextToSize(recText, pageWidth - margin*2 - 12);
+  const recBoxH = 10 + recLines.length*4.6;
+  doc.setFillColor(...FOREST); doc.roundedRect(margin, y, pageWidth-margin*2, recBoxH, 1.5, 1.5, "F");
+  F("bold"); doc.setFontSize(7.5); doc.setTextColor(...GOLD);
+  doc.text("REKOMENDACJA", margin+6, y+7);
+  F("normal"); doc.setFontSize(9.5); doc.setTextColor(255,255,255);
+  doc.text(recLines, margin+6, y+13);
+  y += recBoxH + 10;
+
+  // Configuration
+  F("bold"); doc.setFontSize(12); doc.setTextColor(...INK);
+  doc.text("Wybrana konfiguracja", margin, y); y += 7;
+  F("normal"); doc.setFontSize(9.5); doc.setTextColor(...INK);
   if(configLines.length){
     configLines.forEach(line => {
-      const wrapped = doc.splitTextToSize("• " + line, pageWidth - margin*2);
-      wrapped.forEach(w => { doc.text(w, margin, y); y += 5.5; });
+      const wrapped = doc.splitTextToSize(line, pageWidth - margin*2 - 6);
+      doc.setTextColor(...FOREST); doc.text("•", margin, y);
+      doc.setTextColor(...INK); doc.text(wrapped, margin+5, y);
+      y += wrapped.length*4.8;
     });
   } else {
-    const fallback = [c.zainteresowanie, c.produkt].filter(Boolean).join(" — ") || "Brak zapisanej konfiguracji z konfiguratora — uzupełnij ręcznie przed wysyłką.";
+    const fallback = "Brak zapisanej konfiguracji z konfiguratora — uzupełnij ręcznie przed wysyłką.";
     doc.text(doc.splitTextToSize(fallback, pageWidth - margin*2), margin, y);
-    y += 10;
+    y += 6;
   }
-  y += 8;
+  y += 6;
 
-  doc.setDrawColor(220,220,220); doc.line(margin, y, pageWidth-margin, y);
-  y += 8;
-  doc.setFont("helvetica","normal"); doc.setFontSize(9); doc.setTextColor(120,120,120);
+  // Price block
+  const kwota = guessOfferAmount(briefText);
+  if(kwota){
+    const priceBoxH = 22;
+    doc.setFillColor(...SAGE); doc.roundedRect(margin, y, pageWidth-margin*2, priceBoxH, 1.5, 1.5, "F");
+    F("bold"); doc.setFontSize(7.5); doc.setTextColor(61,101,56);
+    doc.text("CENA KATALOGOWA", margin+6, y+7);
+    F("bold"); doc.setFontSize(17); doc.setTextColor(...FOREST);
+    doc.text(kwota + " zł", margin+6, y+16);
+    y += priceBoxH + 8;
+  }
+
+  // Footer
+  const footerY = 272;
+  doc.setDrawColor(...LINE); doc.line(margin, footerY-4, pageWidth-margin, footerY-4);
+  F("normal"); doc.setFontSize(7.5); doc.setTextColor(...DIM);
   const disclaimer = "Oferta orientacyjna na podstawie danych z konfiguratora. Ceny katalogowe mogą ulec zmianie; ostateczne warunki ustalamy podczas rozmowy. Ważność oferty: 14 dni.";
-  doc.text(doc.splitTextToSize(disclaimer, pageWidth - margin*2), margin, y);
-  y += 14;
-  doc.setTextColor(45,90,39); doc.setFont("helvetica","bold"); doc.setFontSize(10);
-  doc.text("735 115 427  ·  kontakt@sklepzastodola.pl  ·  sklepzastodola.pl", margin, y);
+  doc.text(doc.splitTextToSize(disclaimer, pageWidth - margin*2), margin, footerY);
+  F("bold"); doc.setFontSize(9); doc.setTextColor(...FOREST);
+  doc.text("735 115 427  ·  kontakt@sklepzastodola.pl  ·  sklepzastodola.pl", margin, 289);
 
   const safeName = (c.firma || c.osoba || "klient").toString().toLowerCase()
     .replace(/[^a-z0-9]+/gi,"-").replace(/^-+|-+$/g,"").slice(0,40) || "klient";

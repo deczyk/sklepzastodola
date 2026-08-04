@@ -9,6 +9,36 @@ const {
   buildAdvisorEmailHtml,
   buildBriefEmailHtml
 } = require("./_email");
+const { buildOfferPdf } = require("./_offer-pdf");
+
+function briefConfigLines(payload) {
+  const raw = String(payload.konfiguracja || "").replace(/^\[[^\]]*\]\s*/, "");
+  return raw.split(/\s*\|\s*/).filter(Boolean);
+}
+
+async function buildBriefPdfAttachment(payload, lead) {
+  try {
+    const pdfBuffer = await buildOfferPdf({
+      clientName: lead.osoba || lead.firma || "",
+      location: [lead.miejscowosc, lead.wojewodztwo].filter(Boolean).join(", "),
+      productTitle: lead.produkt || lead.zainteresowanie || "Oferta dla Twojego gospodarstwa",
+      productDesc: "Oferta wstępna przygotowana na podstawie konfiguracji wybranej w konfiguratorze.",
+      recommendation: "Poniżej znajdziesz wybraną konfigurację i orientacyjną cenę katalogową. Skontaktujemy się, żeby dopiąć szczegóły i potwierdzić dostępność.",
+      configLines: briefConfigLines(payload),
+      priceNetto: payload.cena_netto && payload.cena_netto !== "—" ? payload.cena_netto : "",
+      priceBrutto: payload.cena_brutto && payload.cena_brutto !== "—" ? payload.cena_brutto : ""
+    });
+    const safeName = (lead.osoba || lead.firma || "klient").toLowerCase()
+      .replace(/[^a-z0-9]+/gi, "-").replace(/^-+|-+$/g, "").slice(0, 40) || "klient";
+    return [{
+      filename: `oferta-${safeName}.pdf`,
+      content: pdfBuffer.toString("base64")
+    }];
+  } catch (error) {
+    console.error("Offer PDF generation failed", error && error.message ? error.message : error);
+    return undefined;
+  }
+}
 
 const ALLOWED_SOURCES = {
   kontakt: {
@@ -308,11 +338,21 @@ module.exports = async function handler(req, res) {
 
     if (hasEmailConfig() && lead.email && (source === "advisor" || source === "brief")) {
       try {
-        const subject = source === "advisor"
-          ? "Twój wynik z kalkulatora Advisor — Sklep za Stodołą"
-          : "Twoja konfiguracja — Sklep za Stodołą";
-        const html = source === "advisor" ? buildAdvisorEmailHtml(payload) : buildBriefEmailHtml(payload);
-        await sendEmail({ to: lead.email, subject, html });
+        if (source === "advisor") {
+          await sendEmail({
+            to: lead.email,
+            subject: "Obliczyliśmy Twój potencjał — Sklep za Stodołą",
+            html: buildAdvisorEmailHtml(payload)
+          });
+        } else {
+          const attachments = await buildBriefPdfAttachment(payload, lead);
+          await sendEmail({
+            to: lead.email,
+            subject: "Twoja oferta — Sklep za Stodołą",
+            html: buildBriefEmailHtml(payload),
+            attachments
+          });
+        }
       } catch (emailError) {
         console.error("Offer email failed", emailError && emailError.message ? emailError.message : emailError);
       }
