@@ -339,8 +339,14 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--cr);color:var(
       }
     }
     window.sendBrief=function(){
-      var name=readVal('f-name'),tel=readVal('f-tel');
-      if(!name||!tel){alert('Uzupełnij imię i nazwisko oraz numer telefonu.');return;}
+      var name=readVal('f-name'),tel=readVal('f-tel'),woj=readVal('f-woj'),krowy=readVal('f-krowy'),litry=readVal('f-litry');
+      var missing=[];
+      if(!name)missing.push('imię i nazwisko');
+      if(!tel)missing.push('numer telefonu');
+      if(!woj)missing.push('województwo');
+      if(!krowy)missing.push('liczbę krów');
+      if(!litry)missing.push('dzienną produkcję mleka');
+      if(missing.length){alert('Uzupełnij: '+missing.join(', ')+'.');return;}
       var honeypot=readVal('f-website');if(honeypot)return;
       var id='BRF-'+new Date().toISOString().slice(0,10).replace(/-/g,'')+'-'+Math.random().toString(36).slice(2,7).toUpperCase();
       var konfiguracja='['+id+'] '+buildKonfiguracjaText();
