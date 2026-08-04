@@ -841,15 +841,38 @@ function goStep(n) {
 
 // ── SUMMARY ───────────────────────────────────────────────────────────────────
 function buildSummary() {
-  const rows = [
-    ['Model', 'BRUNIMAT 650 Premium DUO'],
-    ['Certyfikat CE-MID', '✓ w zestawie'],
-    ['Reszta + banknoty + czytnik', '✓ w zestawie'],
-    ['Drukarka paragonów', '✓ w zestawie'],
-    ['Ogrzewanie Anti-Frost', '✓ w zestawie'],
-    ['Kanny 50 L', kanny + ' szt.'],
-  ];
-  selected.forEach(k => rows.push([OPT_LABELS[k], '✓ wybrano']));
+  document.getElementById('summary-head').textContent = PRODUCT_NAMES[currentProduct] + ' — Konfiguracja';
+  const rows = [];
+
+  if (currentProduct === 'mlekomat') {
+    rows.push(
+      ['Model', 'BRUNIMAT 650 Premium DUO'],
+      ['Certyfikat CE-MID', '✓ w zestawie'],
+      ['Reszta + banknoty + czytnik', '✓ w zestawie'],
+      ['Drukarka paragonów', '✓ w zestawie'],
+      ['Ogrzewanie Anti-Frost', '✓ w zestawie'],
+      ['Kanny 50 L', kanny + ' szt.'],
+    );
+    selected.forEach(k => rows.push([OPT_LABELS[k], '✓ wybrano']));
+  } else if (currentProduct === 'sielaff') {
+    rows.push(
+      ['Produkt', 'Automat chłodniczy Sielaff'],
+      ['Typ', SIELAFF_NAMES[sielaffKey]],
+      ['Wycena', 'indywidualna — po kontakcie'],
+    );
+  } else if (currentProduct === 'butelki') {
+    rows.push(
+      ['Produkt', 'Szklane butelki z etykietą'],
+      ['Ilość', butelki + ' szt.'],
+      ['Wycena', 'indywidualna — po kontakcie'],
+    );
+  } else if (currentProduct === 'pawilon') {
+    rows.push(
+      ['Produkt', 'Pawilon drewniany'],
+      ['Rozmiar', PAWILON_NAMES[pawilonKey]],
+      ['Wycena', 'indywidualna — po kontakcie'],
+    );
+  }
 
   const name = document.getElementById('f-name').value;
   const woj  = document.getElementById('f-woj').value;
@@ -869,12 +892,27 @@ function buildSummary() {
     : '<div style="height:4px;background:var(--line)"></div>'
   ).join('');
 
-  const { netto, brutto, arimr } = calcPrice();
-  const vat = brutto - netto;
-  document.getElementById('sum-netto').textContent  = fmt(netto);
-  document.getElementById('sum-vat').textContent    = fmt(vat);
-  document.getElementById('sum-brutto').textContent = fmt(brutto);
-  document.getElementById('sum-arimr').textContent  = fmt(arimr);
+  const dot = document.getElementById('f-dotacja').value;
+  const arimrRow = document.getElementById('sum-arimr-row');
+
+  if (currentProduct === 'mlekomat') {
+    const { netto, brutto, arimr } = calcPrice();
+    const vat = brutto - netto;
+    document.getElementById('sum-netto').textContent  = fmt(netto);
+    document.getElementById('sum-vat').textContent    = fmt(vat);
+    document.getElementById('sum-brutto').textContent = fmt(brutto);
+    if (dot === 'tak') {
+      arimrRow.style.display = 'flex';
+      document.getElementById('sum-arimr').textContent = fmt(arimr);
+    } else {
+      arimrRow.style.display = 'none';
+    }
+  } else {
+    document.getElementById('sum-netto').textContent  = '—';
+    document.getElementById('sum-vat').textContent    = '—';
+    document.getElementById('sum-brutto').textContent = 'wycena indywidualna';
+    arimrRow.style.display = 'none';
+  }
 }
 
 // ── SEND ──────────────────────────────────────────────────────────────────────
