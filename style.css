@@ -60,3 +60,7 @@
 .faq-clean-section{padding:2.35rem 5vw 5.8rem!important}
 .faq-clean{margin-top:0!important}
 @media (max-width:640px){.faq-clean-section{padding:1.6rem 5vw 4.5rem!important}}
+
+/* Kalkulator: pod 860px .roi-grid już się składa do 1 kolumny, ale między ~860-1000px
+   stały układ 1.1fr/.9fr z gap:4rem robi się ciasny i "rozjechany" — dokładamy własny próg. */
+@media (max-width:1000px){.roi-grid{grid-template-columns:1fr!important;gap:2.2rem!important}}
