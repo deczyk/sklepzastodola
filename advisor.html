@@ -394,6 +394,11 @@ async function sendToUs(){
       interest: interestVal,
       notes: document.getElementById("notes").value.trim(),
       answersText,
+      wynikPotencjalu: document.getElementById("scoreTxt").innerText,
+      porada: document.getElementById("advice").innerText,
+      roiLata: document.getElementById("roiTxt").innerText,
+      roiLataZDofinansowaniem: document.getElementById("roiEuTxt").innerText,
+      potencjalRoczny: document.getElementById("profitYearTxt").innerText,
       website: ""
     };
     await fetch('/api/leads', {

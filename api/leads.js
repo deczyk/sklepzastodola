@@ -3,6 +3,12 @@ const {
   panelStoreConfigStatus,
   mutatePanelStore
 } = require("./_panel-store");
+const {
+  hasEmailConfig,
+  sendEmail,
+  buildAdvisorEmailHtml,
+  buildBriefEmailHtml
+} = require("./_email");
 
 const ALLOWED_SOURCES = {
   kontakt: {
@@ -299,6 +305,18 @@ module.exports = async function handler(req, res) {
 
       return { created: true, clientId: client.id };
     });
+
+    if (hasEmailConfig() && lead.email && (source === "advisor" || source === "brief")) {
+      try {
+        const subject = source === "advisor"
+          ? "Twój wynik z kalkulatora Advisor — Sklep za Stodołą"
+          : "Twoja konfiguracja — Sklep za Stodołą";
+        const html = source === "advisor" ? buildAdvisorEmailHtml(payload) : buildBriefEmailHtml(payload);
+        await sendEmail({ to: lead.email, subject, html });
+      } catch (emailError) {
+        console.error("Offer email failed", emailError && emailError.message ? emailError.message : emailError);
+      }
+    }
 
     return res.status(200).json({ ok: true, ...mutation.result });
   } catch (error) {
