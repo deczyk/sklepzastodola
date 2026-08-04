@@ -2060,7 +2060,7 @@
         </div>
         <textarea id="historyNewEntry" placeholder="Np. [kontakt] Dzwoniłem, zainteresowany, oddzwaniam za tydzień..."></textarea>
         <label>Notatka głosowa / nagranie z telefonu
-          <input type="file" id="historyNewAudio" accept="audio/*">
+          <input type="file" id="historyNewAudio" accept="audio/amr,audio/*">
           <span class="audioHint">Najlepiej krótki plik M4A/MP3 z telefonu. Limit: 2 MB, żeby synchronizacja panelu działała stabilnie.</span>
         </label>
         <div class="audioTools">
@@ -3094,10 +3094,15 @@ function renderHistoryAudio(h){
   if(!h || !h.audioData) return "";
   const name = h.audioName || "notatka głosowa";
   const size = h.audioSize ? ` · ${Math.round(h.audioSize / 1024)} KB` : "";
+  const isAmr = /amr/i.test(h.audioType || "") || /\.amr$/i.test(name);
+  const fallback = isAmr
+    ? `<div class="audioHint">Format AMR nie zawsze odtwarza się w przeglądarce na komputerze. Jeśli powyższy odtwarzacz milczy: <a href="${crmEsc(h.audioData)}" download="${crmEsc(name)}">Pobierz plik audio</a></div>`
+    : `<a class="audioHint" href="${crmEsc(h.audioData)}" download="${crmEsc(name)}">Pobierz plik audio</a>`;
   return `
     <div class="historyAudio">
       <div class="historyAudioTitle">Notatka głosowa: ${crmEsc(name)}${crmEsc(size)}</div>
       <audio controls preload="metadata" src="${crmEsc(h.audioData)}"></audio>
+      ${fallback}
     </div>
   `;
 }
@@ -3306,7 +3311,7 @@ function renderQuickClientUpdate(c){
       </div>
       <label class="quickUpdateNote">Notatka<textarea data-quick-field="note" placeholder="Wpisz notatkę dokładnie tak, jak chcesz ją widzieć w historii kontaktu."></textarea></label>
       <label class="quickUpdateNote">Notatka głosowa / nagranie z telefonu
-        <input type="file" data-quick-field="audio" accept="audio/*">
+        <input type="file" data-quick-field="audio" accept="audio/amr,audio/*">
         <span class="audioHint">Możesz wkleić nagranie rozmowy z telefonu. Limit: 2 MB, żeby synchronizacja panelu działała stabilnie.</span>
       </label>
       <div class="audioTools">
