@@ -181,10 +181,48 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--cr);color:var(
 
 <div class="brief-wrap">
 
-  <!-- ═══ KROK 1 — MODEL + WYMAGANE ═══ -->
-  <div class="step active" id="step1">
+  <!-- ═══ KROK 0 — WYBÓR PRODUKTU ═══ -->
+  <div class="step active" id="step0">
     <div class="step-head">
-      <div class="step-num">Krok 1 z 3 — Konfiguracja</div>
+      <div class="step-num">Krok 1 z 4 — Wybór produktu</div>
+      <div class="step-title">Co chcesz skonfigurować?</div>
+      <div class="step-sub">Wybierz produkt — konfigurator pokaże opcje i wycenę dopasowane do Twojego wyboru.</div>
+    </div>
+    <div class="product-grid">
+      <div class="product-card" onclick="selectProduct('mlekomat')">
+        <div class="pc-icon">🥛</div>
+        <div class="pc-name">Mlekomat BRUNIMAT</div>
+        <div class="pc-desc">Automat do świeżego mleka z wyceną online — kanny, płatności, higiena.</div>
+        <div class="pc-tag">wycena online</div>
+      </div>
+      <div class="product-card" onclick="selectProduct('sielaff')">
+        <div class="pc-icon">🥤</div>
+        <div class="pc-name">Automat chłodniczy Sielaff</div>
+        <div class="pc-desc">Automaty na jaja, sery, napoje i produkty świeże — seria do wyboru.</div>
+        <div class="pc-tag">wycena indywidualna</div>
+      </div>
+      <div class="product-card" onclick="selectProduct('butelki')">
+        <div class="pc-icon">🍾</div>
+        <div class="pc-name">Szklane butelki z etykietą</div>
+        <div class="pc-desc">Butelki pod Twój punkt sprzedaży — ilość i etykieta.</div>
+        <div class="pc-tag">wycena indywidualna</div>
+      </div>
+      <div class="product-card" onclick="selectProduct('pawilon')">
+        <div class="pc-icon">🏠</div>
+        <div class="pc-name">Pawilon drewniany</div>
+        <div class="pc-desc">Pawilon pod punkt sprzedaży — rozmiar i wykończenie.</div>
+        <div class="pc-tag">wycena indywidualna</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ KROK 1 — KONFIGURACJA ═══ -->
+  <div class="step" id="step1">
+
+    <!-- ══ MLEKOMAT BRUNIMAT ══ -->
+    <div id="config-mlekomat">
+    <div class="step-head">
+      <div class="step-num">Krok 2 z 4 — Konfiguracja</div>
       <div class="step-title">BRUNIMAT 650 Premium DUO</div>
       <div class="step-sub">Konfigurujesz automat do mleka ze standardowym wyposażeniem. Poniżej możesz wybrać liczbę kannych i opcje dodatkowe.</div>
     </div>
