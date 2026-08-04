@@ -52,10 +52,13 @@
 @keyframes sc { 0%,100%{opacity:.4} 50%{opacity:1} }
 
 /* EXCLUSIVE DISTRIBUTOR */
-.distributor-band { background: var(--bg2); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); padding: 2rem 5vw 2.2rem; text-align: center; }
+.distributor-band { background: var(--wheat-bg); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); padding: 2rem 5vw 2.4rem; text-align: center; }
 .distributor-label { font-size: clamp(.74rem, 1.4vw, .88rem); font-weight: 800; letter-spacing: .13em; line-height: 1.35; text-transform: uppercase; color: var(--forest); margin-bottom: 1rem; }
 .distributor-logo { display: inline-flex; align-items: center; justify-content: center; max-width: min(420px, 82vw); margin: 0 auto; }
 .distributor-logo img { width: 100%; height: auto; object-fit: contain; }
+.distributor-swiss { display: inline-flex; align-items: center; gap: .45rem; margin-top: 1.2rem; padding: .4rem .9rem; border-radius: 999px; background: var(--paper); border: 1px solid rgba(184,144,42,.35); color: var(--wheat); font-size: .78rem; font-weight: 800; letter-spacing: .04em; }
+.distributor-trust { display: flex; flex-wrap: wrap; justify-content: center; gap: .6rem .7rem; margin-top: 1.3rem; }
+.distributor-trust span { display: inline-flex; align-items: center; gap: .4rem; padding: .5rem .85rem; border-radius: 999px; background: var(--paper); border: 1px solid var(--line); box-shadow: var(--shadow); color: var(--ink); font-size: .82rem; font-weight: 700; }
 
 /* DEMO VIDEO */
 .demo-video-sec { padding: 5.5rem 5vw; background: var(--bg); border-bottom: 1px solid var(--line); }
@@ -273,8 +276,8 @@
   <div class="hero-content">
     <p class="hero-eyebrow" data-r="fade">Kompleksowa obsługa farmera</p>
     <h1 class="hero-h1" data-r>
-      Twój sklep,<br>
-      <em>przy Twoim gospodarstwie</em>
+      Przestań sprzedawać mleko za grosze.<br>
+      <em>Zacznij sprzedawać je swoim klientom.</em>
     </h1>
     <p class="hero-sub" data-r data-d="1">
       Sklep za Stodołą pomaga rolnikom uruchomić sprzedaż bezpośrednią i <a href="poradnik-rhd-krok-po-kroku.html" style="color:var(--forest);text-decoration:underline">RHD (Rolniczy Handel Detaliczny)</a> przy gospodarstwie:
@@ -293,6 +296,15 @@
     <p class="distributor-label">WYŁĄCZNY DYSTRYBUTOR MLEKOMATÓW BRUNIMAT W POLSCE</p>
     <div class="distributor-logo">
       <img src="brunimat-logo.webp" width="1068" height="264" alt="BRUNIMAT" loading="lazy" decoding="async">
+    </div>
+    <span class="distributor-swiss">🇨🇭 Technologia ze Szwajcarii — certyfikat METAS</span>
+    <div class="distributor-trust">
+      <span>✓ Wyłączny dystrybutor BRUNIMAT</span>
+      <span>✓ Mlekomat z certyfikatem CE-MID</span>
+      <span>✓ Szkolenie w Szwajcarii</span>
+      <span>✓ Instalacja i serwis w całej Polsce</span>
+      <span>✓ Wsparcie po uruchomieniu</span>
+      <span>✓ Pomoc w finansowaniu i dotacji ARiMR</span>
     </div>
   </div>
 </section>
@@ -447,9 +459,15 @@
       </button>
       <button type="button" class="practice-card" data-practice-title="Sprzedaż pracuje codziennie" data-practice-copy="Klient wraca, bo ma wygodny punkt po drodze. Ty widzisz sprzedaż i nie oddajesz całej wartości mleka pośrednikom.">
         <span class="practice-icon">📊</span>
-        <span class="practice-kicker">Efekt</span>
+        <span class="practice-kicker">Krok 4</span>
         <strong>Płaci i wraca</strong>
         <span>Stały punkt przy gospodarstwie zamiast jednorazowej sprzedaży.</span>
+      </button>
+      <button type="button" class="practice-card" style="grid-column:1/-1" data-practice-title="Punkt zaczyna żyć własnym ruchem" data-practice-copy="Zadowolony klient mówi o punkcie sąsiadom i znajomym. Nowi klienci trafiają do Ciebie bez dodatkowych wydatków na reklamę.">
+        <span class="practice-icon">📣</span>
+        <span class="practice-kicker">Efekt</span>
+        <strong>Poleca dalej</strong>
+        <span>Marketing szeptany robi swoje — ruch rośnie sam.</span>
       </button>
     </div>
     <aside class="practice-outcome" aria-live="polite">
