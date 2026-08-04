@@ -9,10 +9,10 @@
 <style>
 :root{--g:#1a5c2a;--gl:#e8f4ec;--ink:#141414;--mid:#4a4a4a;--lt:#888;--line:#e2d9cd;--cr:#faf7f2;--amber:#b07d2a;--al:#fdf5e6;--r:8px}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--cr);color:var(--ink);line-height:1.6}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--cr);color:var(--ink);line-height:1.6;padding-top:4.2rem}
 
 /* ── PROGRESS BAR ── */
-.progress-bar{position:sticky;top:0;z-index:100;background:#fff;border-bottom:1px solid var(--line);padding:.6rem 1.5rem;display:flex;align-items:center;gap:1rem}
+.progress-bar{position:relative;background:#fff;border-bottom:1px solid var(--line);padding:.6rem 1.5rem;display:flex;align-items:center;gap:1rem}
 .progress-steps{display:flex;gap:.5rem;flex:1}
 .ps{flex:1;height:4px;background:var(--line);border-radius:2px;transition:background .3s}
 .ps.done{background:var(--g)}
@@ -81,6 +81,19 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--cr);color:var(
 .opt-badge{font-size:.68rem;background:var(--al);color:var(--amber);padding:2px 7px;border-radius:8px;font-weight:600;flex-shrink:0}
 .opt-badge.popular{background:var(--gl);color:var(--g)}
 
+/* ── OPTION PRICE ── */
+.opt-price{font-size:.72rem;font-weight:700;color:var(--g);background:var(--gl);padding:3px 9px;border-radius:8px;white-space:nowrap;flex-shrink:0;font-variant-numeric:tabular-nums}
+
+/* ── PRODUCT CHOICE ── */
+.product-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:.8rem;margin-bottom:1.5rem}
+@media(max-width:520px){.product-grid{grid-template-columns:1fr}}
+.product-card{background:#fff;border:2px solid var(--line);border-radius:var(--r);padding:1.3rem 1.4rem;cursor:pointer;transition:border-color .18s,background .18s,transform .18s;display:flex;flex-direction:column;gap:.3rem;user-select:none}
+.product-card:hover{border-color:var(--g);background:var(--gl);transform:translateY(-2px)}
+.pc-icon{font-size:2rem}
+.pc-name{font-size:1.02rem;font-weight:700;color:var(--g)}
+.pc-desc{font-size:.8rem;color:var(--mid);line-height:1.5}
+.pc-tag{font-size:.66rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--amber);background:var(--al);align-self:flex-start;padding:2px 8px;border-radius:8px;margin-top:.3rem}
+
 /* ── SECTION DIVIDER ── */
 .opt-section-label{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--lt);margin:1.4rem 0 .6rem}
 
@@ -138,19 +151,25 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--cr);color:var(
 </head>
 <body>
 
-<nav>
-  <a href="index.html" class="nav-logo">Sklep za Stodołą</a>
-  <ul class="nav-links" id="nav-links" style="display:none"></ul>
+<nav class="nav" id="nav">
+  <a href="index.html" class="nav-logo"><span class="nav-logo-dot"></span>Sklep za Stodołą</a>
+  <ul class="nav-links">
+    <li><a href="index.html">Start</a></li>
+    <li><a href="oferta.html">Oferta</a></li>
+    <li><a href="kontakt.html">Kontakt</a></li>
+  </ul>
+  <a href="tel:533200652" class="nav-cta">Zadzwoń</a>
 </nav>
 
 <!-- PROGRESS -->
 <div class="progress-bar">
   <div class="progress-steps">
-    <div class="ps active" id="ps1"></div>
+    <div class="ps active" id="ps0"></div>
+    <div class="ps" id="ps1"></div>
     <div class="ps" id="ps2"></div>
     <div class="ps" id="ps3"></div>
   </div>
-  <div class="progress-label" id="progress-text">Krok 1 z 3 — Model</div>
+  <div class="progress-label" id="progress-text">Krok 1 z 4 — Wybór produktu</div>
 </div>
 
 <!-- LIVE PRICE BADGE -->
@@ -162,10 +181,48 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--cr);color:var(
 
 <div class="brief-wrap">
 
-  <!-- ═══ KROK 1 — MODEL + WYMAGANE ═══ -->
-  <div class="step active" id="step1">
+  <!-- ═══ KROK 0 — WYBÓR PRODUKTU ═══ -->
+  <div class="step active" id="step0">
     <div class="step-head">
-      <div class="step-num">Krok 1 z 3 — Konfiguracja</div>
+      <div class="step-num">Krok 1 z 4 — Wybór produktu</div>
+      <div class="step-title">Co chcesz skonfigurować?</div>
+      <div class="step-sub">Wybierz produkt — konfigurator pokaże opcje i wycenę dopasowane do Twojego wyboru.</div>
+    </div>
+    <div class="product-grid">
+      <div class="product-card" onclick="selectProduct('mlekomat')">
+        <div class="pc-icon">🥛</div>
+        <div class="pc-name">Mlekomat BRUNIMAT</div>
+        <div class="pc-desc">Automat do świeżego mleka z wyceną online — kanny, płatności, higiena.</div>
+        <div class="pc-tag">wycena online</div>
+      </div>
+      <div class="product-card" onclick="selectProduct('sielaff')">
+        <div class="pc-icon">🥤</div>
+        <div class="pc-name">Automat chłodniczy Sielaff</div>
+        <div class="pc-desc">Automaty na jaja, sery, napoje i produkty świeże — seria do wyboru.</div>
+        <div class="pc-tag">wycena indywidualna</div>
+      </div>
+      <div class="product-card" onclick="selectProduct('butelki')">
+        <div class="pc-icon">🍾</div>
+        <div class="pc-name">Szklane butelki z etykietą</div>
+        <div class="pc-desc">Butelki pod Twój punkt sprzedaży — ilość i etykieta.</div>
+        <div class="pc-tag">wycena indywidualna</div>
+      </div>
+      <div class="product-card" onclick="selectProduct('pawilon')">
+        <div class="pc-icon">🏠</div>
+        <div class="pc-name">Pawilon drewniany</div>
+        <div class="pc-desc">Pawilon pod punkt sprzedaży — rozmiar i wykończenie.</div>
+        <div class="pc-tag">wycena indywidualna</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ KROK 1 — KONFIGURACJA ═══ -->
+  <div class="step" id="step1">
+
+    <!-- ══ MLEKOMAT BRUNIMAT ══ -->
+    <div id="config-mlekomat">
+    <div class="step-head">
+      <div class="step-num">Krok 2 z 4 — Konfiguracja</div>
       <div class="step-title">BRUNIMAT 650 Premium DUO</div>
       <div class="step-sub">Konfigurujesz automat do mleka ze standardowym wyposażeniem. Poniżej możesz wybrać liczbę kannych i opcje dodatkowe.</div>
     </div>
@@ -241,7 +298,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--cr);color:var(
     </div>
 
     <!-- OPCJE DODATKOWE -->
-    <div class="opt-section-label">Opcje dodatkowe — wybierz co potrzebujesz</div>
+    <div class="opt-section-label">Opcje dodatkowe — wybierz co potrzebujesz (ceny netto)</div>
     <div class="opt-grid">
 
       <div class="opt-item" onclick="toggleOpt(this,'gsm_full')" data-key="gsm_full">
@@ -250,6 +307,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--cr);color:var(
           <div class="opt-name">GSM — powiadomienia SMS (pełny pakiet)</div>
           <div class="opt-desc">Alarm SMS przy awarii, włamaniu i różne statusy maszyny</div>
         </div>
+        <div class="opt-price">3 300 zł</div>
       </div>
 
       <div class="opt-item" onclick="toggleOpt(this,'gsm_poziom')" data-key="gsm_poziom">
@@ -258,6 +316,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--cr);color:var(
           <div class="opt-name">GSM — alarm niskiego poziomu mleka</div>
           <div class="opt-desc">SMS gdy zbiornik spada poniżej ustawionego progu (np. 50 L)</div>
         </div>
+        <div class="opt-price">1 100 zł</div>
         <div class="opt-badge popular">polecane</div>
       </div>
 
@@ -267,6 +326,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--cr);color:var(
           <div class="opt-name">Automatyczne płukanie strefy dozowania</div>
           <div class="opt-desc">Czyszczenie po każdej sprzedaży mleka — higiena HACCP bez pracy ręcznej</div>
         </div>
+        <div class="opt-price">1 300 zł</div>
         <div class="opt-badge popular">polecane</div>
       </div>
 
@@ -276,6 +336,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--cr);color:var(
           <div class="opt-name">Płatność kartą (terminal Nayax)</div>
           <div class="opt-desc">Karta, blik, Apple Pay — rosnąca popularność bezgotówkowych płatności</div>
         </div>
+        <div class="opt-price">4 300 zł</div>
       </div>
 
       <div class="opt-item" onclick="toggleOpt(this,'alarm')" data-key="alarm">
@@ -284,6 +345,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--cr);color:var(
           <div class="opt-name">Alarm + syrena antywłamaniowa</div>
           <div class="opt-desc">SMS + syrena przy naruszeniu szafy sterowniczej</div>
         </div>
+        <div class="opt-price">1 300 zł</div>
       </div>
 
       <div class="opt-item" onclick="toggleOpt(this,'wozek')" data-key="wozek">
@@ -292,24 +354,180 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--cr);color:var(
           <div class="opt-name">Wózek do kannych 50 L</div>
           <div class="opt-desc">Ułatwia codzienną wymianę zbiornika — mniej wysiłku fizycznego</div>
         </div>
+        <div class="opt-price">1 800 zł</div>
       </div>
 
     </div>
 
     <div class="btn-row">
+      <button class="btn-back" onclick="goStep(0)">← Zmień produkt</button>
       <button class="btn-next" onclick="goStep(2)">Dalej — dane kontaktowe →</button>
+    </div>
+    </div><!-- /config-mlekomat -->
+
+    <!-- ══ AUTOMAT CHŁODNICZY SIELAFF ══ -->
+    <div id="config-sielaff" style="display:none">
+      <div class="step-head">
+        <div class="step-num">Krok 2 z 4 — Konfiguracja</div>
+        <div class="step-title">Automat chłodniczy Sielaff</div>
+        <div class="step-sub">Automaty na jaja, sery, napoje i produkty świeże. Wybierz serię — wycenę przygotujemy indywidualnie.</div>
+      </div>
+
+      <div class="opt-section-label">Który typ Cię interesuje?</div>
+      <div class="opt-grid" id="sielaff-grid">
+
+        <div class="opt-item selected" onclick="selectSielaff(this,'sielaff_chlodniczy')" data-key="sielaff_chlodniczy">
+          <div class="opt-check"></div>
+          <div class="opt-label">
+            <div class="opt-name">Automat chłodniczy — napoje i produkty świeże</div>
+            <div class="opt-desc">Jaja, sery, mleko, napoje — sprzedaż w temperaturze chłodniczej</div>
+          </div>
+        </div>
+
+        <div class="opt-item" onclick="selectSielaff(this,'sielaff_combi')" data-key="sielaff_combi">
+          <div class="opt-check"></div>
+          <div class="opt-label">
+            <div class="opt-name">Combi — chłodzenie + część sucha</div>
+            <div class="opt-desc">Produkty świeże i trwałe w jednym urządzeniu</div>
+          </div>
+        </div>
+
+        <div class="opt-item" onclick="selectSielaff(this,'sielaff_napoje')" data-key="sielaff_napoje">
+          <div class="opt-check"></div>
+          <div class="opt-label">
+            <div class="opt-name">Napoje zimne (Cold Drinks)</div>
+            <div class="opt-desc">Woda, soki, napoje — wysokie półki na butelki</div>
+          </div>
+        </div>
+
+        <div class="opt-item" onclick="selectSielaff(this,'sielaff_hot')" data-key="sielaff_hot">
+          <div class="opt-check"></div>
+          <div class="opt-label">
+            <div class="opt-name">Napoje gorące (Hot Drinks)</div>
+            <div class="opt-desc">Kawa, herbata, czekolada — automaty kawowe Sielaff</div>
+          </div>
+        </div>
+
+        <div class="opt-item" onclick="selectSielaff(this,'sielaff_outdoor')" data-key="sielaff_outdoor">
+          <div class="opt-check"></div>
+          <div class="opt-label">
+            <div class="opt-name">Wersja zewnętrzna (Outdoor)</div>
+            <div class="opt-desc">Przystosowana do pracy na zewnątrz, obok pawilonu</div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="model-card">
+        <div class="mc-icon">📋</div>
+        <div>
+          <div class="mc-name">Wycena indywidualna</div>
+          <div class="mc-desc">Ceny katalogowe automatów Sielaff — podajemy indywidualnie po kontakcie. Wypełnij formularz, a przygotujemy ofertę na wybrany typ.</div>
+        </div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn-back" onclick="goStep(0)">← Zmień produkt</button>
+        <button class="btn-next" onclick="goStep(2)">Dalej — dane kontaktowe →</button>
+      </div>
+    </div>
+
+    <!-- ══ SZKLANE BUTELKI ══ -->
+    <div id="config-butelki" style="display:none">
+      <div class="step-head">
+        <div class="step-num">Krok 2 z 4 — Konfiguracja</div>
+        <div class="step-title">Szklane butelki z etykietą</div>
+        <div class="step-sub">Butelki pod Twój punkt sprzedaży — z etykietą i pod indywidualną wycenę.</div>
+      </div>
+
+      <div class="kanny-row">
+        <div class="kanny-info">
+          <strong>Liczba butelek</strong>
+          <span>Orientacyjna ilość na start — np. 100–500 szt.</span>
+        </div>
+        <div class="kanny-ctrl">
+          <button class="kanny-btn" onclick="changeButelki(-50)">−</button>
+          <div class="kanny-num" id="butelki-display">200</div>
+          <button class="kanny-btn" onclick="changeButelki(50)">+</button>
+        </div>
+      </div>
+
+      <div class="model-card">
+        <div class="mc-icon">🍾</div>
+        <div>
+          <div class="mc-name">Butelki 0,5 L / 1 L z etykietą</div>
+          <div class="mc-desc">Ceny katalogowe — podajemy indywidualnie po kontakcie. Etykieta Sklep za Stodołą lub Twoja własna.</div>
+        </div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn-back" onclick="goStep(0)">← Zmień produkt</button>
+        <button class="btn-next" onclick="goStep(2)">Dalej — dane kontaktowe →</button>
+      </div>
+    </div>
+
+    <!-- ══ PAWILON ══ -->
+    <div id="config-pawilon" style="display:none">
+      <div class="step-head">
+        <div class="step-num">Krok 2 z 4 — Konfiguracja</div>
+        <div class="step-title">Pawilon drewniany</div>
+        <div class="step-sub">Pawilon pod Twój punkt sprzedaży — wybierz orientacyjny rozmiar, wycenę przygotujemy indywidualnie.</div>
+      </div>
+
+      <div class="opt-section-label">Orientacyjny rozmiar</div>
+      <div class="opt-grid" id="pawilon-grid">
+
+        <div class="opt-item selected" onclick="selectPawilon(this,'pawilon_s')" data-key="pawilon_s">
+          <div class="opt-check"></div>
+          <div class="opt-label">
+            <div class="opt-name">Pawilon S — kompaktowy</div>
+            <div class="opt-desc">Pod mlekomat i podstawowe produkty</div>
+          </div>
+        </div>
+
+        <div class="opt-item" onclick="selectPawilon(this,'pawilon_m')" data-key="pawilon_m">
+          <div class="opt-check"></div>
+          <div class="opt-label">
+            <div class="opt-name">Pawilon M — standardowy</div>
+            <div class="opt-desc">Mlekomat + automaty + regały</div>
+          </div>
+        </div>
+
+        <div class="opt-item" onclick="selectPawilon(this,'pawilon_l')" data-key="pawilon_l">
+          <div class="opt-check"></div>
+          <div class="opt-label">
+            <div class="opt-name">Pawilon L — duży</div>
+            <div class="opt-desc">Pełny sklep przy gospodarstwie</div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="model-card">
+        <div class="mc-icon">🏠</div>
+        <div>
+          <div class="mc-name">Wycena indywidualna</div>
+          <div class="mc-desc">Ceny katalogowe pawilonów — podajemy indywidualnie po kontakcie, po ustaleniu wymiarów i wykończenia.</div>
+        </div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn-back" onclick="goStep(0)">← Zmień produkt</button>
+        <button class="btn-next" onclick="goStep(2)">Dalej — dane kontaktowe →</button>
+      </div>
     </div>
   </div>
 
   <!-- ═══ KROK 2 — FORMULARZ ═══ -->
   <div class="step" id="step2">
     <div class="step-head">
-      <div class="step-num">Krok 2 z 3 — Twoje dane</div>
+      <div class="step-num">Krok 3 z 4 — Twoje dane</div>
       <div class="step-title">Kilka słów o gospodarstwie</div>
       <div class="step-sub">Żeby przygotować dokładną ofertę — potrzebujemy kilku informacji. Nic skomplikowanego.</div>
     </div>
 
     <form id="brief-form" onsubmit="return false">
+    <input type="text" name="website" id="f-website" value="" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;top:-9999px;height:0;width:0;opacity:0"/>
     <div class="form-grid">
       <div class="field">
         <label>Imię i nazwisko *</label>
@@ -364,6 +582,15 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--cr);color:var(
           <option>Nie wiem jeszcze</option>
         </select>
       </div>
+      <div class="field field-full">
+        <label>Czy jesteś zainteresowany dotacją ARiMR?</label>
+        <select id="f-dotacja">
+          <option value="">— wybierz —</option>
+          <option value="tak">Tak — chcę zobaczyć cenę po dotacji</option>
+          <option value="nie">Nie</option>
+          <option value="nie_wiem">Nie wiem jeszcze</option>
+        </select>
+      </div>
       <div class="field field-full field-opt">
         <label>Uwagi lub pytania</label>
         <textarea id="f-uwagi" placeholder="Np. termin realizacji, specjalne wymagania lokalizacyjne..."></textarea>
@@ -380,14 +607,13 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--cr);color:var(
   <!-- ═══ KROK 3 — PODSUMOWANIE ═══ -->
   <div class="step" id="step3">
     <div class="step-head">
-      <div class="step-num">Krok 3 z 3 — Podsumowanie</div>
+      <div class="step-num">Krok 4 z 4 — Podsumowanie</div>
       <div class="step-title">Twoja konfiguracja</div>
       <div class="step-sub">Sprawdź czy wszystko się zgadza, a potem wyślij — oddzwonimy w ciągu jednego dnia roboczego.</div>
     </div>
 
-    <!-- SUMMARY CARD -->
     <div class="summary-card" id="summary-card">
-      <div class="sh">BRUNIMAT 650 Premium DUO — Konfiguracja</div>
+      <div class="sh" id="summary-head">Konfiguracja</div>
       <div id="summary-rows"></div>
     </div>
 
@@ -406,7 +632,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--cr);color:var(
         <span class="key">Cena brutto</span>
         <span class="val green" id="sum-brutto">—</span>
       </div>
-      <div class="summary-row highlight">
+      <div class="summary-row highlight" id="sum-arimr-row" style="display:none">
         <span class="key">Po dotacji ARiMR 50% — brutto</span>
         <span class="val" id="sum-arimr">—</span>
       </div>
@@ -473,8 +699,33 @@ const OPT_LABELS = {
 
 // ── STATE ─────────────────────────────────────────────────────────────────────
 let kanny = 2;
+let butelki = 200;
 let selected = new Set();
-let currentStep = 1;
+let currentStep = 0;
+let currentProduct = 'mlekomat';
+let sielaffKey = 'sielaff_chlodniczy';
+let pawilonKey = 'pawilon_s';
+
+const PRODUCT_NAMES = {
+  mlekomat: 'Mlekomat BRUNIMAT 650 Premium DUO',
+  sielaff:  'Automat chłodniczy Sielaff',
+  butelki:  'Szklane butelki z etykietą',
+  pawilon:  'Pawilon drewniany',
+};
+
+const SIELAFF_NAMES = {
+  sielaff_chlodniczy: 'Automat chłodniczy — napoje i produkty świeże',
+  sielaff_combi:      'Combi — chłodzenie + część sucha',
+  sielaff_napoje:     'Napoje zimne (Cold Drinks)',
+  sielaff_hot:        'Napoje gorące (Hot Drinks)',
+  sielaff_outdoor:    'Wersja zewnętrzna (Outdoor)',
+};
+
+const PAWILON_NAMES = {
+  pawilon_s: 'Pawilon S — kompaktowy',
+  pawilon_m: 'Pawilon M — standardowy',
+  pawilon_l: 'Pawilon L — duży',
+};
 
 // ── PRICE CALC ────────────────────────────────────────────────────────────────
 function calcPrice() {
@@ -491,9 +742,16 @@ function calcPrice() {
 function fmt(n) { return n.toLocaleString('pl-PL') + ' zł'; }
 
 function updateBadge() {
+  if (currentProduct !== 'mlekomat') {
+    document.getElementById('badge-price').textContent = 'wycena indywidualna';
+    document.getElementById('badge-sub').textContent = 'netto — po kontakcie';
+    return;
+  }
   const { netto, brutto, arimr } = calcPrice();
   document.getElementById('badge-price').textContent = fmt(netto);
-  document.getElementById('badge-sub').textContent = `brutto ${fmt(brutto)} · po dotacji ${fmt(arimr)}`;
+  const dot = document.getElementById('f-dotacja').value;
+  document.getElementById('badge-sub').textContent =
+    dot === 'tak' ? `brutto ${fmt(brutto)} · po dotacji ${fmt(arimr)}` : `brutto ${fmt(brutto)}`;
 }
 
 // ── KANNY ─────────────────────────────────────────────────────────────────────
@@ -501,6 +759,33 @@ function changeKanny(d) {
   kanny = Math.max(2, Math.min(4, kanny + d));
   document.getElementById('kanny-display').textContent = kanny;
   updateBadge();
+}
+
+// ── BUTELKI ───────────────────────────────────────────────────────────────────
+function changeButelki(d) {
+  butelki = Math.max(50, Math.min(1000, butelki + d));
+  document.getElementById('butelki-display').textContent = butelki;
+}
+
+// ── PRODUCT SELECT ────────────────────────────────────────────────────────────
+function selectProduct(key) {
+  currentProduct = key;
+  document.querySelectorAll('#step1 > div[id^="config-"]').forEach(el => el.style.display = 'none');
+  document.getElementById('config-' + key).style.display = 'block';
+  updateBadge();
+  goStep(1);
+}
+
+function selectSielaff(el, key) {
+  sielaffKey = key;
+  document.querySelectorAll('#sielaff-grid .opt-item').forEach(e => e.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+function selectPawilon(el, key) {
+  pawilonKey = key;
+  document.querySelectorAll('#pawilon-grid .opt-item').forEach(e => e.classList.remove('selected'));
+  el.classList.add('selected');
 }
 
 // ── OPTIONS ───────────────────────────────────────────────────────────────────
@@ -526,8 +811,8 @@ function toggleOpt(el, key) {
 
 // ── STEPS ─────────────────────────────────────────────────────────────────────
 function goStep(n) {
-  if (n === 2) {
-    // validate step 1 — nothing required here
+  if (n === 1 && currentStep === 0) {
+    // przejście z wyboru produktu — konfiguracja już ustawiona przez selectProduct
   }
   if (n === 3) {
     const name = document.getElementById('f-name').value.trim();
@@ -545,26 +830,49 @@ function goStep(n) {
   document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
   document.getElementById('step' + n).classList.add('active');
   // update progress
-  for (let i = 1; i <= 3; i++) {
+  for (let i = 0; i <= 3; i++) {
     const ps = document.getElementById('ps' + i);
     ps.className = 'ps' + (i < n ? ' done' : i === n ? ' active' : '');
   }
-  const labels = ['', 'Krok 1 z 3 — Model', 'Krok 2 z 3 — Dane', 'Krok 3 z 3 — Podsumowanie'];
+  const labels = ['', 'Krok 1 z 4 — Wybór produktu', 'Krok 2 z 4 — Konfiguracja', 'Krok 3 z 4 — Dane', 'Krok 4 z 4 — Podsumowanie'];
   document.getElementById('progress-text').textContent = labels[n];
   window.scrollTo({top:0, behavior:'smooth'});
 }
 
 // ── SUMMARY ───────────────────────────────────────────────────────────────────
 function buildSummary() {
-  const rows = [
-    ['Model', 'BRUNIMAT 650 Premium DUO'],
-    ['Certyfikat CE-MID', '✓ w zestawie'],
-    ['Reszta + banknoty + czytnik', '✓ w zestawie'],
-    ['Drukarka paragonów', '✓ w zestawie'],
-    ['Ogrzewanie Anti-Frost', '✓ w zestawie'],
-    ['Kanny 50 L', kanny + ' szt.'],
-  ];
-  selected.forEach(k => rows.push([OPT_LABELS[k], '✓ wybrano']));
+  document.getElementById('summary-head').textContent = PRODUCT_NAMES[currentProduct] + ' — Konfiguracja';
+  const rows = [];
+
+  if (currentProduct === 'mlekomat') {
+    rows.push(
+      ['Model', 'BRUNIMAT 650 Premium DUO'],
+      ['Certyfikat CE-MID', '✓ w zestawie'],
+      ['Reszta + banknoty + czytnik', '✓ w zestawie'],
+      ['Drukarka paragonów', '✓ w zestawie'],
+      ['Ogrzewanie Anti-Frost', '✓ w zestawie'],
+      ['Kanny 50 L', kanny + ' szt.'],
+    );
+    selected.forEach(k => rows.push([OPT_LABELS[k], '✓ wybrano']));
+  } else if (currentProduct === 'sielaff') {
+    rows.push(
+      ['Produkt', 'Automat chłodniczy Sielaff'],
+      ['Typ', SIELAFF_NAMES[sielaffKey]],
+      ['Wycena', 'indywidualna — po kontakcie'],
+    );
+  } else if (currentProduct === 'butelki') {
+    rows.push(
+      ['Produkt', 'Szklane butelki z etykietą'],
+      ['Ilość', butelki + ' szt.'],
+      ['Wycena', 'indywidualna — po kontakcie'],
+    );
+  } else if (currentProduct === 'pawilon') {
+    rows.push(
+      ['Produkt', 'Pawilon drewniany'],
+      ['Rozmiar', PAWILON_NAMES[pawilonKey]],
+      ['Wycena', 'indywidualna — po kontakcie'],
+    );
+  }
 
   const name = document.getElementById('f-name').value;
   const woj  = document.getElementById('f-woj').value;
@@ -584,12 +892,27 @@ function buildSummary() {
     : '<div style="height:4px;background:var(--line)"></div>'
   ).join('');
 
-  const { netto, brutto, arimr } = calcPrice();
-  const vat = brutto - netto;
-  document.getElementById('sum-netto').textContent  = fmt(netto);
-  document.getElementById('sum-vat').textContent    = fmt(vat);
-  document.getElementById('sum-brutto').textContent = fmt(brutto);
-  document.getElementById('sum-arimr').textContent  = fmt(arimr);
+  const dot = document.getElementById('f-dotacja').value;
+  const arimrRow = document.getElementById('sum-arimr-row');
+
+  if (currentProduct === 'mlekomat') {
+    const { netto, brutto, arimr } = calcPrice();
+    const vat = brutto - netto;
+    document.getElementById('sum-netto').textContent  = fmt(netto);
+    document.getElementById('sum-vat').textContent    = fmt(vat);
+    document.getElementById('sum-brutto').textContent = fmt(brutto);
+    if (dot === 'tak') {
+      arimrRow.style.display = 'flex';
+      document.getElementById('sum-arimr').textContent = fmt(arimr);
+    } else {
+      arimrRow.style.display = 'none';
+    }
+  } else {
+    document.getElementById('sum-netto').textContent  = '—';
+    document.getElementById('sum-vat').textContent    = '—';
+    document.getElementById('sum-brutto').textContent = 'wycena indywidualna';
+    arimrRow.style.display = 'none';
+  }
 }
 
 // ── SEND ──────────────────────────────────────────────────────────────────────
@@ -600,8 +923,21 @@ async function sendBrief() {
 
   const { netto, brutto, arimr } = calcPrice();
   const opts = [...selected].map(k => OPT_LABELS[k]).join(', ') || 'brak';
+  const dot = document.getElementById('f-dotacja').value;
+
+  let konfiguracja = '';
+  if (currentProduct === 'mlekomat') {
+    konfiguracja = `BRUNIMAT 650 Premium DUO | kanny: ${kanny} | opcje: ${opts}`;
+  } else if (currentProduct === 'sielaff') {
+    konfiguracja = `Sielaff | typ: ${SIELAFF_NAMES[sielaffKey]}`;
+  } else if (currentProduct === 'butelki') {
+    konfiguracja = `Butelki z etykietą | ilość: ${butelki} szt.`;
+  } else if (currentProduct === 'pawilon') {
+    konfiguracja = `Pawilon | rozmiar: ${PAWILON_NAMES[pawilonKey]}`;
+  }
 
   const data = {
+    source: 'brief',
     imie:       document.getElementById('f-name').value,
     telefon:    document.getElementById('f-tel').value,
     email:      document.getElementById('f-email').value,
@@ -609,22 +945,29 @@ async function sendBrief() {
     krowy:      document.getElementById('f-krowy').value,
     litry:      document.getElementById('f-litry').value,
     pawilon:    document.getElementById('f-pawilon').value,
+    dotacja:    dot === 'tak' ? 'Tak' : dot === 'nie' ? 'Nie' : dot === 'nie_wiem' ? 'Nie wiem jeszcze' : '',
     uwagi:      document.getElementById('f-uwagi').value,
-    konfiguracja: `BRUNIMAT 650 Premium DUO | kanny: ${kanny} | opcje: ${opts}`,
-    cena_netto:  fmt(netto),
-    cena_brutto: fmt(brutto),
-    po_dotacji:  fmt(arimr),
-    zrodlo: 'brief-konfiguracja',
+    produkt:    PRODUCT_NAMES[currentProduct],
+    konfiguracja,
+    cena_netto:  currentProduct === 'mlekomat' ? fmt(netto) : 'wycena indywidualna',
+    cena_brutto: currentProduct === 'mlekomat' ? fmt(brutto) : 'wycena indywidualna',
+    po_dotacji:  currentProduct === 'mlekomat' && dot === 'tak' ? fmt(arimr) : '',
+    website:     document.getElementById('f-website') ? document.getElementById('f-website').value : ''
   };
 
-  const fd = new FormData();
-  Object.entries(data).forEach(([k,v]) => fd.append(k,v));
-
   try {
-    await fetch('https://formspree.io/f/mqeogyjd', {
-      method: 'POST', body: fd, headers: {Accept: 'application/json'}
+    const res = await fetch('/api/leads', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(data)
     });
-  } catch(e) {}
+    if (!res.ok) throw new Error('Serwer zwrócił błąd: ' + res.status);
+  } catch(e) {
+    btn.disabled = false;
+    btn.textContent = 'Wyślij zapytanie — oddzwonimy w 24h';
+    alert('Nie udało się wysłać formularza. Spróbuj ponownie za chwilę albo zadzwoń: 533 200 652.');
+    return;
+  }
 
   document.getElementById('brief-form') && (document.getElementById('brief-form').style.display='none');
   document.getElementById('send-btn').style.display='none';

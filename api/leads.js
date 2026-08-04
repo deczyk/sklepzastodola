@@ -25,6 +25,13 @@ const ALLOWED_SOURCES = {
     status: "nowy",
     priorytet: "B",
     notificationTitle: "Nowy lead z Advisor OLX"
+  },
+  brief: {
+    zrodloLeada: "Brief konfiguracja",
+    kategoriaLeada: "Brief",
+    status: "nowy",
+    priorytet: "B",
+    notificationTitle: "Nowa konfiguracja z brief"
   }
 };
 
@@ -103,11 +110,23 @@ function buildLeadData(payload, source) {
   const wojewodztwo = readString(payload, ["wojewodztwo", "region"], 120);
   const miejscowosc = readString(payload, ["miejscowosc", "county", "lokalizacja"], 120);
   const ulica = readString(payload, ["ulica"], 120);
-  const zainteresowanie = readString(payload, ["zainteresowanie", "interestLabel", "temat"], 120);
+  const zainteresowanie = readString(payload, ["zainteresowanie", "interestLabel", "temat"], 120) || (source === "brief" ? "BRUNIMAT 650 Premium DUO" : "");
   const produkt = readString(payload, ["produkt", "packageName", "interestLabel", "temat"], 120) || zainteresowanie;
   const obiekcje = readString(payload, ["obiekcje"], 120);
   const notes = sanitizeLongText(payload.notes || payload.wiadomosc || payload.message || payload.answersText || "");
-  const answersText = sanitizeLongText(payload.answersText || payload.message || notes);
+  let answersText = sanitizeLongText(payload.answersText || payload.message || notes);
+  if (source === "brief") {
+    const detale = [
+      payload.konfiguracja ? `Konfiguracja: ${clampText(payload.konfiguracja, 500)}` : "",
+      payload.krowy ? `Stado: ${clampText(payload.krowy, 120)}` : "",
+      payload.litry ? `Produkcja: ${clampText(payload.litry, 120)}` : "",
+      payload.pawilon ? `Pawilon: ${clampText(payload.pawilon, 120)}` : "",
+      [payload.cena_netto, payload.cena_brutto, payload.po_dotacji].filter(Boolean).length
+        ? `Wycena (netto | brutto | po dotacji): ${[payload.cena_netto, payload.cena_brutto, payload.po_dotacji].filter(Boolean).join(" | ")}`
+        : ""
+    ].filter(Boolean).join("; ");
+    answersText = sanitizeLongText(detale);
+  }
   const priorytet = inferPriority(source, payload, answersText);
 
   let historyText = "";
@@ -115,8 +134,10 @@ function buildLeadData(payload, source) {
     historyText = `[Formularz strony] Klient wysłał formularz kontaktowy. ${answersText}`.trim();
   } else if (source === "advisor") {
     historyText = `[Advisor] Klient wypełnił formularz doradczy. Odpowiedzi: ${answersText}`.trim();
-  } else {
+  } else if (source === "advisor_olx") {
     historyText = `[Advisor OLX] Klient wypełnił formularz doradczy z OLX. Odpowiedzi: ${answersText}`.trim();
+  } else {
+    historyText = `[Brief] Klient skonfigurował mlekomat w konfiguratorze. ${answersText}`.trim();
   }
 
   return {
