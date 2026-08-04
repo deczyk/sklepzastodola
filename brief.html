@@ -699,8 +699,33 @@ const OPT_LABELS = {
 
 // ── STATE ─────────────────────────────────────────────────────────────────────
 let kanny = 2;
+let butelki = 200;
 let selected = new Set();
-let currentStep = 1;
+let currentStep = 0;
+let currentProduct = 'mlekomat';
+let sielaffKey = 'sielaff_chlodniczy';
+let pawilonKey = 'pawilon_s';
+
+const PRODUCT_NAMES = {
+  mlekomat: 'Mlekomat BRUNIMAT 650 Premium DUO',
+  sielaff:  'Automat chłodniczy Sielaff',
+  butelki:  'Szklane butelki z etykietą',
+  pawilon:  'Pawilon drewniany',
+};
+
+const SIELAFF_NAMES = {
+  sielaff_chlodniczy: 'Automat chłodniczy — napoje i produkty świeże',
+  sielaff_combi:      'Combi — chłodzenie + część sucha',
+  sielaff_napoje:     'Napoje zimne (Cold Drinks)',
+  sielaff_hot:        'Napoje gorące (Hot Drinks)',
+  sielaff_outdoor:    'Wersja zewnętrzna (Outdoor)',
+};
+
+const PAWILON_NAMES = {
+  pawilon_s: 'Pawilon S — kompaktowy',
+  pawilon_m: 'Pawilon M — standardowy',
+  pawilon_l: 'Pawilon L — duży',
+};
 
 // ── PRICE CALC ────────────────────────────────────────────────────────────────
 function calcPrice() {
