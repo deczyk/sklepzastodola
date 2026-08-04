@@ -376,12 +376,21 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--cr);color:var(
     };
     function showSuccess(){
       var step3=document.getElementById('step3');if(!step3)return;
-      var kids=step3.children;
-      for(var i=kids.length-1;i>=0;i--)kids[i].style.display='none';
-      var box=document.createElement('div');
-      box.className='success-msg show';
-      box.innerHTML='<div class="success-icon">✅</div><h2>Dziękujemy!</h2><p>Twoja konfiguracja została wysłana. Oddzwonimy w ciągu jednego dnia roboczego.</p>';
-      step3.appendChild(box);
+      var kids=step3.children,existing=null;
+      for(var i=kids.length-1;i>=0;i--){
+        var c=kids[i];
+        if(c.className&&String(c.className).indexOf('success-msg')!==-1){existing=c;}
+        else{c.style.display='none';}
+      }
+      if(existing){
+        existing.style.display='';
+        if(existing.classList)existing.classList.add('show');
+      }else{
+        var box=document.createElement('div');
+        box.className='success-msg show';
+        box.innerHTML='<div class="success-icon">✅</div><h2>Dziękujemy!</h2><p>Twoja konfiguracja została wysłana. Oddzwonimy w ciągu jednego dnia roboczego.</p>';
+        step3.appendChild(box);
+      }
       setProgress(3,'Krok 4 z 4 — Podsumowanie');
       window.scrollTo(0,0);
     }
