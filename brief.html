@@ -32,7 +32,8 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--cr);color:var(
 .step{display:none}
 .step.active{display:block}
 .step-head{margin-bottom:2rem}
-.step-num{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--g);margin-bottom:.3rem}
+.brief-step-label{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--g);margin-bottom:.5rem;display:flex;align-items:center;gap:.6rem}
+.brief-step-label::before{content:'';display:block;width:1.4rem;height:1px;background:var(--g)}
 .step-title{font-size:1.6rem;font-weight:800;color:var(--ink);line-height:1.2}
 .step-sub{font-size:.9rem;color:var(--mid);margin-top:.4rem}
 
@@ -196,7 +197,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--cr);color:var(
   <!-- ═══ KROK 0 — WYBÓR PRODUKTU ═══ -->
   <div class="step active" id="step0">
     <div class="step-head">
-      <div class="step-num">Krok 1 z 4 — Wybór produktu</div>
+      <div class="brief-step-label">Krok 1 z 4 — Wybór produktu</div>
       <div class="step-title">Co chcesz skonfigurować?</div>
       <div class="step-sub">Wybierz jeden lub kilka produktów — możesz skonfigurować cały punkt sprzedaży albo tylko samo urządzenie. Konfigurator pokaże opcje i wycenę dla każdego wybranego produktu.</div>
     </div>
@@ -469,7 +470,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--cr);color:var(
     <!-- ══ MLEKOMAT BRUNIMAT ══ -->
     <div id="config-mlekomat">
     <div class="step-head">
-      <div class="step-num">Krok 2 z 4 — Konfiguracja</div>
+      <div class="brief-step-label">Krok 2 z 4 — Konfiguracja</div>
       <div class="step-title">BRUNIMAT 650 Premium DUO</div>
       <div class="step-sub">Konfigurujesz automat do mleka ze standardowym wyposażeniem. Poniżej możesz wybrać liczbę kannych i opcje dodatkowe.</div>
     </div>
@@ -615,7 +616,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--cr);color:var(
     <!-- ══ AUTOMAT CHŁODNICZY SIELAFF ══ -->
     <div id="config-sielaff" style="display:none">
       <div class="step-head">
-        <div class="step-num">Krok 2 z 4 — Konfiguracja</div>
+        <div class="brief-step-label">Krok 2 z 4 — Konfiguracja</div>
         <div class="step-title">Automat chłodniczy Sielaff</div>
         <div class="step-sub">Automaty na jaja, sery, napoje i produkty świeże. Wybierz serię — wycenę przygotujemy indywidualnie.</div>
       </div>
@@ -682,7 +683,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--cr);color:var(
     <!-- ══ SZKLANE BUTELKI ══ -->
     <div id="config-butelki" style="display:none">
       <div class="step-head">
-        <div class="step-num">Krok 2 z 4 — Konfiguracja</div>
+        <div class="brief-step-label">Krok 2 z 4 — Konfiguracja</div>
         <div class="step-title">Szklane butelki z etykietą</div>
         <div class="step-sub">Butelki pod Twój punkt sprzedaży — z etykietą i pod indywidualną wycenę.</div>
       </div>
@@ -716,7 +717,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--cr);color:var(
     <!-- ══ PAWILON ══ -->
     <div id="config-pawilon" style="display:none">
       <div class="step-head">
-        <div class="step-num">Krok 2 z 4 — Konfiguracja</div>
+        <div class="brief-step-label">Krok 2 z 4 — Konfiguracja</div>
         <div class="step-title">Pawilon drewniany</div>
         <div class="step-sub">Pawilon pod Twój punkt sprzedaży — wybierz orientacyjny rozmiar, wycenę przygotujemy indywidualnie.</div>
       </div>
@@ -768,7 +769,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--cr);color:var(
   <!-- ═══ KROK 2 — FORMULARZ ═══ -->
   <div class="step" id="step2">
     <div class="step-head">
-      <div class="step-num">Krok 3 z 4 — Twoje dane</div>
+      <div class="brief-step-label">Krok 3 z 4 — Twoje dane</div>
       <div class="step-title">Kilka słów o gospodarstwie</div>
       <div class="step-sub">Żeby przygotować dokładną ofertę — potrzebujemy kilku informacji. Nic skomplikowanego.</div>
     </div>
@@ -854,7 +855,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--cr);color:var(
   <!-- ═══ KROK 3 — PODSUMOWANIE ═══ -->
   <div class="step" id="step3">
     <div class="step-head">
-      <div class="step-num">Krok 4 z 4 — Podsumowanie</div>
+      <div class="brief-step-label">Krok 4 z 4 — Podsumowanie</div>
       <div class="step-title">Twoja konfiguracja</div>
       <div class="step-sub">Sprawdź czy wszystko się zgadza, a potem wyślij — oddzwonimy w ciągu jednego dnia roboczego.</div>
     </div>
