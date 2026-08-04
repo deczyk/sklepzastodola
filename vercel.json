@@ -1,4 +1,8 @@
 {
+  "redirects": [
+    { "source": "/oferta.html", "destination": "/", "permanent": true },
+    { "source": "/oferta", "destination": "/", "permanent": true }
+  ],
   "headers": [
     {
       "source": "/(.*)",
