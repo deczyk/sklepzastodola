@@ -410,7 +410,11 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--cr);color:var(
           window.scrollTo(0,0);
         }
       };
-      var sub=document.querySelector('.btn-submit');
+      var sub=document.querySelector('.btn-submit')||(function(){
+        var btns=document.querySelectorAll('#step3 button');
+        for(var i=0;i<btns.length;i++){if(btns[i].textContent.indexOf('Wyślij')!==-1)return btns[i];}
+        return null;
+      })();
       if(sub){
         var clone=sub.cloneNode(false);
         clone.onclick=function(){window.sendBrief();};
