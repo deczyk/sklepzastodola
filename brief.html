@@ -923,6 +923,18 @@ async function sendBrief() {
 
   const { netto, brutto, arimr } = calcPrice();
   const opts = [...selected].map(k => OPT_LABELS[k]).join(', ') || 'brak';
+  const dot = document.getElementById('f-dotacja').value;
+
+  let konfiguracja = '';
+  if (currentProduct === 'mlekomat') {
+    konfiguracja = `BRUNIMAT 650 Premium DUO | kanny: ${kanny} | opcje: ${opts}`;
+  } else if (currentProduct === 'sielaff') {
+    konfiguracja = `Sielaff | typ: ${SIELAFF_NAMES[sielaffKey]}`;
+  } else if (currentProduct === 'butelki') {
+    konfiguracja = `Butelki z etykietą | ilość: ${butelki} szt.`;
+  } else if (currentProduct === 'pawilon') {
+    konfiguracja = `Pawilon | rozmiar: ${PAWILON_NAMES[pawilonKey]}`;
+  }
 
   const data = {
     source: 'brief',
@@ -933,11 +945,13 @@ async function sendBrief() {
     krowy:      document.getElementById('f-krowy').value,
     litry:      document.getElementById('f-litry').value,
     pawilon:    document.getElementById('f-pawilon').value,
+    dotacja:    dot === 'tak' ? 'Tak' : dot === 'nie' ? 'Nie' : dot === 'nie_wiem' ? 'Nie wiem jeszcze' : '',
     uwagi:      document.getElementById('f-uwagi').value,
-    konfiguracja: `BRUNIMAT 650 Premium DUO | kanny: ${kanny} | opcje: ${opts}`,
-    cena_netto:  fmt(netto),
-    cena_brutto: fmt(brutto),
-    po_dotacji:  fmt(arimr),
+    produkt:    PRODUCT_NAMES[currentProduct],
+    konfiguracja,
+    cena_netto:  currentProduct === 'mlekomat' ? fmt(netto) : 'wycena indywidualna',
+    cena_brutto: currentProduct === 'mlekomat' ? fmt(brutto) : 'wycena indywidualna',
+    po_dotacji:  currentProduct === 'mlekomat' && dot === 'tak' ? fmt(arimr) : '',
     website:     document.getElementById('f-website') ? document.getElementById('f-website').value : ''
   };
 
