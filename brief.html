@@ -472,7 +472,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--cr);color:var(
         return null;
       })();
       if(sub){
-        var clone=sub.cloneNode(false);
+        var clone=sub.cloneNode(true);
         clone.onclick=function(){window.sendBrief();};
         if(sub.parentNode)sub.parentNode.replaceChild(clone,sub);
       }
@@ -626,10 +626,6 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--cr);color:var(
 
     </div>
 
-    <div class="btn-row">
-      <button class="btn-back" onclick="goStep(0)">← Zmień produkt</button>
-      <button class="btn-next" onclick="goStep(2)">Dalej — dane kontaktowe →</button>
-    </div>
     </div><!-- /config-mlekomat -->
 
     <!-- ══ AUTOMAT CHŁODNICZY SIELAFF ══ -->
@@ -693,10 +689,6 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--cr);color:var(
         </div>
       </div>
 
-      <div class="btn-row">
-        <button class="btn-back" onclick="goStep(0)">← Zmień produkt</button>
-        <button class="btn-next" onclick="goStep(2)">Dalej — dane kontaktowe →</button>
-      </div>
     </div>
 
     <!-- ══ SZKLANE BUTELKI ══ -->
@@ -727,10 +719,6 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--cr);color:var(
         </div>
       </div>
 
-      <div class="btn-row">
-        <button class="btn-back" onclick="goStep(0)">← Zmień produkt</button>
-        <button class="btn-next" onclick="goStep(2)">Dalej — dane kontaktowe →</button>
-      </div>
     </div>
 
     <!-- ══ PAWILON ══ -->
@@ -778,10 +766,11 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--cr);color:var(
         </div>
       </div>
 
-      <div class="btn-row">
-        <button class="btn-back" onclick="goStep(0)">← Zmień produkt</button>
-        <button class="btn-next" onclick="goStep(2)">Dalej — dane kontaktowe →</button>
-      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn-back" onclick="goStep(0)">← Zmień produkt</button>
+      <button class="btn-next" onclick="goStep(2)">Dalej — dane kontaktowe →</button>
     </div>
   </div>
 
