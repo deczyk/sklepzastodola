@@ -360,14 +360,168 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--cr);color:var(
     </div>
 
     <div class="btn-row">
+      <button class="btn-back" onclick="goStep(0)">← Zmień produkt</button>
       <button class="btn-next" onclick="goStep(2)">Dalej — dane kontaktowe →</button>
+    </div>
+    </div><!-- /config-mlekomat -->
+
+    <!-- ══ AUTOMAT CHŁODNICZY SIELAFF ══ -->
+    <div id="config-sielaff" style="display:none">
+      <div class="step-head">
+        <div class="step-num">Krok 2 z 4 — Konfiguracja</div>
+        <div class="step-title">Automat chłodniczy Sielaff</div>
+        <div class="step-sub">Automaty na jaja, sery, napoje i produkty świeże. Wybierz serię — wycenę przygotujemy indywidualnie.</div>
+      </div>
+
+      <div class="opt-section-label">Który typ Cię interesuje?</div>
+      <div class="opt-grid" id="sielaff-grid">
+
+        <div class="opt-item selected" onclick="selectSielaff(this,'sielaff_chlodniczy')" data-key="sielaff_chlodniczy">
+          <div class="opt-check"></div>
+          <div class="opt-label">
+            <div class="opt-name">Automat chłodniczy — napoje i produkty świeże</div>
+            <div class="opt-desc">Jaja, sery, mleko, napoje — sprzedaż w temperaturze chłodniczej</div>
+          </div>
+        </div>
+
+        <div class="opt-item" onclick="selectSielaff(this,'sielaff_combi')" data-key="sielaff_combi">
+          <div class="opt-check"></div>
+          <div class="opt-label">
+            <div class="opt-name">Combi — chłodzenie + część sucha</div>
+            <div class="opt-desc">Produkty świeże i trwałe w jednym urządzeniu</div>
+          </div>
+        </div>
+
+        <div class="opt-item" onclick="selectSielaff(this,'sielaff_napoje')" data-key="sielaff_napoje">
+          <div class="opt-check"></div>
+          <div class="opt-label">
+            <div class="opt-name">Napoje zimne (Cold Drinks)</div>
+            <div class="opt-desc">Woda, soki, napoje — wysokie półki na butelki</div>
+          </div>
+        </div>
+
+        <div class="opt-item" onclick="selectSielaff(this,'sielaff_hot')" data-key="sielaff_hot">
+          <div class="opt-check"></div>
+          <div class="opt-label">
+            <div class="opt-name">Napoje gorące (Hot Drinks)</div>
+            <div class="opt-desc">Kawa, herbata, czekolada — automaty kawowe Sielaff</div>
+          </div>
+        </div>
+
+        <div class="opt-item" onclick="selectSielaff(this,'sielaff_outdoor')" data-key="sielaff_outdoor">
+          <div class="opt-check"></div>
+          <div class="opt-label">
+            <div class="opt-name">Wersja zewnętrzna (Outdoor)</div>
+            <div class="opt-desc">Przystosowana do pracy na zewnątrz, obok pawilonu</div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="model-card">
+        <div class="mc-icon">📋</div>
+        <div>
+          <div class="mc-name">Wycena indywidualna</div>
+          <div class="mc-desc">Ceny katalogowe automatów Sielaff — podajemy indywidualnie po kontakcie. Wypełnij formularz, a przygotujemy ofertę na wybrany typ.</div>
+        </div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn-back" onclick="goStep(0)">← Zmień produkt</button>
+        <button class="btn-next" onclick="goStep(2)">Dalej — dane kontaktowe →</button>
+      </div>
+    </div>
+
+    <!-- ══ SZKLANE BUTELKI ══ -->
+    <div id="config-butelki" style="display:none">
+      <div class="step-head">
+        <div class="step-num">Krok 2 z 4 — Konfiguracja</div>
+        <div class="step-title">Szklane butelki z etykietą</div>
+        <div class="step-sub">Butelki pod Twój punkt sprzedaży — z etykietą i pod indywidualną wycenę.</div>
+      </div>
+
+      <div class="kanny-row">
+        <div class="kanny-info">
+          <strong>Liczba butelek</strong>
+          <span>Orientacyjna ilość na start — np. 100–500 szt.</span>
+        </div>
+        <div class="kanny-ctrl">
+          <button class="kanny-btn" onclick="changeButelki(-50)">−</button>
+          <div class="kanny-num" id="butelki-display">200</div>
+          <button class="kanny-btn" onclick="changeButelki(50)">+</button>
+        </div>
+      </div>
+
+      <div class="model-card">
+        <div class="mc-icon">🍾</div>
+        <div>
+          <div class="mc-name">Butelki 0,5 L / 1 L z etykietą</div>
+          <div class="mc-desc">Ceny katalogowe — podajemy indywidualnie po kontakcie. Etykieta Sklep za Stodołą lub Twoja własna.</div>
+        </div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn-back" onclick="goStep(0)">← Zmień produkt</button>
+        <button class="btn-next" onclick="goStep(2)">Dalej — dane kontaktowe →</button>
+      </div>
+    </div>
+
+    <!-- ══ PAWILON ══ -->
+    <div id="config-pawilon" style="display:none">
+      <div class="step-head">
+        <div class="step-num">Krok 2 z 4 — Konfiguracja</div>
+        <div class="step-title">Pawilon drewniany</div>
+        <div class="step-sub">Pawilon pod Twój punkt sprzedaży — wybierz orientacyjny rozmiar, wycenę przygotujemy indywidualnie.</div>
+      </div>
+
+      <div class="opt-section-label">Orientacyjny rozmiar</div>
+      <div class="opt-grid" id="pawilon-grid">
+
+        <div class="opt-item selected" onclick="selectPawilon(this,'pawilon_s')" data-key="pawilon_s">
+          <div class="opt-check"></div>
+          <div class="opt-label">
+            <div class="opt-name">Pawilon S — kompaktowy</div>
+            <div class="opt-desc">Pod mlekomat i podstawowe produkty</div>
+          </div>
+        </div>
+
+        <div class="opt-item" onclick="selectPawilon(this,'pawilon_m')" data-key="pawilon_m">
+          <div class="opt-check"></div>
+          <div class="opt-label">
+            <div class="opt-name">Pawilon M — standardowy</div>
+            <div class="opt-desc">Mlekomat + automaty + regały</div>
+          </div>
+        </div>
+
+        <div class="opt-item" onclick="selectPawilon(this,'pawilon_l')" data-key="pawilon_l">
+          <div class="opt-check"></div>
+          <div class="opt-label">
+            <div class="opt-name">Pawilon L — duży</div>
+            <div class="opt-desc">Pełny sklep przy gospodarstwie</div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="model-card">
+        <div class="mc-icon">🏠</div>
+        <div>
+          <div class="mc-name">Wycena indywidualna</div>
+          <div class="mc-desc">Ceny katalogowe pawilonów — podajemy indywidualnie po kontakcie, po ustaleniu wymiarów i wykończenia.</div>
+        </div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn-back" onclick="goStep(0)">← Zmień produkt</button>
+        <button class="btn-next" onclick="goStep(2)">Dalej — dane kontaktowe →</button>
+      </div>
     </div>
   </div>
 
   <!-- ═══ KROK 2 — FORMULARZ ═══ -->
   <div class="step" id="step2">
     <div class="step-head">
-      <div class="step-num">Krok 2 z 3 — Twoje dane</div>
+      <div class="step-num">Krok 3 z 4 — Twoje dane</div>
       <div class="step-title">Kilka słów o gospodarstwie</div>
       <div class="step-sub">Żeby przygotować dokładną ofertę — potrzebujemy kilku informacji. Nic skomplikowanego.</div>
     </div>
