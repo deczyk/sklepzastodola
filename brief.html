@@ -81,6 +81,19 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--cr);color:var(
 .opt-badge{font-size:.68rem;background:var(--al);color:var(--amber);padding:2px 7px;border-radius:8px;font-weight:600;flex-shrink:0}
 .opt-badge.popular{background:var(--gl);color:var(--g)}
 
+/* ── OPTION PRICE ── */
+.opt-price{font-size:.72rem;font-weight:700;color:var(--g);background:var(--gl);padding:3px 9px;border-radius:8px;white-space:nowrap;flex-shrink:0;font-variant-numeric:tabular-nums}
+
+/* ── PRODUCT CHOICE ── */
+.product-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:.8rem;margin-bottom:1.5rem}
+@media(max-width:520px){.product-grid{grid-template-columns:1fr}}
+.product-card{background:#fff;border:2px solid var(--line);border-radius:var(--r);padding:1.3rem 1.4rem;cursor:pointer;transition:border-color .18s,background .18s,transform .18s;display:flex;flex-direction:column;gap:.3rem;user-select:none}
+.product-card:hover{border-color:var(--g);background:var(--gl);transform:translateY(-2px)}
+.pc-icon{font-size:2rem}
+.pc-name{font-size:1.02rem;font-weight:700;color:var(--g)}
+.pc-desc{font-size:.8rem;color:var(--mid);line-height:1.5}
+.pc-tag{font-size:.66rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--amber);background:var(--al);align-self:flex-start;padding:2px 8px;border-radius:8px;margin-top:.3rem}
+
 /* ── SECTION DIVIDER ── */
 .opt-section-label{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--lt);margin:1.4rem 0 .6rem}
 
