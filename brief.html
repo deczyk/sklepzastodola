@@ -286,6 +286,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--cr);color:var(
       var i=window._selProducts.indexOf(p);
       if(i===-1)window._selProducts.push(p);else window._selProducts.splice(i,1);
       updateSelUI();
+      if(window.updateBadge)window.updateBadge();
     };
     function applyConfigVisibility(){
       for(var k in SECTIONS){var sec=document.getElementById(SECTIONS[k]);if(sec)sec.style.display=sel(k)?'':'none';}
@@ -303,9 +304,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--cr);color:var(
         document.getElementById('step0').classList.remove('active');
         document.getElementById('step1').classList.add('active');
         setProgress(1,'Krok 2 z 4 — Konfiguracja');
-        var bp=document.getElementById('badge-price'),bs=document.getElementById('badge-sub');
-        if(bp)bp.textContent='indywidualnie';
-        if(bs)bs.textContent='po kontakcie';
+        if(window.updateBadge)window.updateBadge();
       }
       applyConfigVisibility();
       window.scrollTo(0,0);
@@ -319,9 +318,10 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--cr);color:var(
           document.querySelectorAll('#sielaff-addons .opt-item.selected .opt-name').forEach(function(n){addons.push(n.textContent);});
           var priceVals=pc.querySelectorAll('.price-card-row .v');
           var priceTxt=priceVals.length===2?(' — '+priceVals[0].textContent+' netto / '+priceVals[1].textContent+' brutto'):'';
-          return (nm?nm.textContent:'')+(vr?' ('+vr.textContent+')':'')+(addons.length?' + '+addons.join(', '):'')+priceTxt;
+          var produkty=readVal('f-sielaff-produkty');
+          return (nm?nm.textContent:'')+(vr?' ('+vr.textContent+')':'')+(addons.length?' + '+addons.join(', '):'')+priceTxt+(produkty?' | co sprzedawać: '+produkty:'');
         }
-        var s=document.querySelector('#sielaff-grid .opt-item.selected');return s&&s.querySelector('.opt-name')?s.querySelector('.opt-name').textContent:'';
+        return '';
       }
       if(k==='butelki'){
         var b=document.getElementById('butelki-display');
@@ -406,22 +406,33 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--cr);color:var(
           rows.insertAdjacentHTML('beforeend','<div class="summary-row"><span class="key">'+NAMES[k]+'</span><span class="val">'+(det||'wycena indywidualna')+'</span></div>');
         }
       }
+      var totals=combinedTotals();
       var netto=document.getElementById('sum-netto'),vat=document.getElementById('sum-vat'),brutto=document.getElementById('sum-brutto');
-      if(netto)netto.textContent='—';if(vat)vat.textContent='—';if(brutto)brutto.textContent='wycena indywidualna';
+      if(totals.hasPriced){
+        if(netto)netto.textContent=fmtPrice(totals.totalNetto);
+        if(vat)vat.textContent=fmtPrice(totals.totalBrutto-totals.totalNetto);
+        if(brutto)brutto.textContent=fmtPrice(totals.totalBrutto)+(totals.hasUnpriced?' + inne (indywidualnie)':'');
+      }else{
+        if(netto)netto.textContent='—';if(vat)vat.textContent='—';if(brutto)brutto.textContent='wycena indywidualna';
+      }
       var ar=document.getElementById('sum-arimr-row');if(ar)ar.style.display='none';
+      var priceHead=document.getElementById('price-summary-head');if(priceHead)priceHead.textContent='Szacunkowa wycena';
     }
     function appendExtraRows(){
       var head=document.getElementById('summary-head');if(head)head.textContent='Twoja konfiguracja';
       var rows=document.getElementById('summary-rows');if(!rows)return;
-      var hasExtra=false;
       for(var i=0;i<window._selProducts.length;i++){
         var k=window._selProducts[i];if(k==='mlekomat')continue;
-        hasExtra=true;
         var det=detailFor(k);
         rows.insertAdjacentHTML('beforeend','<div class="summary-row"><span class="key">'+NAMES[k]+'</span><span class="val">'+(det||'wycena indywidualna')+'</span></div>');
       }
+      var totals=combinedTotals();
+      var netto=document.getElementById('sum-netto'),vat=document.getElementById('sum-vat'),brutto=document.getElementById('sum-brutto');
+      if(netto)netto.textContent=fmtPrice(totals.totalNetto);
+      if(vat)vat.textContent=fmtPrice(totals.totalBrutto-totals.totalNetto);
+      if(brutto)brutto.textContent=fmtPrice(totals.totalBrutto)+(totals.hasUnpriced?' + inne (indywidualnie)':'');
       var priceHead=document.getElementById('price-summary-head');
-      if(priceHead)priceHead.textContent=hasExtra?'Szacunkowa wycena — sam mlekomat':'Szacunkowa wycena';
+      if(priceHead)priceHead.textContent='Szacunkowa wycena';
     }
     function parsePriceNumber(text){
       var m=(text||'').replace(/[^\d]/g,'');
@@ -443,6 +454,27 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--cr);color:var(
       return {netto:totalNetto, brutto:Math.round(totalNetto*1.23), addonNames:addonNames};
     }
 
+    // Jedno źródło prawdy dla łącznej ceny — sumuje wszystkie wybrane produkty,
+    // które mają realną cenę katalogową. Butelki/pawilon dopisać tu, gdy dostaną
+    // realne ceny (na razie zostają "wycena indywidualna").
+    var PRICE_GETTERS={
+      mlekomat:function(){
+        if(!sel('mlekomat')||typeof window.calcPrice!=='function')return null;
+        var p=window.calcPrice();
+        return {netto:p.netto, brutto:p.brutto};
+      },
+      sielaff:function(){ return sel('sielaff') ? calcSielaffPrice() : null; }
+    };
+    function combinedTotals(){
+      var totalNetto=0,totalBrutto=0,hasPriced=false,hasUnpriced=false;
+      for(var i=0;i<window._selProducts.length;i++){
+        var k=window._selProducts[i],getter=PRICE_GETTERS[k],r=getter?getter():null;
+        if(r&&r.netto>0){totalNetto+=r.netto;totalBrutto+=r.brutto;hasPriced=true;}
+        else if(!getter){hasUnpriced=true;}
+      }
+      return {totalNetto:totalNetto,totalBrutto:totalBrutto,hasPriced:hasPriced,hasUnpriced:hasUnpriced};
+    }
+
     window.sendBrief=function(){
       var name=readVal('f-name'),tel=readVal('f-tel'),woj=readVal('f-woj'),krowy=readVal('f-krowy'),litry=readVal('f-litry');
       var missing=[];
@@ -457,21 +489,19 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--cr);color:var(
       var konfiguracja='['+id+'] '+buildKonfiguracjaText();
       var uwagi=readVal('f-uwagi');
 
-      var mlekomatNetto=0, mlekomatBrutto=0, poDotacji='';
+      var mlekomatPrice = PRICE_GETTERS.mlekomat();
+      var mlekomatNetto = mlekomatPrice ? mlekomatPrice.netto : 0;
+      var mlekomatBrutto = mlekomatPrice ? mlekomatPrice.brutto : 0;
+      var poDotacji='';
       if(sel('mlekomat')){
-        var ne=document.getElementById('sum-netto'),br=document.getElementById('sum-brutto');
-        mlekomatNetto=ne?parsePriceNumber(ne.textContent):0;
-        mlekomatBrutto=br?parsePriceNumber(br.textContent):0;
         var row=document.getElementById('sum-arimr-row');
         if(row&&row.style.display!=='none'){var v=row.querySelector('.val');if(v)poDotacji=v.textContent;}
       }
-      var sielaffPrice = sel('sielaff') ? calcSielaffPrice() : null;
+      var sielaffPrice = PRICE_GETTERS.sielaff();
 
-      var totalNetto = mlekomatNetto + (sielaffPrice?sielaffPrice.netto:0);
-      var totalBrutto = mlekomatBrutto + (sielaffPrice?sielaffPrice.brutto:0);
-      var hasPricedProduct = mlekomatNetto>0 || (sielaffPrice&&sielaffPrice.netto>0);
-      var netto = hasPricedProduct ? fmtPrice(totalNetto) : 'wycena indywidualna';
-      var brutto = hasPricedProduct ? fmtPrice(totalBrutto) : 'wycena indywidualna';
+      var totals = combinedTotals();
+      var netto = totals.hasPriced ? fmtPrice(totals.totalNetto) : 'wycena indywidualna';
+      var brutto = totals.hasPriced ? fmtPrice(totals.totalBrutto) : 'wycena indywidualna';
 
       var payload={
         source:'brief',osoba:name,telefon:tel,email:readVal('f-email'),wojewodztwo:readVal('f-woj'),
@@ -512,6 +542,22 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--cr);color:var(
       window.scrollTo(0,0);
     }
     document.addEventListener('DOMContentLoaded',function(){
+      // Nadpisujemy DOPIERO po DOMContentLoaded, bo skrypt cennika (dalej w
+      // pliku) deklaruje własną, jednoproduktową wersję updateBadge — gdyby
+      // nadpisać wcześniej, zostałaby po cichu zastąpiona z powrotem.
+      window.updateBadge=function(){
+        var bp=document.getElementById('badge-price'),bs=document.getElementById('badge-sub');
+        if(!bp||!bs)return;
+        var totals=combinedTotals();
+        if(totals.hasPriced){
+          bp.textContent=fmtPrice(totals.totalNetto);
+          bs.textContent='brutto '+fmtPrice(totals.totalBrutto)+(totals.hasUnpriced?' + inne (indywidualnie)':'');
+        }else{
+          bp.textContent='indywidualnie';
+          bs.textContent='po kontakcie';
+        }
+      };
+      window.updateBadge();
       window.__origGoStep=window.goStep;
       window.__origSelectProduct=window.selectProduct;
       window.goStep=function(n){
@@ -675,6 +721,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--cr);color:var(
           <div class="opt-desc">Karta, blik, Apple Pay — rosnąca popularność bezgotówkowych płatności</div>
         </div>
         <div class="opt-price">4 300 zł</div>
+        <div class="opt-badge popular">★ polecane</div>
       </div>
 
       <div class="opt-item" onclick="toggleOpt(this,'wozek')" data-key="wozek">
@@ -748,57 +795,9 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--cr);color:var(
         </div>
       </div>
 
-      <div class="opt-section-label">Inny typ — wycena indywidualna</div>
-      <div class="opt-grid" id="sielaff-grid">
-
-        <div class="opt-item selected" onclick="selectSielaff(this,'sielaff_chlodniczy')" data-key="sielaff_chlodniczy">
-          <div class="opt-check"></div>
-          <div class="opt-label">
-            <div class="opt-name">Automat chłodniczy — napoje i produkty świeże</div>
-            <div class="opt-desc">Jaja, sery, mleko, napoje — sprzedaż w temperaturze chłodniczej</div>
-          </div>
-        </div>
-
-        <div class="opt-item" onclick="selectSielaff(this,'sielaff_combi')" data-key="sielaff_combi">
-          <div class="opt-check"></div>
-          <div class="opt-label">
-            <div class="opt-name">Combi — chłodzenie + część sucha</div>
-            <div class="opt-desc">Produkty świeże i trwałe w jednym urządzeniu</div>
-          </div>
-        </div>
-
-        <div class="opt-item" onclick="selectSielaff(this,'sielaff_napoje')" data-key="sielaff_napoje">
-          <div class="opt-check"></div>
-          <div class="opt-label">
-            <div class="opt-name">Napoje zimne (Cold Drinks)</div>
-            <div class="opt-desc">Woda, soki, napoje — wysokie półki na butelki</div>
-          </div>
-        </div>
-
-        <div class="opt-item" onclick="selectSielaff(this,'sielaff_hot')" data-key="sielaff_hot">
-          <div class="opt-check"></div>
-          <div class="opt-label">
-            <div class="opt-name">Napoje gorące (Hot Drinks)</div>
-            <div class="opt-desc">Kawa, herbata, czekolada — automaty kawowe Sielaff</div>
-          </div>
-        </div>
-
-        <div class="opt-item" onclick="selectSielaff(this,'sielaff_outdoor')" data-key="sielaff_outdoor">
-          <div class="opt-check"></div>
-          <div class="opt-label">
-            <div class="opt-name">Wersja zewnętrzna (Outdoor)</div>
-            <div class="opt-desc">Przystosowana do pracy na zewnątrz, obok pawilonu</div>
-          </div>
-        </div>
-
-      </div>
-
-      <div class="model-card">
-        <div class="mc-icon">📋</div>
-        <div>
-          <div class="mc-name">Wycena indywidualna</div>
-          <div class="mc-desc">Ceny katalogowe automatów Sielaff — podajemy indywidualnie po kontakcie. Wypełnij formularz, a przygotujemy ofertę na wybrany typ.</div>
-        </div>
+      <div class="field field-full field-opt" style="margin-top:1.2rem">
+        <label>Co planujesz sprzedawać z automatu?</label>
+        <textarea id="f-sielaff-produkty" placeholder="Np. jajka, sery, wędliny, napoje, gotowe dania..."></textarea>
       </div>
 
     </div>
@@ -1017,7 +1016,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--cr);color:var(
     <div class="btn-row" style="margin-top:1.5rem;">
       <button class="btn-back" onclick="goStep(2)">← Wróć</button>
     </div>
-    <button class="btn-submit" id="send-btn" onclick="sendBrief()" style="margin-top:.8rem">
+    <button class="btn-submit" id="send-btn" style="margin-top:.8rem">
       Wyślij zapytanie — oddzwonimy w 24h
     </button>
 
@@ -1088,11 +1087,6 @@ const PRODUCT_NAMES = {
 const SIELAFF_NAMES = {
   combi_m_1ro:        'SiLine SÜ Combi-M — wariant 1 RO (na zewnątrz, pod butelki)',
   combi_m_3rb:         'SiLine SÜ Combi-M — wariant 3 RB (do wnętrza, wydawanie bezpośrednie + schowek na towary gabarytowe)',
-  sielaff_chlodniczy: 'Automat chłodniczy — napoje i produkty świeże',
-  sielaff_combi:      'Combi — chłodzenie + część sucha',
-  sielaff_napoje:     'Napoje zimne (Cold Drinks)',
-  sielaff_hot:        'Napoje gorące (Hot Drinks)',
-  sielaff_outdoor:    'Wersja zewnętrzna (Outdoor)',
 };
 
 const PAWILON_NAMES = {
@@ -1150,16 +1144,11 @@ function selectProduct(key) {
   goStep(1);
 }
 
-function selectSielaff(el, key) {
-  sielaffKey = key;
-  document.querySelectorAll('#sielaff-grid .opt-item').forEach(e => e.classList.remove('selected'));
-  el.classList.add('selected');
-}
-
 function selectSielaffPrice(el, key) {
   sielaffKey = key;
   document.querySelectorAll('#config-sielaff .price-card').forEach(e => e.classList.remove('selected'));
   el.classList.add('selected');
+  updateBadge();
 }
 
 function selectPawilon(el, key) {
@@ -1298,65 +1287,9 @@ function buildSummary() {
   }
 }
 
-// ── SEND ──────────────────────────────────────────────────────────────────────
-async function sendBrief() {
-  const btn = document.getElementById('send-btn');
-  btn.disabled = true;
-  btn.textContent = 'Wysyłam...';
-
-  const { netto, brutto, arimr } = calcPrice();
-  const opts = [...selected].map(k => OPT_LABELS[k]).join(', ') || 'brak';
-  const dot = document.getElementById('f-dotacja').value;
-
-  let konfiguracja = '';
-  if (currentProduct === 'mlekomat') {
-    konfiguracja = `BRUNIMAT 650 Premium DUO | kanny: ${kanny} | opcje: ${opts}`;
-  } else if (currentProduct === 'sielaff') {
-    konfiguracja = `Sielaff | typ: ${SIELAFF_NAMES[sielaffKey]}`;
-  } else if (currentProduct === 'butelki') {
-    konfiguracja = `Butelki z etykietą | ilość: ${butelki} szt.`;
-  } else if (currentProduct === 'pawilon') {
-    konfiguracja = `Pawilon | rozmiar: ${PAWILON_NAMES[pawilonKey]}`;
-  }
-
-  const data = {
-    source: 'brief',
-    imie:       document.getElementById('f-name').value,
-    telefon:    document.getElementById('f-tel').value,
-    email:      document.getElementById('f-email').value,
-    wojewodztwo:document.getElementById('f-woj').value,
-    krowy:      document.getElementById('f-krowy').value,
-    litry:      document.getElementById('f-litry').value,
-    pawilon:    document.getElementById('f-pawilon').value,
-    dotacja:    dot === 'tak' ? 'Tak' : dot === 'nie' ? 'Nie' : dot === 'nie_wiem' ? 'Nie wiem jeszcze' : '',
-    uwagi:      document.getElementById('f-uwagi').value,
-    produkt:    PRODUCT_NAMES[currentProduct],
-    konfiguracja,
-    cena_netto:  currentProduct === 'mlekomat' ? fmt(netto) : 'wycena indywidualna',
-    cena_brutto: currentProduct === 'mlekomat' ? fmt(brutto) : 'wycena indywidualna',
-    po_dotacji:  currentProduct === 'mlekomat' && dot === 'tak' ? fmt(arimr) : '',
-    website:     document.getElementById('f-website') ? document.getElementById('f-website').value : ''
-  };
-
-  try {
-    const res = await fetch('/api/leads', {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify(data)
-    });
-    if (!res.ok) throw new Error('Serwer zwrócił błąd: ' + res.status);
-  } catch(e) {
-    btn.disabled = false;
-    btn.textContent = 'Wyślij zapytanie — oddzwonimy w 24h';
-    alert('Nie udało się wysłać formularza. Spróbuj ponownie za chwilę albo zadzwoń: 735 115 427.');
-    return;
-  }
-
-  document.getElementById('brief-form') && (document.getElementById('brief-form').style.display='none');
-  document.getElementById('send-btn').style.display='none';
-  document.getElementById('success-msg').classList.add('show');
-  document.getElementById('suc-name').textContent = document.getElementById('f-name').value.split(' ')[0] || 'Ciebie';
-}
+// Wysyłka formularza jest obsługiwana przez window.sendBrief zdefiniowane
+// w nadkładzie multi-wyboru (na początku pliku) — to jedyne miejsce, które
+// zna łączną cenę mlekomatu + automatu chłodniczego.
 
 function scrollToSummary() {
   if (currentStep === 3) window.scrollTo({top:0,behavior:'smooth'});
