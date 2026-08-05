@@ -1,4 +1,10 @@
 {
+  "functions": {
+    "api/leads.js": {
+      "memory": 1536,
+      "maxDuration": 30
+    }
+  },
   "redirects": [
     { "source": "/oferta.html", "destination": "/", "statusCode": 301 },
     { "source": "/oferta", "destination": "/", "statusCode": 301 }
