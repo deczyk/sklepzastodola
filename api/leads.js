@@ -8,8 +8,8 @@ const {
   sendEmail,
   buildAdvisorEmailHtml,
   buildAdvisorEmailText,
-  buildBriefEmailHtml,
-  buildBriefEmailText
+  buildOfferShowcaseEmailHtml,
+  buildOfferShowcaseEmailText
 } = require("./_email");
 const { buildOfferPdf } = require("./_offer-pdf");
 
@@ -459,11 +459,26 @@ module.exports = async function handler(req, res) {
           });
         } else {
           const attachments = await buildBriefPdfAttachment(payload, lead, mutation.result.priorHistoria || []);
+          const mNetto = Number(payload.mlekomat_netto) || 0;
+          const sNetto = Number(payload.sielaff_netto) || 0;
+          const konfigText = String(payload.konfiguracja || "");
+          // Fall back to keyword sniffing when no priced line was sent (e.g.
+          // an individually-quoted Sielaff config) so the block still shows.
+          const hasMlekomat = mNetto > 0 || /mlekomat|brunimat/i.test(konfigText);
+          const hasSielaff = sNetto > 0 || /sielaff/i.test(konfigText);
+          const showcaseData = {
+            clientName: lead.osoba || lead.firma || "",
+            location: [lead.miejscowosc, lead.wojewodztwo].filter(Boolean).join(", "),
+            hasMlekomat,
+            hasSielaff,
+            mlekomatPriceNetto: mNetto > 0 ? fmtZl(mNetto) : "",
+            sielaffPriceNetto: sNetto > 0 ? fmtZl(sNetto) : ""
+          };
           await sendEmail({
             to: lead.email,
             subject: "Twoja oferta — Sklep za Stodołą",
-            html: buildBriefEmailHtml(payload),
-            text: buildBriefEmailText(payload),
+            html: buildOfferShowcaseEmailHtml(showcaseData),
+            text: buildOfferShowcaseEmailText(showcaseData),
             attachments
           });
         }
