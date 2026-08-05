@@ -278,7 +278,7 @@ ${sielaffPriceBrutto ? `<div style="padding-top:2px;font-size:13px;line-height:1
 <td width="25%" valign="top" style="padding:14px 12px;"><div style="font-size:10px;line-height:14px;color:#6b746f;font-weight:bold;">WAŻNOŚĆ</div><div style="padding-top:5px;font-size:13px;line-height:18px;font-weight:bold;">14 dni</div></td>
 </tr></table></td></tr>
 
-<tr><td style="padding:0 30px 8px 30px;"><div style="font-size:21px;line-height:28px;font-weight:bold;color:#0f4a2f;">Proponowany zestaw</div></td></tr>
+<tr><td style="padding:0 30px 8px 30px;"><div style="font-size:21px;line-height:28px;font-weight:bold;color:#0f4a2f;">Twoja konfiguracja</div></td></tr>
 <tr><td style="padding:0 30px 24px 30px;">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%;border-collapse:collapse;">
 ${zestawRows.join("\n")}
@@ -341,7 +341,7 @@ function buildOfferShowcaseEmailText(data) {
     "",
     `Klient: ${clientName || "—"} | Lokalizacja: ${location || "—"} | Data: ${dateStr} | Ważność: 14 dni`,
     "",
-    "Proponowany zestaw:"
+    "Twoja konfiguracja:"
   ];
   if (hasMlekomat) lines.push("- BRUNIMAT 650 Premium DUO — mlekomat z pełnym wyposażeniem (CE-MID, GSM, płukanie, Anti-Frost, alarm, płatności gotówkowe).");
   if (hasSielaff) lines.push("- Automat Sielaff — sprzedaż dodatkowych produktów gospodarstwa (jaja, nabiał, miód, sery, przetwory i inne).");
