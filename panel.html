@@ -2109,7 +2109,6 @@
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script>
 const STORAGE_KEY = "panel_items_v2";
 const PANEL_SESSION_KEY = "panel_session_password";
@@ -5247,15 +5246,13 @@ function offerIncludedItems(konfigText){
   if(t.includes("gsm")) items.push("Monitoring GSM — zdalny podgląd i kontrola poziomu mleka");
   if(t.includes("płukanie")||t.includes("plukanie")) items.push("Automatyczne płukanie strefy dozowania");
   if(t.includes("alarm")) items.push("Alarm i syrena antywłamaniowa");
-  if(t.includes("sielaff")) items.push("Chłodzenie zapewniające świeżość produktów przez cały dzień");
+  if(t.includes("sielaff")){
+    items.push("Chłodzenie zapewniające świeżość produktów przez cały dzień");
+    items.push("Ekran dotykowy z czytelną prezentacją oferty");
+    items.push("Płatność gotówką i/lub kartą, w zależności od wybranej opcji");
+  }
   return items;
 }
-
-const OFFER_ROLLOUT_STAGES = [
-  {tag:"START", name:"Mlekomat BRUNIMAT", desc:"Uruchomienie sprzedaży mleka i sprawdzenie realnego popytu."},
-  {tag:"WYGODA", name:"Automat na butelki", desc:"Ułatwienie zakupu klientom i zwiększenie wygody obsługi."},
-  {tag:"ROZWÓJ", name:"Automaty na inne produkty", desc:"Budowa stałego punktu sprzedaży bezpośredniej gospodarstwa."}
-];
 
 function offerPhotos(konfigText){
   const t=(konfigText||"").toLowerCase(); const photos=[];
@@ -5264,299 +5261,73 @@ function offerPhotos(konfigText){
   return photos;
 }
 
-let _pdfImageCache = {};
-async function loadPdfImage(file){
-  if(_pdfImageCache[file]) return _pdfImageCache[file];
-  const res = await fetch(file);
-  const buf = await res.arrayBuffer();
-  let binary=""; const bytes=new Uint8Array(buf);
-  for(let i=0;i<bytes.byteLength;i++) binary+=String.fromCharCode(bytes[i]);
-  const dataUrl = "data:image/jpeg;base64,"+btoa(binary);
-  _pdfImageCache[file] = dataUrl;
-  return dataUrl;
-}
-
 function guessOfferAmount(text){
   const m = (text || "").match(/([\d][\d\s]{2,})\s*zł/);
   return m ? m[1].replace(/\s+/g,"") : "";
 }
 
-let _pdfFontsCache = null;
-async function loadPdfFonts(doc){
-  if(!_pdfFontsCache){
-    const toBase64 = buf => {
-      let binary = "";
-      const bytes = new Uint8Array(buf);
-      for(let i=0;i<bytes.byteLength;i++) binary += String.fromCharCode(bytes[i]);
-      return btoa(binary);
-    };
-    const [regRes, boldRes] = await Promise.all([
-      fetch("fonts/NotoSans-Regular.ttf"),
-      fetch("fonts/NotoSans-Bold.ttf")
-    ]);
-    const [regBuf, boldBuf] = await Promise.all([regRes.arrayBuffer(), boldRes.arrayBuffer()]);
-    _pdfFontsCache = { regular: toBase64(regBuf), bold: toBase64(boldBuf) };
-  }
-  doc.addFileToVFS("NotoSans-Regular.ttf", _pdfFontsCache.regular);
-  doc.addFont("NotoSans-Regular.ttf", "NotoSans", "normal");
-  doc.addFileToVFS("NotoSans-Bold.ttf", _pdfFontsCache.bold);
-  doc.addFont("NotoSans-Bold.ttf", "NotoSans", "bold");
-}
-
+// Generuje PDF oferty po stronie serwera (pdf-lib + NotoSans — poprawne
+// polskie znaki, zdjęcia urządzeń obok siebie) i pokazuje podgląd w nowej
+// karcie przeglądarki, zamiast wymuszać pobranie pliku. Ten sam silnik
+// (api/_offer-pdf.js) generuje też PDF wysyłany mailem z brief.html /
+// advisor.html, więc oba źródła zawsze wyglądają identycznie.
 async function generateOfferPdf(clientId){
   const c = data.klienci.find(x=>x.id===clientId);
   if(!c) return;
-  if(!(window.jspdf && window.jspdf.jsPDF)){
-    alert("Biblioteka PDF nie wczytała się. Sprawdź połączenie z internetem i odśwież panel.");
-    return;
-  }
   const briefEntry = findLatestBriefHistory(c);
   const briefText = briefEntry ? parseHistoryText(briefEntry.tekst || "").text : "";
   const configLines = briefText
     ? briefText.replace(/^Klient skonfigurował mlekomat w konfiguratorze\.\s*/,"").split(/;\s*/).filter(Boolean)
     : [];
-
-  const { jsPDF } = window.jspdf;
-  const doc = new jsPDF({unit:"mm", format:"a4"});
-  try{ await loadPdfFonts(doc); }
-  catch(e){ alert("Nie udało się wczytać czcionki z polskimi znakami. Sprawdź połączenie i spróbuj ponownie."); return; }
-  const F = (style) => doc.setFont("NotoSans", style);
-  const pageWidth = doc.internal.pageSize.getWidth();
-  const margin = 18;
-  const BOTTOM = 262;
-  let y;
-
-  const FOREST = [45,90,39], GOLD = [184,144,42], CREAM = [247,244,238],
-        SAGE = [232,240,230], INK = [30,30,26], MUTED = [107,100,84], DIM = [138,128,112], LINE = [228,221,209];
-
+  const kwota = guessOfferAmount(briefText);
   const titleText = c.produkt || c.zainteresowanie || "Oferta dla Twojego gospodarstwa";
 
-  function drawMainHeader(){
-    doc.setFillColor(...FOREST); doc.rect(0, 0, pageWidth, 34, "F");
-    F("bold"); doc.setFontSize(16); doc.setTextColor(255,255,255);
-    doc.text("Sklep za Stodołą", margin, 16);
-    F("normal"); doc.setFontSize(8.5); doc.setTextColor(225,235,224);
-    doc.text("Dystrybucja, instalacja i serwis mlekomatów BRUNIMAT w Polsce", margin, 22);
-    F("bold"); doc.setFontSize(8.5);
-    const badgeText = "OFERTA WSTĘPNA";
-    const badgeW = doc.getTextWidth(badgeText) + 10;
-    doc.setFillColor(...GOLD); doc.roundedRect(pageWidth-margin-badgeW, 9, badgeW, 8, 1.5, 1.5, "F");
-    doc.setTextColor(255,255,255); doc.text(badgeText, pageWidth-margin-badgeW+5, 14.5);
-  }
-  function drawContinuationHeader(){
-    doc.setFillColor(...FOREST); doc.rect(0, 0, pageWidth, 16, "F");
-    F("bold"); doc.setFontSize(10); doc.setTextColor(255,255,255);
-    doc.text("Sklep za Stodołą", margin, 10.5);
-    F("normal"); doc.setFontSize(8); doc.setTextColor(225,235,224);
-    doc.text("Oferta | " + titleText, pageWidth-margin, 10.5, {align:"right"});
-  }
-  function newPage(){
-    doc.addPage();
-    drawContinuationHeader();
-    y = 26;
-  }
-  function ensureSpace(needed){
-    if(y + needed > BOTTOM) newPage();
-  }
-  function sectionTitle(num, title){
-    ensureSpace(16);
-    doc.setFillColor(...FOREST); doc.circle(margin+3, y, 3.4, "F");
-    F("bold"); doc.setFontSize(8); doc.setTextColor(255,255,255);
-    doc.text(String(num), margin+3, y+1.2, {align:"center"});
-    F("bold"); doc.setFontSize(12); doc.setTextColor(...INK);
-    doc.text(title, margin+10, y+1.3);
-    y += 6;
-    doc.setDrawColor(...LINE); doc.line(margin, y, pageWidth-margin, y);
-    y += 7;
-  }
-  function drawCheckmark(x, cy){
-    doc.setDrawColor(...FOREST); doc.setLineWidth(0.6);
-    doc.line(x, cy, x+1.2, cy+1.6);
-    doc.line(x+1.2, cy+1.6, x+3.2, cy-1.8);
-    doc.setLineWidth(0.2); doc.setDrawColor(...LINE);
-  }
+  const payload = {
+    clientName: getClientDisplayName(c),
+    location: clientLocation(c) || "",
+    dateStr: new Date().toLocaleDateString("pl-PL"),
+    productTitle: titleText,
+    docTitle: titleText,
+    recommendation: "Oferta przygotowana na podstawie wybranej konfiguracji w naszym konfiguratorze. Poniżej znajdziesz szczegóły, co wchodzi w skład zestawu i orientacyjną cenę katalogową.",
+    configLines,
+    priceLines: [],
+    totalNetto: kwota ? (kwota + " zł") : "",
+    totalBrutto: "",
+    insightCards: offerInsightCards(c, briefText),
+    includedItems: offerIncludedItems(briefText),
+    photos: offerPhotos(briefText),
+    filenameHint: c.firma || c.osoba || "klient"
+  };
 
-  drawMainHeader();
-  y = 46;
-  F("bold"); doc.setFontSize(18); doc.setTextColor(...INK);
-  doc.text(doc.splitTextToSize(titleText, pageWidth - margin*2), margin, y);
-  y += 12;
+  // Otwieramy pustą kartę od razu, w bezpośredniej reakcji na klik — jeśli
+  // otworzymy ją dopiero po fetchu, część przeglądarek zablokuje to jako popup.
+  const previewTab = window.open("", "_blank");
 
-  // Client info bar
-  const barH = 20;
-  doc.setFillColor(...CREAM); doc.setDrawColor(...LINE);
-  doc.roundedRect(margin, y, pageWidth-margin*2, barH, 1.5, 1.5, "FD");
-  const cols = [["KLIENT", getClientDisplayName(c)], ["LOKALIZACJA", clientLocation(c) || "—"], ["DATA", new Date().toLocaleDateString("pl-PL")]];
-  const colW = (pageWidth - margin*2 - 12) / cols.length;
-  cols.forEach(([label, value], i) => {
-    const cx = margin + 6 + i*colW;
-    F("bold"); doc.setFontSize(7); doc.setTextColor(...DIM);
-    doc.text(label, cx, y+8);
-    F("bold"); doc.setFontSize(10.5); doc.setTextColor(...INK);
-    doc.text(doc.splitTextToSize(value, colW-6)[0] || "—", cx, y+15);
-  });
-  y += barH + 10;
-
-  // Recommendation box
-  const recText = "Oferta przygotowana na podstawie wybranej konfiguracji w naszym konfiguratorze. Poniżej znajdziesz szczegóły, co wchodzi w skład zestawu i orientacyjną cenę katalogową.";
-  F("normal"); doc.setFontSize(9.5);
-  const recLines = doc.splitTextToSize(recText, pageWidth - margin*2 - 12);
-  const recBoxH = 10 + recLines.length*4.6;
-  ensureSpace(recBoxH + 10);
-  doc.setFillColor(...FOREST); doc.roundedRect(margin, y, pageWidth-margin*2, recBoxH, 1.5, 1.5, "F");
-  F("bold"); doc.setFontSize(7.5); doc.setTextColor(...GOLD);
-  doc.text("REKOMENDACJA", margin+6, y+7);
-  F("normal"); doc.setFontSize(9.5); doc.setTextColor(255,255,255);
-  doc.text(recLines, margin+6, y+13);
-  y += recBoxH + 10;
-
-  // 1. Insight cards
-  const insightCards = offerInsightCards(c, briefText);
-  if(insightCards.length){
-    sectionTitle(1, "Dlaczego ten wariant pasuje");
-    const cardGap = 6;
-    const cardW = (pageWidth - margin*2 - cardGap) / 2;
-    for(let i=0;i<insightCards.length;i+=2){
-      const row = insightCards.slice(i, i+2);
-      F("normal"); doc.setFontSize(8.3);
-      const wraps = row.map(it => doc.splitTextToSize(it.desc, cardW-10));
-      const rowH = Math.max(...wraps.map(w=>w.length))*4.1 + 15;
-      ensureSpace(rowH + 4);
-      row.forEach((it, idx) => {
-        const cx = margin + idx*(cardW+cardGap);
-        doc.setFillColor(...CREAM); doc.setDrawColor(...LINE);
-        doc.roundedRect(cx, y, cardW, rowH, 1.5, 1.5, "FD");
-        F("bold"); doc.setFontSize(9); doc.setTextColor(...FOREST);
-        doc.text(doc.splitTextToSize(it.title, cardW-10), cx+5, y+7);
-        F("normal"); doc.setFontSize(8.3); doc.setTextColor(...MUTED);
-        doc.text(wraps[idx], cx+5, y+13);
-      });
-      y += rowH + 4;
-    }
-    y += 4;
-  }
-
-  // 2. Co jest w zestawie
-  const includedItems = offerIncludedItems(briefText);
-  sectionTitle(2, "Co jest w zestawie");
-  {
-    const colW2 = (pageWidth - margin*2 - 8) / 2;
-    F("normal"); doc.setFontSize(9);
-    for(let i=0;i<includedItems.length;i+=2){
-      const row = includedItems.slice(i, i+2);
-      const wraps = row.map(t => doc.splitTextToSize(t, colW2-10));
-      const rowH = Math.max(...wraps.map(w=>w.length))*4.4 + 3;
-      ensureSpace(rowH + 2);
-      row.forEach((t, idx) => {
-        const cx = margin + idx*(colW2+8);
-        drawCheckmark(cx+1, y+2.6);
-        doc.setTextColor(...INK);
-        doc.text(wraps[idx], cx+8, y+3.2);
-      });
-      y += rowH + 2;
-    }
-  }
-  y += 6;
-
-  if(configLines.length){
-    ensureSpace(14);
-    F("bold"); doc.setFontSize(11); doc.setTextColor(...INK);
-    doc.text("Szczegóły konfiguracji", margin, y); y += 7;
-    F("normal"); doc.setFontSize(9); doc.setTextColor(...INK);
-    configLines.forEach(line => {
-      const wrapped = doc.splitTextToSize(line, pageWidth - margin*2 - 6);
-      ensureSpace(wrapped.length*4.6 + 2);
-      doc.setTextColor(...FOREST); doc.text("•", margin, y);
-      doc.setTextColor(...INK); doc.text(wrapped, margin+5, y);
-      y += wrapped.length*4.6;
+  let resp;
+  try{
+    resp = await fetch("/api/offer-pdf-preview", {
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body: JSON.stringify(payload)
     });
-    y += 6;
+  }catch(e){
+    if(previewTab) previewTab.close();
+    alert("Nie udało się połączyć z generatorem PDF. Sprawdź połączenie i spróbuj ponownie.");
+    return;
   }
-
-  // 3. Cena i zakres wyceny
-  sectionTitle(3, "Cena i zakres wyceny");
-  const kwota = guessOfferAmount(briefText);
-  if(kwota){
-    const priceBoxH = 22;
-    ensureSpace(priceBoxH + 10);
-    doc.setFillColor(...SAGE); doc.roundedRect(margin, y, pageWidth-margin*2, priceBoxH, 1.5, 1.5, "F");
-    F("bold"); doc.setFontSize(7.5); doc.setTextColor(61,101,56);
-    doc.text("RAZEM — CENA KATALOGOWA NETTO", margin+6, y+7);
-    F("bold"); doc.setFontSize(17); doc.setTextColor(...FOREST);
-    doc.text(kwota + " zł", margin+6, y+16);
-    y += priceBoxH + 10;
+  if(!resp.ok){
+    if(previewTab) previewTab.close();
+    alert("Nie udało się wygenerować PDF-a oferty. Spróbuj ponownie za chwilę.");
+    return;
   }
-  const individualQuoteItems = ["Transport i dostawa", "Rozładunek, ustawienie i uruchomienie", "Serwis pogwarancyjny"];
-  ensureSpace(20 + individualQuoteItems.length*6.5);
-  F("bold"); doc.setFontSize(11); doc.setTextColor(...INK);
-  doc.text("Do osobnej wyceny", margin, y); y += 5;
-  F("normal"); doc.setFontSize(8); doc.setTextColor(...DIM);
-  doc.text("(nie wliczone w cenę powyżej — wyceniamy indywidualnie po rozmowie)", margin, y+3); y += 12;
-  F("normal"); doc.setFontSize(9.5); doc.setTextColor(...INK);
-  individualQuoteItems.forEach(label => {
-    doc.setTextColor(...GOLD); doc.text("—", margin, y);
-    doc.setTextColor(...INK); doc.text(label, margin+7, y);
-    y += 6.5;
-  });
-  y += 6;
-
-  // 4. Proponowane wdrożenie etapowe
-  sectionTitle(4, "Proponowane wdrożenie etapowe");
-  {
-    const stageGap = 5;
-    const stageW = (pageWidth - margin*2 - stageGap*2) / 3;
-    F("normal"); doc.setFontSize(8);
-    const wraps = OFFER_ROLLOUT_STAGES.map(s => doc.splitTextToSize(s.desc, stageW-8));
-    const stageH = Math.max(...wraps.map(w=>w.length))*4 + 22;
-    ensureSpace(stageH + 4);
-    OFFER_ROLLOUT_STAGES.forEach((s, idx) => {
-      const cx = margin + idx*(stageW+stageGap);
-      doc.setFillColor(...CREAM); doc.setDrawColor(...LINE);
-      doc.roundedRect(cx, y, stageW, stageH, 1.5, 1.5, "FD");
-      F("bold"); doc.setFontSize(7); doc.setTextColor(...GOLD);
-      doc.text(s.tag, cx+5, y+7);
-      F("bold"); doc.setFontSize(9.5); doc.setTextColor(...INK);
-      doc.text(doc.splitTextToSize(s.name, stageW-8), cx+5, y+13);
-      F("normal"); doc.setFontSize(8); doc.setTextColor(...MUTED);
-      doc.text(wraps[idx], cx+5, y+19);
-    });
-    y += stageH + 8;
-  }
-
-  // 5. Zdjęcia urządzenia
-  const photos = offerPhotos(briefText);
-  if(photos.length){
-    sectionTitle(5, "Zdjęcia urządzenia");
-    for(const p of photos){
-      try{
-        const dataUrl = await loadPdfImage(p.file);
-        const props = doc.getImageProperties(dataUrl);
-        const imgW = 75, imgH = imgW * props.height / props.width;
-        ensureSpace(imgH + 14);
-        doc.addImage(dataUrl, "JPEG", margin, y, imgW, imgH);
-        F("normal"); doc.setFontSize(8); doc.setTextColor(...MUTED);
-        doc.text(p.caption, margin, y+imgH+5);
-        y += imgH + 12;
-      } catch(e){ /* zdjęcie niedostępne — pomiń bez przerywania generowania */ }
-    }
-  }
-
-  // Footer
-  const disclaimer = "Oferta orientacyjna na podstawie danych z konfiguratora. Ceny katalogowe mogą ulec zmianie; ostateczne warunki ustalamy podczas rozmowy. Ważność oferty: 14 dni.";
-  F("normal"); doc.setFontSize(7.5);
-  const disclaimerLines = doc.splitTextToSize(disclaimer, pageWidth - margin*2);
-  ensureSpace(disclaimerLines.length*3.6 + 16);
-  const footerY = y + 6;
-  doc.setDrawColor(...LINE); doc.line(margin, footerY-4, pageWidth-margin, footerY-4);
-  doc.setTextColor(...DIM);
-  doc.text(disclaimerLines, margin, footerY);
-  F("bold"); doc.setFontSize(9); doc.setTextColor(...FOREST);
-  doc.text("735 115 427  ·  kontakt@sklepzastodola.pl  ·  sklepzastodola.pl", margin, footerY + disclaimerLines.length*3.6 + 6);
+  const blob = await resp.blob();
+  const url = URL.createObjectURL(blob);
+  if(previewTab) previewTab.location = url;
+  else window.open(url, "_blank");
 
   const safeName = (c.firma || c.osoba || "klient").toString().toLowerCase()
     .replace(/[^a-z0-9]+/gi,"-").replace(/^-+|-+$/g,"").slice(0,40) || "klient";
   const filename = `oferta-${safeName}-${new Date().toISOString().slice(0,10)}.pdf`;
-  doc.save(filename);
 
   if(!Array.isArray(c.oferty)) c.oferty = [];
   const now = new Date().toISOString();
@@ -5564,13 +5335,13 @@ async function generateOfferPdf(clientId){
     id:"o_"+Date.now(),
     dataWyslania:"",
     wariant: configLines[0] ? configLines[0].slice(0,120) : (c.zainteresowanie || ""),
-    kwota: guessOfferAmount(briefText),
+    kwota,
     waluta:"PLN",
     status:"Robocza",
     linkOferta:"",
     nazwaPliku: filename,
     nastepnyFollowup:"",
-    notatka:"Wygenerowano automatycznie z danych konfiguratora (brief.html). Pobrano na komputer — wyślij ręcznie mailem.",
+    notatka:"Wygenerowano automatycznie z danych konfiguratora (brief.html). Otwarto podgląd PDF w nowej karcie — zapisz lub wyślij ręcznie mailem.",
     dataUtworzenia: now,
     dataAktualizacji: now
   });

@@ -56,7 +56,6 @@ async function buildOfferPdf(data) {
     individualQuoteItems = ["Transport i dostawa", "Rozładunek, ustawienie i uruchomienie", "Serwis pogwarancyjny"],
     insightCards = [],
     includedItems = [],
-    rolloutStages = [],
     photos = [],
     docTitle = "BRUNIMAT 650 Premium DUO",
   } = data;
@@ -270,32 +269,7 @@ async function buildOfferPdf(data) {
     ctx.y -= 10;
   }
 
-  // ── 4. Proponowane wdrożenie etapowe ─────────────────────────
-  if (rolloutStages.length) {
-    sectionTitle("Proponowane wdrożenie etapowe");
-    const gap = 12;
-    const cardW = (CONTENT_W - gap * (rolloutStages.length - 1)) / rolloutStages.length;
-    const cardH = 92;
-    ensureSpace(cardH + 10);
-    rolloutStages.forEach((stage, i) => {
-      const cx = MARGIN + i * (cardW + gap);
-      page().drawRectangle({ x: cx, y: ctx.y - cardH, width: cardW, height: cardH, borderColor: LINE, borderWidth: 1, color: WHITE });
-      page().drawCircle({ x: cx + 20, y: ctx.y - 22, size: 11, color: FOREST });
-      const numTxt = String(i + 1);
-      const nw = fontBold.widthOfTextAtSize(numTxt, 10);
-      page().drawText(numTxt, { x: cx + 20 - nw / 2, y: ctx.y - 25.5, size: 10, font: fontBold, color: WHITE });
-      const tagW = fontBold.widthOfTextAtSize(stage.tag, 7.5);
-      page().drawText(stage.tag, { x: cx + cardW - 14 - tagW, y: ctx.y - 19, size: 7.5, font: fontBold, color: GOLD });
-      const nameLines = wrapText(fontBold, 9.5, stage.name, cardW - 24);
-      let ny = ctx.y - 42;
-      nameLines.forEach(line => { page().drawText(line, { x: cx + 14, y: ny, size: 9.5, font: fontBold, color: INK }); ny -= 12; });
-      const descLines = wrapText(font, 8, stage.desc, cardW - 24);
-      descLines.forEach(line => { page().drawText(line, { x: cx + 14, y: ny, size: 8, font, color: MUTED }); ny -= 10.5; });
-    });
-    ctx.y -= cardH + 20;
-  }
-
-  // ── 5. Zdjęcia urządzenia ────────────────────────────────────
+  // ── 4. Zdjęcia urządzenia ────────────────────────────────────
   if (photos.length) {
     sectionTitle("Zdjęcia urządzenia");
     const gap = 16;

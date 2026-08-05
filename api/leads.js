@@ -21,12 +21,6 @@ function fmtZl(n) {
   return num > 0 ? `${num.toLocaleString("pl-PL")} zł` : "";
 }
 
-const ROLLOUT_STAGES = [
-  { tag: "START", name: "Mlekomat BRUNIMAT", desc: "Uruchomienie sprzedaży mleka i sprawdzenie realnego popytu." },
-  { tag: "WYGODA", name: "Automat na butelki", desc: "Ułatwienie zakupu klientom i zwiększenie wygody obsługi." },
-  { tag: "ROZWÓJ", name: "Automaty na inne produkty", desc: "Budowa stałego punktu sprzedaży bezpośredniej gospodarstwa." }
-];
-
 function mlekomatIncludedItems(konfigText) {
   const items = [
     "Certyfikat CE-MID — legalizowany pomiar wydawanej ilości",
@@ -141,7 +135,6 @@ async function buildBriefPdfAttachment(payload, lead, priorHistoria) {
       totalBrutto: priceLines.length ? (payload.cena_brutto && payload.cena_brutto !== "—" ? payload.cena_brutto : "") : "",
       insightCards: buildInsightCards(payload, priorHistoria),
       includedItems,
-      rolloutStages: ROLLOUT_STAGES,
       photos: buildPhotos(konfigText)
     });
     const safeName = (lead.osoba || lead.firma || "klient").toLowerCase()
