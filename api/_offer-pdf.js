@@ -65,6 +65,8 @@ async function buildOfferPdf(data) {
 
   const font = await doc.embedFont(fs.readFileSync(path.join(__dirname, "fonts", "NotoSans-Regular.ttf")), { subset: true });
   const fontBold = await doc.embedFont(fs.readFileSync(path.join(__dirname, "fonts", "NotoSans-Bold.ttf")), { subset: true });
+  const logoImage = await doc.embedPng(loadImage("logo.png"));
+  const logoSize = 34;
 
   let sectionCounter = 0;
   let pageIndex = 0;
@@ -72,9 +74,11 @@ async function buildOfferPdf(data) {
   function drawMainHeader(page) {
     const headerH = 96;
     page.drawRectangle({ x: 0, y: PAGE_H - headerH, width: PAGE_W, height: headerH, color: FOREST });
-    page.drawText("SKLEP ZA STODOŁĄ", { x: MARGIN, y: PAGE_H - 40, size: 17, font: fontBold, color: WHITE });
+    page.drawImage(logoImage, { x: MARGIN, y: PAGE_H - 30 - logoSize, width: logoSize, height: logoSize });
+    const textX = MARGIN + logoSize + 12;
+    page.drawText("SKLEP ZA STODOŁĄ", { x: textX, y: PAGE_H - 40, size: 17, font: fontBold, color: WHITE });
     page.drawText("Dystrybucja, instalacja i serwis mlekomatów BRUNIMAT w Polsce", {
-      x: MARGIN, y: PAGE_H - 58, size: 9, font, color: rgb(0.85, 0.9, 0.85)
+      x: textX, y: PAGE_H - 58, size: 9, font, color: rgb(0.85, 0.9, 0.85)
     });
     const badgeText = "OFERTA WSTĘPNA";
     const badgeSize = 9;
@@ -170,7 +174,9 @@ async function buildOfferPdf(data) {
   // ── Recommendation box ──────────────────────────────────────
   if (recommendation) {
     const recLines = wrapText(font, 10, recommendation, CONTENT_W - 32);
-    const recBoxH = 22 + recLines.length * 13.5;
+    // +10 bottom padding — without it the last line's descenders (ą, ę, g, y)
+    // sat right on the box edge, almost clipped.
+    const recBoxH = 22 + recLines.length * 13.5 + 10;
     ensureSpace(recBoxH + 14);
     page().drawRectangle({ x: MARGIN, y: ctx.y - recBoxH, width: CONTENT_W, height: recBoxH, color: FOREST });
     page().drawText("REKOMENDACJA", { x: MARGIN + 16, y: ctx.y - 18, size: 8, font: fontBold, color: GOLD });
