@@ -7,7 +7,9 @@ const {
   hasEmailConfig,
   sendEmail,
   buildAdvisorEmailHtml,
-  buildBriefEmailHtml
+  buildAdvisorEmailText,
+  buildBriefEmailHtml,
+  buildBriefEmailText
 } = require("./_email");
 const { buildOfferPdf } = require("./_offer-pdf");
 
@@ -451,8 +453,9 @@ module.exports = async function handler(req, res) {
         if (source === "advisor") {
           await sendEmail({
             to: lead.email,
-            subject: "Obliczyliśmy Twój potencjał — Sklep za Stodołą",
-            html: buildAdvisorEmailHtml(payload)
+            subject: "Twój wynik z kalkulatora — Sklep za Stodołą",
+            html: buildAdvisorEmailHtml(payload),
+            text: buildAdvisorEmailText(payload)
           });
         } else {
           const attachments = await buildBriefPdfAttachment(payload, lead, mutation.result.priorHistoria || []);
@@ -460,6 +463,7 @@ module.exports = async function handler(req, res) {
             to: lead.email,
             subject: "Twoja oferta — Sklep za Stodołą",
             html: buildBriefEmailHtml(payload),
+            text: buildBriefEmailText(payload),
             attachments
           });
         }

@@ -7,10 +7,14 @@ function hasEmailConfig() {
   return Boolean(RESEND_API_KEY);
 }
 
-async function sendEmail({ to, subject, html, attachments }) {
+async function sendEmail({ to, subject, html, text, attachments }) {
   if (!RESEND_API_KEY || !to) return { ok: false, skipped: true };
   try {
-    const body = { from: RESEND_FROM, to, subject, html };
+    // Always send a text/plain alternative alongside the HTML body. An
+    // HTML-only email (no multipart/alternative) is a well-known spam
+    // signal for filters, including Gmail's — this affected the Advisor
+    // "potencjał" email specifically once it started landing in spam.
+    const body = { from: RESEND_FROM, to, subject, html, text: text || htmlToPlainFallback(html) };
     if (Array.isArray(attachments) && attachments.length) body.attachments = attachments;
     const res = await fetch("https://api.resend.com/emails", {
       method: "POST",
@@ -30,6 +34,23 @@ async function sendEmail({ to, subject, html, attachments }) {
     console.error("Resend send error", error && error.message ? error.message : error);
     return { ok: false, error: error && error.message };
   }
+}
+
+// Last-resort plain-text version if a caller doesn't supply one explicitly —
+// strips tags/entities well enough to not be empty, but the dedicated
+// buildAdvisorEmailText / buildBriefEmailText below read much better.
+function htmlToPlainFallback(html) {
+  return String(html || "")
+    .replace(/<(script|style)[^>]*>[\s\S]*?<\/\1>/gi, " ")
+    .replace(/<br\s*\/?>/gi, "\n")
+    .replace(/<\/(p|div|h1|h2|tr)>/gi, "\n")
+    .replace(/<[^>]+>/g, " ")
+    .replace(/&nbsp;/g, " ")
+    .replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">")
+    .replace(/&#(\d+);/g, (_, code) => String.fromCodePoint(Number(code)))
+    .replace(/[ \t]+/g, " ")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
 }
 
 function esc(value) {
@@ -89,18 +110,37 @@ function firstName(value) {
 function buildAdvisorEmailHtml(payload) {
   const name = firstName(payload.osoba || payload.owner);
   const wynik = esc(payload.wynikPotencjalu || "");
+  const farma = esc(payload.firma || payload.farm || "");
   return wrapEmail(`
     <p style="font-size:13px;color:#6b6454;margin:0 0 4px">Dzień dobry${name ? ", " + name : ""},</p>
-    <h1 style="font-size:20px;margin:0 0 12px;color:#1e1e1a">Obliczyliśmy Twój potencjał</h1>
-    <p style="line-height:1.6;font-size:14px;color:#3d3b35">Dziękujemy za wypełnienie kalkulatora Advisor. Oto wynik:</p>
-    <div style="background:#f5eddb;border-radius:10px;padding:16px 18px;margin:18px 0;text-align:center">
-      <div style="font-size:13px;color:#6b6454;text-transform:uppercase;letter-spacing:.05em;font-weight:bold">Potencjał projektu</div>
-      <div style="font-size:32px;font-weight:bold;color:#2d5a27;margin-top:4px">${wynik}</div>
+    <h1 style="font-size:20px;margin:0 0 12px;color:#1e1e1a">Wynik z kalkulatora Advisor</h1>
+    <p style="line-height:1.6;font-size:14px;color:#3d3b35">Dziękujemy za wypełnienie kalkulatora${farma ? " dla " + farma : ""}. Na podstawie podanych danych wyszło nam:</p>
+    <div style="background:#f5eddb;border-radius:10px;padding:14px 18px;margin:18px 0;text-align:center">
+      <div style="font-size:12px;color:#6b6454;text-transform:uppercase;letter-spacing:.05em;font-weight:bold">Potencjał projektu</div>
+      <div style="font-size:24px;font-weight:bold;color:#2d5a27;margin-top:4px">${wynik}</div>
     </div>
-    <p style="line-height:1.6;font-size:14px">Następny krok: skonfiguruj swój punkt sprzedaży w naszym konfiguratorze — w kilka minut dostaniesz spersonalizowaną ofertę z ceną.</p>
-    ${ctaButton(`${SITE_URL}/brief.html`, "Skonfiguruj swoją ofertę →")}
+    <p style="line-height:1.6;font-size:14px">Jeśli chcesz zobaczyć dokładną cenę, możesz wypełnić nasz konfigurator — zajmuje kilka minut.</p>
+    ${ctaButton(`${SITE_URL}/brief.html`, "Otwórz konfigurator")}
     <p style="line-height:1.6;font-size:13px;color:#6b6454;margin-top:20px;text-align:center">Masz pytania? Zadzwoń: <strong>735 115 427</strong></p>
   `);
+}
+
+function buildAdvisorEmailText(payload) {
+  const name = firstName(payload.osoba || payload.owner) || "";
+  const wynik = String(payload.wynikPotencjalu || "").trim();
+  const farma = String(payload.firma || payload.farm || "").trim();
+  return [
+    `Dzień dobry${name ? ", " + name : ""},`,
+    "",
+    `Dziękujemy za wypełnienie kalkulatora${farma ? " dla " + farma : ""}. Wynik: ${wynik || "brak danych"}.`,
+    "",
+    "Jeśli chcesz zobaczyć dokładną cenę, wypełnij konfigurator (kilka minut):",
+    `${SITE_URL}/brief.html`,
+    "",
+    "Masz pytania? Zadzwoń: 735 115 427.",
+    "",
+    "Sklep za Stodołą Sp. z o.o. — 735 115 427 — kontakt@sklepzastodola.pl — sklepzastodola.pl"
+  ].join("\n");
 }
 
 function buildBriefEmailHtml(payload) {
@@ -116,4 +156,25 @@ function buildBriefEmailHtml(payload) {
   `);
 }
 
-module.exports = { hasEmailConfig, sendEmail, buildAdvisorEmailHtml, buildBriefEmailHtml };
+function buildBriefEmailText(payload) {
+  const name = firstName(payload.osoba) || "";
+  return [
+    `Dzień dobry${name ? ", " + name : ""},`,
+    "",
+    "Dziękujemy za wypełnienie konfiguratora. W załączniku znajdziesz ofertę PDF przygotowaną na podstawie Twojej konfiguracji.",
+    "To wycena orientacyjna na podstawie cen katalogowych. Oddzwonimy w ciągu jednego dnia roboczego, żeby dopiąć szczegóły.",
+    "",
+    "Zadzwoń: 735 115 427",
+    "",
+    "Sklep za Stodołą Sp. z o.o. — 735 115 427 — kontakt@sklepzastodola.pl — sklepzastodola.pl"
+  ].join("\n");
+}
+
+module.exports = {
+  hasEmailConfig,
+  sendEmail,
+  buildAdvisorEmailHtml,
+  buildAdvisorEmailText,
+  buildBriefEmailHtml,
+  buildBriefEmailText
+};
