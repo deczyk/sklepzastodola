@@ -227,7 +227,7 @@ ${photoRows.join("\n")}` : "";
 <div style="padding-top:14px;font-size:14px;line-height:21px;">Cena obejmuje mlekomat, 2 pojemniki 50 l, system gotówkowy, drukarkę, GSM, automatyczne płukanie, Anti-Frost, alarm, 2 linie mleka oraz certyfikat CE-MID.</div>`);
   }
   if (hasSielaff) {
-    priceRows.push(`<div style="${hasMlekomat ? "padding-top:14px;" : ""}font-size:${hasMlekomat ? "18px;line-height:24px;" : "26px;line-height:32px;"}font-weight:bold;color:#0f4a2f;">Sielaff: ${sielaffPriceNetto ? esc(sielaffPriceNetto) + " netto" : "osobna wycena"}</div>
+    priceRows.push(`<div style="${hasMlekomat ? "padding-top:14px;" : ""}font-size:26px;line-height:32px;font-weight:bold;color:#0f4a2f;">Sielaff: ${sielaffPriceNetto ? esc(sielaffPriceNetto) + " netto" : "osobna wycena"}</div>
 <div style="padding-top:5px;font-size:14px;line-height:21px;">${sielaffPriceNetto ? "Cena obejmuje automat, ekran dotykowy i system płatności w wybranej konfiguracji." : "Wycena po ustaleniu modelu, liczby modułów, chłodzenia, systemu płatności i zakresu dostawy."}</div>`);
   }
 
