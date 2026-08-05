@@ -160,7 +160,12 @@ function buildOfferShowcaseEmailHtml(data) {
     hasMlekomat = false,
     hasSielaff = false,
     mlekomatPriceNetto = "",
-    sielaffPriceNetto = ""
+    mlekomatPriceBrutto = "",
+    sielaffPriceNetto = "",
+    sielaffPriceBrutto = "",
+    totalNetto = "",
+    totalBrutto = "",
+    individualQuoteItems = []
   } = data || {};
 
   const both = hasMlekomat && hasSielaff;
@@ -224,10 +229,12 @@ ${photoRows.join("\n")}` : "";
   const priceRows = [];
   if (hasMlekomat) {
     priceRows.push(`<div style="font-size:26px;line-height:32px;font-weight:bold;color:#0f4a2f;">BRUNIMAT: ${esc(mlekomatPriceNetto || "wycena indywidualna")}${mlekomatPriceNetto ? " netto" : ""}</div>
+${mlekomatPriceBrutto ? `<div style="padding-top:2px;font-size:13px;line-height:19px;color:#5c6862;">Brutto: ${esc(mlekomatPriceBrutto)}</div>` : ""}
 <div style="padding-top:14px;font-size:14px;line-height:21px;">Cena obejmuje mlekomat, 2 pojemniki 50 l, system gotówkowy, drukarkę, GSM, automatyczne płukanie, Anti-Frost, alarm, 2 linie mleka oraz certyfikat CE-MID.</div>`);
   }
   if (hasSielaff) {
     priceRows.push(`<div style="${hasMlekomat ? "padding-top:14px;" : ""}font-size:26px;line-height:32px;font-weight:bold;color:#0f4a2f;">Sielaff: ${sielaffPriceNetto ? esc(sielaffPriceNetto) + " netto" : "osobna wycena"}</div>
+${sielaffPriceBrutto ? `<div style="padding-top:2px;font-size:13px;line-height:19px;color:#5c6862;">Brutto: ${esc(sielaffPriceBrutto)}</div>` : ""}
 <div style="padding-top:5px;font-size:14px;line-height:21px;">${sielaffPriceNetto ? "Cena obejmuje automat, ekran dotykowy i system płatności w wybranej konfiguracji." : "Wycena po ustaleniu modelu, liczby modułów, chłodzenia, systemu płatności i zakresu dostawy."}</div>`);
   }
 
@@ -294,7 +301,18 @@ ${fitRows.join("\n")}
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%;border-collapse:collapse;background-color:#eef5f1;border:1px solid #d7e4dc;">
 <tr><td style="padding:20px;">
 ${priceRows.join("\n")}
-<div style="padding-top:12px;font-size:13px;line-height:20px;color:#6c4b1f;"><strong>Osobno:</strong> transport, rozładunek, ustawienie, przygotowanie miejsca i przyłączy${hasSielaff ? " oraz instalacja automatu Sielaff" : ""}.</div>
+${totalNetto ? `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%;border-collapse:collapse;margin-top:14px;background-color:#ffffff;border:1px solid #cfe0d6;"><tr><td style="padding:14px 16px;">
+<div style="font-size:10.5px;line-height:15px;font-weight:bold;color:#3d6538;">RAZEM — CENA KATALOGOWA NETTO</div>
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%;border-collapse:collapse;"><tr>
+<td valign="bottom" style="padding-top:3px;font-size:22px;line-height:28px;font-weight:bold;color:#0f4a2f;">${esc(totalNetto)}</td>
+${totalBrutto ? `<td align="right" valign="bottom" style="font-size:12.5px;line-height:18px;color:#5c6862;">Brutto: ${esc(totalBrutto)}</td>` : ""}
+</tr></table>
+</td></tr></table>` : ""}
+${individualQuoteItems.length ? `<div style="padding-top:14px;font-size:13px;line-height:19px;font-weight:bold;color:#24312b;">Do osobnej wyceny</div>
+<div style="padding-top:2px;font-size:11.5px;line-height:17px;color:#8a8070;">(nie wliczone w cenę powyżej — wyceniamy indywidualnie po rozmowie)</div>
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%;border-collapse:collapse;">
+${individualQuoteItems.map(label => `<tr><td style="padding:3px 0;font-size:12.5px;line-height:18px;color:#24312b;"><span style="color:#d0aa3d;">&mdash;</span> ${esc(label)}${(label === "Rozładunek, ustawienie i uruchomienie" && hasSielaff) ? " (oraz instalacja automatu Sielaff)" : ""}</td></tr>`).join("\n")}
+</table>` : `<div style="padding-top:12px;font-size:13px;line-height:20px;color:#6c4b1f;"><strong>Osobno:</strong> transport, rozładunek, ustawienie, przygotowanie miejsca i przyłączy${hasSielaff ? " oraz instalacja automatu Sielaff" : ""}.</div>`}
 </td></tr></table></td></tr>
 
 <tr><td style="padding:0 30px 24px 30px;">
@@ -314,7 +332,9 @@ function buildOfferShowcaseEmailText(data) {
   const {
     clientName = "", location = "", dateStr = new Date().toLocaleDateString("pl-PL"),
     hasMlekomat = false, hasSielaff = false,
-    mlekomatPriceNetto = "", sielaffPriceNetto = ""
+    mlekomatPriceNetto = "", mlekomatPriceBrutto = "",
+    sielaffPriceNetto = "", sielaffPriceBrutto = "",
+    totalNetto = "", totalBrutto = "", individualQuoteItems = []
   } = data || {};
   const lines = [
     "SKLEP ZA STODOŁĄ — OFERTA WSTĘPNA",
@@ -326,11 +346,16 @@ function buildOfferShowcaseEmailText(data) {
   if (hasMlekomat) lines.push("- BRUNIMAT 650 Premium DUO — mlekomat z pełnym wyposażeniem (CE-MID, GSM, płukanie, Anti-Frost, alarm, płatności gotówkowe).");
   if (hasSielaff) lines.push("- Automat Sielaff — sprzedaż dodatkowych produktów gospodarstwa (jaja, nabiał, miód, sery, przetwory i inne).");
   lines.push("", "Cena i zakres wyceny:");
-  if (hasMlekomat) lines.push(`BRUNIMAT: ${mlekomatPriceNetto ? mlekomatPriceNetto + " netto" : "wycena indywidualna"}`);
-  if (hasSielaff) lines.push(`Sielaff: ${sielaffPriceNetto ? sielaffPriceNetto + " netto" : "osobna wycena"}`);
+  if (hasMlekomat) lines.push(`BRUNIMAT: ${mlekomatPriceNetto ? mlekomatPriceNetto + " netto" : "wycena indywidualna"}${mlekomatPriceBrutto ? ` (brutto: ${mlekomatPriceBrutto})` : ""}`);
+  if (hasSielaff) lines.push(`Sielaff: ${sielaffPriceNetto ? sielaffPriceNetto + " netto" : "osobna wycena"}${sielaffPriceBrutto ? ` (brutto: ${sielaffPriceBrutto})` : ""}`);
+  if (totalNetto) lines.push(`RAZEM — CENA KATALOGOWA NETTO: ${totalNetto}${totalBrutto ? ` (brutto: ${totalBrutto})` : ""}`);
+  if (individualQuoteItems.length) {
+    lines.push("", "Do osobnej wyceny (nie wliczone w cenę powyżej):");
+    individualQuoteItems.forEach(i => lines.push(`- ${i}`));
+  } else {
+    lines.push("", "Osobno: transport, rozładunek, ustawienie, przygotowanie miejsca i przyłączy" + (hasSielaff ? " oraz instalacja automatu Sielaff." : "."));
+  }
   lines.push(
-    "",
-    "Osobno: transport, rozładunek, ustawienie, przygotowanie miejsca i przyłączy" + (hasSielaff ? " oraz instalacja automatu Sielaff." : "."),
     "",
     "Następny krok: krótka rozmowa telefoniczna i zdjęcia lokalizacji.",
     "",

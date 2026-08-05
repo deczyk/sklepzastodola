@@ -23,6 +23,8 @@ function fmtZl(n) {
   return num > 0 ? `${num.toLocaleString("pl-PL")} zł` : "";
 }
 
+const DEFAULT_INDIVIDUAL_QUOTE_ITEMS = ["Transport i dostawa", "Rozładunek, ustawienie i uruchomienie", "Serwis pogwarancyjny"];
+
 function mlekomatIncludedItems(konfigText) {
   const items = [
     "Certyfikat CE-MID — legalizowany pomiar wydawanej ilości",
@@ -461,6 +463,8 @@ module.exports = async function handler(req, res) {
           const attachments = await buildBriefPdfAttachment(payload, lead, mutation.result.priorHistoria || []);
           const mNetto = Number(payload.mlekomat_netto) || 0;
           const sNetto = Number(payload.sielaff_netto) || 0;
+          const mBrutto = Number(payload.mlekomat_brutto) || 0;
+          const sBrutto = Number(payload.sielaff_brutto) || 0;
           const konfigText = String(payload.konfiguracja || "");
           // Fall back to keyword sniffing when no priced line was sent (e.g.
           // an individually-quoted Sielaff config) so the block still shows.
@@ -472,7 +476,12 @@ module.exports = async function handler(req, res) {
             hasMlekomat,
             hasSielaff,
             mlekomatPriceNetto: mNetto > 0 ? fmtZl(mNetto) : "",
-            sielaffPriceNetto: sNetto > 0 ? fmtZl(sNetto) : ""
+            mlekomatPriceBrutto: mBrutto > 0 ? fmtZl(mBrutto) : "",
+            sielaffPriceNetto: sNetto > 0 ? fmtZl(sNetto) : "",
+            sielaffPriceBrutto: sBrutto > 0 ? fmtZl(sBrutto) : "",
+            totalNetto: (mNetto > 0 || sNetto > 0) ? (payload.cena_netto && payload.cena_netto !== "—" ? payload.cena_netto : "") : "",
+            totalBrutto: (mNetto > 0 || sNetto > 0) ? (payload.cena_brutto && payload.cena_brutto !== "—" ? payload.cena_brutto : "") : "",
+            individualQuoteItems: DEFAULT_INDIVIDUAL_QUOTE_ITEMS
           };
           await sendEmail({
             to: lead.email,
