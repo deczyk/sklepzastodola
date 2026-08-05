@@ -110,6 +110,12 @@ function buildPhotos(konfigText) {
   if (t.includes("sielaff")) {
     photos.push({ file: "sielaff-combi-m.jpg", caption: "Automat chłodniczy Sielaff SiLine SÜ Combi-M" });
   }
+  if (t.includes("butelk")) {
+    photos.push({ file: "butelka.jpg", caption: "Szklane butelki z etykietą Sklep za Stodołą" });
+  }
+  if (t.includes("pawilon")) {
+    photos.push({ file: "pawilon.jpg", caption: "Pawilon drewniany" });
+  }
   return photos;
 }
 
@@ -122,6 +128,14 @@ async function buildBriefPdfAttachment(payload, lead, priorHistoria) {
     if (sNetto > 0) priceLines.push({ label: "Automat chłodniczy Sielaff SiLine SÜ Combi-M", netto: fmtZl(sNetto) });
 
     const konfigText = String(payload.konfiguracja || "");
+    const hasButelki = /butelk/i.test(konfigText);
+    const hasPawilon = /pawilon/i.test(konfigText);
+    // Butelki/pawilon nie mają jeszcze cen katalogowych w konfiguratorze —
+    // pokazujemy je jako osobne pozycje z wyceną indywidualną, nie wliczamy
+    // do sumy "RAZEM" (ta pozostaje tylko dla realnie wycenionych produktów).
+    if (hasButelki) priceLines.push({ label: "Szklane butelki z etykietą", netto: "wycena indywidualna" });
+    if (hasPawilon) priceLines.push({ label: "Pawilon drewniany", netto: "wycena indywidualna" });
+
     const includedItems = [
       ...(mNetto > 0 ? mlekomatIncludedItems(konfigText) : []),
       ...(sNetto > 0 ? sielaffIncludedItems() : [])
@@ -135,8 +149,8 @@ async function buildBriefPdfAttachment(payload, lead, priorHistoria) {
       recommendation: "Poniżej znajdziesz wybraną konfigurację i orientacyjną cenę katalogową. Skontaktujemy się, żeby dopiąć szczegóły i potwierdzić dostępność.",
       configLines: briefConfigLines(payload),
       priceLines,
-      totalNetto: priceLines.length ? (payload.cena_netto && payload.cena_netto !== "—" ? payload.cena_netto : "") : "",
-      totalBrutto: priceLines.length ? (payload.cena_brutto && payload.cena_brutto !== "—" ? payload.cena_brutto : "") : "",
+      totalNetto: (mNetto > 0 || sNetto > 0) ? (payload.cena_netto && payload.cena_netto !== "—" ? payload.cena_netto : "") : "",
+      totalBrutto: (mNetto > 0 || sNetto > 0) ? (payload.cena_brutto && payload.cena_brutto !== "—" ? payload.cena_brutto : "") : "",
       insightCards: buildInsightCards(payload, priorHistoria),
       includedItems,
       photos: buildPhotos(konfigText)
@@ -467,14 +481,19 @@ module.exports = async function handler(req, res) {
           const sBrutto = Number(payload.sielaff_brutto) || 0;
           const konfigText = String(payload.konfiguracja || "");
           // Fall back to keyword sniffing when no priced line was sent (e.g.
-          // an individually-quoted Sielaff config) so the block still shows.
+          // an individually-quoted Sielaff config, or butelki/pawilon which
+          // never have a catalog price) so the block still shows.
           const hasMlekomat = mNetto > 0 || /mlekomat|brunimat/i.test(konfigText);
           const hasSielaff = sNetto > 0 || /sielaff/i.test(konfigText);
+          const hasButelki = /butelk/i.test(konfigText);
+          const hasPawilon = /pawilon/i.test(konfigText);
           const showcaseData = {
             clientName: lead.osoba || lead.firma || "",
             location: [lead.miejscowosc, lead.wojewodztwo].filter(Boolean).join(", "),
             hasMlekomat,
             hasSielaff,
+            hasButelki,
+            hasPawilon,
             mlekomatPriceNetto: mNetto > 0 ? fmtZl(mNetto) : "",
             mlekomatPriceBrutto: mBrutto > 0 ? fmtZl(mBrutto) : "",
             sielaffPriceNetto: sNetto > 0 ? fmtZl(sNetto) : "",

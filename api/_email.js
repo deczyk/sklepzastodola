@@ -115,10 +115,10 @@ function buildAdvisorEmailHtml(payload) {
     <p style="font-size:13px;color:#6b6454;margin:0 0 4px">Dzień dobry${name ? ", " + name : ""},</p>
     <h1 style="font-size:20px;margin:0 0 12px;color:#1e1e1a">Wynik z kalkulatora Advisor</h1>
     <p style="line-height:1.6;font-size:14px;color:#3d3b35">Dziękujemy za wypełnienie kalkulatora${farma ? " dla " + farma : ""}. Na podstawie podanych danych wyszło nam:</p>
-    <div style="background:#f5eddb;border-radius:10px;padding:14px 18px;margin:18px 0;text-align:center">
+    ${wynik ? `<div style="background:#f5eddb;border-radius:10px;padding:14px 18px;margin:18px 0;text-align:center">
       <div style="font-size:12px;color:#6b6454;text-transform:uppercase;letter-spacing:.05em;font-weight:bold">Potencjał projektu</div>
       <div style="font-size:24px;font-weight:bold;color:#2d5a27;margin-top:4px">${wynik}</div>
-    </div>
+    </div>` : ""}
     <p style="line-height:1.6;font-size:14px">Jeśli chcesz zobaczyć dokładną cenę, możesz wypełnić nasz konfigurator — zajmuje kilka minut.</p>
     ${ctaButton(`${SITE_URL}/brief.html`, "Otwórz konfigurator")}
     <p style="line-height:1.6;font-size:13px;color:#6b6454;margin-top:20px;text-align:center">Masz pytania? Zadzwoń: <strong>735 115 427</strong></p>
@@ -159,6 +159,8 @@ function buildOfferShowcaseEmailHtml(data) {
     dateStr = new Date().toLocaleDateString("pl-PL"),
     hasMlekomat = false,
     hasSielaff = false,
+    hasButelki = false,
+    hasPawilon = false,
     mlekomatPriceNetto = "",
     mlekomatPriceBrutto = "",
     sielaffPriceNetto = "",
@@ -191,7 +193,15 @@ function buildOfferShowcaseEmailHtml(data) {
   }
   if (hasSielaff) {
     n++;
-    zestawRows.push(`<tr><td style="padding:10px 0;font-size:14px;line-height:21px;"><strong style="color:#0f4a2f;">${n}. Automat Sielaff.</strong> Sprzedaż dodatkowych produktów gospodarstwa, takich jak jaja, nabiał, miód, sery, przetwory, kasze, mąki, soki i syropy. Finalny model, liczba półek, system chłodzenia i płatności wymagają osobnej konfiguracji.</td></tr>`);
+    zestawRows.push(`<tr><td style="padding:10px 0;${(hasButelki || hasPawilon) ? "border-bottom:1px solid #e3e6e3;" : ""}font-size:14px;line-height:21px;"><strong style="color:#0f4a2f;">${n}. Automat Sielaff.</strong> Sprzedaż dodatkowych produktów gospodarstwa, takich jak jaja, nabiał, miód, sery, przetwory, kasze, mąki, soki i syropy. Finalny model, liczba półek, system chłodzenia i płatności wymagają osobnej konfiguracji.</td></tr>`);
+  }
+  if (hasButelki) {
+    n++;
+    zestawRows.push(`<tr><td style="padding:10px 0;${hasPawilon ? "border-bottom:1px solid #e3e6e3;" : ""}font-size:14px;line-height:21px;"><strong style="color:#0f4a2f;">${n}. Szklane butelki z etykietą.</strong> Butelki z własną etykietą Sklep za Stodołą do sprzedaży mleka. Wycena indywidualna, zależna od ilości i wariantu etykiety.</td></tr>`);
+  }
+  if (hasPawilon) {
+    n++;
+    zestawRows.push(`<tr><td style="padding:10px 0;font-size:14px;line-height:21px;"><strong style="color:#0f4a2f;">${n}. Pawilon drewniany.</strong> Zadaszone miejsce sprzedaży przy gospodarstwie, przygotowane pod urządzenia. Wycena indywidualna, zależna od wielkości i wyposażenia.</td></tr>`);
   }
 
   const photoRows = [];
@@ -206,6 +216,14 @@ function buildOfferShowcaseEmailHtml(data) {
   if (hasSielaff) {
     photoRows.push(`<tr><td align="center" style="padding:0 30px 10px 30px;"><img src="${EMAIL_ASSETS}/sielaff.jpg" width="420" alt="Automat Sielaff do sprzedaży produktów gospodarstwa" style="display:block;width:420px;max-width:100%;height:auto;border:1px solid #d9ddd8;"></td></tr>
 <tr><td align="center" style="padding:0 30px 10px 30px;font-size:12px;line-height:18px;color:#5d6862;">Automat Sielaff do sprzedaży produktów dodatkowych — zdjęcie poglądowe.</td></tr>`);
+  }
+  if (hasPawilon) {
+    photoRows.push(`<tr><td align="center" style="padding:0 30px 10px 30px;"><img src="${EMAIL_ASSETS}/pawilon.jpg" width="420" alt="Pawilon drewniany" style="display:block;width:420px;max-width:100%;height:auto;border:1px solid #d9ddd8;"></td></tr>
+<tr><td align="center" style="padding:0 30px 10px 30px;font-size:12px;line-height:18px;color:#5d6862;">Pawilon drewniany — zdjęcie poglądowe.</td></tr>`);
+  }
+  if (hasButelki) {
+    photoRows.push(`<tr><td align="center" style="padding:0 30px 10px 30px;"><img src="${EMAIL_ASSETS}/butelka.jpg" width="220" alt="Szklane butelki z etykietą Sklep za Stodołą" style="display:block;width:220px;max-width:100%;height:auto;border:1px solid #d9ddd8;"></td></tr>
+<tr><td align="center" style="padding:0 30px 10px 30px;font-size:12px;line-height:18px;color:#5d6862;">Szklane butelki z etykietą Sklep za Stodołą — zdjęcie poglądowe.</td></tr>`);
   }
   const photosSection = photoRows.length ? `
 <tr><td style="padding:0 30px 10px 30px;"><div style="font-size:21px;line-height:28px;font-weight:bold;color:#0f4a2f;">Zdjęcia urządzeń</div></td></tr>
@@ -236,6 +254,14 @@ ${mlekomatPriceBrutto ? `<div style="padding-top:2px;font-size:13px;line-height:
     priceRows.push(`<div style="${hasMlekomat ? "padding-top:14px;" : ""}font-size:26px;line-height:32px;font-weight:bold;color:#0f4a2f;">Sielaff: ${sielaffPriceNetto ? esc(sielaffPriceNetto) + " netto" : "osobna wycena"}</div>
 ${sielaffPriceBrutto ? `<div style="padding-top:2px;font-size:13px;line-height:19px;color:#5c6862;">Brutto: ${esc(sielaffPriceBrutto)}</div>` : ""}
 <div style="padding-top:5px;font-size:14px;line-height:21px;">${sielaffPriceNetto ? "Cena obejmuje automat, ekran dotykowy i system płatności w wybranej konfiguracji." : "Wycena po ustaleniu modelu, liczby modułów, chłodzenia, systemu płatności i zakresu dostawy."}</div>`);
+  }
+  if (hasButelki) {
+    priceRows.push(`<div style="${(hasMlekomat || hasSielaff) ? "padding-top:14px;" : ""}font-size:20px;line-height:26px;font-weight:bold;color:#0f4a2f;">Szklane butelki z etykietą: wycena indywidualna</div>
+<div style="padding-top:5px;font-size:14px;line-height:21px;">Zależna od ilości i wariantu etykiety — wyceniamy po rozmowie.</div>`);
+  }
+  if (hasPawilon) {
+    priceRows.push(`<div style="${(hasMlekomat || hasSielaff || hasButelki) ? "padding-top:14px;" : ""}font-size:20px;line-height:26px;font-weight:bold;color:#0f4a2f;">Pawilon drewniany: wycena indywidualna</div>
+<div style="padding-top:5px;font-size:14px;line-height:21px;">Zależna od wielkości i wyposażenia — zbieramy 2-3 oferty od wykonawców.</div>`);
   }
 
   const nextStepText = both
@@ -331,7 +357,7 @@ ${individualQuoteItems.map(label => `<tr><td style="padding:3px 0;font-size:12.5
 function buildOfferShowcaseEmailText(data) {
   const {
     clientName = "", location = "", dateStr = new Date().toLocaleDateString("pl-PL"),
-    hasMlekomat = false, hasSielaff = false,
+    hasMlekomat = false, hasSielaff = false, hasButelki = false, hasPawilon = false,
     mlekomatPriceNetto = "", mlekomatPriceBrutto = "",
     sielaffPriceNetto = "", sielaffPriceBrutto = "",
     totalNetto = "", totalBrutto = "", individualQuoteItems = []
@@ -345,9 +371,13 @@ function buildOfferShowcaseEmailText(data) {
   ];
   if (hasMlekomat) lines.push("- BRUNIMAT 650 Premium DUO — mlekomat z pełnym wyposażeniem (CE-MID, GSM, płukanie, Anti-Frost, alarm, płatności gotówkowe).");
   if (hasSielaff) lines.push("- Automat Sielaff — sprzedaż dodatkowych produktów gospodarstwa (jaja, nabiał, miód, sery, przetwory i inne).");
+  if (hasButelki) lines.push("- Szklane butelki z etykietą — wycena indywidualna, zależna od ilości i wariantu etykiety.");
+  if (hasPawilon) lines.push("- Pawilon drewniany — wycena indywidualna, zależna od wielkości i wyposażenia.");
   lines.push("", "Cena i zakres wyceny:");
   if (hasMlekomat) lines.push(`BRUNIMAT: ${mlekomatPriceNetto ? mlekomatPriceNetto + " netto" : "wycena indywidualna"}${mlekomatPriceBrutto ? ` (brutto: ${mlekomatPriceBrutto})` : ""}`);
   if (hasSielaff) lines.push(`Sielaff: ${sielaffPriceNetto ? sielaffPriceNetto + " netto" : "osobna wycena"}${sielaffPriceBrutto ? ` (brutto: ${sielaffPriceBrutto})` : ""}`);
+  if (hasButelki) lines.push("Szklane butelki z etykietą: wycena indywidualna");
+  if (hasPawilon) lines.push("Pawilon drewniany: wycena indywidualna");
   if (totalNetto) lines.push(`RAZEM — CENA KATALOGOWA NETTO: ${totalNetto}${totalBrutto ? ` (brutto: ${totalBrutto})` : ""}`);
   if (individualQuoteItems.length) {
     lines.push("", "Do osobnej wyceny (nie wliczone w cenę powyżej):");
