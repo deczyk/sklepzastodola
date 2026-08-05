@@ -57,6 +57,19 @@ async function readPanelStore() {
   };
 }
 
+async function readPanelStoreVersion() {
+  const url = `${SUPABASE_URL}/rest/v1/${encodeURIComponent(PANEL_STORE_TABLE)}?id=eq.${encodeURIComponent(PANEL_STORE_ID)}&select=version`;
+  const response = await fetch(url, { headers: headers() });
+
+  if (!response.ok) {
+    throw new Error(`Supabase GET ${response.status}: ${(await responseText(response)).slice(0, 500)}`);
+  }
+
+  const rows = await response.json();
+  if (!Array.isArray(rows) || !rows.length) return 0;
+  return Number(rows[0].version || 1);
+}
+
 async function savePanelStore(expectedVersion, data) {
   const response = await fetch(`${SUPABASE_URL}/rest/v1/rpc/${encodeURIComponent(PANEL_STORE_SAVE_RPC)}`, {
     method: "POST",
@@ -96,6 +109,7 @@ module.exports = {
   hasPanelStoreConfig,
   panelStoreConfigStatus,
   readPanelStore,
+  readPanelStoreVersion,
   savePanelStore,
   mutatePanelStore
 };

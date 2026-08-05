@@ -5,6 +5,7 @@ const {
   hasPanelStoreConfig,
   panelStoreConfigStatus,
   readPanelStore,
+  readPanelStoreVersion,
   savePanelStore
 } = require("./_panel-store");
 
@@ -77,6 +78,10 @@ module.exports = async function handler(req, res) {
 
   try {
     if (req.method === "GET") {
+      if ((req.query && (req.query.versionOnly === "1" || req.query.versionOnly === "true"))) {
+        const version = await readPanelStoreVersion();
+        return res.status(200).json({ version, database: "supabase" });
+      }
       const store = await readPanelStore();
       return res.status(200).json({
         record: store.data || {},

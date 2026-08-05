@@ -1292,6 +1292,7 @@
       <p>Prywatne centrum CRM, dokumentów, kontaktów i operacji.</p>
     </div>
     <span id="syncStatus" style="font-size:11px;color:#cfe8d6;margin-left:auto;margin-right:4px"></span>
+    <button id="liveSyncBanner" class="lockBtn" onclick="refreshFromRemote()" style="display:none;background:#c9a24a;border-color:#c9a24a;color:#22331f;font-weight:bold">🔄 Nowe dane — odśwież</button>
     <a class="lockBtn" href="index.html">Strona główna</a>
     <button class="lockBtn" onclick="refreshFromRemote()">⟳ Odśwież</button>
     <div class="themeToggleGroup" aria-label="Motyw panelu">
@@ -1339,6 +1340,16 @@
             <div class="commandCounters" id="dailyCommandCounters"></div>
           </div>
           <div id="dailyCommandCenter"></div>
+        </div>
+
+        <div class="dashCard">
+          <div class="commandHeader">
+            <div>
+              <div class="dashCardTitle">📔 Dziennik dnia</div>
+              <p>Zapisz, co dziś zrobiliście, zerknij na poprzednie dni albo zaplanuj zadanie na jutro.</p>
+            </div>
+            <button class="doneBtn" onclick="switchTab('dziennik')">Otwórz dziennik</button>
+          </div>
         </div>
 
         <div class="dashCard dashNotifications">
@@ -1390,6 +1401,45 @@
           <div id="dashInstalacje" class="dashMiniStats"></div>
         </div>
       </div>
+    </div>
+
+    <div class="tabPane" id="tabpane-dziennik">
+    <div class="section">
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:6px">
+        <button class="histBtn" onclick="diaryShiftDay(-1)">← Poprzedni dzień</button>
+        <div style="text-align:center">
+          <h2 id="diaryDateLabel" style="margin:0 0 6px">—</h2>
+          <input type="date" id="diaryDatePicker" onchange="diaryJumpToDate(this.value)">
+        </div>
+        <button class="histBtn" onclick="diaryShiftDay(1)">Następny dzień →</button>
+      </div>
+      <div style="text-align:center;margin-bottom:18px">
+        <button class="addBtn" onclick="diaryGoToday()">📍 Wróć do dziś</button>
+      </div>
+
+      <h3>📝 Co zrobiliśmy tego dnia</h3>
+      <div class="newItemForm" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px">
+        <textarea id="diaryEntryText" placeholder="Co zrobiliście dzisiaj? Np. Zadzwoniłem do 3 klientów, wysłałem 2 oferty, dogadałem termin montażu..." style="flex:1;min-width:240px"></textarea>
+        <select id="diaryEntryWho">
+          <option value="Jakub">Jakub</option>
+          <option value="Jarosław">Jarosław</option>
+        </select>
+        <button class="save" onclick="addDiaryEntry()">Dodaj wpis</button>
+      </div>
+      <div id="diaryEntries"></div>
+
+      <h3 style="margin-top:26px">✅ Zadania na ten dzień</h3>
+      <p style="color:var(--muted);margin:-4px 0 12px">Zaplanuj zadanie na dowolny dzień — np. przejdź na jutro i zapisz, co macie zrobić.</p>
+      <div class="newItemForm" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px">
+        <input type="text" id="diaryTaskText" placeholder="Zadanie na ten dzień..." style="flex:1;min-width:200px">
+        <select id="diaryTaskWho">
+          <option value="Jakub">Jakub</option>
+          <option value="Jarosław">Jarosław</option>
+        </select>
+        <button class="save" onclick="addDiaryTask()">Dodaj zadanie</button>
+      </div>
+      <div id="diaryTasks"></div>
+    </div>
     </div>
 
     <div class="tabPane" id="tabpane-zadania">
@@ -2152,6 +2202,7 @@ async function tryUnlock(){
 document.getElementById("pwInput").addEventListener("keydown", e=>{ if(e.key==="Enter") tryUnlock(); });
 
 function lock(){
+  stopLivePolling();
   localStorage.removeItem("panel_unlocked");
   localStorage.removeItem(PANEL_SESSION_KEY);
   sessionStorage.removeItem("panel_unlocked");
@@ -2238,7 +2289,8 @@ function syncNavigationFromTab(name){
     marketing:"marketing-home",
     materialy:"docs-materials",
     ustawienia:"ai-settings",
-    telefony:"clients-phones"
+    telefony:"clients-phones",
+    dziennik:"diary"
   };
   if(name === "klienci"){
     const clientMap = {
@@ -2452,6 +2504,7 @@ function defaultData(){
     powiadomienia: [],
     zadania: [],
     checklisty: [],
+    dziennik: {},
     planLipiec2026: defaultJulyActionPlan(),
     contentPlanFacebook: defaultFacebookContentPlan()
   };
@@ -2650,6 +2703,7 @@ async function initApp(){
   }
   render();
   scheduleDriveAutoSync();
+  startLivePolling();
 }
 
 function normalizePanelDocuments(d){
@@ -2698,6 +2752,7 @@ function fillMissingDefaults(d){
   if(normalizePanelDocuments(d)) changed = true;
   if(!d.sprawy || d.sprawy.length===0){ d.sprawy = dflt.sprawy; changed = true; }
   if(!d.klienci){ d.klienci = []; changed = true; }
+  if(!d.dziennik || typeof d.dziennik !== "object"){ d.dziennik = {}; changed = true; }
   if(!d.doradcyRolni){ d.doradcyRolni = []; changed = true; }
   if(!d.log){ d.log = []; changed = true; }
   if(!d.terminy || d.terminy.length===0){ d.terminy = dflt.terminy; changed = true; }
@@ -2752,13 +2807,15 @@ function fillMissingDefaults(d){
   return changed;
 }
 
-async function refreshFromRemote(){
+async function refreshFromRemote(options = {}){
+  showLiveSyncBanner(false);
   if(!SYNC_ENABLED){ setSyncStatus("Synchronizacja wyłączona", true); return; }
   if(hasUnsyncedLocalChanges || !lastCloudSaveOk){
+    if(options.silent) return; // nie przerywamy cichego pollingu confirmem
     const ok = confirm("Masz lokalne zmiany niezapisane w chmurze. Odświeżenie może je nadpisać. Kontynuować?");
     if(!ok) return;
   }
-  setSyncStatus("Odświeżanie...", false);
+  if(!options.silent) setSyncStatus("Odświeżanie...", false);
   let remote = null;
   try{
     remote = await fetchRemote();
@@ -2775,6 +2832,60 @@ async function refreshFromRemote(){
   } else {
     setSyncStatus("Nie udało się odświeżyć", true);
   }
+}
+
+// ================= Live sync (polling odświeżania) =================
+let livePollTimer = null;
+const LIVE_POLL_MS = 20000;
+
+function isSomethingLikelyBeingEdited(){
+  const openModal = document.querySelector(".previewModal.open");
+  if(openModal) return true;
+  const active = document.activeElement;
+  if(active && ["INPUT","TEXTAREA","SELECT"].includes(active.tagName)) return true;
+  return false;
+}
+
+function showLiveSyncBanner(show){
+  const el = document.getElementById("liveSyncBanner");
+  if(el) el.style.display = show ? "" : "none";
+}
+
+async function checkForRemoteUpdate(){
+  if(!SYNC_ENABLED || document.hidden) return;
+  if(hasUnsyncedLocalChanges || !lastCloudSaveOk) return; // nie nadpisujemy niewysłanych zmian
+  const password = getPanelPassword();
+  if(!password) return;
+  try{
+    const res = await fetch("/api/panel-data?versionOnly=1", { headers: { "X-Panel-Password": password } });
+    if(!res.ok) return;
+    const json = await res.json();
+    const remoteVersion = Number(json.version);
+    if(!Number.isFinite(remoteVersion) || currentPanelVersion === null) return;
+    if(remoteVersion <= currentPanelVersion) { showLiveSyncBanner(false); return; }
+    // Są nowsze dane w chmurze niż to, co mamy załadowane.
+    if(isSomethingLikelyBeingEdited()){
+      showLiveSyncBanner(true); // nie przerywamy edycji — tylko pokazujemy przycisk
+    } else {
+      showLiveSyncBanner(false);
+      await refreshFromRemote({silent:true});
+    }
+  }catch(e){
+    // Cichy brak sieci — nie przeszkadzamy użytkownikowi co 20 sekund.
+  }
+}
+
+function startLivePolling(){
+  stopLivePolling();
+  if(!SYNC_ENABLED) return;
+  livePollTimer = setInterval(checkForRemoteUpdate, LIVE_POLL_MS);
+  document.addEventListener("visibilitychange", ()=>{ if(!document.hidden) checkForRemoteUpdate(); });
+}
+
+function stopLivePolling(){
+  clearInterval(livePollTimer);
+  livePollTimer = null;
+  showLiveSyncBanner(false);
 }
 
 function saveData(options = {}){
@@ -3802,6 +3913,7 @@ function render(){
   renderActivityLog();
   renderClients();
   renderTelefony();
+  renderDiary();
   renderDoradcyRolni();
   fillDocumentClientOptions();
 
@@ -4310,6 +4422,7 @@ const PANEL_NAV = {
     label: "START",
     views: [
       {key:"dashboard", label:"Dashboard", tab:"dashboard"},
+      {key:"diary", label:"Dziennik dnia", tab:"dziennik", priority:true},
       {key:"july-plan", label:"Plan Lipiec 2026", tab:"planlipiec", priority:true}
     ]
   },
@@ -8108,6 +8221,133 @@ function importNotesSectionFromPackage(){
   if(result){
     result.innerHTML = `<div class="backupPreviewStatus"><b>Import notatek zakończony.</b><br>Dodano notatek: ${added}<br>Pominięto duplikatów: ${skippedDuplicates}<br>Odrzucono notatek: ${rejected}<br>Odrzucono przez brak klienta: ${missingClient}</div>`;
   }
+}
+
+// ================= Dziennik dnia =================
+let diaryCurrentDate = null;
+
+function ensureDiaryDay(dateKey){
+  if(!data.dziennik || typeof data.dziennik !== "object") data.dziennik = {};
+  if(!data.dziennik[dateKey]) data.dziennik[dateKey] = {wpisy:[], zadania:[]};
+  if(!Array.isArray(data.dziennik[dateKey].wpisy)) data.dziennik[dateKey].wpisy = [];
+  if(!Array.isArray(data.dziennik[dateKey].zadania)) data.dziennik[dateKey].zadania = [];
+  return data.dziennik[dateKey];
+}
+
+function getDiaryDay(dateKey){
+  return (data.dziennik && data.dziennik[dateKey]) || {wpisy:[], zadania:[]};
+}
+
+function formatDiaryDateLabel(dateKey){
+  const d = new Date(dateKey + "T00:00:00");
+  let label = d.toLocaleDateString("pl-PL", {weekday:"long", day:"numeric", month:"long", year:"numeric"});
+  label = label.charAt(0).toUpperCase() + label.slice(1);
+  if(dateKey === formatDateOnly(new Date())) label += " · dziś";
+  return label;
+}
+
+function renderDiary(){
+  const label = document.getElementById("diaryDateLabel");
+  if(!label) return; // zakładka nie jest jeszcze w DOM
+  if(!diaryCurrentDate) diaryCurrentDate = formatDateOnly(new Date());
+  label.textContent = formatDiaryDateLabel(diaryCurrentDate);
+  const picker = document.getElementById("diaryDatePicker");
+  if(picker) picker.value = diaryCurrentDate;
+
+  const day = getDiaryDay(diaryCurrentDate);
+  const entriesEl = document.getElementById("diaryEntries");
+  if(entriesEl){
+    const wpisy = [...day.wpisy].sort((a,b)=> new Date(a.czas) - new Date(b.czas));
+    entriesEl.innerHTML = wpisy.length ? wpisy.map(w => `
+      <div class="terminItem">
+        <div class="terminDate">${crmEsc(new Date(w.czas).toLocaleTimeString("pl-PL", {hour:"2-digit", minute:"2-digit"}))}</div>
+        <div class="terminInfo">
+          <div class="nazwa">${crmEsc(w.kto || "")}</div>
+          <div class="notatka">${crmEsc(w.tekst)}</div>
+        </div>
+        <button class="delBtn" onclick="deleteDiaryEntry('${diaryCurrentDate}','${w.id}')">Usuń</button>
+      </div>
+    `).join("") : '<div class="empty">Brak wpisów tego dnia.</div>';
+  }
+
+  const tasksEl = document.getElementById("diaryTasks");
+  if(tasksEl){
+    tasksEl.innerHTML = day.zadania.length ? day.zadania.map(z => `
+      <div class="zadanieItem ${z.zrobione ? "done" : ""}">
+        <span class="zadanieTekst">${crmEsc(z.tekst)}</span>
+        <span class="ktoBadge">${crmEsc(z.kto || "")}</span>
+        <button class="doneBtn" onclick="toggleDiaryTask('${diaryCurrentDate}','${z.id}')">${z.zrobione ? "↩ Przywróć" : "✔ Zrobione"}</button>
+        <button class="delBtn" onclick="deleteDiaryTask('${diaryCurrentDate}','${z.id}')">Usuń</button>
+      </div>
+    `).join("") : '<div class="empty">Brak zadań zaplanowanych na ten dzień.</div>';
+  }
+}
+
+function diaryShiftDay(delta){
+  const base = new Date(diaryCurrentDate + "T00:00:00");
+  diaryCurrentDate = formatDateOnly(addDaysDate(base, delta));
+  renderDiary();
+}
+
+function diaryJumpToDate(value){
+  if(!value) return;
+  diaryCurrentDate = value;
+  renderDiary();
+}
+
+function diaryGoToday(){
+  diaryCurrentDate = formatDateOnly(new Date());
+  renderDiary();
+}
+
+function addDiaryEntry(){
+  const ta = document.getElementById("diaryEntryText");
+  const who = document.getElementById("diaryEntryWho");
+  const tekst = ta.value.trim();
+  if(!tekst) return;
+  const day = ensureDiaryDay(diaryCurrentDate);
+  day.wpisy.push({id:"dw_"+Date.now(), tekst, kto: who.value, czas: new Date().toISOString()});
+  logActivity(`dodał(a) wpis do dziennika dnia (${diaryCurrentDate})`);
+  saveData();
+  ta.value = "";
+  renderDiary();
+}
+
+function deleteDiaryEntry(dateKey, id){
+  const day = getDiaryDay(dateKey);
+  data.dziennik[dateKey].wpisy = day.wpisy.filter(w => w.id !== id);
+  saveData();
+  renderDiary();
+}
+
+function addDiaryTask(){
+  const input = document.getElementById("diaryTaskText");
+  const who = document.getElementById("diaryTaskWho");
+  const tekst = input.value.trim();
+  if(!tekst) return;
+  const day = ensureDiaryDay(diaryCurrentDate);
+  day.zadania.push({id:"dt_"+Date.now(), tekst, kto: who.value, zrobione:false});
+  logActivity(`zaplanował(a) zadanie na ${diaryCurrentDate}: „${tekst}”`);
+  saveData();
+  input.value = "";
+  renderDiary();
+}
+
+function toggleDiaryTask(dateKey, id){
+  const day = getDiaryDay(dateKey);
+  const z = day.zadania.find(x => x.id === id);
+  if(z){
+    z.zrobione = !z.zrobione;
+    saveData();
+    renderDiary();
+  }
+}
+
+function deleteDiaryTask(dateKey, id){
+  const day = getDiaryDay(dateKey);
+  data.dziennik[dateKey].zadania = day.zadania.filter(z => z.id !== id);
+  saveData();
+  renderDiary();
 }
 
 // ================= Do zrobienia =================
