@@ -1719,6 +1719,7 @@
           <button class="crmViewBtn" id="clientsViewFollowBtn" onclick="setClientsView('followups')">Do kontaktu</button>
           <button class="crmViewBtn" id="clientsViewAdvisorBtn" onclick="setClientsView('advisor')">Advisor</button>
           <button class="crmViewBtn" id="clientsViewAdvisorOlxBtn" onclick="setClientsView('advisorolx')">Advisor OLX</button>
+          <button class="crmViewBtn" id="clientsViewOlxBtn" onclick="setClientsView('olxpotencjalni')">Potencjalni (OLX)</button>
         </div>
         <div class="crmHint" id="crmViewHint">Widoki robocze korzystaja tylko z obecnych danych klientow.</div>
       </div>
@@ -1759,6 +1760,24 @@
       <div id="clientsMobileCards" class="clientsMobileCards"></div>
       <div id="clientsKanban" class="clientsKanban"></div>
       <div id="clientsFollowups" class="clientsFollowups"></div>
+
+      <div id="clientsOlxPotencjalni" class="clientsFollowups" style="display:none">
+        <div class="privateNotice"><b>Potencjalni klienci (OLX):</b> kontakty z ogłoszeń OLX, do których wysłaliście wiadomość, ale jeszcze nie są w normalnym lejku sprzedażowym. Gdy taka osoba wypełni formularz Advisor (albo poda ten sam numer telefonu w innym formularzu), panel sam przeniesie ją do zwykłej bazy klientów — bez duplikatu.</div>
+        <div class="clientActions">
+          <input type="file" id="olxXlsxInput" accept=".xlsx,.xls,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel" style="display:none" onchange="importOlxLeadsFromSelectedXlsx(this)">
+          <button class="importBtn" onclick="document.getElementById('olxXlsxInput').click()">⇩ Wczytaj z Excela (telefon + link OLX)</button>
+          <button class="importBtn" style="background:#3a6b4a" onclick="exportOlxLeadsToXlsx()">⇧ Eksportuj do XLSX</button>
+          <span id="olxImportMsg"></span>
+        </div>
+        <div class="newItemForm" style="display:flex;gap:8px;flex-wrap:wrap;margin:14px 0">
+          <input type="text" id="olxLeadTelefon" placeholder="Telefon">
+          <input type="text" id="olxLeadLink" placeholder="Link do ogłoszenia OLX" style="flex:2;min-width:220px">
+          <input type="text" id="olxLeadNotatka" placeholder="Notatka (opcjonalnie)" style="flex:2;min-width:200px">
+          <button class="save" onclick="addOlxLead()">Dodaj</button>
+        </div>
+        <input type="text" id="searchOlxLeads" placeholder="Szukaj po telefonie, linku albo notatce..." oninput="renderClients()" style="margin-bottom:12px;max-width:360px;width:100%">
+        <div id="list-olxpotencjalni"></div>
+      </div>
     </div>
     </div>
 
@@ -2299,7 +2318,8 @@ function syncNavigationFromTab(name){
       kanban:"sales-kanban",
       followups:"sales-followups",
       advisor:"sales-advisor",
-      advisorolx:"sales-advisorolx"
+      advisorolx:"sales-advisorolx",
+      olxpotencjalni:"clients-olx-potential"
     };
     currentMainCategory = currentClientsView === "directory" || currentSubView.startsWith("clients-") ? "clients" : (currentSubView === "today-followups" ? "start" : "sales");
     currentSubView = clientMap[currentClientsView] || "clients-directory";
@@ -3586,7 +3606,7 @@ function deleteHistoryEntry(index){
 function renderStatsBar(){
   const bar = document.getElementById("statsBar");
   if(!bar) return;
-  const klienci = data.klienci || [];
+  const klienci = (data.klienci || []).filter(c => c.segment !== "olx_potencjalny");
   const wPipeline = klienci.filter(c=>["oferta","negocjacje","rozmowa","kontakt","zglosil_sie"].includes(c.status)).length;
   const wygrani = klienci.filter(c=>c.status==="wygrany").length;
   const sprawyOpen = (data.sprawy||[]).filter(s=>s.status!=="done").length;
@@ -4433,6 +4453,7 @@ const PANEL_NAV = {
       {key:"clients-followups", label:"Do kontaktu", tab:"klienci", clientsView:"followups"},
       {key:"clients-advisor", label:"Advisor", tab:"klienci", clientsView:"advisor"},
       {key:"clients-advisorolx", label:"Advisor OLX", tab:"klienci", clientsView:"advisorolx"},
+      {key:"clients-olx-potential", label:"Potencjalni (OLX)", tab:"klienci", clientsView:"olxpotencjalni"},
       {key:"clients-phones", label:"Telefony klientów", tab:"telefony"}
     ]
   },
@@ -4722,7 +4743,7 @@ function renderDailyCommandCenter(){
   const host = document.getElementById("dailyCommandCenter");
   const counters = document.getElementById("dailyCommandCounters");
   if(!host || !counters) return;
-  const clients = Array.isArray(data.klienci) ? data.klienci : [];
+  const clients = (Array.isArray(data.klienci) ? data.klienci : []).filter(c => c.segment !== "olx_potencjalny");
   const followupTodayClients = clients.filter(isTodayFollowup);
   const overdueClients = clients.filter(isOverdueFollowup);
 
@@ -5080,7 +5101,8 @@ function updateClientsViewHint(){
     kanban:"Kolumny statusów pomagają szybko ocenić etap każdego klienta.",
     followups:"Widok klientów, do których trzeba wrócić w pierwszej kolejności.",
     advisor:"Leady z formularza Advisor jako osobny roboczy widok sprzedażowy.",
-    advisorolx:"Leady z formularza Advisor OLX jako osobny widok do szybkiego działania."
+    advisorolx:"Leady z formularza Advisor OLX jako osobny widok do szybkiego działania.",
+    olxpotencjalni:"Kontakty z OLX, do których wysłaliście wiadomość — osobno, żeby nie mieszać z aktualnymi klientami. Gdy ktoś stąd wypełni formularz Advisor, panel sam przeniesie go do zwykłej bazy."
   };
   if(currentSubView === "sales-offers"){
     hint.textContent = "Oferty są zarządzane w karcie klienta. Otwórz klienta z tabeli albo kart mobilnych.";
@@ -5101,7 +5123,8 @@ function setClientsView(view, options={}){
     kanban: "clientsViewKanbanBtn",
     followups: "clientsViewFollowBtn",
     advisor: "clientsViewAdvisorBtn",
-    advisorolx: "clientsViewAdvisorOlxBtn"
+    advisorolx: "clientsViewAdvisorOlxBtn",
+    olxpotencjalni: "clientsViewOlxBtn"
   };
   document.querySelectorAll(".crmViewBtn").forEach(btn=>btn.classList.toggle("active", btn.id === viewMap[view]));
   if(!options.preserveNavigation){
@@ -5111,9 +5134,10 @@ function setClientsView(view, options={}){
       kanban:"sales-kanban",
       followups:"sales-followups",
       advisor:"sales-advisor",
-      advisorolx:"sales-advisorolx"
+      advisorolx:"sales-advisorolx",
+      olxpotencjalni:"clients-olx-potential"
     };
-    currentMainCategory = view === "directory" ? "clients" : "sales";
+    currentMainCategory = (view === "directory" || view === "olxpotencjalni") ? "clients" : "sales";
     currentSubView = subViewMap[view] || "clients-directory";
     renderNavigation();
   }
@@ -5127,10 +5151,12 @@ function setClientsViewContainers(){
   const directory = document.getElementById("clientsDirectory");
   const kanban = document.getElementById("clientsKanban");
   const followups = document.getElementById("clientsFollowups");
+  const olx = document.getElementById("clientsOlxPotencjalni");
   if(directory) directory.style.display = currentClientsView === "directory" ? "grid" : "none";
   if(tableWrap) tableWrap.style.display = currentClientsView === "table" ? "" : "none";
   if(kanban) kanban.style.display = currentClientsView === "kanban" ? "grid" : "none";
   if(followups) followups.style.display = ["followups","advisor","advisorolx"].includes(currentClientsView) ? "block" : "none";
+  if(olx) olx.style.display = currentClientsView === "olxpotencjalni" ? "block" : "none";
 }
 
 function renderClientDirectory(list){
@@ -5313,8 +5339,14 @@ function openClientCard(clientId){
       <div class="clientCardBadges">
         <span class="kanbanPill">${crmEsc(labelFrom(STATUS_OPTS, c.status))}</span>
         <span class="kanbanPill">${crmEsc(labelFrom(PRIO_OPTS, c.priorytet))}</span>
+        ${c.segment === "olx_potencjalny" ? '<span class="kanbanPill gold">Potencjalny OLX</span>' : ""}
       </div>
     </div>
+    ${c.segment === "olx_potencjalny" ? `
+    <div class="privateNotice">
+      To kontakt z listy potencjalnych klientów OLX (jeszcze nie w zwykłym lejku sprzedażowym).
+      <button class="histBtn" onclick="graduateOlxLead('${crmEsc(c.id)}')" style="margin-left:10px">Przenieś do zwykłej bazy klientów</button>
+    </div>` : ""}
     <div class="clientCardGrid">
       <div class="clientCardField"><b>Firma / gospodarstwo</b>${clientField(c,"firma")}</div>
       <div class="clientCardField"><b>Osoba kontaktowa</b>${clientField(c,"osoba")}</div>
@@ -5621,6 +5653,15 @@ function renderClients(){
   if(!body) return;
   let list = [...(data.klienci||[])];
 
+  if(currentClientsView === "olxpotencjalni"){
+    setClientsViewContainers();
+    updateClientsViewHint();
+    renderOlxPotencjalni(list.filter(c => c.segment === "olx_potencjalny"));
+    renderClientsMobileCards([]);
+    return;
+  }
+  list = list.filter(c => c.segment !== "olx_potencjalny"); // potencjalni z OLX nie mieszają się z resztą bazy
+
   const fStatus = document.getElementById("filterStatus").value;
   const fPrio = document.getElementById("filterPrio").value;
   const fText = document.getElementById("filterText").value.trim().toLowerCase();
@@ -5746,6 +5787,14 @@ function submitAddClient(){
     document.getElementById("addClientError").style.display="block";
     return;
   }
+  const telefonNowy = val("ac_telefon");
+  const existingByPhone = telefonNowy ? findClientByPhone(telefonNowy) : null;
+  if(existingByPhone){
+    const otworz = confirm(`Klient z tym numerem telefonu już jest w bazie (${existingByPhone.firma||existingByPhone.osoba||"bez nazwy"}). Otworzyć jego kartę zamiast dodawać duplikat?`);
+    closeAddClientModal();
+    if(otworz) openClientCard(existingByPhone.id);
+    return;
+  }
   const now = new Date().toISOString();
   data.klienci.push({
     id:"c_"+Date.now(),
@@ -5838,6 +5887,161 @@ function exportClientsToXlsx(){
   const dateStr = new Date().toISOString().slice(0,10);
   XLSX.writeFile(wb, `Baza_klientow_${dateStr}.xlsx`);
   logActivity("wyeksportował(a) bazę klientów do XLSX");
+}
+
+// ================= Potencjalni klienci (OLX) =================
+function phoneDigits(value){
+  return (value || "").toString().replace(/\D/g, "");
+}
+
+function findClientByPhone(phone){
+  const digits = phoneDigits(phone);
+  if(!digits) return null;
+  return (data.klienci||[]).find(c => phoneDigits(c.telefon) === digits) || null;
+}
+
+function renderOlxPotencjalni(list){
+  const el = document.getElementById("list-olxpotencjalni");
+  if(!el) return;
+  const q = (document.getElementById("searchOlxLeads")?.value || "").toLowerCase().trim();
+  const rows = list
+    .filter(c => !q || (c.telefon||"").toLowerCase().includes(q) || (c.notatki||"").toLowerCase().includes(q) || (c.linkOlx||"").toLowerCase().includes(q))
+    .sort((a,b) => new Date(b.utworzono||0) - new Date(a.utworzono||0));
+  if(!rows.length){
+    el.innerHTML = `<div class="empty">${q ? "Brak wyników pasujących do wyszukiwania." : "Brak potencjalnych klientów z OLX — dodaj ręcznie albo wczytaj z Excela."}</div>`;
+    return;
+  }
+  el.innerHTML = rows.map(c => `
+    <div class="terminItem">
+      <div class="terminDate">${c.telefon ? `<a href="tel:${crmEsc(phoneDigits(c.telefon))}">${crmEsc(c.telefon)}</a>` : "—"}</div>
+      <div class="terminInfo">
+        <div class="nazwa">${c.linkOlx ? `<a href="${crmEsc(c.linkOlx)}" target="_blank" rel="noopener">Ogłoszenie OLX ↗</a>` : "Bez linku OLX"}</div>
+        <div class="notatka">${crmEsc(c.notatki || "")}</div>
+      </div>
+      <button class="histBtn" onclick="openClientCard('${crmEsc(c.id)}')">Karta klienta</button>
+      <button class="delBtn" onclick="deleteClient('${crmEsc(c.id)}')">Usuń</button>
+    </div>
+  `).join("");
+}
+
+function graduateOlxLead(id){
+  const c = (data.klienci||[]).find(x=>x.id===id);
+  if(!c) return;
+  c.segment = null;
+  c.zaktualizowano = new Date().toISOString();
+  logActivity(`przeniósł(-osła) potencjalnego klienta OLX (${c.firma||c.osoba||c.telefon||"bez nazwy"}) do zwykłej bazy klientów`);
+  saveData();
+  render();
+  openClientCard(id);
+}
+
+function addOlxLead(){
+  const telefonEl = document.getElementById("olxLeadTelefon");
+  const linkEl = document.getElementById("olxLeadLink");
+  const notatkaEl = document.getElementById("olxLeadNotatka");
+  const telefon = telefonEl.value.trim();
+  const linkOlx = linkEl.value.trim();
+  const notatka = notatkaEl.value.trim();
+  if(!telefon){ alert("Podaj przynajmniej numer telefonu."); return; }
+
+  const existing = findClientByPhone(telefon);
+  const now = new Date().toISOString();
+  if(existing){
+    if(!existing.linkOlx && linkOlx) existing.linkOlx = linkOlx;
+    if(notatka) existing.notatki = existing.notatki ? `${existing.notatki}\n\n${notatka}` : notatka;
+    existing.zaktualizowano = now;
+    logActivity(`ten numer telefonu już był w bazie (${existing.firma||existing.osoba||"bez nazwy"}) — dopisano notatkę OLX zamiast duplikatu`);
+    alert("Ten numer telefonu już jest w bazie klientów — nie dodano duplikatu, dopisano notatkę do istniejącego klienta.");
+  } else {
+    data.klienci.push({
+      id:"c_"+Date.now(),
+      telefon, linkOlx,
+      segment:"olx_potencjalny",
+      zrodloLeada:"OLX",
+      kategoriaLeada:"Potencjalny OLX",
+      status:"kontakt",
+      priorytet:"B",
+      notatki: notatka,
+      nastepnyFollowup:"",
+      utworzono: now, zaktualizowano: now,
+      historia:[{tekst:"[OLX] Wysłano wiadomość do ogłoszenia na OLX.", kto:getWhoAmI(), data:now}],
+      oferty:[]
+    });
+    logActivity(`dodał(a) potencjalnego klienta OLX (${telefon})`);
+  }
+  saveData();
+  telefonEl.value=""; linkEl.value=""; notatkaEl.value="";
+  renderClients();
+}
+
+function exportOlxLeadsToXlsx(){
+  const rows = (data.klienci||[]).filter(c => c.segment === "olx_potencjalny").map(c => ({
+    "Telefon": c.telefon || "",
+    "Link OLX": c.linkOlx || "",
+    "Status": STATUS_OPTS.find(s=>s[0]===c.status)?.[1] || c.status || "",
+    "Notatka": c.notatki || ""
+  }));
+  if(!rows.length){ alert("Brak potencjalnych klientów OLX do eksportu."); return; }
+  const ws = XLSX.utils.json_to_sheet(rows);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "Potencjalni OLX");
+  const dateStr = new Date().toISOString().slice(0,10);
+  XLSX.writeFile(wb, `Potencjalni_OLX_${dateStr}.xlsx`);
+  logActivity("wyeksportował(a) listę potencjalnych klientów OLX do XLSX");
+}
+
+async function importOlxLeadsFromSelectedXlsx(input){
+  const msg = document.getElementById("olxImportMsg");
+  const file = input?.files?.[0];
+  if(!file) return;
+  if(msg) msg.textContent = `Wczytuję: ${file.name}...`;
+  try{
+    const buf = await file.arrayBuffer();
+    const wb = XLSX.read(buf, {type:"array", cellDates:true});
+    const ws = wb.Sheets[wb.SheetNames[0]];
+    const rows = XLSX.utils.sheet_to_json(ws, {defval:""});
+    let added = 0, updated = 0, skipped = 0;
+    const now = new Date().toISOString();
+    rows.forEach(r => {
+      const telefon = xlsxLooseVal(r, ["Telefon","Tel","Numer","Numer telefonu","Nr telefonu","Phone"]);
+      const linkOlx = xlsxLooseVal(r, ["Link","Link OLX","OLX","Ogloszenie","Ogłoszenie","URL","Link do ogloszenia","Link do ogłoszenia"]);
+      const notatka = xlsxLooseVal(r, ["Notatka","Notatki","Uwagi","Opis"]);
+      if(!telefon){ skipped++; return; }
+      const existing = findClientByPhone(telefon);
+      if(existing){
+        if(!existing.linkOlx && linkOlx) existing.linkOlx = linkOlx;
+        const importNote = notatka || "Import OLX: wysłano wiadomość na OLX.";
+        if(!(existing.notatki||"").includes(importNote)) existing.notatki = existing.notatki ? `${existing.notatki}\n\n${importNote}` : importNote;
+        existing.zaktualizowano = now;
+        updated++;
+        return;
+      }
+      data.klienci.push({
+        id:"c_"+Date.now()+"_"+added,
+        telefon, linkOlx,
+        segment:"olx_potencjalny",
+        zrodloLeada:"OLX",
+        kategoriaLeada:"Potencjalny OLX",
+        status:"kontakt",
+        priorytet:"B",
+        notatki: notatka,
+        nastepnyFollowup:"",
+        utworzono: now, zaktualizowano: now,
+        historia:[{tekst:"[Import OLX] Wysłano wiadomość do ogłoszenia na OLX.", kto:getWhoAmI(), data:now}],
+        oferty:[]
+      });
+      added++;
+    });
+    saveData(); renderClients();
+    if(added>0 || updated>0) logActivity(`zaimportował(a) potencjalnych klientów OLX z Excela (nowych: ${added}, dopisanych do istniejących: ${updated})`);
+    if(msg){
+      msg.textContent = `Zaimportowano ${added} nowych.${updated>0?` Dopisano notatkę do ${updated} już istniejących klientów (ten sam numer telefonu — bez duplikatu).`:""}${skipped>0?` Pominięto ${skipped} wierszy bez numeru telefonu.`:""}`;
+    }
+  }catch(e){
+    if(msg) msg.textContent = "Błąd wczytywania pliku: " + e.message;
+  }finally{
+    if(input) input.value = "";
+  }
 }
 
 function clientsWithPhone(){
@@ -8441,8 +8645,8 @@ function renderDashboard(){
   const dashDate = document.getElementById("dashDate");
   dashDate.textContent = new Date().toLocaleDateString("pl-PL", {weekday:"long", day:"numeric", month:"long", year:"numeric"});
 
-  // Lejek sprzedażowy
-  const klienci = data.klienci || [];
+  // Lejek sprzedażowy (bez potencjalnych klientów OLX — mają osobny widok)
+  const klienci = (data.klienci || []).filter(c => c.segment !== "olx_potencjalny");
   const zadaniaOtwarte = (data.zadania||[]).filter(z=>!z.zrobione);
   const terminyPilne = (data.terminy||[]).filter(t=>{
     const dni = safeDaysUntil(t.data);

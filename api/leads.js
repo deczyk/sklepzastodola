@@ -428,6 +428,9 @@ module.exports = async function handler(req, res) {
         existing.notatki = mergeNotes(existing.notatki, lead.notes);
         if (existing.priorytet !== "A" && lead.priorytet === "A") existing.priorytet = "A";
         if (!existing.status) existing.status = lead.sourceCfg.status;
+        // Ten sam numer telefonu/e-mail wypełnił teraz prawdziwy formularz —
+        // "awansujemy" go z listy potencjalnych klientów OLX do zwykłej bazy.
+        if (existing.segment === "olx_potencjalny") existing.segment = null;
 
         data.powiadomienia.unshift(buildNotification(existing, lead, now, true));
 
