@@ -113,11 +113,17 @@ async function buildOfferPdf(data) {
     sectionCounter++;
     ensureSpace(30);
     const badgeR = 8;
-    page().drawCircle({ x: MARGIN + badgeR, y: ctx.y - badgeR + 3, size: badgeR, color: FOREST });
+    // Circle center and title baseline are picked independently so the
+    // digit's visual (cap-height) center lines up with the title's —
+    // drawCircle's y is a center, drawText's y is a baseline, so naively
+    // sharing one offset between them left the badge sitting low.
+    const titleBaselineY = ctx.y - 4;
+    const badgeCenterY = titleBaselineY + 4.85; // ~half the 13.5pt title's cap-height
+    page().drawCircle({ x: MARGIN + badgeR, y: badgeCenterY, size: badgeR, color: FOREST });
     const numTxt = String(sectionCounter);
     const nw = fontBold.widthOfTextAtSize(numTxt, 8.5);
-    page().drawText(numTxt, { x: MARGIN + badgeR - nw / 2, y: ctx.y - badgeR - 1, size: 8.5, font: fontBold, color: WHITE });
-    page().drawText(title, { x: MARGIN + badgeR * 2 + 8, y: ctx.y - 4, size: 13.5, font: fontBold, color: INK });
+    page().drawText(numTxt, { x: MARGIN + badgeR - nw / 2, y: badgeCenterY - 3, size: 8.5, font: fontBold, color: WHITE });
+    page().drawText(title, { x: MARGIN + badgeR * 2 + 8, y: titleBaselineY, size: 13.5, font: fontBold, color: INK });
     ctx.y -= 22;
     page().drawLine({ start: { x: MARGIN, y: ctx.y }, end: { x: PAGE_W - MARGIN, y: ctx.y }, thickness: 0.75, color: LINE });
     ctx.y -= 16;
