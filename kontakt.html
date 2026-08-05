@@ -206,8 +206,8 @@
       <h2 class="sec-title" style="font-size:clamp(1.6rem,2.5vw,2.2rem)">Zadzwoń lub<br><em>napisz bezpośrednio.</em></h2>
       <p style="font-size:.9rem;color:var(--dim);line-height:1.7;margin-top:.8rem">Działamy w całej Polsce. Odpiszemy lub oddzwonimy w ciągu 24h w dni robocze.</p>
       <div class="contact-links">
-        <a class="clink" href="tel:735115427"><span class="clink-icon">📞</span>735 115 427</a>
-        <a class="clink" href="tel:690000923"><span class="clink-icon">📞</span>690 000 923</a>
+        <a class="clink" href="tel:+48735115427"><span class="clink-icon">📞</span>+48 735 115 427</a>
+        <a class="clink" href="tel:+48690000923"><span class="clink-icon">📞</span>+48 690 000 923</a>
         <a class="clink" href="mailto:kontakt@sklepzastodola.pl"><span class="clink-icon">✉️</span>kontakt@sklepzastodola.pl</a>
         <a class="clink" href="https://www.facebook.com/profile.php?id=61591710038575" target="_blank" rel="noopener"><span class="clink-icon">📘</span>Facebook</a>
         <a class="clink" href="https://www.instagram.com/sklepzastodola/" target="_blank" rel="noopener"><span class="clink-icon">📷</span>Instagram</a>
@@ -299,7 +299,7 @@
   <li><a href="jak-dzialamy.html">Jak działamy</a></li>
   <li><a href="kontakt.html">Kontakt</a></li>
 </ul></div>
-    <div class="footer-col"><h3>Kontakt</h3><ul><li><a href="tel:735115427">735 115 427</a></li><li><a href="tel:690000923">690 000 923</a></li><li><a href="mailto:kontakt@sklepzastodola.pl">kontakt@sklepzastodola.pl</a></li></ul></div>
+    <div class="footer-col"><h3>Kontakt</h3><ul><li><a href="tel:+48735115427">+48 735 115 427</a></li><li><a href="tel:+48690000923">+48 690 000 923</a></li><li><a href="mailto:kontakt@sklepzastodola.pl">kontakt@sklepzastodola.pl</a></li></ul></div>
   </div>
   <div class="footer-bottom"><p class="footer-copy">© 2026 Sklep za Stodołą Sp. z o.o.</p><div class="footer-links"><a href="polityka.html">Polityka prywatności</a></div></div>
 </footer>
@@ -324,7 +324,7 @@ document.getElementById('cform').addEventListener('submit', async function(e){
     body: formData,
     headers: { 'Accept': 'application/json' }
   });
-  if(!res.ok){ txt.textContent='Wyślij wiadomość →'; msg.textContent='Coś poszło nie tak. Zadzwoń: 735 115 427.'; msg.style.color='#c0392b'; msg.style.display='block'; btn.disabled=false; return; }
+  if(!res.ok){ txt.textContent='Wyślij wiadomość →'; msg.textContent='Coś poszło nie tak. Zadzwoń: +48 735 115 427.'; msg.style.color='#c0392b'; msg.style.display='block'; btn.disabled=false; return; }
   txt.textContent='✓ Wiadomość wysłana!';
   msg.textContent='Odezwiemy się w ciągu 24h. Dziękujemy!';
   msg.style.display='block'; msg.style.color='var(--moss)';

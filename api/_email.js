@@ -90,7 +90,7 @@ function wrapEmail(bodyHtml) {
     ${bodyHtml}
   </div>
   <div style="text-align:center;margin-top:22px;font-size:12px;color:#8a8070">
-    Sklep za Stodołą Sp. z o.o. &middot; 735 115 427 &middot; kontakt@sklepzastodola.pl &middot; sklepzastodola.pl
+    Sklep za Stodołą Sp. z o.o. &middot; +48 735 115 427 &middot; kontakt@sklepzastodola.pl &middot; sklepzastodola.pl
   </div>
 </div>
 </body></html>`;
@@ -121,7 +121,7 @@ function buildAdvisorEmailHtml(payload) {
     </div>` : ""}
     <p style="line-height:1.6;font-size:14px">Jeśli chcesz zobaczyć dokładną cenę, możesz wypełnić nasz konfigurator — zajmuje kilka minut.</p>
     ${ctaButton(`${SITE_URL}/brief.html`, "Otwórz konfigurator")}
-    <p style="line-height:1.6;font-size:13px;color:#6b6454;margin-top:20px;text-align:center">Masz pytania? Zadzwoń: <strong>735 115 427</strong></p>
+    <p style="line-height:1.6;font-size:13px;color:#6b6454;margin-top:20px;text-align:center">Masz pytania? Zadzwoń: <strong>+48 735 115 427</strong></p>
   `);
 }
 
@@ -137,9 +137,9 @@ function buildAdvisorEmailText(payload) {
     "Jeśli chcesz zobaczyć dokładną cenę, wypełnij konfigurator (kilka minut):",
     `${SITE_URL}/brief.html`,
     "",
-    "Masz pytania? Zadzwoń: 735 115 427.",
+    "Masz pytania? Zadzwoń: +48 735 115 427.",
     "",
-    "Sklep za Stodołą Sp. z o.o. — 735 115 427 — kontakt@sklepzastodola.pl — sklepzastodola.pl"
+    "Sklep za Stodołą Sp. z o.o. — +48 735 115 427 — kontakt@sklepzastodola.pl — sklepzastodola.pl"
   ].join("\n");
 }
 

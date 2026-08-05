@@ -318,7 +318,7 @@ async function buildOfferPdf(data) {
   const discLines = wrapText(font, 8, disclaimer, CONTENT_W);
   let fy = footerY;
   discLines.forEach(line => { page().drawText(line, { x: MARGIN, y: fy, size: 8, font, color: DIM }); fy -= 11; });
-  page().drawText("735 115 427  ·  kontakt@sklepzastodola.pl  ·  sklepzastodola.pl", {
+  page().drawText("+48 735 115 427  ·  kontakt@sklepzastodola.pl  ·  sklepzastodola.pl", {
     x: MARGIN, y: fy - 8, size: 9, font: fontBold, color: FOREST
   });
 

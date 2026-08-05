@@ -100,7 +100,7 @@
   if(document.getElementById('nav') && !document.getElementById('sticky-mobile-cta')){
     document.body.insertAdjacentHTML('beforeend',
       '<div class="sticky-mobile-cta" id="sticky-mobile-cta">' +
-        '<a href="tel:735115427" class="smc-call">📞 Zadzwoń</a>' +
+        '<a href="tel:+48735115427" class="smc-call">📞 Zadzwoń</a>' +
         '<a href="index.html#kalkulator" class="smc-calc">📊 Policz opłacalność</a>' +
       '</div>'
     );

@@ -1712,6 +1712,15 @@
     </div>
     </div>
 
+    <div class="tabPane" id="tabpane-telefony">
+    <div class="section">
+      <h2>Telefony klientów <button class="addBtn" onclick="exportTelefonyToXlsx()">⬇ Eksportuj do Excela</button></h2>
+      <p style="color:var(--muted);margin:-8px 0 14px">Wszystkie numery telefonów klientów w jednym miejscu — do szybkiego dzwonienia i eksportu.</p>
+      <input type="text" id="searchTelefony" placeholder="Szukaj po nazwie lub numerze..." oninput="renderTelefony()" style="margin-bottom:14px;max-width:360px;width:100%">
+      <div id="list-telefony"></div>
+    </div>
+    </div>
+
     <div class="tabPane" id="tabpane-doradcy">
     <div class="section" id="section-doradcy">
       <h2>Baza doradców rolnych</h2>
@@ -2228,7 +2237,8 @@ function syncNavigationFromTab(name){
     mailtemplates:"sales-mail-templates",
     marketing:"marketing-home",
     materialy:"docs-materials",
-    ustawienia:"ai-settings"
+    ustawienia:"ai-settings",
+    telefony:"clients-phones"
   };
   if(name === "klienci"){
     const clientMap = {
@@ -2383,7 +2393,7 @@ Zawsze mówimy wprost:
 
 Nie wciskamy rozwiązania na siłę. Jeśli po rozmowie uznamy, że mlekomat nie jest dla Was najlepszym pomysłem — też to szczerze powiemy.
 
-Chcecie taką szczerą rozmowę? Napiszcie lub zadzwońcie: 735 115 427.`
+Chcecie taką szczerą rozmowę? Napiszcie lub zadzwońcie: +48 735 115 427.`
     }
   ];
 }
@@ -3791,6 +3801,7 @@ function render(){
   renderStatsBar();
   renderActivityLog();
   renderClients();
+  renderTelefony();
   renderDoradcyRolni();
   fillDocumentClientOptions();
 
@@ -4308,7 +4319,8 @@ const PANEL_NAV = {
       {key:"clients-directory", label:"Lista klientów", tab:"klienci", clientsView:"directory", priority:true},
       {key:"clients-followups", label:"Do kontaktu", tab:"klienci", clientsView:"followups"},
       {key:"clients-advisor", label:"Advisor", tab:"klienci", clientsView:"advisor"},
-      {key:"clients-advisorolx", label:"Advisor OLX", tab:"klienci", clientsView:"advisorolx"}
+      {key:"clients-advisorolx", label:"Advisor OLX", tab:"klienci", clientsView:"advisorolx"},
+      {key:"clients-phones", label:"Telefony klientów", tab:"telefony"}
     ]
   },
   sales: {
@@ -5713,6 +5725,49 @@ function exportClientsToXlsx(){
   const dateStr = new Date().toISOString().slice(0,10);
   XLSX.writeFile(wb, `Baza_klientow_${dateStr}.xlsx`);
   logActivity("wyeksportował(a) bazę klientów do XLSX");
+}
+
+function clientsWithPhone(){
+  return (data.klienci||[]).filter(c => (c.telefon||"").toString().trim());
+}
+
+function renderTelefony(){
+  const list = document.getElementById("list-telefony");
+  if(!list) return;
+  const q = (document.getElementById("searchTelefony")?.value || "").toLowerCase().trim();
+  const rows = clientsWithPhone()
+    .filter(c => !q || clientName(c).toLowerCase().includes(q) || (c.telefon||"").toLowerCase().includes(q))
+    .sort((a,b) => clientName(a).localeCompare(clientName(b), "pl"));
+  if(!rows.length){
+    list.innerHTML = `<div class="empty">${q ? "Brak numerów pasujących do wyszukiwania." : "Brak zapisanych numerów telefonów — dodaj telefon na karcie klienta."}</div>`;
+    return;
+  }
+  list.innerHTML = rows.map(c => `
+    <div class="terminItem">
+      <div class="terminDate"><a href="tel:${crmEsc(c.telefon.toString().replace(/\s+/g,""))}">${crmEsc(c.telefon)}</a></div>
+      <div class="terminInfo">
+        <div class="nazwa">${crmEsc(clientName(c))}</div>
+        <div class="notatka">${crmEsc(c.miejscowosc || "")}</div>
+      </div>
+      <button class="histBtn" onclick="openClientCard('${crmEsc(c.id)}')">Karta klienta</button>
+    </div>
+  `).join("");
+}
+
+function exportTelefonyToXlsx(){
+  const rows = clientsWithPhone().map(c => ({
+    "Klient": clientName(c),
+    "Telefon": c.telefon,
+    "Miejscowość": c.miejscowosc || "",
+    "Status": STATUS_OPTS.find(s=>s[0]===c.status)?.[1] || c.status || ""
+  }));
+  if(!rows.length){ alert("Brak zapisanych numerów telefonów do eksportu."); return; }
+  const ws = XLSX.utils.json_to_sheet(rows);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "Telefony");
+  const dateStr = new Date().toISOString().slice(0,10);
+  XLSX.writeFile(wb, `Telefony_klientow_${dateStr}.xlsx`);
+  logActivity("wyeksportował(a) listę telefonów klientów do XLSX");
 }
 
 function xlsxVal(row, names){
@@ -8423,7 +8478,7 @@ W rozmowie doprecyzujemy:
 Pozdrawiam
 Jakub Deczyński
 Sklep za Stodołą sp. z o.o.
-735 115 427
++48 735 115 427
 www.sklepzastodola.pl`
   },
   {
@@ -8451,7 +8506,7 @@ Po tych informacjach przygotuję konkretniejszą rekomendację: Start, Standard 
 Pozdrawiam
 Jakub Deczyński
 Sklep za Stodołą sp. z o.o.
-735 115 427
++48 735 115 427
 www.sklepzastodola.pl`
   },
   {
@@ -8477,7 +8532,7 @@ Proponowany następny krok: ${v.nextStep}.
 Pozdrawiam
 Jakub Deczyński
 Sklep za Stodołą sp. z o.o.
-735 115 427
++48 735 115 427
 www.sklepzastodola.pl`
   },
   {
@@ -8505,7 +8560,7 @@ Po doprecyzowaniu tych informacji przygotuję propozycję dopasowaną do Państw
 Pozdrawiam
 Jakub Deczyński
 Sklep za Stodołą sp. z o.o.
-735 115 427
++48 735 115 427
 www.sklepzastodola.pl`
   }
 ];
