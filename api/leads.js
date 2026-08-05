@@ -11,7 +11,12 @@ const {
   buildOfferShowcaseEmailHtml,
   buildOfferShowcaseEmailText
 } = require("./_email");
-const { htmlToPdf } = require("./_html-to-pdf");
+const { buildOfferPdf } = require("./_offer-pdf");
+
+function briefConfigLines(payload) {
+  const raw = String(payload.konfiguracja || "").replace(/^\[[^\]]*\]\s*/, "");
+  return raw.split(/\s*\|\s*/).filter(Boolean);
+}
 
 function fmtZl(n) {
   const num = Number(n);
@@ -20,46 +25,122 @@ function fmtZl(n) {
 
 const DEFAULT_INDIVIDUAL_QUOTE_ITEMS = ["Transport i dostawa", "Rozładunek, ustawienie i uruchomienie", "Serwis pogwarancyjny"];
 
-// Single source of truth for the offer: both the email body and the
-// attached PDF render from this same object (in fact from the exact same
-// HTML string — see the dispatch code below), so they can never show
-// different products, prices, or photos.
-function buildShowcaseData(payload, lead) {
-  const mNetto = Number(payload.mlekomat_netto) || 0;
-  const sNetto = Number(payload.sielaff_netto) || 0;
-  const mBrutto = Number(payload.mlekomat_brutto) || 0;
-  const sBrutto = Number(payload.sielaff_brutto) || 0;
-  const konfigText = String(payload.konfiguracja || "");
-  // Fall back to keyword sniffing when no priced line was sent (e.g. an
-  // individually-quoted Sielaff config, or butelki/pawilon which never
-  // have a catalog price) so the block still shows.
-  const hasMlekomat = mNetto > 0 || /mlekomat|brunimat/i.test(konfigText);
-  const hasSielaff = sNetto > 0 || /sielaff/i.test(konfigText);
-  const hasButelki = /butelk/i.test(konfigText);
-  const hasPawilon = /pawilon/i.test(konfigText);
-  return {
-    clientName: lead.osoba || lead.firma || "",
-    location: [lead.miejscowosc, lead.wojewodztwo].filter(Boolean).join(", "),
-    hasMlekomat,
-    hasSielaff,
-    hasButelki,
-    hasPawilon,
-    mlekomatPriceNetto: mNetto > 0 ? fmtZl(mNetto) : "",
-    mlekomatPriceBrutto: mBrutto > 0 ? fmtZl(mBrutto) : "",
-    sielaffPriceNetto: sNetto > 0 ? fmtZl(sNetto) : "",
-    sielaffPriceBrutto: sBrutto > 0 ? fmtZl(sBrutto) : "",
-    totalNetto: (mNetto > 0 || sNetto > 0) ? (payload.cena_netto && payload.cena_netto !== "—" ? payload.cena_netto : "") : "",
-    totalBrutto: (mNetto > 0 || sNetto > 0) ? (payload.cena_brutto && payload.cena_brutto !== "—" ? payload.cena_brutto : "") : "",
-    individualQuoteItems: DEFAULT_INDIVIDUAL_QUOTE_ITEMS
-  };
+function mlekomatIncludedItems(konfigText) {
+  const items = [
+    "Certyfikat CE-MID — legalizowany pomiar wydawanej ilości",
+    "System gotówkowy — monety i banknoty z automatycznym wydawaniem reszty",
+    "Drukarka paragonów po każdej transakcji",
+    "Ogrzewanie termostatyczne Anti-Frost"
+  ];
+  const t = (konfigText || "").toLowerCase();
+  if (t.includes("gsm")) items.push("Monitoring GSM — zdalny podgląd i kontrola poziomu mleka");
+  if (t.includes("płukanie") || t.includes("plukanie")) items.push("Automatyczne płukanie strefy dozowania");
+  if (t.includes("alarm")) items.push("Alarm i syrena antywłamaniowa");
+  if (t.includes("kartą") || t.includes("karta") || t.includes("nayax")) items.push("Płatność kartą (terminal Nayax)");
+  return items;
 }
 
-// Prints the exact offer-email HTML to a PDF via headless Chromium, so the
-// attachment is pixel-identical to the email body instead of a separately
-// maintained pdf-lib layout that can drift from it.
-async function buildBriefPdfAttachment(html, lead) {
+function sielaffIncludedItems() {
+  return [
+    "Chłodzenie zapewniające świeżość produktów przez cały dzień",
+    "Ekran dotykowy z czytelną prezentacją oferty",
+    "Płatność gotówką i/lub kartą, w zależności od wybranej opcji"
+  ];
+}
+
+function buildInsightCards(payload, priorHistoria) {
+  const cards = [];
+  const krowy = String(payload.krowy || "");
+  const litry = String(payload.litry || "");
+  const pawilon = String(payload.pawilon || "");
+
+  if (litry && !/^do 50/i.test(litry)) {
+    cards.push({
+      title: "Wystarczająca produkcja",
+      desc: `Zadeklarowana produkcja (${litry}) daje realny wolumen do sprzedaży bezpośredniej bez ryzyka pustego punktu.`
+    });
+  }
+  if (/tak/i.test(pawilon)) {
+    cards.push({
+      title: "Gotowe miejsce na start",
+      desc: "Masz już miejsce pod automat — to skraca czas wdrożenia, bo nie czekamy na budowę pawilonu."
+    });
+  } else if (/nie/i.test(pawilon)) {
+    cards.push({
+      title: "Pawilon do zaplanowania",
+      desc: "Nie masz jeszcze gotowego miejsca — pomożemy dobrać i wycenić drewniany pawilon pod automat."
+    });
+  }
+
+  // Enrich from a prior Advisor submission on the same client, if present.
+  const advisorEntry = (priorHistoria || []).find(h => /^\[advisor\]/i.test(String(h.tekst || "")));
+  if (advisorEntry) {
+    const text = String(advisorEntry.tekst || "");
+    if (/nieformaln[aą] baz[eę] klient[oó]w.*TAK/i.test(text)) {
+      cards.push({
+        title: "Stała grupa odbiorców",
+        desc: "Z ankiety Advisor wynika, że masz już nieformalną bazę klientów — to zmniejsza ryzyko startu."
+      });
+    }
+    if (/dost[eę]p do energii elektrycznej.*TAK/i.test(text) && /dost[eę]p do wody.*TAK/i.test(text)) {
+      cards.push({
+        title: "Media na miejscu",
+        desc: "Masz już dostęp do prądu i wody w lokalizacji — instalacja będzie prostsza i szybsza."
+      });
+    }
+  }
+
+  cards.push({
+    title: "Sprzedaż przez cały rok",
+    desc: "Konfiguracja z ogrzewaniem Anti-Frost pozwala sprzedawać bez przerw również zimą."
+  });
+  cards.push({
+    title: "Rozbudowa w kolejnych etapach",
+    desc: "Automat na butelki i urządzenia na inne produkty można dołączyć po uruchomieniu mlekomatu."
+  });
+  return cards.slice(0, 6);
+}
+
+function buildPhotos(konfigText) {
+  const t = (konfigText || "").toLowerCase();
+  const photos = [];
+  if (t.includes("mlekomat") || t.includes("brunimat")) {
+    photos.push({ file: "automat2.jpg", caption: "Mlekomat BRUNIMAT — front z dozownikiem" });
+  }
+  if (t.includes("sielaff")) {
+    photos.push({ file: "sielaff-combi-m.jpg", caption: "Automat chłodniczy Sielaff SiLine SÜ Combi-M" });
+  }
+  return photos;
+}
+
+async function buildBriefPdfAttachment(payload, lead, priorHistoria) {
   try {
-    const pdfBuffer = await htmlToPdf(html);
+    const priceLines = [];
+    const mNetto = Number(payload.mlekomat_netto) || 0;
+    const sNetto = Number(payload.sielaff_netto) || 0;
+    if (mNetto > 0) priceLines.push({ label: "Mlekomat BRUNIMAT 650 Premium DUO", netto: fmtZl(mNetto) });
+    if (sNetto > 0) priceLines.push({ label: "Automat chłodniczy Sielaff SiLine SÜ Combi-M", netto: fmtZl(sNetto) });
+
+    const konfigText = String(payload.konfiguracja || "");
+    const includedItems = [
+      ...(mNetto > 0 ? mlekomatIncludedItems(konfigText) : []),
+      ...(sNetto > 0 ? sielaffIncludedItems() : [])
+    ];
+
+    const pdfBuffer = await buildOfferPdf({
+      clientName: lead.osoba || lead.firma || "",
+      location: [lead.miejscowosc, lead.wojewodztwo].filter(Boolean).join(", "),
+      productTitle: lead.produkt || lead.zainteresowanie || "Oferta dla Twojego gospodarstwa",
+      productDesc: "Oferta wstępna przygotowana na podstawie konfiguracji wybranej w konfiguratorze.",
+      recommendation: "Poniżej znajdziesz wybraną konfigurację i orientacyjną cenę katalogową. Skontaktujemy się, żeby dopiąć szczegóły i potwierdzić dostępność.",
+      configLines: briefConfigLines(payload),
+      priceLines,
+      totalNetto: priceLines.length ? (payload.cena_netto && payload.cena_netto !== "—" ? payload.cena_netto : "") : "",
+      totalBrutto: priceLines.length ? (payload.cena_brutto && payload.cena_brutto !== "—" ? payload.cena_brutto : "") : "",
+      insightCards: buildInsightCards(payload, priorHistoria),
+      includedItems,
+      photos: buildPhotos(konfigText)
+    });
     const safeName = (lead.osoba || lead.firma || "klient").toLowerCase()
       .replace(/[^a-z0-9]+/gi, "-").replace(/^-+|-+$/g, "").slice(0, 40) || "klient";
     return [{
@@ -379,16 +460,33 @@ module.exports = async function handler(req, res) {
             text: buildAdvisorEmailText(payload)
           });
         } else {
-          // One data object, one rendered HTML string — the PDF attachment
-          // is that exact HTML printed by headless Chrome, so email and PDF
-          // can never disagree on products, prices, or photos.
-          const showcaseData = buildShowcaseData(payload, lead);
-          const html = buildOfferShowcaseEmailHtml(showcaseData);
-          const attachments = await buildBriefPdfAttachment(html, lead);
+          const attachments = await buildBriefPdfAttachment(payload, lead, mutation.result.priorHistoria || []);
+          const mNetto = Number(payload.mlekomat_netto) || 0;
+          const sNetto = Number(payload.sielaff_netto) || 0;
+          const mBrutto = Number(payload.mlekomat_brutto) || 0;
+          const sBrutto = Number(payload.sielaff_brutto) || 0;
+          const konfigText = String(payload.konfiguracja || "");
+          // Fall back to keyword sniffing when no priced line was sent (e.g.
+          // an individually-quoted Sielaff config) so the block still shows.
+          const hasMlekomat = mNetto > 0 || /mlekomat|brunimat/i.test(konfigText);
+          const hasSielaff = sNetto > 0 || /sielaff/i.test(konfigText);
+          const showcaseData = {
+            clientName: lead.osoba || lead.firma || "",
+            location: [lead.miejscowosc, lead.wojewodztwo].filter(Boolean).join(", "),
+            hasMlekomat,
+            hasSielaff,
+            mlekomatPriceNetto: mNetto > 0 ? fmtZl(mNetto) : "",
+            mlekomatPriceBrutto: mBrutto > 0 ? fmtZl(mBrutto) : "",
+            sielaffPriceNetto: sNetto > 0 ? fmtZl(sNetto) : "",
+            sielaffPriceBrutto: sBrutto > 0 ? fmtZl(sBrutto) : "",
+            totalNetto: (mNetto > 0 || sNetto > 0) ? (payload.cena_netto && payload.cena_netto !== "—" ? payload.cena_netto : "") : "",
+            totalBrutto: (mNetto > 0 || sNetto > 0) ? (payload.cena_brutto && payload.cena_brutto !== "—" ? payload.cena_brutto : "") : "",
+            individualQuoteItems: DEFAULT_INDIVIDUAL_QUOTE_ITEMS
+          };
           await sendEmail({
             to: lead.email,
             subject: "Twoja oferta — Sklep za Stodołą",
-            html,
+            html: buildOfferShowcaseEmailHtml(showcaseData),
             text: buildOfferShowcaseEmailText(showcaseData),
             attachments
           });

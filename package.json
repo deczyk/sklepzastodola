@@ -4,9 +4,7 @@
   "version": "1.0.0",
   "description": "Static site + Vercel serverless functions for sklepzastodola.pl",
   "dependencies": {
-    "@pdf-lib/fontkit": "^1.1.1",
-    "@sparticuz/chromium": "^149.0.0",
     "pdf-lib": "^1.17.1",
-    "puppeteer-core": "^25.5.0"
+    "@pdf-lib/fontkit": "^1.1.1"
   }
 }

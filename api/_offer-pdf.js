@@ -237,9 +237,7 @@ async function buildOfferPdf(data) {
     for (const item of priceLines) {
       ensureSpace(16);
       page().drawText(item.label, { x: MARGIN, y: ctx.y, size: 9.5, font, color: MUTED });
-      // Priced items read as "62 730 zł netto"; free-text items ("wycena
-      // indywidualna") should stand on their own, not "wycena indywidualna netto".
-      const nettoTxt = /zł/i.test(item.netto) ? `${item.netto} netto` : String(item.netto);
+      const nettoTxt = `${item.netto} netto`;
       const nw = fontBold.widthOfTextAtSize(nettoTxt, 10);
       page().drawText(nettoTxt, { x: PAGE_W - MARGIN - nw, y: ctx.y, size: 10, font: fontBold, color: INK });
       ctx.y -= 15;
