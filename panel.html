@@ -2061,7 +2061,7 @@
         </div>
         <textarea id="historyNewEntry" placeholder="Np. [kontakt] Dzwoniłem, zainteresowany, oddzwaniam za tydzień..."></textarea>
         <label>Notatka głosowa / nagranie z telefonu
-          <input type="file" id="historyNewAudio" accept="audio/amr,audio/*">
+          <input type="file" id="historyNewAudio" accept="audio/amr,audio/*,.amr,.m4a">
           <span class="audioHint">Najlepiej krótki plik M4A/MP3 z telefonu. Limit: 2 MB, żeby synchronizacja panelu działała stabilnie.</span>
         </label>
         <div class="audioTools">
@@ -2984,12 +2984,34 @@ function historyTextHtml(value){
 const AUDIO_NOTE_MAX_BYTES = 2 * 1024 * 1024;
 const AUDIO_TRANSCRIPTION_MAX_BYTES = 8 * 1024 * 1024;
 
+// Wiele telefonów/przeglądarek nie nadaje poprawnego MIME-typu plikom .amr i .m4a
+// (file.type bywa pusty albo "video/mp4"). Dlatego oprócz MIME sprawdzamy rozszerzenie.
+const AUDIO_EXTENSION_MIME = {
+  amr: "audio/amr",
+  m4a: "audio/mp4",
+  mp3: "audio/mpeg",
+  wav: "audio/wav",
+  ogg: "audio/ogg",
+  oga: "audio/ogg",
+  aac: "audio/aac",
+  webm: "audio/webm",
+  "3gp": "audio/3gpp",
+  flac: "audio/flac"
+};
+
+function resolveAudioFileType(file){
+  if(file.type && file.type.startsWith("audio/")) return file.type;
+  const ext = (file.name || "").split(".").pop().toLowerCase();
+  return AUDIO_EXTENSION_MIME[ext] || null;
+}
+
 function readAudioNoteFile(input){
   const file = input?.files?.[0];
   if(!file) return Promise.resolve(null);
-  if(!file.type.startsWith("audio/")){
+  const resolvedType = resolveAudioFileType(file);
+  if(!resolvedType){
     input.value = "";
-    return Promise.reject(new Error("Dodaj plik audio, np. nagranie M4A albo MP3."));
+    return Promise.reject(new Error("Dodaj plik audio, np. nagranie AMR, M4A albo MP3."));
   }
   if(file.size > AUDIO_NOTE_MAX_BYTES){
     input.value = "";
@@ -2999,7 +3021,7 @@ function readAudioNoteFile(input){
     const reader = new FileReader();
     reader.onload = () => resolve({
       audioName: file.name,
-      audioType: file.type || "audio/mpeg",
+      audioType: resolvedType,
       audioSize: file.size,
       audioData: reader.result
     });
@@ -3011,9 +3033,10 @@ function readAudioNoteFile(input){
 function readAudioFileForTranscription(input){
   const file = input?.files?.[0];
   if(!file) return Promise.reject(new Error("Najpierw wybierz nagranie z telefonu."));
-  if(!file.type.startsWith("audio/")){
+  const resolvedType = resolveAudioFileType(file);
+  if(!resolvedType){
     input.value = "";
-    return Promise.reject(new Error("Dodaj plik audio, np. nagranie M4A albo MP3."));
+    return Promise.reject(new Error("Dodaj plik audio, np. nagranie AMR, M4A albo MP3."));
   }
   if(file.size > AUDIO_TRANSCRIPTION_MAX_BYTES){
     return Promise.reject(new Error("Nagranie jest za duże do transkrypcji w panelu. Maksymalny rozmiar to 8 MB."));
@@ -3022,7 +3045,7 @@ function readAudioFileForTranscription(input){
     const reader = new FileReader();
     reader.onload = () => resolve({
       name: file.name,
-      mimeType: file.type || "audio/mpeg",
+      mimeType: resolvedType,
       size: file.size,
       contentBase64: reader.result
     });
@@ -3315,7 +3338,7 @@ function renderQuickClientUpdate(c){
       </div>
       <label class="quickUpdateNote">Notatka<textarea data-quick-field="note" placeholder="Wpisz notatkę dokładnie tak, jak chcesz ją widzieć w historii kontaktu."></textarea></label>
       <label class="quickUpdateNote">Notatka głosowa / nagranie z telefonu
-        <input type="file" data-quick-field="audio" accept="audio/amr,audio/*">
+        <input type="file" data-quick-field="audio" accept="audio/amr,audio/*,.amr,.m4a">
         <span class="audioHint">Możesz wkleić nagranie rozmowy z telefonu. Limit: 2 MB, żeby synchronizacja panelu działała stabilnie.</span>
       </label>
       <div class="audioTools">
