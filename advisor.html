@@ -62,7 +62,7 @@
     .switch input:checked+.slider{background:var(--green-700)} .switch input:checked+.slider::before{transform:translateX(24px)}
     footer{padding:28px 36px 40px;color:var(--muted);text-align:center}.printOnly{display:none}footer .brand{font-weight:bold;color:var(--green-900)}footer a{color:var(--green-900)}
     @media(max-width:900px){.grid,.row,.row3,.kpis,.package-grid{grid-template-columns:1fr}header{align-items:flex-start;flex-direction:column;padding:13px 16px}header>a:first-child{align-items:flex-start!important;min-height:auto}.wrap{padding-inline:14px}}
-    @media print{body{background:white}.topbar,header,.noPrint,button{display:none!important}.wrap{max-width:none;padding:0}.card{box-shadow:none;border:0;border-radius:0;page-break-inside:avoid}.printOnly{display:block}}
+    @media print{body{background:white}.topbar,header,.noPrint,button{display:none!important}.wrap{max-width:none;padding:0}.card{box-shadow:none;border:0;border-radius:0;page-break-inside:avoid}.printOnly{display:block}#auditWrap{display:block!important}}
   </style>
 </head>
 <body>
@@ -85,8 +85,8 @@
 
 <div class="wrap">
   <div class="intro">
-    <p><strong>Do czego służy to narzędzie?</strong> To kalkulator doradczy przygotowany przez Sklep za Stodołą, który pomaga oszacować potencjał uruchomienia sprzedaży bezpośredniej w jednym z trzech pakietów: START, SPRZEDAŻOWY albo PREMIUM.</p>
-    <p>Wypełnij dane w polach poniżej (albo zostaw podpowiedzi jako orientacyjny przykład) i kliknij <strong>„Przelicz i wyślij wynik do Sklep za Stodołą”</strong> — zobaczysz wynik na ekranie, a my dostaniemy komplet danych do dopasowania oferty. Wynik możesz też zapisać jako PDF.</p>
+    <p><strong>Sprawdź, czy Twoje gospodarstwo może zarabiać więcej na bezpośredniej sprzedaży mleka i produktów rolnych.</strong> Wspieramy gospodarstwa rolne w sprzedaży mleka i innych produktów rolnych — mlekomat to jeden z elementów kanału sprzedaży bezpośredniej, który razem ustawiamy.</p>
+    <p>Wypełnij 3 minuty. Otrzymasz orientacyjny potencjał, ROI i rekomendację pakietu (START, SPRZEDAŻOWY albo PREMIUM). Wynik możesz od razu zapisać jako PDF.</p>
   </div>
   <div class="card noPrint">
     <div class="actions">
@@ -102,20 +102,21 @@
   <div class="grid">
     <section class="card">
       <h2>1. Dane gospodarstwa</h2>
-      <div class="row"><div><label>Nazwa gospodarstwa</label><input id="farm"></div><div><label>Osoba kontaktowa</label><input id="owner"></div></div>
-      <div class="row3"><div><label>Województwo</label><input id="region"></div><div><label>Powiat</label><input id="county"></div><div><label>Telefon</label><input id="phone"></div></div>
-      <div class="row"><div><label>E-mail klienta</label><input id="email" type="email" autocomplete="email"></div></div>
-      <div class="row"><div><label>Co Cię interesuje?</label><select id="interest" onchange="renderAuditQuestions()">
+      <div class="row"><div><label for="farm">Nazwa gospodarstwa</label><input id="farm"></div><div><label for="owner">Osoba kontaktowa</label><input id="owner"></div></div>
+      <div class="row3"><div><label for="region">Województwo</label><input id="region"></div><div><label for="county">Powiat</label><input id="county"></div><div><label for="phone">Telefon</label><input id="phone" type="tel" autocomplete="tel"></div></div>
+      <div class="row"><div><label for="email">E-mail klienta</label><input id="email" type="email" autocomplete="email"></div></div>
+      <div class="row"><div><label for="interest">Co Cię interesuje?</label><select id="interest" onchange="renderAuditQuestions()">
         <option value="sprzedazowy">Pakiet SPRZEDAŻOWY — mlekomat + pawilon + wdrożenie</option>
         <option value="start">Pakiet START — mlekomat i podstawowe wdrożenie</option>
         <option value="premium">Pakiet PREMIUM — pełny system i priorytetowa opieka</option>
         <option value="niezdecydowany">Nie wiem jeszcze — proszę o dobór pakietu</option>
       </select></div></div>
-      <div class="row3"><div><label>Liczba krów mlecznych</label><input type="number" id="cows" value="15"></div><div><label>Średnia wydajność l/krowę/dzień</label><input type="number" id="yield" value="25"></div><div><label>Powierzchnia gospodarstwa ha</label><input type="number" id="ha" value="20"></div></div>
+      <div class="row3"><div><label for="cows">Liczba krów mlecznych</label><input type="number" id="cows" value="15"></div><div><label for="yield">Średnia wydajność l/krowę/dzień</label><input type="number" id="yield" value="25"></div><div><label for="ha">Powierzchnia gospodarstwa ha</label><input type="number" id="ha" value="20"></div></div>
     </section>
 
     <section class="card">
       <h2>2. Wynik inwestycji</h2>
+      <div id="sampleNotice" class="warn" style="display:none;margin-bottom:14px;font-size:.85rem;font-weight:700">Przykładowy scenariusz. Wpisz dane gospodarstwa, aby otrzymać własną kalkulację.</div>
       <div class="kpis">
         <div class="kpi"><b id="scoreTxt">0%</b><span>potencjał projektu</span></div>
         <div class="kpi"><b id="roiTxt">0</b><span>scenariusz bez dofinansowania / lata</span></div>
@@ -130,18 +131,22 @@
 
   <div class="grid">
     <section class="card">
-      <h2>3. Audyt projektu</h2>
-      <table><thead><tr><th>Pytanie</th><th>Odpowiedź</th></tr></thead><tbody id="auditTable"></tbody></table>
+      <h2>3. Audyt projektu <span style="font-weight:400;font-size:.75rem;color:var(--muted)">(opcjonalny — doprecyzowuje wynik)</span></h2>
+      <p style="margin:0 0 14px;color:var(--muted);font-size:.9rem">Wynik w sekcji 2 liczy się już z danych podstawowych. Rozwiń audyt szczegółowy (19 pytań), żeby doprecyzować ocenę potencjału.</p>
+      <button type="button" class="btn btn-ghost noPrint" id="auditToggle" onclick="toggleAudit()">Audyt szczegółowy (opcjonalnie) ▾</button>
+      <div id="auditWrap" style="display:none;margin-top:14px">
+        <table><thead><tr><th>Pytanie</th><th>Odpowiedź</th></tr></thead><tbody id="auditTable"></tbody></table>
+      </div>
     </section>
 
     <section class="card">
       <h2>4. Ekonomia i finansowanie</h2>
-      <div class="row"><div><label>Cena mleka w skupie PLN/l</label><input type="number" step="0.01" id="priceDairy" value="1.90"></div><div><label>Cena sprzedaży bezpośredniej PLN/l</label><input type="number" step="0.01" id="priceDirect" value="5.50"></div></div>
-      <div class="row"><div><label>Sprzedaż przez mlekomat l/dzień (cel / plan)</label><input type="number" id="litersDirect" value="100"></div><div><label>Koszt inwestycji PLN</label><input type="number" id="investment" value="70000"></div></div>
-      <div class="row"><div><label>Realny % sprzedaży zakładanej produkcji</label><input type="number" id="sellThrough" value="70"><p style="font-size:11px;color:#888;margin:4px 0 0">Uwzględnia zasuszenie, wahania popytu, choroby, mleko na potrzeby własne. 100% zakłada sprzedaż całej produkcji bez przerw — rzadko realne.</p></div><div><label>Roczne koszty eksploatacyjne PLN</label><input type="number" id="opCosts" value="12000"><p style="font-size:11px;color:#888;margin:4px 0 0">Energia, mycie/dezynfekcja, serwis i części, transport mleka, straty, obsługa płatności, opakowania.</p></div></div>
-      <div class="row"><div><label>Dni sprzedaży w roku</label><input type="number" id="days" value="365"></div></div>
+      <div class="row"><div><label for="priceDairy">Cena mleka w skupie PLN/l</label><input type="number" step="0.01" id="priceDairy" value="1.90"></div><div><label for="priceDirect">Cena sprzedaży bezpośredniej PLN/l</label><input type="number" step="0.01" id="priceDirect" value="5.50"></div></div>
+      <div class="row"><div><label for="litersDirect">Sprzedaż przez mlekomat l/dzień (cel / plan)</label><input type="number" id="litersDirect" value="100"></div><div><label for="investment">Koszt inwestycji PLN</label><input type="number" id="investment" value="70000"></div></div>
+      <div class="row"><div><label for="sellThrough">Realny % sprzedaży zakładanej produkcji</label><input type="number" id="sellThrough" value="70"><p style="font-size:11px;color:#888;margin:4px 0 0">Uwzględnia zasuszenie, wahania popytu, choroby, mleko na potrzeby własne. 100% zakłada sprzedaż całej produkcji bez przerw — rzadko realne.</p></div><div><label for="opCosts">Roczne koszty eksploatacyjne PLN</label><input type="number" id="opCosts" value="12000"><p style="font-size:11px;color:#888;margin:4px 0 0">Energia, mycie/dezynfekcja, serwis i części, transport mleka, straty, obsługa płatności, opakowania.</p></div></div>
+      <div class="row"><div><label for="days">Dni sprzedaży w roku</label><input type="number" id="days" value="365"></div></div>
       <h3>Leasing / kredyt</h3>
-      <div class="row3"><div><label>Wkład własny %</label><input type="number" id="down" value="20"></div><div><label>Okres finansowania lata</label><input type="number" id="years" value="5"></div><div><label>Oprocentowanie roczne %</label><input type="number" step="0.1" id="rate" value="8"></div></div>
+      <div class="row3"><div><label for="down">Wkład własny %</label><input type="number" id="down" value="20"></div><div><label for="years">Okres finansowania lata</label><input type="number" id="years" value="5"></div><div><label for="rate">Oprocentowanie roczne %</label><input type="number" step="0.1" id="rate" value="8"></div></div>
       <div id="financeResult" class="ok" style="margin-top:14px"></div>
     </section>
   </div>
@@ -235,6 +240,24 @@ function getAuditAnswersText(interest){
 
 function v(id){return parseFloat(document.getElementById(id).value)||0;} function money(x){return Math.round(x).toLocaleString("pl-PL")+" zł";}
 
+function toggleAudit(){
+  const wrap=document.getElementById("auditWrap");
+  const btn=document.getElementById("auditToggle");
+  const open = wrap.style.display==="none";
+  wrap.style.display = open ? "block" : "none";
+  btn.textContent = open ? "Ukryj audyt szczegółowy ▴" : "Audyt szczegółowy (opcjonalnie) ▾";
+}
+
+const SAMPLE_DEFAULTS = {cows:"15",yield:"25",ha:"20",priceDairy:"1.90",priceDirect:"5.50",litersDirect:"100",investment:"70000",sellThrough:"70",opCosts:"12000",days:"365",down:"20",years:"5",rate:"8"};
+function isSampleData(){
+  const farm = document.getElementById("farm").value.trim();
+  if(farm) return false;
+  return Object.entries(SAMPLE_DEFAULTS).every(([id,val])=>{
+    const el=document.getElementById(id);
+    return el && el.value===val;
+  });
+}
+
 const INTEREST_LABELS = {
   start: "Pakiet START — mlekomat i podstawowe wdrożenie",
   sprzedazowy: "Pakiet SPRZEDAŻOWY — mlekomat + pawilon + wdrożenie",
@@ -279,6 +302,7 @@ function calculate(){
   const cashAfterFinance=netYear-payment*12;
   const farmName = document.getElementById("farm").value.trim() || "Twoje gospodarstwo";
 
+  document.getElementById("sampleNotice").style.display = isSampleData() ? "block" : "none";
   document.getElementById("scoreTxt").innerText=score+"%";document.getElementById("scoreBar").style.width=score+"%";
   document.getElementById("roiTxt").innerText=roi.toFixed(1);document.getElementById("roiEuTxt").innerText=roiEu.toFixed(1);document.getElementById("profitYearTxt").innerText=money(marginYear);
   const advice=document.getElementById("advice"); advice.className=`advice-box ${score>=80?"ok":score>=60?"warn":"bad"}`;
@@ -333,6 +357,20 @@ async function sendToUs(){
   const email = document.getElementById("email").value.trim();
   const region = document.getElementById("region").value.trim();
   const county = document.getElementById("county").value.trim();
+
+  const ownerEl = document.getElementById("owner");
+  const phoneEl = document.getElementById("phone");
+  const emailEl = document.getElementById("email");
+  [ownerEl, phoneEl, emailEl].forEach(el => el.style.borderColor = "");
+  if (!owner || (!phone && !email)) {
+    statusEl.textContent = "Podaj osobę kontaktową oraz telefon lub e-mail, żebyśmy mogli się z Tobą skontaktować.";
+    statusEl.style.color = "#a53a30";
+    if (!owner) ownerEl.style.borderColor = "#a53a30";
+    if (!phone && !email) { phoneEl.style.borderColor = "#a53a30"; emailEl.style.borderColor = "#a53a30"; }
+    (!owner ? ownerEl : phoneEl).focus();
+    return;
+  }
+
   const interestVal = document.getElementById("interest").value;
   const auditAnswers = getAuditAnswersText(interestVal);
   const answersText = [

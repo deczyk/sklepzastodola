@@ -197,10 +197,10 @@
   if(!document.getElementById('cookie')){
     document.body.insertAdjacentHTML('beforeend',
       '<div class="cookie" id="cookie" style="position:fixed;left:16px;right:16px;bottom:16px;z-index:9999;max-width:760px;margin:auto;background:#173a2f;color:#fff;border:1px solid rgba(255,255,255,.18);border-radius:16px;box-shadow:0 18px 50px rgba(0,0,0,.24);padding:14px 16px;display:none;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap">' +
-        '<p style="margin:0;font-size:14px;line-height:1.45">Ta strona uzywa plikow cookies. Pixel Meta i analityka wlaczaja sie dopiero po zgodzie. <a href="polityka.html" style="color:#f1d18a;text-decoration:underline">Polityka prywatnosci</a></p>' +
+        '<p style="margin:0;font-size:14px;line-height:1.45">Ta strona używa plików cookies. Piksel Meta i analityka włączają się dopiero po zgodzie. <a href="polityka.html" style="color:#f1d18a;text-decoration:underline">Polityka prywatności</a></p>' +
         '<div class="cookie-btns" style="display:flex;gap:8px;flex-wrap:wrap">' +
-          '<button class="ck-yes" onclick="setCk(&quot;yes&quot;)" style="border:0;border-radius:999px;padding:9px 13px;background:#d8a94f;color:#102b23;font-weight:800;cursor:pointer">Akceptuje</button>' +
-          '<button class="ck-no" onclick="setCk(&quot;no&quot;)" style="border:1px solid rgba(255,255,255,.35);border-radius:999px;padding:9px 13px;background:transparent;color:#fff;font-weight:800;cursor:pointer">Tylko niezbedne</button>' +
+          '<button class="ck-yes" onclick="setCk(&quot;yes&quot;)" style="border:0;border-radius:999px;padding:9px 13px;background:#d8a94f;color:#102b23;font-weight:800;cursor:pointer">Akceptuję</button>' +
+          '<button class="ck-no" onclick="setCk(&quot;no&quot;)" style="border:1px solid rgba(255,255,255,.35);border-radius:999px;padding:9px 13px;background:transparent;color:#fff;font-weight:800;cursor:pointer">Tylko niezbędne</button>' +
         '</div>' +
       '</div>'
     );
