@@ -476,10 +476,12 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--cr);color:var(
     }
 
     window.sendBrief=function(){
-      var name=readVal('f-name'),tel=readVal('f-tel'),woj=readVal('f-woj'),krowy=readVal('f-krowy'),litry=readVal('f-litry');
+      var name=readVal('f-name'),tel=readVal('f-tel'),email=readVal('f-email'),woj=readVal('f-woj'),krowy=readVal('f-krowy'),litry=readVal('f-litry');
+      var emailValid=/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
       var missing=[];
       if(!name)missing.push('imię i nazwisko');
       if(!tel)missing.push('numer telefonu');
+      if(!email||!emailValid)missing.push('poprawny adres e-mail');
       if(!woj)missing.push('województwo');
       if(!krowy)missing.push('liczbę krów');
       if(!litry)missing.push('dzienną produkcję mleka');
@@ -905,8 +907,8 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--cr);color:var(
         <input type="tel" id="f-tel" placeholder="600 000 000" required/>
       </div>
       <div class="field">
-        <label>Email</label>
-        <input type="email" id="f-email" placeholder="jan@kowalski.pl"/>
+        <label>Email *</label>
+        <input type="email" id="f-email" placeholder="jan@kowalski.pl" required/>
       </div>
       <div class="field">
         <label>Województwo *</label>
@@ -1186,11 +1188,13 @@ function goStep(n) {
   if (n === 3) {
     const name = document.getElementById('f-name').value.trim();
     const tel  = document.getElementById('f-tel').value.trim();
+    const email= document.getElementById('f-email').value.trim();
     const woj  = document.getElementById('f-woj').value;
     const krowy= document.getElementById('f-krowy').value;
     const litry= document.getElementById('f-litry').value;
-    if (!name || !tel || !woj || !krowy || !litry) {
-      alert('Wypełnij wymagane pola (imię, telefon, województwo, krowy, litry).');
+    const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    if (!name || !tel || !email || !emailValid || !woj || !krowy || !litry) {
+      alert('Wypełnij wymagane pola (imię, telefon, poprawny e-mail, województwo, krowy, litry).');
       return;
     }
     buildSummary();
