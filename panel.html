@@ -1769,6 +1769,7 @@
           <input type="file" id="olxXlsxInput" accept=".xlsx,.xls,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel" style="display:none" onchange="importOlxLeadsFromSelectedXlsx(this)">
           <button class="importBtn" onclick="document.getElementById('olxXlsxInput').click()">⇩ Wczytaj z Excela (telefon + link OLX)</button>
           <button class="importBtn" style="background:#3a6b4a" onclick="exportOlxLeadsToXlsx()">⇧ Eksportuj do XLSX</button>
+          <button class="importBtn" style="background:#3a6b4a" onclick="exportOlxLeadsNamesToXlsx()">⇧ Eksportuj telefon + nazwa (bez duplikatów)</button>
           <span id="olxImportMsg"></span>
         </div>
         <div class="newItemForm" style="display:flex;gap:8px;flex-wrap:wrap;margin:14px 0">
@@ -2779,6 +2780,12 @@ function fillMissingDefaults(d){
   if(normalizePanelDocuments(d)) changed = true;
   if(!d.sprawy || d.sprawy.length===0){ d.sprawy = dflt.sprawy; changed = true; }
   if(!d.klienci){ d.klienci = []; changed = true; }
+  (d.klienci || []).forEach(c => {
+    if(c && c.telefon){
+      const formattedTel = formatPhonePL(c.telefon);
+      if(formattedTel !== c.telefon){ c.telefon = formattedTel; changed = true; }
+    }
+  });
   if(!d.dziennik || typeof d.dziennik !== "object"){ d.dziennik = {}; changed = true; }
   if(!d.doradcyRolni){ d.doradcyRolni = []; changed = true; }
   if(!d.log){ d.log = []; changed = true; }
@@ -2793,6 +2800,12 @@ function fillMissingDefaults(d){
     changed = true;
   }
   if(!d.podwykonawcy){ d.podwykonawcy = []; changed = true; }
+  (d.podwykonawcy || []).forEach(p => {
+    if(p && p.telefon){
+      const formattedTel = formatPhonePL(p.telefon);
+      if(formattedTel !== p.telefon){ p.telefon = formattedTel; changed = true; }
+    }
+  });
   if(!d.powiadomienia){ d.powiadomienia = []; changed = true; }
   if(!d.checklisty){ d.checklisty = []; changed = true; }
   if(!d.planLipiec2026){ d.planLipiec2026 = defaultJulyActionPlan(); changed = true; }
@@ -4553,6 +4566,14 @@ function clientContact(c){
   return [c.telefon, c.email].filter(Boolean).join(" | ");
 }
 
+function formatPhonePL(value){
+  const raw = (value == null ? "" : value.toString()).trim();
+  if(!raw || raw.startsWith("+")) return raw;
+  let rest = raw.replace(/^0048\s*/, "").replace(/^48(?=[\s\d])/, "").trim();
+  if(/^0\d{9}$/.test(rest.replace(/\s+/g,""))) rest = rest.replace(/^0/, "");
+  return rest ? `+48 ${rest}` : rest;
+}
+
 function phoneHref(value){
   const digits = (value || "").replace(/[^\d+]/g,"");
   return digits ? `tel:${digits}` : "";
@@ -5382,6 +5403,7 @@ function openClientCard(clientId){
       <div class="clientCardField"><b>Czym zainteresowany</b>${clientField(c,null,"product")}</div>
       <div class="clientCardField"><b>Zainteresowanie</b>${clientField(c,null,"zain")}</div>
       <div class="clientCardField"><b>Co go powstrzymuje</b>${clientField(c,null,"objection")}</div>
+      <div class="clientCardField"><b>Termin następnego kontaktu</b>${clientField(c,"nastepnyFollowup","date")}</div>
     </div>
     ${renderQuickClientUpdate(c)}
     ${renderClientDocuments(c)}
@@ -5823,7 +5845,7 @@ function submitAddClient(){
     id:"c_"+Date.now(),
     firma, osoba,
     wojewodztwo: val("ac_wojewodztwo"), miejscowosc: val("ac_miejscowosc"), ulica: val("ac_ulica"),
-    telefon: val("ac_telefon"), email: val("ac_email"),
+    telefon: formatPhonePL(telefonNowy), email: val("ac_email"),
     zainteresowanie:"", priorytet: document.getElementById("ac_priorytet").value || "B",
     status:"nowy", notatki:"",
     nastepnyFollowup:"", zrodloLeada: document.getElementById("ac_zrodloLeada").value,
@@ -5855,7 +5877,7 @@ function updateClient(el){
   const c = data.klienci.find(x=>x.id===id);
   if(c){
     const oldVal = c[field];
-    c[field] = el.value;
+    c[field] = field === "telefon" ? formatPhonePL(el.value) : el.value;
     c.zaktualizowano = new Date().toISOString();
     if(field==="status" && oldVal!==el.value){
       logActivity(`zmienił(a) status klienta „${c.firma||c.osoba||'bez nazwy'}” na ${STATUS_OPTS.find(s=>s[0]===el.value)[1]}`);
@@ -5969,7 +5991,7 @@ function addOlxLead(){
   const wojewodztwoEl = document.getElementById("olxLeadWojewodztwo");
   const linkEl = document.getElementById("olxLeadLink");
   const notatkaEl = document.getElementById("olxLeadNotatka");
-  const telefon = telefonEl.value.trim();
+  const telefon = formatPhonePL(telefonEl.value.trim());
   const wojewodztwo = wojewodztwoEl.value.trim();
   const linkOlx = linkEl.value.trim();
   const notatka = notatkaEl.value.trim();
@@ -6023,6 +6045,24 @@ function exportOlxLeadsToXlsx(){
   logActivity("wyeksportował(a) listę potencjalnych klientów OLX do XLSX");
 }
 
+function exportOlxLeadsNamesToXlsx(){
+  const seen = new Set();
+  const rows = [];
+  (data.klienci||[]).filter(c => c.segment === "olx_potencjalny").forEach(c => {
+    const key = phoneDigits(c.telefon);
+    if(!key || seen.has(key)) return;
+    seen.add(key);
+    rows.push({ "Telefon": c.telefon || "", "Nazwa": clientName(c) || "" });
+  });
+  if(!rows.length){ alert("Brak potencjalnych klientów OLX do eksportu."); return; }
+  const ws = XLSX.utils.json_to_sheet(rows);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "Potencjalni OLX");
+  const dateStr = new Date().toISOString().slice(0,10);
+  XLSX.writeFile(wb, `Potencjalni_OLX_telefon_nazwa_${dateStr}.xlsx`);
+  logActivity("wyeksportował(a) telefon + nazwę potencjalnych klientów OLX (bez duplikatów) do XLSX");
+}
+
 async function importOlxLeadsFromSelectedXlsx(input){
   const msg = document.getElementById("olxImportMsg");
   const file = input?.files?.[0];
@@ -6036,7 +6076,7 @@ async function importOlxLeadsFromSelectedXlsx(input){
     let added = 0, updated = 0, skipped = 0;
     const now = new Date().toISOString();
     rows.forEach(r => {
-      const telefon = xlsxLooseVal(r, ["Telefon","Tel","Numer","Numer telefonu","Nr telefonu","Phone"]);
+      const telefon = formatPhonePL(xlsxLooseVal(r, ["Telefon","Tel","Numer","Numer telefonu","Nr telefonu","Phone"]));
       const wojewodztwo = xlsxLooseVal(r, ["Wojewodztwo","Województwo","Region"]);
       const linkOlx = xlsxLooseVal(r, ["Link","Link OLX","OLX","Ogloszenie","Ogłoszenie","URL","Link do ogloszenia","Link do ogłoszenia"]);
       const notatka = xlsxLooseVal(r, ["Notatka","Notatki","Uwagi","Opis"]);
@@ -6948,7 +6988,7 @@ function readPodwykonawcaForm(){
     nazwa,
     kategoria: document.getElementById("kategoria-podwykonawcy").value,
     osoba: document.getElementById("osoba-podwykonawcy").value.trim(),
-    telefon: document.getElementById("telefon-podwykonawcy").value.trim(),
+    telefon: formatPhonePL(document.getElementById("telefon-podwykonawcy").value.trim()),
     email: document.getElementById("email-podwykonawcy").value.trim(),
     strona: document.getElementById("strona-podwykonawcy").value.trim(),
     lokalizacja: document.getElementById("lokalizacja-podwykonawcy").value.trim(),
@@ -8051,7 +8091,7 @@ function updateClientImportButton(){
 }
 
 function normalizeClientPhone(value){
-  return importValue(value);
+  return formatPhonePL(importValue(value));
 }
 
 function normalizeClientPhoneKey(value){
