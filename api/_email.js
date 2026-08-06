@@ -1,5 +1,9 @@
 const RESEND_API_KEY = process.env.RESEND_API_KEY;
 const RESEND_FROM = process.env.RESEND_FROM_EMAIL || "Sklep za Stodołą <oferty@sklepzastodola.pl>";
+// oferty@ jest tylko adresem nadawczym (brandowanym), nie ma tam fizycznej
+// skrzynki odbiorczej. Każda odpowiedź klienta ma więc leciec na realną,
+// obsługiwaną skrzynkę — domyślnie kontakt@, nadpisywalne przez env.
+const RESEND_REPLY_TO = process.env.RESEND_REPLY_TO_EMAIL || "kontakt@sklepzastodola.pl";
 const LOGO_URL = "https://www.sklepzastodola.pl/favicon-192.png";
 const SITE_URL = "https://www.sklepzastodola.pl";
 
@@ -14,7 +18,7 @@ async function sendEmail({ to, subject, html, text, attachments }) {
     // HTML-only email (no multipart/alternative) is a well-known spam
     // signal for filters, including Gmail's — this affected the Advisor
     // "potencjał" email specifically once it started landing in spam.
-    const body = { from: RESEND_FROM, to, subject, html, text: text || htmlToPlainFallback(html) };
+    const body = { from: RESEND_FROM, to, subject, html, text: text || htmlToPlainFallback(html), reply_to: RESEND_REPLY_TO };
     if (Array.isArray(attachments) && attachments.length) body.attachments = attachments;
     const res = await fetch("https://api.resend.com/emails", {
       method: "POST",
