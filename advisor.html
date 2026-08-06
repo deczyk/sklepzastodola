@@ -402,10 +402,12 @@ async function sendToUs(){
       _subject: `Advisor EU — wynik kalkulatora: ${farm || "(brak nazwy)"} (${owner || "(brak kontaktu)"})`,
       name: owner,
       phone,
-      email,
-      _replyto: email,
       "Dane formularza Advisor": answersText
     };
+    if (email) {
+      mailPayload.email = email;
+      mailPayload._replyto = email;
+    }
     const fsRes = await fetch('https://formspree.io/f/xdarjozy', {
       method: 'POST',
       body: JSON.stringify(mailPayload),

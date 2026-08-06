@@ -902,19 +902,23 @@
         // nie zależy od stanu backendu panelu.
         let formspreeOk = false;
         try {
+          const emailVal = document.getElementById("email").value.trim();
+          const fsPayload = {
+            name: document.getElementById("name").value.trim(),
+            phone: document.getElementById("phone").value.trim(),
+            _subject: "Nowy wynik Advisor OLX - Sklep za Stodołą",
+            notes: document.getElementById("notes").value.trim(),
+            calculation: c,
+            message
+          };
+          if (emailVal) {
+            fsPayload.email = emailVal;
+            fsPayload._replyto = emailVal;
+          }
           const fsRes = await fetch("https://formspree.io/f/xdarjozy", {
             method: "POST",
             headers: { "Content-Type": "application/json", "Accept": "application/json" },
-            body: JSON.stringify({
-              name: document.getElementById("name").value.trim(),
-              phone: document.getElementById("phone").value.trim(),
-              email: document.getElementById("email").value.trim(),
-              _replyto: document.getElementById("email").value.trim(),
-              _subject: "Nowy wynik Advisor OLX - Sklep za Stodołą",
-              notes: document.getElementById("notes").value.trim(),
-              calculation: c,
-              message
-            })
+            body: JSON.stringify(fsPayload)
           });
           formspreeOk = fsRes.ok;
         } catch (e) {
