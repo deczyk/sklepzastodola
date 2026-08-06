@@ -28,6 +28,21 @@
 <link rel="preload" href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,700;1,400;1,700&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,700;1,400;1,700&display=swap"></noscript>
 <link rel="stylesheet" href="style.css">
+<style>
+.offer-row{display:grid;grid-template-columns:minmax(0,.9fr) minmax(280px,1.1fr);gap:2.6rem;align-items:center;margin-top:3.4rem}
+.offer-row.rev .offer-photo{order:2}
+.offer-photo{border-radius:var(--r-lg);overflow:hidden;border:1px solid var(--line);box-shadow:var(--shadow-lg);background:var(--bg3)}
+.offer-photo img{width:100%;height:320px;object-fit:cover;object-position:center}
+.offer-points{display:grid;gap:.7rem;margin:1.2rem 0 1.5rem}
+.offer-points span{display:flex;align-items:flex-start;gap:.6rem;color:var(--ink2);font-size:.92rem;line-height:1.55}
+.offer-points span::before{content:"✓";width:1.3rem;height:1.3rem;border-radius:50%;background:var(--sage);color:var(--forest);display:inline-flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:900;flex:0 0 auto;margin-top:.05rem}
+.offer-icon{width:44px;height:44px;border-radius:var(--r);background:var(--sage);border:1px solid rgba(45,90,39,.22);display:flex;align-items:center;justify-content:center;font-size:1.15rem;margin-bottom:1rem}
+@media(max-width:860px){
+  .offer-row{grid-template-columns:1fr;gap:1.4rem;margin-top:2.4rem}
+  .offer-row.rev .offer-photo{order:0}
+  .offer-photo img{height:230px}
+}
+</style>
 </head>
 <body>
 
@@ -43,6 +58,7 @@
     <li><a href="index.html">Start</a></li>
     <li><a href="jak-dzialamy.html">Jak działamy</a></li>
     <li><a href="dlaczego.html">Dlaczego to działa?</a></li>
+    <li><a href="oferta.html">Oferta</a></li>
     <li><a href="certyfikaty.html">Certyfikaty</a></li>
     <li><a href="poradnik.html">Poradnik</a></li>
     <li><a href="faq.html">FAQ</a></li>
@@ -55,6 +71,7 @@
   <a href="index.html">Start</a>
   <a href="jak-dzialamy.html">Jak działamy</a>
   <a href="dlaczego.html">Dlaczego to działa?</a>
+  <a href="oferta.html">Oferta</a>
   <a href="certyfikaty.html">Certyfikaty</a>
   <a href="poradnik.html">Poradnik</a>
   <a href="faq.html">FAQ</a>
@@ -65,40 +82,85 @@
 <div class="wrap">
   <p class="page-hero-eyebrow" data-r="fade">Nasza oferta</p>
   <h1 data-r>Z czego budujemy<br><em>punkt sprzedaży?</em></h1>
-  <p class="page-hero-sub" data-r data-d="1">Krótki podgląd — każdy element ma swoją dedykowaną podstronę z pełnym opisem, zdjęciami i parametrami.</p>
+  <p class="page-hero-sub" data-r data-d="1">Mini podgląd czterech elementów systemu — każdy ma swoją dedykowaną podstronę z pełnym opisem, zdjęciami i parametrami technicznymi.</p>
 </div>
 </header>
 
-<section class="preview" id="produkty">
+<section class="sec" id="produkty">
 <div class="wrap">
-  <div class="preview-inner">
-    <div class="preview-grid">
-      <div class="pcard" data-r data-d="1">
-        <div class="pcard-icon">🏡</div>
-        <h3>Pawilon</h3>
-        <p>Drewniany punkt sprzedaży przy gospodarstwie: miejsce na mlekomat, automat Sielaff, butelki, oznaczenie, instrukcje dla klienta i wygodny odbiór produktów 24/7.</p>
-        <a href="pawilony.html" class="pcard-link">Zobacz w ofercie →</a>
+
+  <div class="offer-row" data-r>
+    <figure class="offer-photo" data-r="left">
+      <img src="npawilony2.webp" alt="Pawilon pod mlekomat — Sklep za Stodołą" loading="lazy">
+    </figure>
+    <div data-r="right">
+      <div class="offer-icon">🏡</div>
+      <p class="sec-label">01 · Pawilon</p>
+      <h2 class="sec-title">Miejsce, które robi<br><em>wrażenie profesjonalizmu.</em></h2>
+      <p class="sec-body">Drewniany punkt sprzedaży przy gospodarstwie, dopasowany do celu: pod mlekomat albo jako sklep gospodarczy z szerszym asortymentem.</p>
+      <div class="offer-points">
+        <span>Chroni mlekomat i automaty, porządkuje obsługę klienta.</span>
+        <span>Miejsce na oznaczenie, instrukcje i wygodny odbiór 24/7.</span>
+        <span>Dwa warianty: pod mlekomat albo pełny sklep gospodarczy.</span>
       </div>
-      <div class="pcard" data-r data-d="2">
-        <div class="pcard-icon">🥛</div>
-        <h3>Mlekomat Premium</h3>
-        <p>Mlekomat BRUNIMAT do legalnej sprzedaży mleka z certyfikatem CE-MID — serce sklepu. Chłodzi, liczy, płucze się automatycznie. Płatność kartą, banknotem lub monetą.</p>
-        <a href="mlekomat.html" class="pcard-link">Zobacz w ofercie →</a>
-      </div>
-      <div class="pcard" data-r data-d="3">
-        <div class="pcard-icon">❄</div>
-        <h3>Automaty Sielaff</h3>
-        <p>Automaty Sielaff 24/7 dobierane pod produkt: chłodnicze i combi na sery, jaja, jogurty, masło i przetwory, a przy większych projektach także napoje, produkty paczkowane, outdoor i rozwiązania zwrotne.</p>
-        <a href="automat-chlodniczy.html" class="pcard-link">Zobacz w ofercie →</a>
-      </div>
-      <div class="pcard" data-r data-d="4">
-        <div class="pcard-icon">🥛</div>
-        <h3>Szklane butelki</h3>
-        <p>Zwrotne butelki do świeżego mleka w pojemności 1 l i 0,5 l — z naszym nadrukiem albo indywidualnym oznaczeniem gospodarstwa.</p>
-        <a href="butelki.html" class="pcard-link">Zobacz w ofercie →</a>
-      </div>
+      <a href="pawilony.html" class="btn btn-outline">Zobacz pełną ofertę →</a>
     </div>
   </div>
+
+  <div class="offer-row rev" data-r>
+    <figure class="offer-photo" data-r="right">
+      <img src="automat2.webp" alt="Mlekomat Brunimat Premium — panel płatności i wydawanie mleka" loading="lazy">
+    </figure>
+    <div data-r="left">
+      <div class="offer-icon">🥛</div>
+      <p class="sec-label">02 · Mlekomat Premium</p>
+      <h2 class="sec-title">Serce systemu —<br><em>szwajcarski BRUNIMAT.</em></h2>
+      <p class="sec-body">Mlekomat BRUNIMAT z certyfikatem CE-MID do legalnej sprzedaży świeżego mleka, dostępny dla klienta bez przerwy.</p>
+      <div class="offer-points">
+        <span>Chłodzi, liczy i płucze się automatycznie — bez obsługi.</span>
+        <span>Płatność kartą, banknotem lub monetą.</span>
+        <span>Szwajcarska technologia, certyfikat CE-MID, szkolenie i serwis w Polsce.</span>
+      </div>
+      <a href="mlekomat.html" class="btn btn-outline">Zobacz pełną ofertę →</a>
+    </div>
+  </div>
+
+  <div class="offer-row" data-r>
+    <figure class="offer-photo" data-r="left">
+      <img src="sielaff-combi-m.webp" alt="Automat Sielaff do produktów z gospodarstwa" loading="lazy">
+    </figure>
+    <div data-r="right">
+      <div class="offer-icon">❄</div>
+      <p class="sec-label">03 · Automaty Sielaff</p>
+      <h2 class="sec-title">Reszta asortymentu,<br><em>dostępna całą dobę.</em></h2>
+      <p class="sec-body">Automaty Sielaff dobierane pod realny asortyment gospodarstwa — uzupełnienie mlekomatu o produkty, które też można sprzedawać bez obsługi.</p>
+      <div class="offer-points">
+        <span>Warianty chłodnicze i combi na sery, jaja, jogurty, masło, przetwory.</span>
+        <span>Przy większych projektach: napoje, produkty paczkowane, outdoor.</span>
+        <span>Rozwiązania zwrotne dla obiegu opakowań.</span>
+      </div>
+      <a href="automat-chlodniczy.html" class="btn btn-outline">Zobacz pełną ofertę →</a>
+    </div>
+  </div>
+
+  <div class="offer-row rev" data-r>
+    <figure class="offer-photo" data-r="right">
+      <img src="butelka-sklep-za-stodola.png" alt="Szklana butelka do mleka z logo Sklep za Stodołą" loading="lazy">
+    </figure>
+    <div data-r="left">
+      <div class="offer-icon">🍾</div>
+      <p class="sec-label">04 · Szklane butelki</p>
+      <h2 class="sec-title">Ostatni detal,<br><em>który buduje markę.</em></h2>
+      <p class="sec-body">Zwrotne szklane butelki do świeżego mleka — estetyczne opakowanie zamiast przypadkowych pojemników klienta.</p>
+      <div class="offer-points">
+        <span>Pojemności 1 l i 0,5 l, szkło do kontaktu z żywnością.</span>
+        <span>Nasz nadruk od ręki albo indywidualny nadruk gospodarstwa.</span>
+        <span>Zakrętka wielokrotnego użytku, gotowe do obiegu zwrotnego.</span>
+      </div>
+      <a href="butelki.html" class="btn btn-outline">Zobacz pełną ofertę →</a>
+    </div>
+  </div>
+
 </div>
 </section>
 
