@@ -2141,6 +2141,10 @@
           <input type="text" id="historyNewWho" placeholder="Autor / kto">
         </div>
         <textarea id="historyNewEntry" placeholder="Np. [kontakt] Dzwoniłem, zainteresowany, oddzwaniam za tydzień..."></textarea>
+        <label>Termin następnego kontaktu (opcjonalnie)
+          <input type="date" id="historyNewFollowup">
+          <span class="audioHint">Ustaw, jeśli chcesz przesunąć termin kontaktu — inaczej klient zostanie w „Zaległe”, dopóki nie wpiszesz nowej daty.</span>
+        </label>
         <label>Notatka głosowa / nagranie z telefonu
           <input type="file" id="historyNewAudio" accept="audio/amr,audio/*,.amr,.m4a">
           <span class="audioHint">Najlepiej krótki plik M4A/MP3 z telefonu. Limit: 2 MB, żeby synchronizacja panelu działała stabilnie.</span>
@@ -3085,6 +3089,9 @@ function openHistoryModal(clientId){
   document.getElementById("historyClientName").textContent = `Historia kontaktu — ${c.firma || c.osoba || "bez nazwy"}`;
   document.getElementById("historyNewDate").value = todayInputValue();
   document.getElementById("historyNewWho").value = getWhoAmI();
+  const followupEl0 = document.getElementById("historyNewFollowup");
+  followupEl0.value = historyDateInputValue(c.nastepnyFollowup);
+  followupEl0.dataset.initial = followupEl0.value;
   renderHistoryEntries(c);
   document.getElementById("historyModal").classList.add("open");
 }
@@ -3092,6 +3099,7 @@ function openHistoryModal(clientId){
 function closeHistoryModal(){
   document.getElementById("historyModal").classList.remove("open");
   document.getElementById("historyNewEntry").value = "";
+  document.getElementById("historyNewFollowup").value = "";
   document.getElementById("historyNewAudio").value = "";
   document.getElementById("historyAudioStatus").textContent = "";
   document.getElementById("historyNewDate").value = "";
@@ -3535,6 +3543,7 @@ async function addHistoryEntry(){
   const whoEl = document.getElementById("historyNewWho");
   const dateEl = document.getElementById("historyNewDate");
   const audioEl = document.getElementById("historyNewAudio");
+  const followupEl = document.getElementById("historyNewFollowup");
   const tekst = ta.value.trim();
   if(!currentHistoryClientId) return;
   const c = data.klienci.find(x=>x.id===currentHistoryClientId);
@@ -3549,6 +3558,15 @@ async function addHistoryEntry(){
   if(!c.historia) c.historia = [];
   c.historia.push({tekst: tekst || "[notatka głosowa]", kto: (whoEl.value || getWhoAmI()).trim(), data: historyDateValue(dateEl.value), ...(audio || {})});
   const automation = inferClientAutomation(tekst, c);
+  // Ręczna data w polu "Termin następnego kontaktu" ma priorytet nad automatycznym wykrywaniem z treści notatki —
+  // ustawiamy ją tylko, jeśli user faktycznie ją zmienił względem stanu przy otwarciu modala (inaczej nadpisywalibyśmy
+  // co notatkę, nawet gdy pole zostało tylko podejrzane).
+  const followupVal = followupEl.value;
+  const followupInitial = followupEl.dataset.initial || "";
+  if(followupVal !== followupInitial){
+    c.nastepnyFollowup = followupVal;
+    automation.push(followupVal ? `termin kontaktu: ${followupVal}` : "termin kontaktu: wyczyszczony");
+  }
   c.zaktualizowano = new Date().toISOString();
   logActivity(`dodał(a) notatkę w historii kontaktu klienta „${c.firma||c.osoba||'bez nazwy'}”${automation.length ? ` i panel ustawił: ${automation.join(", ")}` : ""}`);
   await saveData({immediate: Boolean(audio)});
@@ -3559,6 +3577,8 @@ async function addHistoryEntry(){
   audioEl.value = "";
   dateEl.value = todayInputValue();
   whoEl.value = getWhoAmI();
+  followupEl.value = historyDateInputValue(c.nastepnyFollowup);
+  followupEl.dataset.initial = followupEl.value;
   renderHistoryEntries(c);
   renderClients();
   if(currentClientCardId === c.id) openClientCard(c.id);
