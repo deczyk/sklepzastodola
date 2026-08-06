@@ -1,7 +1,6 @@
 {
   "redirects": [
-    { "source": "/oferta.html", "destination": "/", "statusCode": 301 },
-    { "source": "/oferta", "destination": "/", "statusCode": 301 }
+    { "source": "/oferta", "destination": "/oferta.html", "statusCode": 301 }
   ],
   "headers": [
     {
