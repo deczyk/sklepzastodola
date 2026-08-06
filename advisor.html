@@ -103,8 +103,8 @@
     <section class="card">
       <h2>1. Dane gospodarstwa</h2>
       <div class="row"><div><label for="farm">Nazwa gospodarstwa</label><input id="farm"></div><div><label for="owner">Osoba kontaktowa</label><input id="owner"></div></div>
-      <div class="row3"><div><label for="region">Województwo</label><input id="region"></div><div><label for="county">Powiat</label><input id="county"></div><div><label for="phone">Telefon</label><input id="phone" type="tel" autocomplete="tel"></div></div>
-      <div class="row"><div><label for="email">E-mail klienta</label><input id="email" type="email" autocomplete="email"></div></div>
+      <div class="row3"><div><label for="region">Województwo</label><input id="region"></div><div><label for="county">Powiat</label><input id="county"></div><div><label for="phone">Telefon *</label><input id="phone" type="tel" autocomplete="tel" required></div></div>
+      <div class="row"><div><label for="email">E-mail klienta *</label><input id="email" type="email" autocomplete="email" required></div></div>
       <div class="row"><div><label for="interest">Co Cię interesuje?</label><select id="interest" onchange="renderAuditQuestions()">
         <option value="sprzedazowy">Pakiet SPRZEDAŻOWY — mlekomat + pawilon + wdrożenie</option>
         <option value="start">Pakiet START — mlekomat i podstawowe wdrożenie</option>
@@ -362,12 +362,14 @@ async function sendToUs(){
   const phoneEl = document.getElementById("phone");
   const emailEl = document.getElementById("email");
   [ownerEl, phoneEl, emailEl].forEach(el => el.style.borderColor = "");
-  if (!owner || (!phone && !email)) {
-    statusEl.textContent = "Podaj osobę kontaktową oraz telefon lub e-mail, żebyśmy mogli się z Tobą skontaktować.";
+  const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  if (!owner || !phone || !email || !emailValid) {
+    statusEl.textContent = "Podaj osobę kontaktową, telefon i poprawny adres e-mail, żebyśmy mogli się z Tobą skontaktować.";
     statusEl.style.color = "#a53a30";
     if (!owner) ownerEl.style.borderColor = "#a53a30";
-    if (!phone && !email) { phoneEl.style.borderColor = "#a53a30"; emailEl.style.borderColor = "#a53a30"; }
-    (!owner ? ownerEl : phoneEl).focus();
+    if (!phone) phoneEl.style.borderColor = "#a53a30";
+    if (!email || !emailValid) emailEl.style.borderColor = "#a53a30";
+    (!owner ? ownerEl : (!phone ? phoneEl : emailEl)).focus();
     return;
   }
 
