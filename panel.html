@@ -265,6 +265,17 @@
                   font-size:11px;cursor:pointer;color:var(--green);font-weight:bold}
   .audioSpeedBtn:hover{background:#dcebe0}
   .audioSpeedBtn.active{background:var(--green);color:#fff;border-color:var(--green)}
+  .historyImages{margin-top:10px;display:flex;flex-wrap:wrap;gap:8px}
+  .imageDropZone{margin-top:8px;border:2px dashed var(--line);border-radius:10px;padding:14px;text-align:center;
+                  font-size:12px;color:var(--text-muted);background:var(--surface-soft);cursor:pointer;transition:border-color .15s,background .15s}
+  .imageDropZone.dragover{border-color:var(--green);background:var(--surface)}
+  .imageDropZone a{color:var(--green);text-decoration:underline;cursor:pointer}
+  .imagePendingStrip{margin-top:8px;display:flex;flex-wrap:wrap;gap:8px}
+  .imagePendingItem{position:relative;width:64px;height:64px;border-radius:8px;overflow:hidden;border:1px solid var(--line)}
+  .imagePendingItem img{width:100%;height:100%;object-fit:cover;display:block}
+  .imagePendingItem button{position:absolute;top:2px;right:2px;width:18px;height:18px;border-radius:50%;border:0;
+                            background:rgba(0,0,0,.65);color:#fff;font-size:11px;line-height:1;cursor:pointer;padding:0}
+  .imageUploadStatus{display:block;margin-top:6px;font-size:11px;color:var(--text-muted)}
   .audioHint{display:block;margin-top:6px;color:var(--text-muted);font-size:11px;text-transform:none;letter-spacing:0;font-weight:normal}
   .audioTools{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:8px}
   .audioStatus{font-size:12px;color:var(--text-muted);text-transform:none;letter-spacing:0;font-weight:normal}
@@ -2157,6 +2168,13 @@
           <input type="file" id="historyNewAudio" accept="audio/amr,audio/*,.amr,.m4a">
           <span class="audioHint">Najlepiej krótki plik M4A/MP3 z telefonu. Limit: 2 MB, żeby synchronizacja panelu działała stabilnie.</span>
         </label>
+        <label>Zdjęcia (opcjonalnie)
+          <div class="imageDropZone" id="historyImageDropZone">Przeciągnij zdjęcia tutaj, wklej (Ctrl+V) albo <a onclick="document.getElementById('historyImageFile').click()">wybierz plik</a>
+            <input type="file" id="historyImageFile" accept="image/*" multiple style="display:none">
+          </div>
+          <div class="imagePendingStrip" id="historyImageStrip"></div>
+          <span class="imageUploadStatus" id="historyImageStatus"></span>
+        </label>
         <button class="save" onclick="addHistoryEntry()">Dodaj notatkę</button>
       </div>
     </div>
@@ -3161,6 +3179,9 @@ function openHistoryModal(clientId){
   followupEl0.value = historyDateInputValue(c.nastepnyFollowup);
   followupEl0.dataset.initial = followupEl0.value;
   renderHistoryEntries(c);
+  pendingHistoryImages = [];
+  renderPendingHistoryImages();
+  document.getElementById("historyImageStatus").textContent = "";
   document.getElementById("historyModal").classList.add("open");
 }
 
@@ -3171,6 +3192,8 @@ function closeHistoryModal(){
   document.getElementById("historyNewAudio").value = "";
   document.getElementById("historyNewDate").value = "";
   document.getElementById("historyNewWho").value = "";
+  pendingHistoryImages = [];
+  renderPendingHistoryImages();
   currentHistoryEditIndex = null;
   currentHistoryClientId = null;
 }
@@ -3272,6 +3295,157 @@ function renderHistoryAudio(h){
   `;
 }
 
+function renderHistoryImages(h){
+  const images = Array.isArray(h && h.images) ? h.images.filter(img => img && img.link) : [];
+  if(!images.length) return "";
+  return `
+    <div class="historyImages">
+      ${images.map(img => fileChip(img.link, img.name || "Zdjęcie")).join("")}
+    </div>
+  `;
+}
+
+// ================= Zdjęcia w notatkach (drag&drop / wklej / plik -> Google Drive) =================
+const IMAGE_MAX_DIMENSION = 1600;
+const IMAGE_JPEG_QUALITY = 0.82;
+const IMAGE_MAX_COUNT = 6;
+
+// Zawsze pomniejszamy/kompresujemy po stronie przeglądarki przed wysyłką - zdjęcie z telefonu
+// to często kilka-kilkanaście MB, a to i tak trafia na Drive (nie do bazy panelu), ale mniejszy
+// plik to szybsza wysyłka i mniej miejsca na koncie Drive.
+function resizeImageFile(file){
+  return new Promise((resolve, reject) => {
+    if(!file.type || !file.type.startsWith("image/")){
+      reject(new Error(`"${file.name}" nie jest obrazem.`));
+      return;
+    }
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+    img.onload = () => {
+      URL.revokeObjectURL(url);
+      let width = img.naturalWidth, height = img.naturalHeight;
+      if(width > IMAGE_MAX_DIMENSION || height > IMAGE_MAX_DIMENSION){
+        const scale = IMAGE_MAX_DIMENSION / Math.max(width, height);
+        width = Math.round(width * scale);
+        height = Math.round(height * scale);
+      }
+      const canvas = document.createElement("canvas");
+      canvas.width = width;
+      canvas.height = height;
+      canvas.getContext("2d").drawImage(img, 0, 0, width, height);
+      resolve({
+        name: (file.name || "zdjecie").replace(/\.\w+$/, "") + ".jpg",
+        mimeType: "image/jpeg",
+        dataUrl: canvas.toDataURL("image/jpeg", IMAGE_JPEG_QUALITY)
+      });
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error(`Nie udało się odczytać zdjęcia "${file.name}".`)); };
+    img.src = url;
+  });
+}
+
+async function uploadPendingImages(images, statusElId){
+  const statusEl = statusElId ? document.getElementById(statusElId) : null;
+  const uploaded = [];
+  const failed = [];
+  for(const img of images){
+    try{
+      if(statusEl) statusEl.textContent = `Wysyłam zdjęcia na Drive (${uploaded.length + failed.length + 1}/${images.length})...`;
+      const contentBase64 = img.dataUrl.split(",").pop();
+      const json = await driveApi("/api/drive-documents", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: img.name, mimeType: img.mimeType, contentBase64, forNotePhoto: true })
+      });
+      uploaded.push({ name: img.name, link: driveDocumentLink(json.file) });
+    }catch(e){
+      failed.push({ name: img.name, error: e && e.message ? e.message : "nieznany błąd" });
+    }
+  }
+  if(statusEl){
+    statusEl.textContent = failed.length
+      ? `Nie udało się wysłać ${failed.length} z ${images.length} zdjęć: ${failed.map(f => `"${f.name}" (${f.error})`).join("; ")}`
+      : "";
+  }
+  return { uploaded, failed };
+}
+
+let pendingHistoryImages = [];
+async function addHistoryImageFiles(fileList){
+  const files = Array.from(fileList || []).filter(f => f.type && f.type.startsWith("image/"));
+  if(!files.length) return;
+  const statusEl = document.getElementById("historyImageStatus");
+  const room = IMAGE_MAX_COUNT - pendingHistoryImages.length;
+  if(room <= 0){
+    if(statusEl) statusEl.textContent = `Możesz dodać maksymalnie ${IMAGE_MAX_COUNT} zdjęć do jednej notatki.`;
+    return;
+  }
+  if(statusEl) statusEl.textContent = "Przygotowuję zdjęcia...";
+  for(const file of files.slice(0, room)){
+    try{ pendingHistoryImages.push(await resizeImageFile(file)); }
+    catch(e){ if(statusEl) statusEl.textContent = e.message || "Nie udało się dodać zdjęcia."; }
+  }
+  if(statusEl && statusEl.textContent === "Przygotowuję zdjęcia...") statusEl.textContent = "";
+  renderPendingHistoryImages();
+}
+function renderPendingHistoryImages(){
+  const el = document.getElementById("historyImageStrip");
+  if(!el) return;
+  el.innerHTML = pendingHistoryImages.map((img, i) => `
+    <div class="imagePendingItem"><img src="${crmEsc(img.dataUrl)}" alt=""><button type="button" onclick="removePendingHistoryImage(${i})" title="Usuń">✕</button></div>
+  `).join("");
+}
+function removePendingHistoryImage(index){ pendingHistoryImages.splice(index,1); renderPendingHistoryImages(); }
+
+let pendingQuickImages = [];
+async function addQuickImageFiles(fileList){
+  const files = Array.from(fileList || []).filter(f => f.type && f.type.startsWith("image/"));
+  if(!files.length) return;
+  const statusEl = document.getElementById("quickImageStatus");
+  const room = IMAGE_MAX_COUNT - pendingQuickImages.length;
+  if(room <= 0){
+    if(statusEl) statusEl.textContent = `Możesz dodać maksymalnie ${IMAGE_MAX_COUNT} zdjęć do jednej notatki.`;
+    return;
+  }
+  if(statusEl) statusEl.textContent = "Przygotowuję zdjęcia...";
+  for(const file of files.slice(0, room)){
+    try{ pendingQuickImages.push(await resizeImageFile(file)); }
+    catch(e){ if(statusEl) statusEl.textContent = e.message || "Nie udało się dodać zdjęcia."; }
+  }
+  if(statusEl && statusEl.textContent === "Przygotowuję zdjęcia...") statusEl.textContent = "";
+  renderPendingQuickImages();
+}
+function renderPendingQuickImages(){
+  const el = document.getElementById("quickImageStrip");
+  if(!el) return;
+  el.innerHTML = pendingQuickImages.map((img, i) => `
+    <div class="imagePendingItem"><img src="${crmEsc(img.dataUrl)}" alt=""><button type="button" onclick="removePendingQuickImage(${i})" title="Usuń">✕</button></div>
+  `).join("");
+}
+function removePendingQuickImage(index){ pendingQuickImages.splice(index,1); renderPendingQuickImages(); }
+
+function wireImageDropZone(zoneEl, fileInputEl, addFilesFn){
+  if(!zoneEl) return;
+  zoneEl.addEventListener("dragover", e => { e.preventDefault(); zoneEl.classList.add("dragover"); });
+  zoneEl.addEventListener("dragleave", () => zoneEl.classList.remove("dragover"));
+  zoneEl.addEventListener("drop", e => {
+    e.preventDefault();
+    zoneEl.classList.remove("dragover");
+    addFilesFn(e.dataTransfer.files);
+  });
+  zoneEl.addEventListener("paste", e => {
+    const items = Array.from((e.clipboardData && e.clipboardData.items) || []);
+    const files = items.filter(it => it.kind === "file" && it.type.startsWith("image/")).map(it => it.getAsFile()).filter(Boolean);
+    if(files.length) addFilesFn(files);
+  });
+  zoneEl.setAttribute("tabindex", "0"); // żeby zone mogła złapać zdarzenie paste po kliknięciu w nią
+  if(fileInputEl) fileInputEl.addEventListener("change", () => { addFilesFn(fileInputEl.files); fileInputEl.value = ""; });
+}
+// Strefa w modalu historii jest statyczna (nie generowana przy każdym renderze), więc podpinamy ją raz.
+// Strefa w "szybkiej notatce" w karcie klienta jest generowana od nowa za każdym openClientCard() -
+// tam wireImageDropZone() wywołujemy przy każdym otwarciu karty (patrz openClientCard).
+wireImageDropZone(document.getElementById("historyImageDropZone"), document.getElementById("historyImageFile"), addHistoryImageFiles);
+
 function setAudioSpeed(btn, speed){
   const wrap = btn.closest(".historyAudio");
   if(!wrap) return;
@@ -3315,6 +3489,7 @@ function renderHistoryTimeline(c, editable=false){
         </div>
         <div class="txt">${historyTextHtml(parsed.text || "")}</div>
         ${renderHistoryAudio(h)}
+        ${renderHistoryImages(h)}
         ${editable ? `<div class="historyActions">
           <button class="histBtn" onclick="editHistoryEntry(${index})">Edytuj</button>
           <button class="delBtn" onclick="deleteHistoryEntry(${index})">Usuń</button>
@@ -3488,6 +3663,13 @@ function renderQuickClientUpdate(c){
         <input type="file" data-quick-field="audio" accept="audio/amr,audio/*,.amr,.m4a">
         <span class="audioHint">Możesz wkleić nagranie rozmowy z telefonu. Limit: 2 MB, żeby synchronizacja panelu działała stabilnie.</span>
       </label>
+      <label class="quickUpdateNote">Zdjęcia (opcjonalnie)
+        <div class="imageDropZone" id="quickImageDropZone">Przeciągnij zdjęcia tutaj, wklej (Ctrl+V) albo <a onclick="document.getElementById('quickImageFile').click()">wybierz plik</a>
+          <input type="file" id="quickImageFile" accept="image/*" multiple style="display:none">
+        </div>
+        <div class="imagePendingStrip" id="quickImageStrip"></div>
+        <span class="imageUploadStatus" id="quickImageStatus"></span>
+      </label>
       <div class="quickUpdateActions">
         <button class="save" onclick="saveQuickClientUpdate('${crmEsc(c.id)}')">Dodaj notatkę</button>
       </div>
@@ -3515,13 +3697,20 @@ async function saveQuickClientUpdate(clientId){
   }catch(err){
     return alert(err.message || "Nie udało się dodać nagrania.");
   }
-  if(!note && !audio) return alert("Wpisz notatkę albo dodaj notatkę głosową.");
+  if(!note && !audio && !pendingQuickImages.length) return alert("Wpisz notatkę, dodaj notatkę głosową albo zdjęcie.");
+  const { uploaded: images, failed: failedImages } = pendingQuickImages.length
+    ? await uploadPendingImages(pendingQuickImages, "quickImageStatus")
+    : { uploaded: [], failed: [] };
   if(!Array.isArray(c.historia)) c.historia = [];
-  c.historia.push({tekst: note || "[notatka głosowa]", kto: who, data: historyDateValue(date), ...(audio || {})});
+  c.historia.push({tekst: note || "[notatka głosowa]", kto: who, data: historyDateValue(date), ...(audio || {}), ...(images.length ? {images} : {})});
   const automation = inferClientAutomation(note, c);
   c.zaktualizowano = new Date().toISOString();
   logActivity(`dodał(a) ręczną notatkę klienta „${c.firma||c.osoba||'bez nazwy'}”${automation.length ? ` i panel ustawił: ${automation.join(", ")}` : ""}`);
   await saveData({immediate: true});
+  pendingQuickImages = [];
+  if(failedImages.length){
+    alert(`Notatka zapisana, ale ${failedImages.length} zdjęcie(a) nie wysłały się na Drive:\n\n${failedImages.map(f=>`"${f.name}" — ${f.error}`).join("\n")}`);
+  }
   if(!lastCloudSaveOk){
     const reason = document.getElementById("syncStatus")?.textContent || "nieznany błąd";
     alert(`Notatka została zapisana lokalnie, ale NIE zsynchronizowała się jeszcze z chmurą.\n\nPowód: ${reason}\n\nPanel spróbuje wysłać ją ponownie automatycznie — nie czyść danych przeglądarki, dopóki nie zobaczysz statusu "Zsynchronizowano ✓".`);
@@ -3546,9 +3735,13 @@ async function addHistoryEntry(){
   }catch(err){
     return alert(err.message || "Nie udało się dodać nagrania.");
   }
-  if(!tekst && !audio) return alert("Wpisz notatkę albo dodaj notatkę głosową.");
+  if(!tekst && !audio && !pendingHistoryImages.length) return alert("Wpisz notatkę, dodaj notatkę głosową albo zdjęcie.");
+  const { uploaded: images, failed: failedImages } = pendingHistoryImages.length
+    ? await uploadPendingImages(pendingHistoryImages, "historyImageStatus")
+    : { uploaded: [], failed: [] };
   if(!c.historia) c.historia = [];
-  c.historia.push({tekst: tekst || "[notatka głosowa]", kto: (whoEl.value || getWhoAmI()).trim(), data: historyDateValue(dateEl.value), ...(audio || {})});
+  c.historia.push({tekst: tekst || "[notatka głosowa]", kto: (whoEl.value || getWhoAmI()).trim(), data: historyDateValue(dateEl.value), ...(audio || {}), ...(images.length ? {images} : {})});
+  pendingHistoryImages = [];
   const followupBefore = c.nastepnyFollowup || "";
   const automation = inferClientAutomation(tekst, c);
   // Ręczna data w polu "Termin następnego kontaktu" ma priorytet nad automatycznym wykrywaniem z treści notatki —
@@ -3574,9 +3767,13 @@ async function addHistoryEntry(){
   whoEl.value = getWhoAmI();
   followupEl.value = historyDateInputValue(c.nastepnyFollowup);
   followupEl.dataset.initial = followupEl.value;
+  renderPendingHistoryImages();
   renderHistoryEntries(c);
   renderClients();
   if(currentClientCardId === c.id) openClientCard(c.id);
+  if(failedImages.length){
+    alert(`Notatka zapisana, ale ${failedImages.length} zdjęcie(a) nie wysłały się na Drive:\n\n${failedImages.map(f=>`"${f.name}" — ${f.error}`).join("\n")}`);
+  }
 }
 
 function editHistoryEntry(index){
@@ -5403,6 +5600,8 @@ function openClientCard(clientId){
       <button class="dangerBtn" onclick="deleteClient('${crmEsc(c.id)}')">Usuń klienta</button>
     </div>
   `;
+  pendingQuickImages = [];
+  wireImageDropZone(document.getElementById("quickImageDropZone"), document.getElementById("quickImageFile"), addQuickImageFiles);
   document.getElementById("clientCardModal").classList.add("open");
 }
 

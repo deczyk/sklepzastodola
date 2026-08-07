@@ -7,8 +7,13 @@ const GOOGLE_SERVICE_ACCOUNT_EMAIL = process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL;
 const GOOGLE_PRIVATE_KEY = process.env.GOOGLE_PRIVATE_KEY;
 const GOOGLE_DRIVE_FOLDER_ID = process.env.GOOGLE_DRIVE_FOLDER_ID || "1FMmp6qdMuMl13vkdfhpddeHH46kTgDy0";
 const DRIVE_FOLDER_MIME_TYPE = "application/vnd.google-apps.folder";
+// Zdjęcia dołączone do notatek klienta lądują w tym podfolderze, żeby NIE mieszały się
+// z dokumentami firmowymi w zakładce "Dokumenty" panelu - listDriveFiles() celowo pomija
+// ten podfolder przy skanowaniu pod kątem auto-synchronizacji dokumentów.
+const NOTES_PHOTOS_FOLDER_NAME = "Zdjęcia z notatek";
 
 let tokenCache = { token: "", expiresAt: 0 };
+let notesPhotosFolderIdCache = "";
 
 function getBasicAuth(req) {
   const header = req.headers.authorization || "";
@@ -183,6 +188,10 @@ async function listDriveFiles(token) {
     files.forEach(file => {
       const folderPath = folder.path;
       if (file.mimeType === DRIVE_FOLDER_MIME_TYPE) {
+        // Zdjęcia z notatek mają świadomie NIE trafiać do zakładki "Dokumenty" -
+        // pomijamy ten podfolder przy skanowaniu (tylko na najwyższym poziomie, żeby
+        // nazwa podfolderu użytkownika gdzieś głębiej w drzewie nie została przypadkiem ucięta).
+        if (!folderPath && file.name === NOTES_PHOTOS_FOLDER_NAME) return;
         queue.push({
           id: file.id,
           path: folderPath ? `${folderPath} / ${file.name}` : file.name
@@ -199,6 +208,41 @@ async function listDriveFiles(token) {
   });
 }
 
+async function findChildFolder(token, parentId, name) {
+  const params = new URLSearchParams({
+    q: `'${parentId}' in parents and trashed = false and mimeType = '${DRIVE_FOLDER_MIME_TYPE}' and name = '${name.replace(/'/g, "\\'")}'`,
+    fields: "files(id,name)",
+    pageSize: "1",
+    supportsAllDrives: "true",
+    includeItemsFromAllDrives: "true"
+  });
+  const res = await fetch(`https://www.googleapis.com/drive/v3/files?${params.toString()}`, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  const json = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(json.error && json.error.message ? json.error.message : "Google Drive folder lookup failed.");
+  return (json.files && json.files[0] && json.files[0].id) || "";
+}
+
+async function createChildFolder(token, parentId, name) {
+  const res = await fetch("https://www.googleapis.com/drive/v3/files?supportsAllDrives=true&fields=id", {
+    method: "POST",
+    headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+    body: JSON.stringify({ name, mimeType: DRIVE_FOLDER_MIME_TYPE, parents: [parentId] })
+  });
+  const json = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(json.error && json.error.message ? json.error.message : "Google Drive folder creation failed.");
+  return json.id;
+}
+
+async function getNotesPhotosFolderId(token) {
+  if (notesPhotosFolderIdCache) return notesPhotosFolderIdCache;
+  let id = await findChildFolder(token, GOOGLE_DRIVE_FOLDER_ID, NOTES_PHOTOS_FOLDER_NAME);
+  if (!id) id = await createChildFolder(token, GOOGLE_DRIVE_FOLDER_ID, NOTES_PHOTOS_FOLDER_NAME);
+  notesPhotosFolderIdCache = id;
+  return id;
+}
+
 async function uploadDriveFile(token, payload) {
   const name = sanitizeName(payload.name) || "Dokument";
   const mimeType = String(payload.mimeType || "application/octet-stream").slice(0, 120);
@@ -206,10 +250,11 @@ async function uploadDriveFile(token, payload) {
   if (!content.length) throw new Error("Empty file.");
   if (content.length > 25 * 1024 * 1024) throw new Error("File is too large for panel upload. Upload it to Drive directly and use sync.");
 
+  const parentId = payload.forNotePhoto ? await getNotesPhotosFolderId(token) : GOOGLE_DRIVE_FOLDER_ID;
   const metadata = {
     name,
     mimeType,
-    parents: [GOOGLE_DRIVE_FOLDER_ID]
+    parents: [parentId]
   };
   const boundary = `panel_drive_${Date.now()}_${Math.random().toString(36).slice(2)}`;
   const body = Buffer.concat([
