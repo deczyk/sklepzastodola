@@ -259,6 +259,12 @@
   .historyAudio{margin-top:10px;padding:9px;border:1px solid var(--line);border-radius:10px;background:var(--surface-soft)}
   .historyAudioTitle{font-size:12px;font-weight:800;color:var(--green);margin-bottom:6px}
   .historyAudio audio{width:100%;display:block}
+  .audioSpeed{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-top:6px}
+  .audioSpeedLabel{font-size:11px;color:var(--text-muted)}
+  .audioSpeedBtn{background:var(--light);border:1px solid var(--line);border-radius:8px;padding:3px 8px;
+                  font-size:11px;cursor:pointer;color:var(--green);font-weight:bold}
+  .audioSpeedBtn:hover{background:#dcebe0}
+  .audioSpeedBtn.active{background:var(--green);color:#fff;border-color:var(--green)}
   .audioHint{display:block;margin-top:6px;color:var(--text-muted);font-size:11px;text-transform:none;letter-spacing:0;font-weight:normal}
   .audioTools{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:8px}
   .audioStatus{font-size:12px;color:var(--text-muted);text-transform:none;letter-spacing:0;font-weight:normal}
@@ -3295,9 +3301,25 @@ function renderHistoryAudio(h){
     <div class="historyAudio">
       <div class="historyAudioTitle">Notatka głosowa: ${crmEsc(name)}${crmEsc(size)}</div>
       <audio controls preload="metadata" src="${crmEsc(h.audioData)}"></audio>
+      <div class="audioSpeed">
+        <span class="audioSpeedLabel">Szybkość:</span>
+        <button type="button" class="audioSpeedBtn active" data-speed="1" onclick="setAudioSpeed(this,1)">1x</button>
+        <button type="button" class="audioSpeedBtn" data-speed="1.25" onclick="setAudioSpeed(this,1.25)">1.25x</button>
+        <button type="button" class="audioSpeedBtn" data-speed="1.5" onclick="setAudioSpeed(this,1.5)">1.5x</button>
+        <button type="button" class="audioSpeedBtn" data-speed="2" onclick="setAudioSpeed(this,2)">2x</button>
+      </div>
       ${fallback}
     </div>
   `;
+}
+
+function setAudioSpeed(btn, speed){
+  const wrap = btn.closest(".historyAudio");
+  if(!wrap) return;
+  const audioEl = wrap.querySelector("audio");
+  if(!audioEl) return;
+  audioEl.playbackRate = speed;
+  wrap.querySelectorAll(".audioSpeedBtn").forEach(b => b.classList.toggle("active", b === btn));
 }
 
 function renderHistoryTimeline(c, editable=false){
