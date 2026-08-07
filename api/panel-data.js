@@ -126,3 +126,14 @@ module.exports = async function handler(req, res) {
   res.setHeader("Allow", "GET, PUT");
   return res.status(405).json({ error: "Method not allowed" });
 };
+
+// Bez tego Vercel domyślnie ogranicza ciało zapytania do kilku MB. Notatki głosowe
+// (do 2 MB każda, zakodowane w base64 w pełnej paczce danych panelu) łatwo to przekroczą,
+// gdy uzbiera się ich więcej u kilku klientów - stąd zapis milknie bez wyjaśnienia.
+module.exports.config = {
+  api: {
+    bodyParser: {
+      sizeLimit: "20mb"
+    }
+  }
+};

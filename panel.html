@@ -3523,7 +3523,8 @@ async function saveQuickClientUpdate(clientId){
   logActivity(`dodał(a) ręczną notatkę klienta „${c.firma||c.osoba||'bez nazwy'}”${automation.length ? ` i panel ustawił: ${automation.join(", ")}` : ""}`);
   await saveData({immediate: true});
   if(!lastCloudSaveOk){
-    alert("Notatka została zapisana lokalnie, ale jeszcze nie zsynchronizowała się z chmurą. Panel spróbuje wysłać ją ponownie automatycznie — nie czyść danych przeglądarki, dopóki nie zobaczysz statusu 'Zsynchronizowano'.");
+    const reason = document.getElementById("syncStatus")?.textContent || "nieznany błąd";
+    alert(`Notatka została zapisana lokalnie, ale NIE zsynchronizowała się jeszcze z chmurą.\n\nPowód: ${reason}\n\nPanel spróbuje wysłać ją ponownie automatycznie — nie czyść danych przeglądarki, dopóki nie zobaczysz statusu "Zsynchronizowano ✓".`);
   }
   renderClients();
   openClientCard(clientId);
@@ -3564,7 +3565,8 @@ async function addHistoryEntry(){
   await saveData({immediate: true});
   if((c.nastepnyFollowup || "") !== followupBefore) syncFollowupToCalendar(c);
   if(!lastCloudSaveOk){
-    alert("Notatka została zapisana lokalnie, ale jeszcze nie zsynchronizowała się z chmurą. Panel spróbuje wysłać ją ponownie automatycznie — nie czyść danych przeglądarki, dopóki nie zobaczysz statusu 'Zsynchronizowano'.");
+    const reason = document.getElementById("syncStatus")?.textContent || "nieznany błąd";
+    alert(`Notatka została zapisana lokalnie, ale NIE zsynchronizowała się jeszcze z chmurą.\n\nPowód: ${reason}\n\nPanel spróbuje wysłać ją ponownie automatycznie — nie czyść danych przeglądarki, dopóki nie zobaczysz statusu "Zsynchronizowano ✓".`);
   }
   ta.value = "";
   audioEl.value = "";
