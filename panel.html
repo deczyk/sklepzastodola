@@ -5386,6 +5386,8 @@ function openClientCard(clientId){
       <div class="clientCardField"><b>Zainteresowanie</b>${clientField(c,null,"zain")}</div>
       <div class="clientCardField"><b>Co go powstrzymuje</b>${clientField(c,null,"objection")}</div>
       <div class="clientCardField"><b>Termin następnego kontaktu</b>${clientField(c,"nastepnyFollowup","date")}</div>
+      <div class="clientCardField"><b>Status</b>${clientField(c,null,"status")}</div>
+      <div class="clientCardField"><b>Priorytet</b>${clientField(c,null,"prio")}</div>
     </div>
     ${renderQuickClientUpdate(c)}
     ${renderClientDocuments(c)}
@@ -5867,7 +5869,7 @@ function updateClient(el){
     saveData();
     if(field==="nastepnyFollowup" && oldVal!==el.value) syncFollowupToCalendar(c);
     if(field==="status" || field==="priorytet") renderStatsBar();
-    if(["firma","osoba","telefon","email","wojewodztwo","miejscowosc","ulica","zainteresowanie","produkt","nastepnyFollowup","zrodloLeada","obiekcje"].includes(field)){
+    if(["firma","osoba","telefon","email","wojewodztwo","miejscowosc","ulica","zainteresowanie","produkt","nastepnyFollowup","zrodloLeada","obiekcje","status","priorytet"].includes(field)){
       renderClients();
       if(currentClientCardId===id) openClientCard(id);
     }
