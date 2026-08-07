@@ -3645,6 +3645,7 @@ async function addHistoryEntry(){
   if(!tekst && !audio) return alert("Wpisz notatkę albo dodaj notatkę głosową.");
   if(!c.historia) c.historia = [];
   c.historia.push({tekst: tekst || "[notatka głosowa]", kto: (whoEl.value || getWhoAmI()).trim(), data: historyDateValue(dateEl.value), ...(audio || {})});
+  const followupBefore = c.nastepnyFollowup || "";
   const automation = inferClientAutomation(tekst, c);
   // Ręczna data w polu "Termin następnego kontaktu" ma priorytet nad automatycznym wykrywaniem z treści notatki —
   // ustawiamy ją tylko, jeśli user faktycznie ją zmienił względem stanu przy otwarciu modala (inaczej nadpisywalibyśmy
@@ -3658,6 +3659,7 @@ async function addHistoryEntry(){
   c.zaktualizowano = new Date().toISOString();
   logActivity(`dodał(a) notatkę w historii kontaktu klienta „${c.firma||c.osoba||'bez nazwy'}”${automation.length ? ` i panel ustawił: ${automation.join(", ")}` : ""}`);
   await saveData({immediate: true});
+  if((c.nastepnyFollowup || "") !== followupBefore) syncFollowupToCalendar(c);
   if(!lastCloudSaveOk){
     alert("Notatka została zapisana lokalnie, ale jeszcze nie zsynchronizowała się z chmurą. Panel spróbuje wysłać ją ponownie automatycznie — nie czyść danych przeglądarki, dopóki nie zobaczysz statusu 'Zsynchronizowano'.");
   }
@@ -5958,11 +5960,53 @@ function updateClient(el){
       logActivity(`zmienił(a) status klienta „${c.firma||c.osoba||'bez nazwy'}” na ${STATUS_OPTS.find(s=>s[0]===el.value)[1]}`);
     }
     saveData();
+    if(field==="nastepnyFollowup" && oldVal!==el.value) syncFollowupToCalendar(c);
     if(field==="status" || field==="priorytet") renderStatsBar();
     if(["firma","osoba","telefon","email","wojewodztwo","miejscowosc","ulica","zainteresowanie","produkt","nastepnyFollowup","zrodloLeada","obiekcje"].includes(field)){
       renderClients();
       if(currentClientCardId===id) openClientCard(id);
     }
+  }
+}
+
+// ================= Google Calendar (termin następnego kontaktu) =================
+// Ten sam wzorzec co synchronizacja Drive: best-effort, w tle, nigdy nie blokuje
+// ani nie przerywa zapisu notatki/karty klienta, jeśli Kalendarz akurat nie odpowiada.
+async function syncFollowupToCalendar(c){
+  const password = getPanelPassword();
+  if(!password || !c) return;
+  try{
+    if(c.nastepnyFollowup){
+      const res = await fetch("/api/calendar-events", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "X-Panel-Password": password },
+        body: JSON.stringify({
+          eventId: c.googleCalendarEventId || "",
+          clientId: c.id,
+          clientName: c.firma || c.osoba || "klient",
+          phone: c.telefon || "",
+          notes: c.obiekcje || "",
+          date: c.nastepnyFollowup
+        })
+      });
+      if(res.ok){
+        const json = await res.json().catch(()=>null);
+        if(json && json.eventId && json.eventId !== c.googleCalendarEventId){
+          c.googleCalendarEventId = json.eventId;
+          saveData();
+        }
+      }
+    } else if(c.googleCalendarEventId){
+      const eventId = c.googleCalendarEventId;
+      c.googleCalendarEventId = "";
+      saveData();
+      await fetch(`/api/calendar-events?eventId=${encodeURIComponent(eventId)}`, {
+        method: "DELETE",
+        headers: { "X-Panel-Password": password }
+      });
+    }
+  }catch(e){
+    console.warn("Nie udało się zsynchronizować terminu kontaktu z Google Calendar:", e);
   }
 }
 
