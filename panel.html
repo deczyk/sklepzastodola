@@ -2205,7 +2205,21 @@
 <script>
 const STORAGE_KEY = "panel_items_v2";
 const PANEL_SESSION_KEY = "panel_session_password";
+const PENDING_SYNC_KEY = "panel_pending_sync_v1";
 const SYNC_ENABLED = true;
+
+// Flaga niezapisanych zmian musi przeżyć odświeżenie strony — inaczej po F5/zamknięciu karty
+// w trakcie zapisu (debounce, słabe łącze, konflikt wersji) panel ładuje dane z chmury i ubija
+// notatkę, która jeszcze nie zdążyła tam dotrzeć. Dlatego trzymamy ją też w localStorage.
+function markPendingSync(pending){
+  try{
+    if(pending) localStorage.setItem(PENDING_SYNC_KEY, "1");
+    else localStorage.removeItem(PENDING_SYNC_KEY);
+  }catch(e){}
+}
+function hasPendingSyncFromPreviousSession(){
+  try{ return localStorage.getItem(PENDING_SYNC_KEY) === "1"; }catch(e){ return false; }
+}
 
 function getPanelPassword(){
   return localStorage.getItem(PANEL_SESSION_KEY) || sessionStorage.getItem(PANEL_SESSION_KEY) || "";
@@ -2627,7 +2641,7 @@ async function fetchRemote(password = getPanelPassword()){
   return json.record;
 }
 
-async function pushRemote(payload){
+async function pushRemote(payload, attempt = 0){
   if(!SYNC_ENABLED) return;
   try{
     const password = getPanelPassword();
@@ -2642,7 +2656,24 @@ async function pushRemote(payload){
       body: JSON.stringify(payload)
     });
     if(res.status === 401) throw new Error("AUTH");
-    if(res.status === 409) throw new Error("VERSION_CONFLICT");
+    if(res.status === 409){
+      // Ktoś inny (albo inna karta) zapisał w międzyczasie. Zamiast po prostu poddać się i zostawić
+      // lokalne zmiany zawieszone w powietrzu, dociągamy najnowszą wersję i próbujemy zapisać jeszcze
+      // raz — dane lokalne (z nowo dodaną notatką) i tak są najbardziej aktualne z punktu widzenia
+      // tego, co user właśnie wpisał, więc mają pierwszeństwo przy retry.
+      if(attempt < 3){
+        try{
+          const freshRes = await fetch("/api/panel-data", { headers: { "X-Panel-Password": password } });
+          if(freshRes.ok){
+            const freshJson = await freshRes.json();
+            if(Number.isFinite(Number(freshJson.version))) currentPanelVersion = Number(freshJson.version);
+          }
+        }catch(e){}
+        await new Promise(r => setTimeout(r, 300 * (attempt + 1)));
+        return pushRemote(payload, attempt + 1);
+      }
+      throw new Error("VERSION_CONFLICT");
+    }
     if(!res.ok) throw new Error(await syncErrorMessage(res));
     try{
       const json = await res.json();
@@ -2650,11 +2681,13 @@ async function pushRemote(payload){
     }catch(e){}
     lastCloudSaveOk = true;
     hasUnsyncedLocalChanges = false;
+    markPendingSync(false);
     setSyncStatus("Zsynchronizowano ✓", false);
   }catch(e){
     console.warn("Nie udało się zapisać do wspólnego magazynu:", e);
     lastCloudSaveOk = false;
     hasUnsyncedLocalChanges = true;
+    markPendingSync(true);
     setSyncStatus(syncErrorText(e), true);
   }
 }
@@ -2727,14 +2760,23 @@ async function initApp(){
     }
   }
   const local = loadLocalCache();
-  const preferLocal = shouldPreferLocalCache(remote, local);
-  data = preferLocal ? local : (remote || local || defaultData());
+  // Jeśli poprzednia sesja skończyła się z niezapisanymi zmianami (zamknięta karta / odświeżenie
+  // w trakcie debounce / błąd sieci), NIE wolno ich ubić świeżymi danymi z chmury — to właśnie
+  // powodowało znikanie notatek. Lokalne dane wygrywają, dopóki nie zostaną skutecznie wysłane.
+  const pendingFromBefore = hasPendingSyncFromPreviousSession();
+  const preferLocal = pendingFromBefore || shouldPreferLocalCache(remote, local);
+  data = preferLocal ? (local || remote || defaultData()) : (remote || local || defaultData());
   const repairedMojibake = repairMojibakeDeep(data);
   const wasIncomplete = fillMissingDefaults(data);
   localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
   if(SYNC_ENABLED){
-    setSyncStatus(preferLocal ? "Dane lokalne - chmura była pusta ⚠" : (remote ? "Dane z chmury ✓" : "Dane lokalne - chmura niedostępna ⚠"), !remote || preferLocal);
-    if(wasIncomplete || preferLocal || repairedMojibake) pushRemote(data); // napraw brakujące dane w chmurze na stałe
+    if(pendingFromBefore){
+      setSyncStatus("Dosyłam niezapisane zmiany z poprzedniej sesji...", true);
+      hasUnsyncedLocalChanges = true;
+    } else {
+      setSyncStatus(preferLocal ? "Dane lokalne - chmura była pusta ⚠" : (remote ? "Dane z chmury ✓" : "Dane lokalne - chmura niedostępna ⚠"), !remote || preferLocal);
+    }
+    if(pendingFromBefore || wasIncomplete || preferLocal || repairedMojibake) pushRemote(data); // dosyłamy zaległe/brakujące dane do chmury
   }
   render();
   scheduleDriveAutoSync();
@@ -2935,10 +2977,20 @@ function stopLivePolling(){
   showLiveSyncBanner(false);
 }
 
+// Ostrzegaj przed zamknięciem/odświeżeniem karty, dopóki jest coś niezapisanego w chmurze —
+// sama flaga w localStorage (markPendingSync) już chroni dane, to tylko dodatkowa podpowiedź dla usera.
+window.addEventListener("beforeunload", (e)=>{
+  if(hasUnsyncedLocalChanges){
+    e.preventDefault();
+    e.returnValue = "";
+  }
+});
+
 function saveData(options = {}){
   localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
   if(!SYNC_ENABLED) return Promise.resolve(false);
   hasUnsyncedLocalChanges = true;
+  markPendingSync(true); // trwałe, żeby zamknięcie karty przed zapisem w chmurze nie zgubiło zmiany
   setSyncStatus("Zapisywanie...", false);
   clearTimeout(saveTimer);
   if(options.immediate){
@@ -3566,9 +3618,9 @@ async function saveQuickClientUpdate(clientId){
   const automation = inferClientAutomation(note, c);
   c.zaktualizowano = new Date().toISOString();
   logActivity(`dodał(a) ręczną notatkę klienta „${c.firma||c.osoba||'bez nazwy'}”${automation.length ? ` i panel ustawił: ${automation.join(", ")}` : ""}`);
-  await saveData({immediate: Boolean(audio)});
-  if(audio && !lastCloudSaveOk){
-    alert("Notatka głosowa została zapisana lokalnie, ale nie zsynchronizowała się z chmurą. Nie zamykaj panelu i spróbuj odświeżyć / zapisać ponownie.");
+  await saveData({immediate: true});
+  if(!lastCloudSaveOk){
+    alert("Notatka została zapisana lokalnie, ale jeszcze nie zsynchronizowała się z chmurą. Panel spróbuje wysłać ją ponownie automatycznie — nie czyść danych przeglądarki, dopóki nie zobaczysz statusu 'Zsynchronizowano'.");
   }
   renderClients();
   openClientCard(clientId);
@@ -3605,9 +3657,9 @@ async function addHistoryEntry(){
   }
   c.zaktualizowano = new Date().toISOString();
   logActivity(`dodał(a) notatkę w historii kontaktu klienta „${c.firma||c.osoba||'bez nazwy'}”${automation.length ? ` i panel ustawił: ${automation.join(", ")}` : ""}`);
-  await saveData({immediate: Boolean(audio)});
-  if(audio && !lastCloudSaveOk){
-    alert("Notatka głosowa została zapisana lokalnie, ale nie zsynchronizowała się z chmurą. Nie zamykaj panelu i spróbuj odświeżyć / zapisać ponownie.");
+  await saveData({immediate: true});
+  if(!lastCloudSaveOk){
+    alert("Notatka została zapisana lokalnie, ale jeszcze nie zsynchronizowała się z chmurą. Panel spróbuje wysłać ją ponownie automatycznie — nie czyść danych przeglądarki, dopóki nie zobaczysz statusu 'Zsynchronizowano'.");
   }
   ta.value = "";
   audioEl.value = "";
