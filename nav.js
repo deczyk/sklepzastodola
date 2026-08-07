@@ -222,6 +222,24 @@
     }, 800);
   }
 
+  // ── LINK DO OPINII GOOGLE (w stopce, na każdej stronie) ──
+  const REVIEW_URL = 'https://g.page/r/CaOKJvXUy2BUEBM/review';
+  if(!document.getElementById('google-review-link')){
+    const footerLinks = document.querySelector('.footer-links');
+    if(footerLinks){
+      footerLinks.insertAdjacentHTML('beforeend',
+        '<a id="google-review-link" href="' + REVIEW_URL + '" target="_blank" rel="noopener">⭐ Oceń nas na Google</a>'
+      );
+    } else {
+      const plainFooter = document.querySelector('footer');
+      if(plainFooter){
+        plainFooter.insertAdjacentHTML('beforeend',
+          ' · <a id="google-review-link" href="' + REVIEW_URL + '" target="_blank" rel="noopener" style="color:#d8a94f;text-decoration:none;font-weight:700">⭐ Oceń nas na Google</a>'
+        );
+      }
+    }
+  }
+
   // ── FAQ ──
   document.querySelectorAll('.fq-q').forEach(btn=>{
     btn.addEventListener('click', ()=>{
