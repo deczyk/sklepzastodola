@@ -433,6 +433,7 @@ module.exports = async function handler(req, res) {
         if (existing.segment === "olx_potencjalny") existing.segment = null;
 
         data.powiadomienia.unshift(buildNotification(existing, lead, now, true));
+        data.powiadomienia = data.powiadomienia.slice(0, 200); // nie rosnij w nieskończoność
 
         return { updatedExisting: true, clientId: existing.id, priorHistoria };
       }
@@ -463,6 +464,7 @@ module.exports = async function handler(req, res) {
 
       data.klienci.push(client);
       data.powiadomienia.unshift(buildNotification(client, lead, now, false));
+      data.powiadomienia = data.powiadomienia.slice(0, 200); // nie rosnij w nieskończoność
 
       return { created: true, clientId: client.id };
     });

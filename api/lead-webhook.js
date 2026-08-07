@@ -119,6 +119,7 @@ module.exports = async function handler(req, res) {
         przeczytane: false,
         klientId: client.id
       });
+      data.powiadomienia = data.powiadomienia.slice(0, 200); // nie rosnij w nieskończoność
 
       return { clientId: client.id };
     });
