@@ -122,8 +122,8 @@ function buildAdvisorEmailHtml(payload) {
       <div style="font-size:12px;color:#6b6454;text-transform:uppercase;letter-spacing:.05em;font-weight:bold">Potencjał projektu</div>
       <div style="font-size:24px;font-weight:bold;color:#2d5a27;margin-top:4px">${wynik}</div>
     </div>` : ""}
-    <p style="line-height:1.6;font-size:14px">Jeśli chcesz zobaczyć dokładną cenę, możesz wypełnić nasz konfigurator — zajmuje kilka minut.</p>
-    ${ctaButton(`${SITE_URL}/brief.html`, "Otwórz konfigurator")}
+    <p style="line-height:1.6;font-size:14px">Skonfiguruj, co ma się znaleźć w Twoim projekcie — mlekomat, pawilon, dodatkowe wyposażenie. Na tej podstawie przygotujemy dla Ciebie konkretną ofertę.</p>
+    ${ctaButton(`${SITE_URL}/brief.html`, "Skonfiguruj swój projekt")}
     <p style="line-height:1.6;font-size:13px;color:#6b6454;margin-top:20px;text-align:center">Masz pytania? Zadzwoń: <strong>+48 735 115 427</strong></p>
   `);
 }
@@ -137,7 +137,7 @@ function buildAdvisorEmailText(payload) {
     "",
     `Dziękujemy za wypełnienie kalkulatora${farma ? " dla " + farma : ""}. Wynik: ${wynik || "brak danych"}.`,
     "",
-    "Jeśli chcesz zobaczyć dokładną cenę, wypełnij konfigurator (kilka minut):",
+    "Skonfiguruj, co ma się znaleźć w Twoim projekcie (mlekomat, pawilon, dodatkowe wyposażenie) — na tej podstawie przygotujemy konkretną ofertę:",
     `${SITE_URL}/brief.html`,
     "",
     "Masz pytania? Zadzwoń: +48 735 115 427.",

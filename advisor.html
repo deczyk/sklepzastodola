@@ -62,6 +62,10 @@
     .switch input:checked+.slider{background:var(--green-700)} .switch input:checked+.slider::before{transform:translateX(24px)}
     footer{padding:28px 36px 40px;color:var(--muted);text-align:center}.printOnly{display:none}footer .brand{font-weight:bold;color:var(--green-900)}footer a{color:var(--green-900)}
     @media(max-width:900px){.grid,.row,.row3,.kpis,.package-grid{grid-template-columns:1fr}header{align-items:flex-start;flex-direction:column;padding:13px 16px}header>a:first-child{align-items:flex-start!important;min-height:auto}.wrap{padding-inline:14px}}
+    body.mode-short .full-only{display:none!important}
+    body.mode-short .grid{grid-template-columns:1fr}
+    .mode-switch{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+    .mode-switch .copy b{display:block;color:var(--green-950)}.mode-switch .copy span{display:block;color:var(--muted);font-size:.85rem;margin-top:2px}
     @media print{body{background:white}.topbar,header,.noPrint,button{display:none!important}.wrap{max-width:none;padding:0}.card{box-shadow:none;border:0;border-radius:0;page-break-inside:avoid}.printOnly{display:block}#auditWrap{display:block!important}}
   </style>
 </head>
@@ -88,12 +92,19 @@
     <p><strong>Sprawdź, czy Twoje gospodarstwo może zarabiać więcej na bezpośredniej sprzedaży mleka i produktów rolnych.</strong> Wspieramy gospodarstwa rolne w sprzedaży mleka i innych produktów rolnych — mlekomat to jeden z elementów kanału sprzedaży bezpośredniej, który razem ustawiamy.</p>
     <p>Wypełnij 3 minuty. Otrzymasz orientacyjny potencjał, ROI i rekomendację pakietu (START, SPRZEDAŻOWY albo PREMIUM). Wynik możesz od razu zapisać jako PDF.</p>
   </div>
+  <div class="card noPrint mode-switch">
+    <div class="copy"><b>Wersja formularza</b><span>Skrócona: szybki wynik z minimum pytań. Rozszerzona: pełny audyt, leasing i rekomendacja pakietu.</span></div>
+    <div class="actions">
+      <button type="button" class="btn btn-ghost" id="modeShortBtn" onclick="setMode('short')">Wersja skrócona</button>
+      <button type="button" class="btn btn-ghost" id="modeFullBtn" onclick="setMode('full')">Wersja rozszerzona</button>
+    </div>
+  </div>
   <div class="card noPrint">
     <div class="actions">
       <button class="btn btn-primary" onclick="sendToUs()">Przelicz i wyślij wynik do Sklep za Stodołą</button>
       <button class="btn btn-secondary" onclick="window.print()">Generuj raport PDF / drukuj</button>
-      <button class="btn btn-ghost" onclick="saveData()">Zapisz dane</button>
-      <button class="btn btn-ghost" onclick="loadData()">Wczytaj dane</button>
+      <button class="btn btn-ghost full-only" onclick="saveData()">Zapisz dane</button>
+      <button class="btn btn-ghost full-only" onclick="loadData()">Wczytaj dane</button>
       <button class="btn btn-ghost" onclick="resetAll()">Wyczyść</button>
     </div>
     <div id="sendStatus" style="margin-top:8px;font-size:13px"></div>
@@ -106,12 +117,12 @@
       <div class="row3"><div><label for="region">Województwo</label><input id="region"></div><div><label for="county">Powiat</label><input id="county"></div><div><label for="phone">Telefon *</label><input id="phone" type="tel" autocomplete="tel" required></div></div>
       <div class="row"><div><label for="email">E-mail klienta *</label><input id="email" type="email" autocomplete="email" required></div></div>
       <div class="row"><div><label for="interest">Co Cię interesuje?</label><select id="interest" onchange="renderAuditQuestions()">
-        <option value="sprzedazowy">Pakiet SPRZEDAŻOWY — mlekomat + pawilon + wdrożenie</option>
-        <option value="start">Pakiet START — mlekomat i podstawowe wdrożenie</option>
-        <option value="premium">Pakiet PREMIUM — pełny system i priorytetowa opieka</option>
+        <option value="sprzedazowy">Pakiet SPRZEDAŻOWY — mlekomat + automat chłodniczy + pawilon</option>
+        <option value="start">Pakiet START — mlekomat + pawilon</option>
+        <option value="premium">Pakiet PREMIUM — mlekomat + automat chłodniczy + pawilon + pomoc ARIMR</option>
         <option value="niezdecydowany">Nie wiem jeszcze — proszę o dobór pakietu</option>
       </select></div></div>
-      <div class="row3"><div><label for="cows">Liczba krów mlecznych</label><input type="number" id="cows" value="15"></div><div><label for="yield">Średnia wydajność l/krowę/dzień</label><input type="number" id="yield" value="25"></div><div><label for="ha">Powierzchnia gospodarstwa ha</label><input type="number" id="ha" value="20"></div></div>
+      <div class="row3 full-only"><div><label for="cows">Liczba krów mlecznych</label><input type="number" id="cows" value="15"></div><div><label for="yield">Średnia wydajność l/krowę/dzień</label><input type="number" id="yield" value="25"></div><div><label for="ha">Powierzchnia gospodarstwa ha</label><input type="number" id="ha" value="20"></div></div>
     </section>
 
     <section class="card">
@@ -130,7 +141,7 @@
   </div>
 
   <div class="grid">
-    <section class="card">
+    <section class="card full-only">
       <h2>3. Audyt projektu <span style="font-weight:400;font-size:.75rem;color:var(--muted)">(opcjonalny — doprecyzowuje wynik)</span></h2>
       <p style="margin:0 0 14px;color:var(--muted);font-size:.9rem">Wynik w sekcji 2 liczy się już z danych podstawowych. Rozwiń audyt szczegółowy (19 pytań), żeby doprecyzować ocenę potencjału.</p>
       <button type="button" class="btn btn-ghost noPrint" id="auditToggle" onclick="toggleAudit()">Audyt szczegółowy (opcjonalnie) ▾</button>
@@ -143,11 +154,11 @@
       <h2>4. Ekonomia i finansowanie</h2>
       <div class="row"><div><label for="priceDairy">Cena mleka w skupie PLN/l</label><input type="number" step="0.01" id="priceDairy" value="1.90"></div><div><label for="priceDirect">Cena sprzedaży bezpośredniej PLN/l</label><input type="number" step="0.01" id="priceDirect" value="5.50"></div></div>
       <div class="row"><div><label for="litersDirect">Sprzedaż przez mlekomat l/dzień (cel / plan)</label><input type="number" id="litersDirect" value="100"></div><div><label for="investment">Koszt inwestycji PLN</label><input type="number" id="investment" value="70000"></div></div>
-      <div class="row"><div><label for="sellThrough">Realny % sprzedaży zakładanej produkcji</label><input type="number" id="sellThrough" value="70"><p style="font-size:11px;color:#888;margin:4px 0 0">Uwzględnia zasuszenie, wahania popytu, choroby, mleko na potrzeby własne. 100% zakłada sprzedaż całej produkcji bez przerw — rzadko realne.</p></div><div><label for="opCosts">Roczne koszty eksploatacyjne PLN</label><input type="number" id="opCosts" value="12000"><p style="font-size:11px;color:#888;margin:4px 0 0">Energia, mycie/dezynfekcja, serwis i części, transport mleka, straty, obsługa płatności, opakowania.</p></div></div>
+      <div class="row full-only"><div><label for="sellThrough">Realny % sprzedaży zakładanej produkcji</label><input type="number" id="sellThrough" value="70"><p style="font-size:11px;color:#888;margin:4px 0 0">Uwzględnia zasuszenie, wahania popytu, choroby, mleko na potrzeby własne. 100% zakłada sprzedaż całej produkcji bez przerw — rzadko realne.</p></div><div><label for="opCosts">Roczne koszty eksploatacyjne PLN</label><input type="number" id="opCosts" value="12000"><p style="font-size:11px;color:#888;margin:4px 0 0">Energia, mycie/dezynfekcja, serwis i części, transport mleka, straty, obsługa płatności, opakowania.</p></div></div>
       <div class="row"><div><label for="days">Dni sprzedaży w roku</label><input type="number" id="days" value="365"></div></div>
-      <h3>Leasing / kredyt</h3>
-      <div class="row3"><div><label for="down">Wkład własny %</label><input type="number" id="down" value="20"></div><div><label for="years">Okres finansowania lata</label><input type="number" id="years" value="5"></div><div><label for="rate">Oprocentowanie roczne %</label><input type="number" step="0.1" id="rate" value="8"></div></div>
-      <div id="financeResult" class="ok" style="margin-top:14px"></div>
+      <h3 class="full-only">Leasing / kredyt</h3>
+      <div class="row3 full-only"><div><label for="down">Wkład własny %</label><input type="number" id="down" value="20"></div><div><label for="years">Okres finansowania lata</label><input type="number" id="years" value="5"></div><div><label for="rate">Oprocentowanie roczne %</label><input type="number" step="0.1" id="rate" value="8"></div></div>
+      <div id="financeResult" class="ok full-only" style="margin-top:14px"></div>
     </section>
   </div>
 
@@ -167,12 +178,12 @@
     <p style="font-size:12px;color:#666">Uwaga: to narzędzie doradcze. Nie stanowi gwarancji otrzymania wsparcia. Każdy nabór wymaga sprawdzenia aktualnego regulaminu, kosztów kwalifikowalnych i decyzji instytucji przyznającej pomoc.</p>
   </section>
 
-  <section class="card">
+  <section class="card full-only">
     <h2>6. Rekomendowane rozwiązanie</h2>
     <div class="package-grid">
-      <div class="package-card"><b>START</b><p>Mlekomat, podstawowe uruchomienie i przygotowanie do późniejszej rozbudowy.</p></div>
-      <div class="package-card recommended"><b>SPRZEDAŻOWY</b><p>Mlekomat, pawilon, wdrożenie, dokumenty, finansowanie i prosty marketing lokalny.</p></div>
-      <div class="package-card"><b>PREMIUM</b><p>Pełny system sprzedaży z lepszą konfiguracją, rozbudowanym pawilonem i priorytetową opieką.</p></div>
+      <div class="package-card"><b>START</b><p>Mlekomat + pawilon sprzedażowy.</p></div>
+      <div class="package-card recommended"><b>SPRZEDAŻOWY</b><p>Mlekomat + automat chłodniczy + pawilon sprzedażowy.</p></div>
+      <div class="package-card"><b>PREMIUM</b><p>Mlekomat + automat chłodniczy + pawilon sprzedażowy + pomoc w pozyskaniu dofinansowania ARIMR.</p></div>
     </div>
     <div id="solutionNarrative" style="margin-bottom:12px;line-height:1.6;color:#333"></div>
     <div id="solution"></div>
@@ -210,7 +221,7 @@ const PAWILON_ONLY = ["ownProducts","coolerDisplay","retailExperience"];
 
 function getVisibleQuestions(interest){
   const showMlekomat = interest==="start"||interest==="sprzedazowy"||interest==="premium"||interest==="niezdecydowany";
-  const showPawilon = interest==="sprzedazowy"||interest==="premium"||interest==="niezdecydowany";
+  const showPawilon = interest==="start"||interest==="sprzedazowy"||interest==="premium"||interest==="niezdecydowany";
   return auditQuestions.filter(q=>{
     if(MLEKOMAT_ONLY.includes(q[0])) return showMlekomat;
     if(PAWILON_ONLY.includes(q[0])) return showPawilon;
@@ -239,6 +250,29 @@ function getAuditAnswersText(interest){
 }
 
 function v(id){return parseFloat(document.getElementById(id).value)||0;} function money(x){return Math.round(x).toLocaleString("pl-PL")+" zł";}
+function clamp(x,min,max){return Math.min(Math.max(x,min),max);}
+
+function isShortMode(){return document.body.classList.contains("mode-short");}
+
+function setMode(mode){
+  const m = mode==="short" ? "short" : "full";
+  localStorage.setItem("advisorMode", m);
+  document.body.classList.toggle("mode-short", m==="short");
+  const shortBtn=document.getElementById("modeShortBtn"), fullBtn=document.getElementById("modeFullBtn");
+  shortBtn.className = "btn " + (m==="short"?"btn-primary":"btn-ghost");
+  fullBtn.className = "btn " + (m==="full"?"btn-primary":"btn-ghost");
+  const url = new URL(window.location.href);
+  url.searchParams.set("mode", m);
+  history.replaceState(null, "", url);
+  calculate();
+}
+
+function initMode(){
+  const params = new URLSearchParams(window.location.search);
+  let m = params.get("mode");
+  if(m!=="short" && m!=="full") m = localStorage.getItem("advisorMode") || "full";
+  setMode(m);
+}
 
 function toggleAudit(){
   const wrap=document.getElementById("auditWrap");
@@ -259,14 +293,15 @@ function isSampleData(){
 }
 
 const INTEREST_LABELS = {
-  start: "Pakiet START — mlekomat i podstawowe wdrożenie",
-  sprzedazowy: "Pakiet SPRZEDAŻOWY — mlekomat + pawilon + wdrożenie",
-  premium: "Pakiet PREMIUM — pełny system, rozbudowany pawilon i priorytetowa opieka",
+  start: "Pakiet START — mlekomat + pawilon",
+  sprzedazowy: "Pakiet SPRZEDAŻOWY — mlekomat + automat chłodniczy + pawilon",
+  premium: "Pakiet PREMIUM — mlekomat + automat chłodniczy + pawilon + pomoc ARIMR",
   niezdecydowany: "dobór pakietu po rozmowie doradczej"
 };
 
 function calculate(){
   renderAuditQuestions();
+  const shortMode = isShortMode();
   const interest = document.getElementById("interest").value;
   const visibleQ = getVisibleQuestions(interest);
   let max=0,pts=0;visibleQ.forEach(q=>{if(q[2]>0){max+=q[2];pts+=(parseFloat(document.getElementById(q[0]).value)||0)*q[2];}});
@@ -275,18 +310,23 @@ function calculate(){
   const locEl = document.getElementById("location");
   const locVal = locEl ? parseFloat(locEl.value) : 1;
   let scoreCapped = false;
-  if(locVal===0){ score = Math.min(score,70); scoreCapped = true; }
-  else if(locVal===0.5){ score = Math.min(score,80); scoreCapped = true; }
+  if(!shortMode){
+    if(locVal===0){ score = Math.min(score,70); scoreCapped = true; }
+    else if(locVal===0.5){ score = Math.min(score,80); scoreCapped = true; }
+  }
 
   const dairyEl = document.getElementById("dairyExclusivity");
   const dairyVal = dairyEl ? parseFloat(dairyEl.value) : 1;
   let dairyCapped = false;
-  if(dairyVal===0 || dairyVal===0.5){ score = Math.min(score,60); dairyCapped = true; }
+  if(!shortMode && (dairyVal===0 || dairyVal===0.5)){ score = Math.min(score,60); dairyCapped = true; }
 
-  const prod=v("cows")*v("yield"), targetLiters=Math.min(v("litersDirect"),prod||v("litersDirect"));
+  // W wersji skróconej nie ma pól "krowy/wydajność" — produkcję traktujemy jako równą
+  // wpisanej sprzedaży, żeby ukryte wartości domyślne (15 krów/25 l) nie ucinały wyniku.
+  const prod = shortMode ? v("litersDirect") : v("cows")*v("yield");
+  const targetLiters=Math.min(v("litersDirect"),prod||v("litersDirect"));
   const sellThrough=Math.min(100,Math.max(0,v("sellThrough")||100))/100;
   const liters=targetLiters*sellThrough;
-  const fullProductionAssumed = sellThrough>=0.95 && v("litersDirect")>=prod;
+  const fullProductionAssumed = !shortMode && sellThrough>=0.95 && v("litersDirect")>=prod;
 
   const extraMargin=v("priceDirect")-v("priceDairy");
   const marginDay=extraMargin*liters, marginYear=marginDay*v("days");
@@ -302,47 +342,69 @@ function calculate(){
   const cashAfterFinance=netYear-payment*12;
   const farmName = document.getElementById("farm").value.trim() || "Twoje gospodarstwo";
 
-  document.getElementById("sampleNotice").style.display = isSampleData() ? "block" : "none";
+  // W wersji skróconej nie ma audytu (19 pytań), więc "potencjał %" liczymy z ekonomii
+  // (czas zwrotu, wolumen, marża) zamiast z odpowiedzi audytowych — tak jak w dawnym advisor_olx.
+  const paybackMonths = netYear>0 ? (inv/netYear)*12 : Infinity;
+  if(shortMode){
+    const paybackComponent = clamp((60-paybackMonths)/48,0,1)*65;
+    const volumeComponent = clamp(liters/250,0,1)*20;
+    const marginComponent = clamp(extraMargin/4,0,1)*15;
+    score = netYear>0 ? Math.round(paybackComponent+volumeComponent+marginComponent) : 0;
+  }
+
+  document.getElementById("sampleNotice").style.display = (!shortMode && isSampleData()) ? "block" : "none";
   document.getElementById("scoreTxt").innerText=score+"%";document.getElementById("scoreBar").style.width=score+"%";
   document.getElementById("roiTxt").innerText=roi.toFixed(1);document.getElementById("roiEuTxt").innerText=roiEu.toFixed(1);document.getElementById("profitYearTxt").innerText=money(marginYear);
-  const advice=document.getElementById("advice"); advice.className=`advice-box ${score>=80?"ok":score>=60?"warn":"bad"}`;
-  let adviceTxt = score>=80?`${farmName} ma wysoki potencjał dla tego projektu. Warto od razu przygotować konkretną ofertę, dokładny ROI i sprawdzić aktualny nabór UE.`:score>=60?`${farmName} ma realny potencjał, ale zanim przygotujemy ofertę, warto doprecyzować sposób ustawienia punktu, oznaczenie, finansowanie i kwalifikowalność kosztów.`:`Na tym etapie ${farmName} wymaga dokładniejszej analizy, zanim przygotujemy konkretną ofertę i wniosek o finansowanie.`;
-  if(scoreCapped) adviceTxt += ` ⚠ Wynik ograniczony — nie potwierdzono jeszcze, czy punkt będzie łatwy do znalezienia i wygodny dla klientów. To nie przekreśla sprzedaży bezpośredniej, bo po dobre, świeże produkty ludzie potrafią przyjechać specjalnie, ale przed ofertą trzeba ustalić: oznaczenie, dojazd, sposób informowania klientów i czy popyt na ${Math.round(targetLiters).toLocaleString("pl-PL")} l/dzień jest realny.`;
-  if(dairyVal===0) adviceTxt += " 🚫 Klient wskazuje, że umowa z mleczarnią zawiera klauzulę wyłączności blokującą sprzedaż bezpośrednią. To ważne ryzyko prawne — warto porozmawiać indywidualnie ze Sklep za Stodołą, żeby wspólnie ustalić, jak to wyjaśnić przed dalszymi krokami.";
-  else if(dairyVal===0.5) adviceTxt += " ⚠ Nie potwierdzono, czy umowa z mleczarnią pozwala na sprzedaż bezpośrednią. Zalecamy indywidualną rozmowę ze Sklep za Stodołą, żeby to sprawdzić, zanim projekt pójdzie dalej.";
-  if(fullProductionAssumed) adviceTxt += ` ⚠ Kalkulacja zakłada sprzedaż praktycznie całej bieżącej produkcji mleka bez przerw przez cały rok — to optymistyczne założenie (zasuszenie, choroby, wahania popytu). Warto ustalić z klientem plan uzupełnienia mleka z innego zatwierdzonego gospodarstwa albo powiększenia stada.`;
+  const advice=document.getElementById("advice");
+  let adviceTxt;
+  if(shortMode){
+    advice.className = `advice-box ${netYear<=0?"bad":paybackMonths<=24?"ok":paybackMonths<=72?"warn":"bad"}`;
+    if(netYear<=0) adviceTxt = "Przy podanych wartościach potencjał sprzedaży jest zbyt niski lub ujemny. Sprawdź cenę sprzedaży, realny wolumen i koszt inwestycji.";
+    else if(paybackMonths<=24) adviceTxt = "Bardzo dobry potencjał — krótki orientacyjny czas odzyskania inwestycji. Warto przejść do doboru konkretnego pakietu i sprawdzić finansowanie.";
+    else if(paybackMonths<=48) adviceTxt = "Dobry potencjał. Największy wpływ na wynik będą miały realny wolumen sprzedaży, jakość produktu i regularność dostaw.";
+    else if(paybackMonths<=72) adviceTxt = "Umiarkowany potencjał — inwestycja może być uzasadniona, ale warto sprawdzić popyt, koszty i możliwość dofinansowania.";
+    else adviceTxt = "Projekt wymaga dokładniejszej analizy. Przełącz się na wersję rozszerzoną albo napisz do nas — sprawdzimy to razem.";
+  } else {
+    advice.className=`advice-box ${score>=80?"ok":score>=60?"warn":"bad"}`;
+    adviceTxt = score>=80?`${farmName} ma wysoki potencjał dla tego projektu. Warto od razu przygotować konkretną ofertę, dokładny ROI i sprawdzić aktualny nabór UE.`:score>=60?`${farmName} ma realny potencjał, ale zanim przygotujemy ofertę, warto doprecyzować sposób ustawienia punktu, oznaczenie, finansowanie i kwalifikowalność kosztów.`:`Na tym etapie ${farmName} wymaga dokładniejszej analizy, zanim przygotujemy konkretną ofertę i wniosek o finansowanie.`;
+    if(scoreCapped) adviceTxt += ` ⚠ Wynik ograniczony — nie potwierdzono jeszcze, czy punkt będzie łatwy do znalezienia i wygodny dla klientów. To nie przekreśla sprzedaży bezpośredniej, bo po dobre, świeże produkty ludzie potrafią przyjechać specjalnie, ale przed ofertą trzeba ustalić: oznaczenie, dojazd, sposób informowania klientów i czy popyt na ${Math.round(targetLiters).toLocaleString("pl-PL")} l/dzień jest realny.`;
+    if(dairyVal===0) adviceTxt += " 🚫 Klient wskazuje, że umowa z mleczarnią zawiera klauzulę wyłączności blokującą sprzedaż bezpośrednią. To ważne ryzyko prawne — warto porozmawiać indywidualnie ze Sklep za Stodołą, żeby wspólnie ustalić, jak to wyjaśnić przed dalszymi krokami.";
+    else if(dairyVal===0.5) adviceTxt += " ⚠ Nie potwierdzono, czy umowa z mleczarnią pozwala na sprzedaż bezpośrednią. Zalecamy indywidualną rozmowę ze Sklep za Stodołą, żeby to sprawdzić, zanim projekt pójdzie dalej.";
+    if(fullProductionAssumed) adviceTxt += ` ⚠ Kalkulacja zakłada sprzedaż praktycznie całej bieżącej produkcji mleka bez przerw przez cały rok — to optymistyczne założenie (zasuszenie, choroby, wahania popytu). Warto ustalić z klientem plan uzupełnienia mleka z innego zatwierdzonego gospodarstwa albo powiększenia stada.`;
+  }
   advice.innerText = adviceTxt;
 
   const financeLabel = euEnabled ? "Rata po uwzględnieniu dofinansowania" : `Szacowana rata finansowania (wkład własny ${v("down")}%)`;
   document.getElementById("financeResult").innerHTML=`<b>Produkcja mleka:</b> ${Math.round(prod).toLocaleString("pl-PL")} l/dzień<br><b>Sprzedaż przez mlekomat (cel):</b> ${Math.round(targetLiters).toLocaleString("pl-PL")} l/dzień<br><b>Realna sprzedaż przy ${Math.round(sellThrough*100)}% wykorzystania:</b> ${Math.round(liters).toLocaleString("pl-PL")} l/dzień<br><b>Potencjał przed kosztami eksploatacyjnymi:</b> ${money(marginYear)}<br><b>Roczne koszty eksploatacyjne:</b> −${money(opCosts)}<br><b>Szacowany wynik po kosztach eksploatacyjnych:</b> ${money(netYear)}<br><b>Inwestycja brutto:</b> ${money(inv)}<br><b>Orientacyjny czas odzyskania inwestycji bez dofinansowania:</b> ${roi.toFixed(1)} lat<br><b>${financeLabel}:</b> ${money(payment)}/mies.<br><b>Cashflow roczny po finansowaniu:</b> ${money(cashAfterFinance)}`;
-  document.getElementById("euResult").innerHTML=`<b>Szacowane dofinansowanie (orientacyjnie 50%):</b> ${money(euGrant)}<br><b>Inwestycja po dofinansowaniu / do sfinansowania:</b> ${money(ownAfterEu)}<br><b>Wkład własny przy finansowaniu:</b> ${money(ownAfterEu*v("down")/100)}<br><b>Orientacyjny czas odzyskania inwestycji z dofinansowaniem:</b> ${roiEu.toFixed(1)} lat`;
+  document.getElementById("euResult").innerHTML=`<b>Szacowane dofinansowanie (orientacyjnie 50%):</b> ${money(euGrant)}<br><b>Inwestycja po dofinansowaniu / do sfinansowania:</b> ${money(ownAfterEu)}<br><b>Orientacyjny czas odzyskania inwestycji z dofinansowaniem:</b> ${roiEu.toFixed(1)} lat${shortMode?"":`<br><b>Wkład własny przy finansowaniu:</b> ${money(ownAfterEu*v("down")/100)}`}`;
 
-  const showPawilon = interest==="sprzedazowy"||interest==="premium"||interest==="niezdecydowany";
-  const showMlekomat = true;
-  let narrative = `<p><strong>${farmName}</strong> jest zainteresowane opcją: <em>${INTEREST_LABELS[interest]}</em>. `;
-  if(showMlekomat){
-    narrative += `Przy ${v("cows")} krowach i wydajności ${v("yield")} l/krowę/dzień, gospodarstwo produkuje ok. ${Math.round(prod).toLocaleString("pl-PL")} l mleka dziennie — planowana sprzedaż przez mlekomat na poziomie ${Math.round(targetLiters).toLocaleString("pl-PL")} l/dzień jest ${targetLiters<=prod?"w pełni pokryta bieżącą produkcją":"wyższa niż obecna produkcja, więc warto zweryfikować możliwości zwiększenia stada lub skupu uzupełniającego"}. `;
+  if(!shortMode){
+    const showPawilon = interest==="start"||interest==="sprzedazowy"||interest==="premium"||interest==="niezdecydowany";
+    const showMlekomat = true;
+    let narrative = `<p><strong>${farmName}</strong> jest zainteresowane opcją: <em>${INTEREST_LABELS[interest]}</em>. `;
+    if(showMlekomat){
+      narrative += `Przy ${v("cows")} krowach i wydajności ${v("yield")} l/krowę/dzień, gospodarstwo produkuje ok. ${Math.round(prod).toLocaleString("pl-PL")} l mleka dziennie — planowana sprzedaż przez mlekomat na poziomie ${Math.round(targetLiters).toLocaleString("pl-PL")} l/dzień jest ${targetLiters<=prod?"w pełni pokryta bieżącą produkcją":"wyższa niż obecna produkcja, więc warto zweryfikować możliwości zwiększenia stada lub skupu uzupełniającego"}. `;
+    }
+    if(interest==="start"){
+      narrative += `Pakiet START traktujemy jako budżetowe wejście w sprzedaż bezpośrednią: mlekomat i pawilon sprzedażowy. `;
+    } else if(interest==="sprzedazowy"){
+      narrative += `Pakiet SPRZEDAŻOWY dokłada do mlekomatu i pawilonu automat chłodniczy — możliwość sprzedaży jaj, serów, masła, jogurtów i innych produktów wymagających chłodzenia. `;
+    } else if(interest==="premium"){
+      narrative += `Pakiet PREMIUM to mlekomat, automat chłodniczy i pawilon plus nasza pomoc w pozyskaniu dofinansowania ARIMR — dla klientów, którzy chcą maksymalnie wykorzystać dostępne wsparcie. `;
+    }
+    narrative += `Przy tych założeniach potencjał przed kosztami eksploatacyjnymi szacujemy na <strong>${money(marginYear)}</strong> rocznie, a po odjęciu szacowanych kosztów eksploatacyjnych (${money(opCosts)}) na <strong>${money(netYear)}</strong>. Orientacyjny czas odzyskania inwestycji, liczony od wyniku po kosztach, to ${roi>0?roi.toFixed(1)+" lat bez dofinansowania":"trudny do oszacowania bez kompletu danych"}${euEnabled?` (${roiEu.toFixed(1)} lat z uwzględnieniem dofinansowania UE)`:""}.</p>`;
+    document.getElementById("solutionNarrative").innerHTML = narrative;
+
+    let sol=[];
+    if(interest==="start") sol.push("Rekomendacja: Pakiet START — mlekomat BRUNIMAT + pawilon sprzedażowy.");
+    else if(interest==="sprzedazowy") sol.push("Rekomendacja: Pakiet SPRZEDAŻOWY — mlekomat + automat chłodniczy + pawilon sprzedażowy.");
+    else if(interest==="premium") sol.push("Rekomendacja: Pakiet PREMIUM — mlekomat + automat chłodniczy + pawilon + pomoc w pozyskaniu dofinansowania ARIMR.");
+    else sol.push("Rekomendacja: dobrać jeden z trzech pakietów po rozmowie — START, SPRZEDAŻOWY albo PREMIUM.");
+    if(document.getElementById("ownProducts") && document.getElementById("ownProducts").value>0 && showPawilon) sol.push("Dodać jajomat / lodówkę na sery, masło, jogurty i produkty regionalne.");
+    if(euEnabled) sol.push("Sprawdzić aktualny nabór UE oraz kwalifikowalność wybranych elementów inwestycji.");
+    sol.push("Kolejny krok: indywidualna oferta, dokładny ROI i lista dokumentów do finansowania.");
+    document.getElementById("solution").innerHTML=sol.map(s=>`<span class="tag">${s}</span>`).join("");
   }
-  if(interest==="start"){
-    narrative += `Pakiet START traktujemy jako budżetowe wejście w sprzedaż bezpośrednią: mlekomat, podstawowe uruchomienie i możliwość późniejszej rozbudowy o pawilon oraz produkty dodatkowe. `;
-  } else if(interest==="sprzedazowy"){
-    narrative += `Pakiet SPRZEDAŻOWY jest rekomendowany jako logiczny środek: mlekomat, pawilon, wdrożenie, dokumenty, finansowanie i prosty marketing lokalny w jednym projekcie. `;
-  } else if(interest==="premium"){
-    narrative += `Pakiet PREMIUM ma sens, jeśli klient chce gotowy system sprzedaży z lepszą konfiguracją, rozbudowanym pawilonem i priorytetową opieką od startu. `;
-  }
-  narrative += `Przy tych założeniach potencjał przed kosztami eksploatacyjnymi szacujemy na <strong>${money(marginYear)}</strong> rocznie, a po odjęciu szacowanych kosztów eksploatacyjnych (${money(opCosts)}) na <strong>${money(netYear)}</strong>. Orientacyjny czas odzyskania inwestycji, liczony od wyniku po kosztach, to ${roi>0?roi.toFixed(1)+" lat bez dofinansowania":"trudny do oszacowania bez kompletu danych"}${euEnabled?` (${roiEu.toFixed(1)} lat z uwzględnieniem dofinansowania UE)`:""}.</p>`;
-  document.getElementById("solutionNarrative").innerHTML = narrative;
-
-  let sol=[];
-  if(interest==="start") sol.push("Rekomendacja: Pakiet START — mlekomat BRUNIMAT, podstawowe wdrożenie, lista formalności i przygotowanie do rozbudowy.");
-  else if(interest==="sprzedazowy") sol.push("Rekomendacja: Pakiet SPRZEDAŻOWY — mlekomat + pawilon + wdrożenie + dokumenty + finansowanie + marketing lokalny.");
-  else if(interest==="premium") sol.push("Rekomendacja: Pakiet PREMIUM — pełny system sprzedaży bezpośredniej z rozbudowanym pawilonem, lepszą konfiguracją i priorytetową opieką.");
-  else sol.push("Rekomendacja: dobrać jeden z trzech pakietów po rozmowie — START, SPRZEDAŻOWY albo PREMIUM.");
-  if(document.getElementById("ownProducts") && document.getElementById("ownProducts").value>0 && showPawilon) sol.push("Dodać jajomat / lodówkę na sery, masło, jogurty i produkty regionalne.");
-  if(euEnabled) sol.push("Sprawdzić aktualny nabór UE oraz kwalifikowalność wybranych elementów inwestycji.");
-  sol.push("Kolejny krok: indywidualna oferta, dokładny ROI i lista dokumentów do finansowania.");
-  document.getElementById("solution").innerHTML=sol.map(s=>`<span class="tag">${s}</span>`).join("");
-
 }
 function saveData(){const data={};document.querySelectorAll("input,select,textarea").forEach(el=>data[el.id]=el.type==="checkbox"?el.checked:el.value);localStorage.setItem("advisorDataEU",JSON.stringify(data));alert("Dane zapisane.");}
 function loadData(){const data=JSON.parse(localStorage.getItem("advisorDataEU")||"{}");Object.entries(data).forEach(([k,val])=>{const el=document.getElementById(k);if(el){if(el.type==="checkbox")el.checked=!!val;else el.value=val;}});calculate();}
@@ -373,9 +435,11 @@ async function sendToUs(){
     return;
   }
 
+  const shortMode = isShortMode();
   const interestVal = document.getElementById("interest").value;
-  const auditAnswers = getAuditAnswersText(interestVal);
+  const auditAnswers = shortMode ? "" : getAuditAnswersText(interestVal);
   const answersText = [
+    `Wersja formularza: ${shortMode ? "skrócona" : "rozszerzona"}`,
     farm ? `Gospodarstwo: ${farm}` : "",
     owner ? `Osoba kontaktowa: ${owner}` : "",
     phone ? `Telefon: ${phone}` : "",
@@ -401,7 +465,7 @@ async function sendToUs(){
   let formspreeOk = false;
   try {
     const mailPayload = {
-      _subject: `Advisor EU — wynik kalkulatora: ${farm || "(brak nazwy)"} (${owner || "(brak kontaktu)"})`,
+      _subject: `Advisor EU (${shortMode ? "skrócona" : "rozszerzona"}) — wynik kalkulatora: ${farm || "(brak nazwy)"} (${owner || "(brak kontaktu)"})`,
       name: owner,
       phone,
       "Dane formularza Advisor": answersText
@@ -424,7 +488,10 @@ async function sendToUs(){
   // jeśli backend akurat nie działa.
   try {
     const leadPayload = {
-      source: "advisor",
+      // Backend (api/leads.js) ma białą listę dozwolonych źródeł — "advisor" i "advisor_olx"
+      // już tam są (advisor_olx to dawny krótki formularz, teraz = tryb skrócony tutaj).
+      // Nowe wartości (advisor_full/advisor_short) zostałyby odrzucone jako "Unknown lead source".
+      source: shortMode ? "advisor_olx" : "advisor",
       firma: farm,
       osoba: owner,
       telefon: phone,
@@ -461,7 +528,7 @@ async function sendToUs(){
     statusEl.style.color = "#b44";
   }
 }
-renderAuditQuestions();calculate();
+renderAuditQuestions();initMode();
 </script>
 <script src="nav.js"></script>
 </body>
