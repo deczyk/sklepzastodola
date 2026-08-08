@@ -1300,6 +1300,7 @@
 </div>
 
 <div id="app" style="display:none">
+  <div id="unsyncedBanner" style="display:none;position:sticky;top:0;z-index:9999;background:#b23b3b;color:#fff;font-weight:bold;text-align:center;padding:10px 14px;font-size:14px;line-height:1.4"></div>
   <header>
     <svg class="logo" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
       <rect width="100" height="100" rx="22" fill="#2d5a27"/>
@@ -2573,11 +2574,28 @@ function defaultData(){
   };
 }
 let data = null;
-let saveTimer = null;
 let initialRemoteData = null;
 let currentPanelVersion = null;
 let lastCloudSaveOk = true;
 let hasUnsyncedLocalChanges = false;
+let syncRetryTimer = null;
+let syncRetryDelay = 5000; // rośnie 5s -> 10s -> 20s -> 30s (max) między nieudanymi próbami
+
+// Duży, stały pasek na górze (nie mały napis w rogu) - ma być niemożliwy do przegapienia,
+// dopóki coś nie jest bezpiecznie zapisane w chmurze. Wołane z każdego miejsca, które zmienia
+// hasUnsyncedLocalChanges.
+function updateUnsyncedBanner(){
+  const el = document.getElementById("unsyncedBanner");
+  if(!el) return;
+  if(!hasUnsyncedLocalChanges){
+    el.style.display = "none";
+    return;
+  }
+  el.style.display = "block";
+  el.textContent = lastCloudSaveOk
+    ? "⏳ Zapisywanie zmian do chmury..."
+    : "⚠ Nie udało się zapisać zmian w chmurze — NIE zamykaj karty i nie loguj się teraz na innym urządzeniu. Panel próbuje ponownie automatycznie.";
+}
 
 function loadLocalCache(){
   try{
@@ -2697,12 +2715,21 @@ async function pushRemote(payload, attempt = 0){
     hasUnsyncedLocalChanges = false;
     markPendingSync(false);
     setSyncStatus("Zsynchronizowano ✓", false);
+    clearTimeout(syncRetryTimer);
+    syncRetryDelay = 5000;
+    updateUnsyncedBanner();
   }catch(e){
     console.warn("Nie udało się zapisać do wspólnego magazynu:", e);
     lastCloudSaveOk = false;
     hasUnsyncedLocalChanges = true;
     markPendingSync(true);
     setSyncStatus(syncErrorText(e), true);
+    updateUnsyncedBanner();
+    // Nie czekamy aż user ręcznie odświeży - próbujemy sami, ze wzrastającym odstępem,
+    // dopóki się nie uda albo dopóki coś innego nie zastąpi tej zmiany świeższym zapisem.
+    clearTimeout(syncRetryTimer);
+    syncRetryTimer = setTimeout(()=>{ if(hasUnsyncedLocalChanges) pushRemote(data); }, syncRetryDelay);
+    syncRetryDelay = Math.min(syncRetryDelay * 2, 30000);
   }
 }
 
@@ -2792,6 +2819,7 @@ async function initApp(){
     }
     if(pendingFromBefore || wasIncomplete || preferLocal || repairedMojibake) pushRemote(data); // dosyłamy zaległe/brakujące dane do chmury
   }
+  updateUnsyncedBanner();
   render();
   scheduleDriveAutoSync();
   startLivePolling();
@@ -3006,12 +3034,11 @@ function saveData(options = {}){
   hasUnsyncedLocalChanges = true;
   markPendingSync(true); // trwałe, żeby zamknięcie karty przed zapisem w chmurze nie zgubiło zmiany
   setSyncStatus("Zapisywanie...", false);
-  clearTimeout(saveTimer);
-  if(options.immediate){
-    return pushRemote(data);
-  }
-  saveTimer = setTimeout(()=>pushRemote(data), 500); // debounce
-  return Promise.resolve(true);
+  updateUnsyncedBanner();
+  // Bez debounce: każda zmiana (dodanie/edycja/usunięcie) idzie do chmury natychmiast, nie po 500ms.
+  // Wszystkie akcje w panelu to pojedyncze kliknięcia/eventy (nie pisanie znak-po-znaku), więc nie ma
+  // ryzyka zalania API - jedno wywołanie saveData() = jeden request od razu.
+  return pushRemote(data);
 }
 
 initTheme();
@@ -3271,18 +3298,57 @@ function readAudioNoteFile(input){
   });
 }
 
+// Wysyła nagranie na Google Drive (ten sam mechanizm co zdjęcia w notatkach) - w bazie panelu
+// zostaje tylko link, nie cały plik zakodowany w tekście. To właśnie te pliki (do 2 MB każdy,
+// mnożone przez każdą notatkę głosową w historii) spowalniały wczytywanie panelu, zwłaszcza
+// na telefonie - cała historia audio leciała w całości przy każdym otwarciu.
+// Jeśli wysyłka na Drive się nie powiedzie (np. brak sieci) - NIE tracimy nagrania, wracamy do
+// starego trybu (plik w bazie panelu), tylko z ostrzeżeniem. Stare notatki sprzed tej zmiany
+// (już zapisane jako plik w bazie) zostają jak są - renderHistoryAudio() dalej je odtwarza.
+async function uploadAudioNote(audio, statusElId){
+  if(!audio) return { audio: null, driveFailed: false };
+  const statusEl = statusElId ? document.getElementById(statusElId) : null;
+  try{
+    if(statusEl) statusEl.textContent = "Wysyłam nagranie na Drive...";
+    const contentBase64 = audio.audioData.split(",").pop();
+    const json = await driveApi("/api/drive-documents", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name: audio.audioName, mimeType: audio.audioType, contentBase64, forNoteAudio: true })
+    });
+    if(statusEl) statusEl.textContent = "";
+    return {
+      audio: {
+        audioName: audio.audioName,
+        audioType: audio.audioType,
+        audioSize: audio.audioSize,
+        audioUrl: (json.file && (json.file.webContentLink || driveDocumentLink(json.file))) || ""
+      },
+      driveFailed: false
+    };
+  }catch(e){
+    console.warn("Nie udało się wysłać nagrania na Drive, zapisuję w bazie panelu (stary tryb):", e);
+    if(statusEl) statusEl.textContent = "";
+    return { audio, driveFailed: true };
+  }
+}
+
 function renderHistoryAudio(h){
-  if(!h || !h.audioData) return "";
+  // audioUrl = nowe notatki (plik na Google Drive, w bazie panelu tylko link - szybkie wczytywanie).
+  // audioData = stare notatki sprzed tej zmiany (plik zakodowany w bazie) - dalej muszą działać,
+  // więc nic z istniejących danych nie migrujemy, tylko nowe idą lepszą ścieżką.
+  const src = h && (h.audioUrl || h.audioData);
+  if(!h || !src) return "";
   const name = h.audioName || "notatka głosowa";
   const size = h.audioSize ? ` · ${Math.round(h.audioSize / 1024)} KB` : "";
   const isAmr = /amr/i.test(h.audioType || "") || /\.amr$/i.test(name);
   const fallback = isAmr
-    ? `<div class="audioHint">Format AMR nie zawsze odtwarza się w przeglądarce na komputerze. Jeśli powyższy odtwarzacz milczy: <a href="${crmEsc(h.audioData)}" download="${crmEsc(name)}">Pobierz plik audio</a></div>`
-    : `<a class="audioHint" href="${crmEsc(h.audioData)}" download="${crmEsc(name)}">Pobierz plik audio</a>`;
+    ? `<div class="audioHint">Format AMR nie zawsze odtwarza się w przeglądarce na komputerze. Jeśli powyższy odtwarzacz milczy: <a href="${crmEsc(src)}" download="${crmEsc(name)}">Pobierz plik audio</a></div>`
+    : `<a class="audioHint" href="${crmEsc(src)}" download="${crmEsc(name)}">Pobierz plik audio</a>`;
   return `
     <div class="historyAudio">
       <div class="historyAudioTitle">Notatka głosowa: ${crmEsc(name)}${crmEsc(size)}</div>
-      <audio controls preload="metadata" src="${crmEsc(h.audioData)}"></audio>
+      <audio controls preload="metadata" src="${crmEsc(src)}"></audio>
       <div class="audioSpeed">
         <span class="audioSpeedLabel">Szybkość:</span>
         <button type="button" class="audioSpeedBtn active" data-speed="1" onclick="setAudioSpeed(this,1)">1x</button>
@@ -3698,11 +3764,12 @@ async function saveQuickClientUpdate(clientId){
     return alert(err.message || "Nie udało się dodać nagrania.");
   }
   if(!note && !audio && !pendingQuickImages.length) return alert("Wpisz notatkę, dodaj notatkę głosową albo zdjęcie.");
+  const { audio: audioToSave, driveFailed: audioDriveFailed } = await uploadAudioNote(audio);
   const { uploaded: images, failed: failedImages } = pendingQuickImages.length
     ? await uploadPendingImages(pendingQuickImages, "quickImageStatus")
     : { uploaded: [], failed: [] };
   if(!Array.isArray(c.historia)) c.historia = [];
-  c.historia.push({tekst: note || "[notatka głosowa]", kto: who, data: historyDateValue(date), ...(audio || {}), ...(images.length ? {images} : {})});
+  c.historia.push({tekst: note || "[notatka głosowa]", kto: who, data: historyDateValue(date), ...(audioToSave || {}), ...(images.length ? {images} : {})});
   const automation = inferClientAutomation(note, c);
   c.zaktualizowano = new Date().toISOString();
   logActivity(`dodał(a) ręczną notatkę klienta „${c.firma||c.osoba||'bez nazwy'}”${automation.length ? ` i panel ustawił: ${automation.join(", ")}` : ""}`);
@@ -3710,6 +3777,9 @@ async function saveQuickClientUpdate(clientId){
   pendingQuickImages = [];
   if(failedImages.length){
     alert(`Notatka zapisana, ale ${failedImages.length} zdjęcie(a) nie wysłały się na Drive:\n\n${failedImages.map(f=>`"${f.name}" — ${f.error}`).join("\n")}`);
+  }
+  if(audioDriveFailed){
+    alert("Nagranie zostało zapisane w notatce, ale nie udało się wysłać go na Drive — zapisało się bezpośrednio w bazie panelu (działa tak samo, tylko trochę spowalnia wczytywanie panelu na dłuższą metę).");
   }
   if(!lastCloudSaveOk){
     const reason = document.getElementById("syncStatus")?.textContent || "nieznany błąd";
@@ -3736,11 +3806,12 @@ async function addHistoryEntry(){
     return alert(err.message || "Nie udało się dodać nagrania.");
   }
   if(!tekst && !audio && !pendingHistoryImages.length) return alert("Wpisz notatkę, dodaj notatkę głosową albo zdjęcie.");
+  const { audio: audioToSave, driveFailed: audioDriveFailed } = await uploadAudioNote(audio);
   const { uploaded: images, failed: failedImages } = pendingHistoryImages.length
     ? await uploadPendingImages(pendingHistoryImages, "historyImageStatus")
     : { uploaded: [], failed: [] };
   if(!c.historia) c.historia = [];
-  c.historia.push({tekst: tekst || "[notatka głosowa]", kto: (whoEl.value || getWhoAmI()).trim(), data: historyDateValue(dateEl.value), ...(audio || {}), ...(images.length ? {images} : {})});
+  c.historia.push({tekst: tekst || "[notatka głosowa]", kto: (whoEl.value || getWhoAmI()).trim(), data: historyDateValue(dateEl.value), ...(audioToSave || {}), ...(images.length ? {images} : {})});
   pendingHistoryImages = [];
   const followupBefore = c.nastepnyFollowup || "";
   const automation = inferClientAutomation(tekst, c);
@@ -3773,6 +3844,9 @@ async function addHistoryEntry(){
   if(currentClientCardId === c.id) openClientCard(c.id);
   if(failedImages.length){
     alert(`Notatka zapisana, ale ${failedImages.length} zdjęcie(a) nie wysłały się na Drive:\n\n${failedImages.map(f=>`"${f.name}" — ${f.error}`).join("\n")}`);
+  }
+  if(audioDriveFailed){
+    alert("Nagranie zostało zapisane w notatce, ale nie udało się wysłać go na Drive — zapisało się bezpośrednio w bazie panelu (działa tak samo, tylko trochę spowalnia wczytywanie panelu na dłuższą metę).");
   }
 }
 
