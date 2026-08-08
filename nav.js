@@ -218,6 +218,11 @@
       if(el){
         el.classList.add('show');
         el.style.display = 'flex';
+        // Na mobile sticky-mobile-cta zajmuje pasek na samym dole ekranu - podnosimy baner
+        // ciasteczek nad niego, żeby przyciski akceptacji się z nim nie nakładały/nie chowały.
+        const stickyCta = document.getElementById('sticky-mobile-cta');
+        const stickyHeight = stickyCta ? stickyCta.offsetHeight : 0;
+        el.style.bottom = stickyHeight > 0 ? `calc(${stickyHeight}px + 16px)` : '16px';
       }
     }, 800);
   }
