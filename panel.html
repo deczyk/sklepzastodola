@@ -738,6 +738,15 @@
   .clientDocTop{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
   .clientDocName{font-weight:bold;color:var(--text)}
   .clientDocMeta{display:flex;gap:6px;flex-wrap:wrap;font-size:12px;color:var(--text-muted);margin-top:4px}
+  .clientBriefSection,.clientAdvisorSection{border:1px solid #ead99a;border-radius:10px;padding:12px;margin-top:12px;background:color-mix(in srgb, var(--surface) 88%, #ead99a 12%)}
+  .clientBriefSection .sectionHead,.clientAdvisorSection .sectionHead{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:10px}
+  .clientBriefSection .sectionHead b,.clientAdvisorSection .sectionHead b{color:#755c15}
+  .sectionDate{font-size:11px;color:var(--text-muted)}
+  .briefConfigList{display:grid;gap:6px;margin:0;padding:0;list-style:none}
+  .briefConfigList li{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:8px 10px;font-size:13px;color:var(--text)}
+  .advisorResultBox{display:grid;gap:0}
+  .advisorResultLine{font-size:13px;color:var(--text);line-height:1.5;padding:4px 0;border-bottom:1px dashed var(--border)}
+  .advisorResultLine:last-child{border-bottom:none}
   .clientDangerZone{display:flex;justify-content:flex-end;margin-top:12px;padding-top:12px;border-top:1px solid #f0d0cb}
   .dangerBtn{border:1px solid #d8a19b;background:#fff5f4;color:#a33b33;border-radius:8px;padding:8px 12px;font-weight:bold;cursor:pointer}
   .dangerBtn:hover{background:#ffecea;border-color:#c66b62}
@@ -5660,6 +5669,8 @@ function openClientCard(clientId){
       <div class="clientCardField"><b>Status</b>${clientField(c,null,"status")}</div>
       <div class="clientCardField"><b>Priorytet</b>${clientField(c,null,"prio")}</div>
     </div>
+    ${renderBriefConfigSection(c)}
+    ${renderAdvisorResultSection(c)}
     ${renderQuickClientUpdate(c)}
     ${renderClientDocuments(c)}
     <div class="clientCardHistory">
@@ -5702,6 +5713,48 @@ function findAdvisorHistoryText(c){
   const hist = Array.isArray(c.historia) ? c.historia : [];
   const entry = hist.find(h => parseHistoryText(h.tekst || "").type.toLowerCase() === "advisor");
   return entry ? (entry.tekst || "") : "";
+}
+
+// Konfiguracja z konfiguratora (brief.html) trafia do historii jako notatka [Brief], w formacie
+// "Klient skonfigurował mlekomat w konfiguratorze. Konfiguracja: ...; Stado: ...; Produkcja: ...".
+// generateOfferPdf() już dzieli ją po "; " do budowy PDF-a - używamy dokładnie tego samego podziału
+// tutaj, żeby pokazać to samo w czytelnej liście w karcie klienta, zamiast tylko w historii kontaktu.
+function renderBriefConfigSection(c){
+  const entry = findLatestBriefHistory(c);
+  if(!entry) return "";
+  const text = parseHistoryText(entry.tekst || "").text || "";
+  const clean = text.replace(/^Klient skonfigurował mlekomat w konfiguratorze\.\s*/, "");
+  const segments = clean.split(/;\s*/).map(s => s.trim()).filter(Boolean);
+  if(!segments.length) return "";
+  return `
+    <div class="clientBriefSection">
+      <div class="sectionHead"><b>🛒 Konfiguracja z konfiguratora (Brief)</b><span class="sectionDate">${crmEsc(historyDateInputValue(entry.data) || "")}</span></div>
+      <ul class="briefConfigList">
+        ${segments.map(s => `<li>${crmEsc(s)}</li>`).join("")}
+      </ul>
+    </div>
+  `;
+}
+
+// Wynik z Advisor (advisor.html) trafia do historii jako notatka [Advisor] / [Advisor OLX],
+// z pełną, wieloliniową treścią ankiety i wyników kalkulatora. Rozpisujemy to linia po linii,
+// zamiast zostawiać schowane w jednym bloku tekstu w chronologicznej historii kontaktu.
+function renderAdvisorResultSection(c){
+  const hist = Array.isArray(c.historia) ? c.historia : [];
+  const entry = hist.find(h => /^advisor/i.test(parseHistoryText(h.tekst || "").type || ""));
+  if(!entry) return "";
+  const text = parseHistoryText(entry.tekst || "").text || "";
+  const clean = text.replace(/^Klient wypełnił formularz doradczy(?: z OLX)?\.\s*Odpowiedzi:\s*/, "");
+  const lines = clean.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+  if(!lines.length) return "";
+  return `
+    <div class="clientAdvisorSection">
+      <div class="sectionHead"><b>🧮 Wynik z kalkulatora Advisor</b><span class="sectionDate">${crmEsc(historyDateInputValue(entry.data) || "")}</span></div>
+      <div class="advisorResultBox">
+        ${lines.map(l => `<div class="advisorResultLine">${crmEsc(l)}</div>`).join("")}
+      </div>
+    </div>
+  `;
 }
 
 function offerInsightCards(c, konfigText){

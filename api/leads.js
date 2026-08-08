@@ -279,11 +279,16 @@ function buildLeadData(payload, source) {
   const notes = sanitizeLongText(payload.notes || payload.wiadomosc || payload.message || payload.answersText || "");
   let answersText = sanitizeLongText(payload.answersText || payload.message || notes);
   if (source === "brief") {
+    // payload.konfiguracja bywał obcinany do 500 znaków - dla wielu wybranych produktów naraz
+    // (mlekomat + sielaff + opcje) to realnie ucinało część konfiguracji przed dotarciem do panelu.
+    // 2000 znaków z zapasem mieści pełną listę, a i tak jest ograniczone przez sanitizeLongText(5000)
+    // na całym złączonym tekście poniżej.
     const detale = [
-      payload.konfiguracja ? `Konfiguracja: ${clampText(payload.konfiguracja, 500)}` : "",
+      payload.konfiguracja ? `Konfiguracja: ${clampText(payload.konfiguracja, 2000)}` : "",
       payload.krowy ? `Stado: ${clampText(payload.krowy, 120)}` : "",
       payload.litry ? `Produkcja: ${clampText(payload.litry, 120)}` : "",
       payload.pawilon ? `Pawilon: ${clampText(payload.pawilon, 120)}` : "",
+      payload.dotacja ? `Zainteresowanie dotacją ARiMR: ${clampText(payload.dotacja, 120)}` : "",
       [payload.cena_netto, payload.cena_brutto, payload.po_dotacji].filter(Boolean).length
         ? `Wycena (netto | brutto | po dotacji): ${[payload.cena_netto, payload.cena_brutto, payload.po_dotacji].filter(Boolean).join(" | ")}`
         : ""
