@@ -5896,18 +5896,48 @@ function renderLeadSourceView(list, mode){
 
 function followupInfo(dateStr){
   if(!dateStr) return {label:"brak terminu", group:"none", days:null};
-  const days = safeDaysUntil(dateStr);
-  if(days === null) return {label:"brak terminu", group:"none", days:null};
-  const time = /^\d{4}-\d{2}-\d{2}T(\d{2}:\d{2})/.exec(dateStr)?.[1] || "";
-  if(days <= 0) return {label:days < 0 ? "po terminie" : `dzisiaj${time ? ` o ${time}` : ""}`, group:"today", days};
-  if(days <= 7) return {label:`za ${days} dni`, group:"soon", days};
-  return {label:`za ${days} dni`, group:"later", days};
+  const raw = dateStr.toString().trim();
+  const match = raw.match(/^(\d{4})-(\d{2})-(\d{2})(?:T(\d{2}):(\d{2}))?/);
+  if(!match) return {label:"brak terminu", group:"none", days:null};
+  const today = new Date();
+  today.setHours(0,0,0,0);
+  const targetDay = new Date(Number(match[1]), Number(match[2]) - 1, Number(match[3]));
+  const days = Math.round((targetDay.getTime() - today.getTime()) / 86400000);
+  const hasTime = Boolean(match?.[4]);
+  if(!hasTime){
+    if(days < 0) return {label:`po terminie o ${Math.abs(days)} ${Math.abs(days) === 1 ? "dzień" : "dni"}`, group:"today", days, overdue:true};
+    if(days === 0) return {label:"dzisiaj", group:"today", days, overdue:false};
+    if(days === 1) return {label:"jutro", group:"soon", days, overdue:false};
+    return {label:`za ${days} dni`, group:days <= 7 ? "soon" : "later", days, overdue:false};
+  }
+
+  const target = new Date(
+    Number(match[1]), Number(match[2]) - 1, Number(match[3]),
+    Number(match[4]), Number(match[5]), 0, 0
+  );
+  const diffMs = target.getTime() - Date.now();
+  const overdue = diffMs < 0;
+  const totalMinutes = Math.max(1, overdue
+    ? Math.floor(Math.abs(diffMs) / 60000)
+    : Math.ceil(diffMs / 60000));
+  if(totalMinutes === 0) return {label:"teraz", group:"today", days:0, overdue:false};
+
+  const fullDays = Math.floor(totalMinutes / 1440);
+  const hours = Math.floor((totalMinutes % 1440) / 60);
+  const minutes = totalMinutes % 60;
+  const parts = [];
+  if(fullDays) parts.push(`${fullDays} ${fullDays === 1 ? "dzień" : "dni"}`);
+  if(hours) parts.push(`${hours} godz.`);
+  if(minutes && fullDays === 0) parts.push(`${minutes} min`);
+  const label = `${overdue ? "po terminie o" : "za"} ${parts.join(" ")}`;
+  const group = overdue || days === 0 ? "today" : (days <= 7 ? "soon" : "later");
+  return {label, group, days, overdue};
 }
 
 function renderClientFollowupPreview(c, compact = false){
   const value = clientFollowup(c);
   const info = followupInfo(value);
-  const state = !value ? "none" : (info.days < 0 ? "overdue" : (info.days === 0 ? "today" : "scheduled"));
+  const state = !value ? "none" : (info.overdue ? "overdue" : (info.days === 0 ? "today" : "scheduled"));
   const when = value ? formatFollowupDateTime(value) : "nie ustawiono";
   const status = value && info.label ? ` (${info.label})` : "";
   return `<div class="clientFollowupPreview ${state}${compact ? " compact" : ""}"><b>Następny kontakt</b><span>${crmEsc(when + status)}</span></div>`;
