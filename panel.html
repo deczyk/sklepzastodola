@@ -92,6 +92,13 @@
   .driveStatus{font-size:12px;color:var(--text-muted);margin-top:6px;min-height:16px}
   .driveStatus.error{color:var(--todo)}
   .driveStatus.ok{color:var(--done)}
+  .driveSyncReport{width:100%;margin-top:8px;border:1px solid var(--border);border-radius:8px;background:var(--surface-soft);overflow:hidden}
+  .driveSyncReport summary{cursor:pointer;padding:10px 12px;font-size:12px;font-weight:700;color:var(--text);list-style-position:inside}
+  .driveSyncReportList{margin:0;padding:0 12px 10px;display:grid;gap:6px;max-height:280px;overflow:auto}
+  .driveSyncReportRow{display:grid;grid-template-columns:minmax(160px,1fr) minmax(180px,1.2fr);gap:10px;padding:7px 9px;border-radius:6px;background:var(--surface);font-size:12px}
+  .driveSyncReportRow b{overflow-wrap:anywhere}
+  .driveSyncReportTarget{color:var(--text-muted);overflow-wrap:anywhere}
+  @media(max-width:700px){.driveSyncReportRow{grid-template-columns:1fr;gap:3px}}
   .delBtn{background:#fff5f4;border:1px solid #e2aaa4;color:#a33b33;cursor:pointer;font-size:12px;
       border-radius:7px;padding:5px 8px;font-weight:bold;opacity:1}
   .delBtn:hover{background:#ffecea;border-color:#c66b62}
@@ -1728,6 +1735,10 @@
       <div class="docActions">
         <button class="docActionBtn" onclick="syncDocumentsFromDrive()">Synchronizuj z Drive</button>
         <span id="driveSyncStatus" class="driveStatus"></span>
+        <details id="driveSyncReport" class="driveSyncReport" hidden>
+          <summary id="driveSyncReportSummary">Raport synchronizacji</summary>
+          <div id="driveSyncReportList" class="driveSyncReportList"></div>
+        </details>
       </div>
       <div class="docToolbar">
         <input type="text" id="searchDokumenty" class="docSearch" placeholder="🔍 Szukaj dokumentu (nazwa, opis, kategoria)..." oninput="render()">
@@ -4397,6 +4408,7 @@ const KATEGORIA_ORDER = [
   "Finansowanie / ARiMR",
   "Materiały sprzedażowe",
   "BRUNIMAT",
+  "Automaty SIELAFF",
   "Pawilony",
   "Klienci",
   "Google Drive",
@@ -4407,15 +4419,17 @@ const DOC_CATEGORY_SUGGESTIONS = [...KATEGORIA_ORDER];
 function inferDocumentCategory(file){
   const name = (file.name || file.title || file.nazwaPliku || "").toLowerCase();
   const mime = (file.mimeType || "").toLowerCase();
-  const text = `${name} ${mime}`;
+  const folderPath = (file.folderPath || file.driveFolderPath || "").toLowerCase();
+  const text = `${name} ${folderPath} ${mime}`;
   if(/cennik|price|pricing|koszt|wycena|xls|xlsx|arkusz/.test(text)) return "Cenniki";
   if(/umowa|kontrakt|podpis|agreement/.test(text)) return "Umowy";
   if(/oferta|offer|propozycja|zamowienie|zamówienie/.test(text)) return "Oferty";
   if(/krs|nip|regon|ceidg|spolka|spółka|formal|rejestr|podpisany|podpis/.test(text)) return "KRS / formalne";
   if(/arimr|ari?mr|dotacj|leasing|kredyt|finansow|wniosek/.test(text)) return "Finansowanie / ARiMR";
-  if(/marketing|ulotk|baner|grafik|social|facebook|olx|material|materiał|sprzedaz|sprzedaż/.test(text)) return "Materiały sprzedażowe";
-  if(/brunimat|mlekomat|automat|duo|premium|650/.test(text)) return "BRUNIMAT";
+  if(/sielaff|siline|combi.?m/.test(text)) return "Automaty SIELAFF";
+  if(/brunimat|mlekomat|duo|premium|650/.test(text)) return "BRUNIMAT";
   if(/pawilon|sklep|punkt sprzeda|kontener|budka/.test(text)) return "Pawilony";
+  if(/marketing|ulotk|baner|grafik|social|facebook|olx|material|materiał|sprzedaz|sprzedaż/.test(text)) return "Materiały sprzedażowe";
   if(/klient|gospodarstwo|lead|crm/.test(text)) return "Klienci";
   return "Inne dokumenty";
 }
@@ -4429,6 +4443,8 @@ function inferDocumentType(file){
   if(category === "Oferty") return "Oferta wysłana";
   if(category === "KRS / formalne") return "KRS / formalne";
   if(category === "Materiały sprzedażowe") return "Materiał sprzedażowy";
+  if(category === "Automaty SIELAFF") return "Dokument SIELAFF";
+  if(category === "BRUNIMAT") return "Dokument BRUNIMAT";
   if(mime.includes("spreadsheet") || /\.(xls|xlsx|csv)$/.test(name)) return "Cennik wewnętrzny";
   return "Dokument firmowy";
 }
@@ -4694,6 +4710,38 @@ function setDriveStatus(id, text, type){
   el.classList.toggle("ok", type === "ok");
 }
 
+function renderDriveSyncReport(entries, unchangedCount){
+  const report = document.getElementById("driveSyncReport");
+  const summary = document.getElementById("driveSyncReportSummary");
+  const list = document.getElementById("driveSyncReportList");
+  if(!report || !summary || !list) return;
+  const rows = Array.isArray(entries) ? entries : [];
+  report.hidden = false;
+  report.open = rows.length > 0;
+  summary.textContent = rows.length
+    ? `Raport: ${rows.length} ${rows.length === 1 ? "zmiana" : "zmian"}, bez zmian ${unchangedCount || 0}`
+    : `Raport: brak nowych zmian, bez zmian ${unchangedCount || 0}`;
+  list.innerHTML = "";
+  if(!rows.length){
+    const empty = document.createElement("div");
+    empty.className = "driveSyncReportTarget";
+    empty.textContent = "Wszystkie pliki są już przypisane i aktualne.";
+    list.appendChild(empty);
+    return;
+  }
+  rows.forEach(entry => {
+    const row = document.createElement("div");
+    row.className = "driveSyncReportRow";
+    const name = document.createElement("b");
+    name.textContent = entry.name || "Plik bez nazwy";
+    const target = document.createElement("span");
+    target.className = "driveSyncReportTarget";
+    target.textContent = entry.target || "Dokumenty";
+    row.append(name, target);
+    list.appendChild(row);
+  });
+}
+
 function readDocumentFormValues(fileName){
   const title = document.getElementById("title-dokumenty").value.trim() || fileName || "Dokument";
   const kategoria = document.getElementById("kategoria-dokumenty").value.trim() || inferDocumentCategory({name:fileName});
@@ -4751,7 +4799,9 @@ function findDriveDocumentMatch(file, existingDocs){
     const docDriveId = (doc.googleDriveId || "").toString();
     const docLinkValue = (doc.link || "").toString();
     const docNameValue = (doc.nazwaPliku || doc.title || "").toString().trim().toLowerCase();
-    return (id && docDriveId === id) || (link && docLinkValue === link) || (name && docNameValue === name);
+    if(id && docDriveId) return docDriveId === id;
+    if(link && docLinkValue) return docLinkValue === link;
+    return Boolean(name && docNameValue === name && (!id || !docDriveId));
   });
 }
 
@@ -4834,6 +4884,8 @@ function assignDriveOfferToClient(file){
 function mergeDriveDocument(doc, file){
   let changed = false;
   const link = driveDocumentLink(file);
+  const inferredCategory = inferDocumentCategory(file);
+  const inferredType = inferDocumentType(file);
   const updates = {
     googleDriveId: file.id || doc.googleDriveId || "",
     link: link || doc.link || "",
@@ -4858,6 +4910,11 @@ function mergeDriveDocument(doc, file){
   }
   if(!doc.desc && file.folderPath){
     doc.desc = `Drive: ${file.folderPath}`;
+    changed = true;
+  }
+  if(inferredCategory === "Automaty SIELAFF" && doc.kategoria === "BRUNIMAT"){
+    doc.kategoria = inferredCategory;
+    doc.typ = inferredType;
     changed = true;
   }
   if(changed) doc.zaktualizowano = new Date().toISOString();
@@ -4956,40 +5013,60 @@ function scheduleDriveAutoSync(){
 }
 
 async function syncDocumentsFromDrive(options={}){
+  if(driveAutoSyncRunning){
+    if(!options.silent) setDriveStatus("driveSyncStatus", "Synchronizacja już trwa. Raport pojawi się po jej zakończeniu.", "");
+    return;
+  }
   if(!options.silent) setDriveStatus("driveSyncStatus", "Pobieram listę plików z Drive...", "");
-  if(driveAutoSyncRunning) return;
   driveAutoSyncRunning = true;
   try{
-    const json = await driveApi("/api/drive-documents");
+    const json = await driveApi("/api/drive-documents?includeClientOffers=1");
     const files = Array.isArray(json.files) ? json.files : [];
     if(!data.dokumenty) data.dokumenty = [];
     let added = 0;
     let updated = 0;
     let skipped = 0;
     let assignedOffers = 0;
+    const reportEntries = [];
     files.forEach(file => {
       const offerAssignment = assignDriveOfferToClient(file);
       if(offerAssignment){
-        if(offerAssignment.added) assignedOffers++;
-        else skipped++;
+        if(offerAssignment.added){
+          assignedOffers++;
+          reportEntries.push({
+            name:file.name,
+            target:`Oferta klienta → ${getClientDisplayName(offerAssignment.client)}`
+          });
+        }else{
+          skipped++;
+        }
         return;
       }
       const existing = findDriveDocumentMatch(file, data.dokumenty);
       if(existing){
         if(mergeDriveDocument(existing, file)){
           updated++;
+          reportEntries.push({
+            name:file.name,
+            target:`Zaktualizowano → Dokumenty / ${existing.kategoria || inferDocumentCategory(file)}`
+          });
         } else {
           skipped++;
         }
       } else {
         const folderNote = file.folderPath ? `Drive: ${file.folderPath}` : "";
+        const category = inferDocumentCategory(file);
         data.dokumenty.push(documentFromDriveFile(file, {
-          kategoria: inferDocumentCategory(file),
+          kategoria: category,
           typ: inferDocumentType(file),
           statusDokumentu:"Aktualny",
           desc: folderNote
         }));
         added++;
+        reportEntries.push({
+          name:file.name,
+          target:`Dodano → Dokumenty / ${category}`
+        });
       }
     });
     if(added || updated || assignedOffers){
@@ -4998,13 +5075,19 @@ async function syncDocumentsFromDrive(options={}){
       if(updated) parts.push(`zaktualizowano ${updated}`);
       if(assignedOffers) parts.push(`przypisano ${assignedOffers} ${assignedOffers === 1 ? "ofertę" : "oferty"} do klientów`);
       logActivity(`zsynchronizował(a) dokumenty z Google Drive: ${parts.join(", ")}`);
-      saveData();
+      await saveData();
     }
     driveLastAutoSyncAt = Date.now();
     render();
-    if(!options.silent) setDriveStatus("driveSyncStatus", `Drive: dodano ${added}, zaktualizowano ${updated}, przypisano ofert ${assignedOffers}, pominięto ${skipped}.`, "ok");
+    if(!options.silent){
+      setDriveStatus("driveSyncStatus", `Drive: dodano ${added}, zaktualizowano ${updated}, przypisano ofert ${assignedOffers}, bez zmian ${skipped}.`, "ok");
+      renderDriveSyncReport(reportEntries, skipped);
+    }
   }catch(e){
-    if(!options.silent) setDriveStatus("driveSyncStatus", `Błąd Drive: ${e.message || e}`, "error");
+    if(!options.silent){
+      setDriveStatus("driveSyncStatus", `Błąd Drive: ${e.message || e}`, "error");
+      renderDriveSyncReport([{name:"Synchronizacja przerwana", target:e.message || String(e)}], 0);
+    }
   }finally{
     driveAutoSyncRunning = false;
   }

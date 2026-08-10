@@ -7,9 +7,9 @@ const GOOGLE_SERVICE_ACCOUNT_EMAIL = process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL;
 const GOOGLE_PRIVATE_KEY = process.env.GOOGLE_PRIVATE_KEY;
 const GOOGLE_DRIVE_FOLDER_ID = "0ACFzxkUrgaMkUk9PVA";
 const DRIVE_FOLDER_MIME_TYPE = "application/vnd.google-apps.folder";
-// Załączniki notatek i oferty klientów lądują w osobnych podfolderach, żeby NIE mieszały się
-// z dokumentami firmowymi w zakładce "Dokumenty" panelu. listDriveFiles() celowo pomija je
-// przy automatycznej synchronizacji, bo są już przypisane do właściwej sekcji karty klienta.
+// Załączniki notatek i oferty klientów lądują w osobnych podfolderach. Zdjęcia i nagrania
+// nigdy nie trafiają do katalogu dokumentów. Oferty mogą być dołączone do pełnej synchronizacji,
+// aby panel przypisał je bezpośrednio do kart klientów.
 const NOTES_PHOTOS_FOLDER_NAME = "Zdjęcia z notatek";
 const NOTES_AUDIO_FOLDER_NAME = "Nagrania z notatek";
 const CLIENT_OFFERS_FOLDER_NAME = "Oferty klientów";
@@ -180,7 +180,7 @@ async function listDriveFolder(token, folderId) {
   return files;
 }
 
-async function listDriveFiles(token) {
+async function listDriveFiles(token, options = {}) {
   const result = [];
   const queue = [{ id: GOOGLE_DRIVE_FOLDER_ID, path: "" }];
   let scanned = 0;
@@ -199,7 +199,7 @@ async function listDriveFiles(token) {
         if (!folderPath && (
           file.name === NOTES_PHOTOS_FOLDER_NAME ||
           file.name === NOTES_AUDIO_FOLDER_NAME ||
-          file.name === CLIENT_OFFERS_FOLDER_NAME
+          (file.name === CLIENT_OFFERS_FOLDER_NAME && !options.includeClientOffers)
         )) return;
         queue.push({
           id: file.id,
@@ -359,7 +359,8 @@ module.exports = async function handler(req, res) {
           .map(file => normalizeDriveFile({ ...file, folderPath: CLIENT_OFFERS_FOLDER_NAME }));
         return res.status(200).json({ files });
       }
-      return res.status(200).json({ files: await listDriveFiles(token) });
+      const includeClientOffers = Boolean(req.query && req.query.includeClientOffers === "1");
+      return res.status(200).json({ files: await listDriveFiles(token, { includeClientOffers }) });
     }
     if (req.method === "POST") {
       const payload = parseBody(req);
