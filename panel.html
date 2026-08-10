@@ -505,7 +505,41 @@
   .fbPostActions button{border:1px solid var(--border);background:var(--surface);color:var(--green);border-radius:8px;
                         padding:7px 10px;font-size:12px;font-weight:bold;cursor:pointer}
   .fbPostCard.published{opacity:.72}
+  .marketingHero{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(240px,.6fr);gap:14px;margin-bottom:14px}
+  .marketingIntro,.marketingCalendarBox{border:1px solid var(--border);border-radius:14px;background:var(--surface-soft);padding:18px}
+  .marketingIntro h2{margin:0 0 6px;color:var(--green);font-size:22px}
+  .marketingIntro p,.marketingCalendarBox p{margin:0;color:var(--text-muted);font-size:13px;line-height:1.5}
+  .marketingCalendarBox{display:flex;align-items:center;justify-content:space-between;gap:12px}
+  .marketingCalendarBox strong{display:block;color:var(--text);margin-bottom:4px}
+  .marketingStats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:18px}
+  .marketingStat{border:1px solid var(--border);border-radius:12px;background:var(--surface);padding:13px 14px}
+  .marketingStat b{display:block;color:var(--green);font-size:23px;line-height:1;margin-bottom:6px}
+  .marketingStat span{font-size:11px;color:var(--text-muted);text-transform:uppercase;font-weight:bold}
+  .marketingSection{border-top:1px solid var(--border);padding-top:18px;margin-top:18px}
+  .marketingSectionHead{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:12px;flex-wrap:wrap}
+  .marketingSectionHead h3{margin:0;color:var(--green);font-size:17px}
+  .marketingSectionHead p{margin:4px 0 0;color:var(--text-muted);font-size:12.5px;line-height:1.45}
+  .marketingChannelGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+  .marketingChannel{border:1px solid var(--border);border-radius:12px;background:var(--surface-soft);padding:14px;display:grid;gap:10px}
+  .marketingChannelTop{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+  .marketingChannelTop strong{color:var(--text);font-size:14px}
+  .marketingChannelFields{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+  .marketingChannel label,.marketingPlanForm label{display:grid;gap:5px;font-size:10px;color:var(--text-muted);font-weight:bold;text-transform:uppercase}
+  .marketingChannel input,.marketingChannel select,.marketingPlanForm input,.marketingPlanForm select,.marketingPlanForm textarea{
+    width:100%;border:1px solid var(--border);border-radius:8px;background:var(--input-bg);color:var(--text);padding:8px 9px;font:inherit;font-size:12.5px}
+  .marketingChannel textarea,.marketingPlanForm textarea{resize:vertical;min-height:70px}
+  .marketingPlanForm{display:none;border:1px solid var(--border);border-radius:12px;background:var(--surface-soft);padding:14px;margin-bottom:12px}
+  .marketingPlanForm.open{display:block}
+  .marketingFormGrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+  .marketingFormWide{grid-column:span 2}
+  .marketingFormFull{grid-column:1/-1}
+  .marketingFormActions{display:flex;justify-content:flex-end;gap:8px;margin-top:10px;flex-wrap:wrap}
+  .marketingPostMeta{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin:7px 0 10px}
+  .marketingPostTitle{font-weight:bold;color:var(--text);font-size:15px;margin-top:3px}
+  .marketingPostEmpty{padding:20px;border:1px dashed var(--border);border-radius:12px;text-align:center;color:var(--text-muted)}
   @media(max-width:850px){.salesLayout{grid-template-columns:1fr}.salesMenu{position:static}.salesMenu{display:flex;overflow-x:auto}.salesMenu button{min-width:210px;margin:0 8px 0 0}}
+  @media(max-width:850px){.marketingHero{grid-template-columns:1fr}.marketingStats{grid-template-columns:repeat(2,minmax(0,1fr))}.marketingChannelGrid{grid-template-columns:1fr}.marketingFormGrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+  @media(max-width:560px){.marketingStats,.marketingFormGrid,.marketingChannelFields{grid-template-columns:1fr}.marketingFormWide,.marketingFormFull{grid-column:auto}.marketingCalendarBox{align-items:flex-start;flex-direction:column}}
 
   /* --- Podwykonawcy --- */
   .vendorIntro{background:#fff8e1;border:1px solid #ead99a;border-left:4px solid var(--accent);border-radius:10px;padding:12px 14px;color:#6d5516;font-size:12.5px;line-height:1.45;margin-bottom:14px}
@@ -1556,7 +1590,7 @@
           <div id="julyFormalities"></div>
         </div>
         <div class="actionBlock">
-          <h3>Kanały marketingowe — lipiec 2026</h3>
+          <h3>Marketing</h3>
           <div id="julyMarketingChannels"></div>
         </div>
         <div class="actionBlock">
@@ -2135,14 +2169,46 @@
     </div>
     <div class="tabPane" id="tabpane-marketing">
       <div class="section">
-        <div class="fbPlanHeader">
-          <div>
-            <h2>Content plan Facebook</h2>
-            <p>Gotowe posty na start profilu firmowego. Status zapisuje się w danych panelu razem z resztą CRM.</p>
+        <div class="marketingHero">
+          <div class="marketingIntro">
+            <h2>Plan marketingowy</h2>
+            <p>Jedno miejsce na rytm publikacji, kanały promocji, gotowe treści i terminy. Zaplanowane działania trafiają również do firmowego Kalendarza Google.</p>
           </div>
-          <button class="addBtn" onclick="renderFacebookContentPlan()">Odśwież listę</button>
+          <div class="marketingCalendarBox">
+            <div><strong>Google Calendar</strong><p id="marketingCalendarStatus">Plan publikacji jest połączony z kalendarzem firmowym.</p></div>
+            <button class="addBtn" onclick="syncAllCalendarTerms({force:true})">Synchronizuj</button>
+          </div>
         </div>
-        <div id="facebookContentPlan" class="fbPlanGrid"></div>
+        <div id="marketingStats" class="marketingStats"></div>
+
+        <div class="marketingSection">
+          <div class="marketingSectionHead">
+            <div><h3>Gdzie się promujemy</h3><p>Ustal status, rytm działania i konkretne miejsca dla każdego kanału.</p></div>
+          </div>
+          <div id="marketingChannels" class="marketingChannelGrid"></div>
+        </div>
+
+        <div class="marketingSection">
+          <div class="marketingSectionHead">
+            <div><h3>Kalendarz publikacji</h3><p>Możesz zaplanować pojedynczy materiał albo całą serię co kilka dni.</p></div>
+            <button class="addBtn" onclick="toggleMarketingPlanForm()">+ Zaplanuj publikację</button>
+          </div>
+          <div class="marketingPlanForm" id="marketingPlanForm">
+            <input type="hidden" id="marketingEditId">
+            <div class="marketingFormGrid">
+              <label class="marketingFormWide">Temat / tytuł<input id="marketingTitle" placeholder="Np. Jak działa mlekomat w praktyce"></label>
+              <label>Kanał<select id="marketingChannel"></select></label>
+              <label>Format<select id="marketingFormat"><option>Post</option><option>Rolka / Shorts</option><option>Reklama</option><option>Artykuł</option><option>Ogłoszenie</option><option>Kontakt / wydarzenie</option></select></label>
+              <label>Start<input type="datetime-local" id="marketingDate"></label>
+              <label>Publikuj co ile dni<input type="number" id="marketingEveryDays" min="1" max="60" value="3"></label>
+              <label>Liczba publikacji<input type="number" id="marketingCount" min="1" max="12" value="1"></label>
+              <label>Status<select id="marketingStatus"><option value="do przygotowania">Do przygotowania</option><option value="gotowe">Gotowe</option><option value="wysłane">Opublikowane</option></select></label>
+              <label class="marketingFormFull">Treść / pomysł / CTA<textarea id="marketingContent" placeholder="Wpisz gotową treść albo krótki pomysł na materiał..."></textarea></label>
+            </div>
+            <div class="marketingFormActions"><button class="cancel" onclick="toggleMarketingPlanForm(false)">Anuluj</button><button class="save" onclick="saveMarketingPlanItem()">Zapisz w planie</button></div>
+          </div>
+          <div id="facebookContentPlan" class="fbPlanGrid"></div>
+        </div>
       </div>
     </div>
     <div class="tabPane" id="tabpane-materialy">
@@ -2595,12 +2661,14 @@ function defaultJulyActionPlan(){
       {id:"ksiegowosc", nazwa:"Ustalenie systemu księgowości (robimy sami)", termin:"", pilne:false, wykonane:false, notatka:""}
     ],
     kanaly: [
-      {id:"fb_organic", kanal:"Facebook (posty organiczne)", status:"Aktywny", budzet:"0 zł", notatki:"Harmonogram 7 postów już w module Content Plan FB"},
-      {id:"fb_ads_likes", kanal:"Facebook Ads (polubienia strony)", status:"Do uruchomienia", budzet:"50 zł", notatki:"Test 1 kreacji, cel: sprawdzić konwersję, nie generować leadów bezpośrednio"},
-      {id:"olx", kanal:"OLX", status:"Aktywny", budzet:"0 zł", notatki:"Wymaga diagnozy treści ogłoszenia"},
-      {id:"fb_groups", kanal:"Grupy rolnicze FB", status:"Do rozpoczęcia", budzet:"0 zł", notatki:"Cel: 3-5 grup, 2-3 posty/tydzień z wartością, nie samą ofertą"},
-      {id:"odr", kanal:"ODR (Ośrodki Doradztwa Rolniczego)", status:"Do rozpoczęcia", budzet:"0 zł", notatki:"Pierwszy kontakt z 1-2 ODR w regionach z aktywnymi leadami"},
-      {id:"targi", kanal:"Targi rolnicze", status:"Do sprawdzenia", budzet:"0 zł", notatki:"Sprawdzić kalendarz na lipiec, bez płatnego stoiska na start"}
+      {id:"fb_organic", kanal:"Facebook — profil firmowy", status:"Aktywny", budzet:"0 zł", rytm:"Co 2-3 dni", miejsca:"Profil Sklep za Stodołą", cel:"Budowanie zaufania i pokazywanie rozwiązań", notatki:"Posty, zdjęcia realizacji, krótkie filmy i odpowiedzi na pytania rolników."},
+      {id:"fb_groups", kanal:"Grupy rolnicze na Facebooku", status:"Do rozpoczęcia", budzet:"0 zł", rytm:"2 razy w tygodniu", miejsca:"3-5 aktywnych grup rolniczych", cel:"Rozmowy i ruch do Advisora", notatki:"Publikować wiedzę i przykłady, nie samą ofertę."},
+      {id:"video_short", kanal:"Rolki / YouTube Shorts", status:"Do rozpoczęcia", budzet:"0 zł", rytm:"1-2 razy w tygodniu", miejsca:"Facebook Reels i YouTube Shorts", cel:"Pokazać działanie automatów", notatki:"Krótkie filmy: zakup, nalewanie, wnętrze urządzenia, produkty 24/7."},
+      {id:"fb_ads_likes", kanal:"Facebook Ads", status:"Do uruchomienia", budzet:"50 zł test", rytm:"Kampanie 7-14 dni", miejsca:"Rolnicy i gospodarstwa w Polsce", cel:"Test zasięgu i wejść na stronę", notatki:"Najpierw jedna kreacja i mały budżet. Skalować dopiero po wyniku."},
+      {id:"olx", kanal:"OLX", status:"Aktywny", budzet:"Do ustalenia", rytm:"Kontrola co 7 dni", miejsca:"Ogłoszenia mlekomatów i systemu sprzedaży", cel:"Pozyskiwanie konkretnych zapytań", notatki:"Odświeżać zdjęcia, tytuł i pierwsze akapity na podstawie wyników."},
+      {id:"google_profile", kanal:"Google / SEO", status:"Aktywny", budzet:"0 zł", rytm:"1 materiał tygodniowo", miejsca:"Strona, poradniki i Profil Firmy Google", cel:"Widoczność na frazy mlekomat i sprzedaż bezpośrednia", notatki:"Rozbudowywać poradniki i publikować aktualności firmy."},
+      {id:"odr", kanal:"ODR i doradcy rolni", status:"Do rozpoczęcia", budzet:"0 zł", rytm:"2-3 kontakty tygodniowo", miejsca:"ODR, doradcy, gminy i partnerzy lokalni", cel:"Polecenia i wiarygodne dotarcie do gospodarstw", notatki:"Krótki mail, telefon i materiał PDF do przekazania zainteresowanym."},
+      {id:"targi", kanal:"Targi i wydarzenia rolnicze", status:"Do sprawdzenia", budzet:"0 zł na start", rytm:"Przegląd raz w miesiącu", miejsca:"Targi regionalne i dni otwarte", cel:"Rozmowy bezpośrednie i kontakty partnerskie", notatki:"Na początku udział jako odwiedzający, bez kosztownego stoiska."}
     ],
     sprzedaz: {
       sprzedane: 0,
@@ -3190,6 +3258,13 @@ function fillMissingDefaults(d){
       d.planLipiec2026.kanaly = d.planLipiec2026.kanaly.concat(missingChannels);
       changed = true;
     }
+    d.planLipiec2026.kanaly.forEach(channel => {
+      const defaults = defaultPlan.kanaly.find(item => item.id === channel.id);
+      if(!defaults) return;
+      ["rytm","miejsca","cel"].forEach(field => {
+        if(!channel[field]){ channel[field] = defaults[field]; changed = true; }
+      });
+    });
     if(!d.planLipiec2026.sprzedaz){ d.planLipiec2026.sprzedaz = defaultPlan.sprzedaz; changed = true; }
     if(typeof d.planLipiec2026.sprzedaz.sprzedane === "undefined"){ d.planLipiec2026.sprzedaz.sprzedane = 0; changed = true; }
     if(typeof d.planLipiec2026.sprzedaz.celZarzadu === "undefined"){ d.planLipiec2026.sprzedaz.celZarzadu = defaultPlan.sprzedaz.celZarzadu; changed = true; }
@@ -3201,6 +3276,14 @@ function fillMissingDefaults(d){
     d.contentPlanFacebook = d.contentPlanFacebook.concat(missingFbPosts);
     changed = true;
   }
+  d.contentPlanFacebook.forEach(post => {
+    if(!post.kanal){ post.kanal = "Facebook — profil firmowy"; changed = true; }
+    if(!post.format){ post.format = "Post"; changed = true; }
+    if(!post.tytul){
+      post.tytul = (post.tresc || "Planowana publikacja").split(/\r?\n/)[0].slice(0, 90) || "Planowana publikacja";
+      changed = true;
+    }
+  });
   if(!d.zadania || d.zadania.length===0){
     d.zadania = dflt.zadania;
     changed = true;
@@ -7038,8 +7121,10 @@ function scheduleCalendarSync(delay = 300){
 }
 
 function setCalendarSyncStatus(text, warn = false){
-  const el = document.getElementById("calendarSyncStatus");
-  if(el){ el.textContent = text; el.style.color = warn ? "var(--todo)" : "var(--muted)"; }
+  ["calendarSyncStatus","marketingCalendarStatus"].forEach(id=>{
+    const el = document.getElementById(id);
+    if(el){ el.textContent = text; el.style.color = warn ? "var(--todo)" : "var(--muted)"; }
+  });
 }
 
 function calendarPayloadSignature(payload){
@@ -7135,8 +7220,8 @@ async function syncAllCalendarTerms(options = {}){
       description:[i.adres || "", i.notatki || ""].filter(Boolean).join("\n\n"), date:i.dataMontazu || ""
     }]));
     (data.contentPlanFacebook || []).forEach(post=>entries.push([post, {
-      sourceId:`facebook:${post.id}`, title:"Facebook: zaplanowana publikacja",
-      description:(post.tresc || "").slice(0, 1500), date:post.dataStart || ""
+      sourceId:`facebook:${post.id}`, title:`Marketing: ${post.tytul || post.kanal || "zaplanowana publikacja"}`,
+      description:[post.kanal || "", post.format || "", (post.tresc || "").slice(0, 1400)].filter(Boolean).join("\n\n"), date:post.dataStart || ""
     }]));
     ((data.planLipiec2026 && data.planLipiec2026.formalnosci) || []).filter(item=>normalizeCalendarDate(item.termin) || item.googleCalendarEventId).forEach(item=>entries.push([item, {
       sourceId:`formality:${item.id}`, title:`Formalność: ${item.nazwa || "zadanie"}`,
@@ -8613,24 +8698,13 @@ function renderJulyActionPlan(){
     </div>
   `).join("");
 
+  const activeChannels = (plan.kanaly || []).filter(item => item.status === "Aktywny").length;
   channelsEl.innerHTML = `
-    <table class="actionTable">
-      <thead><tr><th>Kanał</th><th>Status</th><th>Budżet</th><th>Notatki</th></tr></thead>
-      <tbody>
-        ${(plan.kanaly || []).map(item => `
-          <tr>
-            <td><strong>${crmEsc(item.kanal)}</strong></td>
-            <td>
-              <select onchange="updateJulyChannelStatus('${crmEsc(item.id)}', this.value)">
-                ${JULY_CHANNEL_STATUSES.map(status => `<option value="${crmEsc(status)}" ${item.status === status ? "selected" : ""}>${crmEsc(status)}</option>`).join("")}
-              </select>
-            </td>
-            <td>${crmEsc(item.budzet)}</td>
-            <td>${crmEsc(item.notatki)}</td>
-          </tr>
-        `).join("")}
-      </tbody>
-    </table>
+    <div class="capacityCard">
+      <b>${activeChannels} aktywne</b>
+      <span>Pełny rytm publikacji, miejsca promocji i kalendarz treści są teraz w jednym module Marketing.</span>
+      <div style="margin-top:12px"><button class="addBtn" onclick="setSubView('marketing-home')">Otwórz plan marketingowy</button></div>
+    </div>
   `;
 
   capacityEl.innerHTML = `
@@ -10149,27 +10223,45 @@ function downloadSalesPdf(){
   alert("PDF-y sprzedazowe nie sa juz wbudowane w zrodlo panelu.");
 }
 
-// ==== Content plan Facebook ====
-function fbDateOnly(value){
+// ==== Plan marketingowy ====
+function marketingDate(value){
   if(!value) return null;
-  const d = new Date(value + "T00:00:00");
+  const d = new Date(value.length <= 10 ? value + "T00:00:00" : value);
   return Number.isNaN(d.getTime()) ? null : d;
 }
 
-function fbToday(){
+function marketingToday(){
   const now = new Date();
   return new Date(now.getFullYear(), now.getMonth(), now.getDate());
 }
 
+function marketingDateLabel(value){
+  const d = marketingDate(value);
+  if(!d) return "Bez terminu";
+  const hasTime = String(value).includes("T");
+  return d.toLocaleString("pl-PL", hasTime ? {day:"2-digit",month:"2-digit",year:"numeric",hour:"2-digit",minute:"2-digit"} : {day:"2-digit",month:"2-digit",year:"numeric"});
+}
+
+function marketingInputNow(){
+  const d = new Date(Date.now() - new Date().getTimezoneOffset() * 60000);
+  return d.toISOString().slice(0,16);
+}
+
+function marketingIsPublished(post){
+  return ["wysłane","opublikowane"].includes((post.status || "").toLowerCase());
+}
+
 function findDueFacebookPost(){
-  const today = fbToday();
+  const today = marketingToday();
   const dayMs = 24 * 60 * 60 * 1000;
-  return (data.contentPlanFacebook || []).find(post=>{
-    if(post.status === "wysłane") return false;
-    const start = fbDateOnly(post.dataStart);
-    const end = fbDateOnly(post.dataEnd || post.dataStart);
+  return [...(data.contentPlanFacebook || [])].sort((a,b)=>(a.dataStart || "").localeCompare(b.dataStart || "")).find(post=>{
+    if(marketingIsPublished(post)) return false;
+    const start = marketingDate(post.dataStart);
+    const end = marketingDate(post.dataEnd || post.dataStart);
     if(!start || !end) return false;
-    return today >= new Date(start.getTime() - dayMs) && today <= new Date(end.getTime() + dayMs);
+    const startDay = new Date(start.getFullYear(), start.getMonth(), start.getDate());
+    const endDay = new Date(end.getFullYear(), end.getMonth(), end.getDate());
+    return today >= new Date(startDay.getTime() - dayMs) && today <= new Date(endDay.getTime() + dayMs);
   });
 }
 
@@ -10177,63 +10269,185 @@ function renderFacebookReminder(){
   const box = document.getElementById("fbContentReminder");
   if(!box) return;
   const post = findDueFacebookPost();
-  if(!post){
-    box.style.display = "none";
-    box.innerHTML = "";
-    box.onclick = null;
-    return;
-  }
+  if(!post){ box.style.display = "none"; box.innerHTML = ""; box.onclick = null; return; }
   box.style.display = "flex";
   box.innerHTML = `
     <div>
-      <strong>Dziś zaplanowany post na Facebooka</strong>
-      <span>${crmEsc(post.data)} · Post otwierający kampanię organiczną. Treść i status są w module Content plan Facebook.</span>
+      <strong>Zaplanowane działanie marketingowe</strong>
+      <span>${crmEsc(marketingDateLabel(post.dataStart))} · ${crmEsc(post.kanal || "Facebook")} · ${crmEsc(post.tytul || "Publikacja")}</span>
     </div>
     <div class="fbReminderActions">
-      <button type="button" onclick="event.stopPropagation(); openFacebookPost('${crmEsc(post.id)}')">Zobacz treść</button>
-      <button type="button" class="primary" onclick="event.stopPropagation(); toggleFacebookPostStatus('${crmEsc(post.id)}', true)">Oznacz jako wysłany</button>
-    </div>
-  `;
+      <button type="button" onclick="event.stopPropagation(); openFacebookPost('${crmEsc(post.id)}')">Otwórz plan</button>
+      <button type="button" class="primary" onclick="event.stopPropagation(); toggleFacebookPostStatus('${crmEsc(post.id)}', true)">Oznacz jako opublikowane</button>
+    </div>`;
   box.onclick = ()=>openFacebookPost(post.id);
+}
+
+function renderMarketingStats(){
+  const root = document.getElementById("marketingStats");
+  if(!root || !data) return;
+  const posts = data.contentPlanFacebook || [];
+  const now = new Date();
+  const inSevenDays = new Date(now.getTime() + 7 * 86400000);
+  const upcoming = posts.filter(post=>{
+    const d = marketingDate(post.dataStart);
+    return !marketingIsPublished(post) && d && d >= new Date(now.getFullYear(),now.getMonth(),now.getDate()) && d <= inSevenDays;
+  }).length;
+  const ready = posts.filter(post=>(post.status || "").toLowerCase() === "gotowe").length;
+  const published = posts.filter(marketingIsPublished).length;
+  const active = (getJulyPlan().kanaly || []).filter(channel=>channel.status === "Aktywny").length;
+  root.innerHTML = [
+    [upcoming,"Publikacje w 7 dni"],[ready,"Gotowe do publikacji"],[published,"Opublikowane"],[active,"Aktywne kanały"]
+  ].map(item=>`<div class="marketingStat"><b>${item[0]}</b><span>${item[1]}</span></div>`).join("");
+}
+
+function renderMarketingChannels(){
+  const root = document.getElementById("marketingChannels");
+  if(!root) return;
+  root.innerHTML = (getJulyPlan().kanaly || []).map(channel=>`
+    <article class="marketingChannel">
+      <div class="marketingChannelTop"><strong>${crmEsc(channel.kanal)}</strong><span class="badge">${crmEsc(channel.status || "Do rozpoczęcia")}</span></div>
+      <div class="marketingChannelFields">
+        <label>Status<select onchange="updateMarketingChannel('${crmEsc(channel.id)}','status',this.value)">${JULY_CHANNEL_STATUSES.map(status=>`<option ${channel.status===status?"selected":""}>${crmEsc(status)}</option>`).join("")}</select></label>
+        <label>Rytm<input value="${crmEsc(channel.rytm || "")}" onchange="updateMarketingChannel('${crmEsc(channel.id)}','rytm',this.value)"></label>
+        <label>Budżet<input value="${crmEsc(channel.budzet || "")}" onchange="updateMarketingChannel('${crmEsc(channel.id)}','budzet',this.value)"></label>
+      </div>
+      <label>Gdzie dokładnie<input value="${crmEsc(channel.miejsca || "")}" onchange="updateMarketingChannel('${crmEsc(channel.id)}','miejsca',this.value)"></label>
+      <label>Cel<input value="${crmEsc(channel.cel || "")}" onchange="updateMarketingChannel('${crmEsc(channel.id)}','cel',this.value)"></label>
+      <label>Notatki<textarea onchange="updateMarketingChannel('${crmEsc(channel.id)}','notatki',this.value)">${crmEsc(channel.notatki || "")}</textarea></label>
+    </article>`).join("");
+}
+
+function updateMarketingChannel(id, field, value){
+  const channel = (getJulyPlan().kanaly || []).find(item=>item.id === id);
+  if(!channel || !["status","rytm","miejsca","cel","notatki","budzet"].includes(field)) return;
+  channel[field] = value.trim();
+  saveData();
+  renderMarketingStats();
+  if(field === "status") renderMarketingChannels();
+}
+
+function fillMarketingChannelOptions(selected){
+  const select = document.getElementById("marketingChannel");
+  if(!select) return;
+  const names = (getJulyPlan().kanaly || []).map(item=>item.kanal);
+  select.innerHTML = names.map(name=>`<option ${name===selected?"selected":""}>${crmEsc(name)}</option>`).join("");
+}
+
+function toggleMarketingPlanForm(force){
+  const form = document.getElementById("marketingPlanForm");
+  if(!form) return;
+  const open = typeof force === "boolean" ? force : !form.classList.contains("open");
+  form.classList.toggle("open", open);
+  if(open && !document.getElementById("marketingEditId").value){
+    fillMarketingChannelOptions();
+    document.getElementById("marketingDate").value = marketingInputNow();
+  }
+  if(!open) resetMarketingPlanForm();
+}
+
+function resetMarketingPlanForm(){
+  ["marketingEditId","marketingTitle","marketingContent"].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=""; });
+  const date = document.getElementById("marketingDate"); if(date) date.value="";
+  const every = document.getElementById("marketingEveryDays"); if(every) every.value="3";
+  const count = document.getElementById("marketingCount"); if(count){ count.value="1"; count.disabled=false; }
+  const status = document.getElementById("marketingStatus"); if(status) status.value="do przygotowania";
+}
+
+function saveMarketingPlanItem(){
+  const editId = document.getElementById("marketingEditId").value;
+  const title = document.getElementById("marketingTitle").value.trim();
+  const channel = document.getElementById("marketingChannel").value;
+  const format = document.getElementById("marketingFormat").value;
+  const startRaw = document.getElementById("marketingDate").value;
+  const content = document.getElementById("marketingContent").value.trim();
+  const status = document.getElementById("marketingStatus").value;
+  const everyDays = Math.max(1, parseInt(document.getElementById("marketingEveryDays").value || 3, 10));
+  const count = editId ? 1 : Math.min(12, Math.max(1, parseInt(document.getElementById("marketingCount").value || 1, 10)));
+  if(!title || !startRaw){ alert("Wpisz temat i termin publikacji."); return; }
+  const list = data.contentPlanFacebook || (data.contentPlanFacebook = []);
+  if(editId){
+    const post = list.find(item=>item.id === editId);
+    if(!post) return;
+    Object.assign(post,{tytul:title,kanal:channel,format,dataStart:startRaw,dataEnd:startRaw.slice(0,10),data:marketingDateLabel(startRaw),status,tresc:content});
+  }else{
+    const start = marketingDate(startRaw);
+    for(let index=0; index<count; index+=1){
+      const date = new Date(start.getTime());
+      date.setDate(date.getDate() + index * everyDays);
+      const local = new Date(date.getTime() - date.getTimezoneOffset() * 60000).toISOString().slice(0,16);
+      list.push({id:`marketing_${Date.now()}_${index}`,tytul:count>1?`${title} (${index+1}/${count})`:title,kanal:channel,format,dataStart:local,dataEnd:local.slice(0,10),data:marketingDateLabel(local),status,tresc:content});
+    }
+  }
+  logActivity(`${editId ? "zaktualizował(a)" : "zaplanował(a)"} działanie marketingowe „${title}”`);
+  saveData();
+  scheduleCalendarSync();
+  resetMarketingPlanForm();
+  document.getElementById("marketingPlanForm").classList.remove("open");
+  renderFacebookContentPlan();
+  renderFacebookReminder();
+}
+
+function editMarketingPlanItem(id){
+  const post = (data.contentPlanFacebook || []).find(item=>item.id === id);
+  if(!post) return;
+  document.getElementById("marketingEditId").value = post.id;
+  document.getElementById("marketingTitle").value = post.tytul || "";
+  fillMarketingChannelOptions(post.kanal);
+  document.getElementById("marketingFormat").value = post.format || "Post";
+  document.getElementById("marketingDate").value = (post.dataStart || "").slice(0,16);
+  document.getElementById("marketingContent").value = post.tresc || "";
+  document.getElementById("marketingStatus").value = marketingIsPublished(post) ? "wysłane" : (post.status || "do przygotowania");
+  document.getElementById("marketingCount").value = "1";
+  document.getElementById("marketingCount").disabled = true;
+  document.getElementById("marketingPlanForm").classList.add("open");
+  document.getElementById("marketingPlanForm").scrollIntoView({behavior:"smooth",block:"center"});
+}
+
+function deleteMarketingPlanItem(id){
+  const post = (data.contentPlanFacebook || []).find(item=>item.id === id);
+  if(!post || !confirm("Usunąć tę pozycję z planu marketingowego i Kalendarza Google?")) return;
+  data.contentPlanFacebook = (data.contentPlanFacebook || []).filter(item=>item.id !== id);
+  saveData();
+  if(post.googleCalendarEventId) deleteCalendarEvent(post.googleCalendarEventId).catch(error=>console.warn("Nie udało się usunąć publikacji z Google Calendar:", error));
+  renderFacebookContentPlan();
+  renderFacebookReminder();
 }
 
 function renderFacebookContentPlan(){
   const root = document.getElementById("facebookContentPlan");
   if(!root) return;
-  const posts = data.contentPlanFacebook || [];
-  if(!posts.length){
-    root.innerHTML = '<div class="empty">Brak zaplanowanych postów.</div>';
-    return;
-  }
+  renderMarketingStats();
+  renderMarketingChannels();
+  fillMarketingChannelOptions(document.getElementById("marketingChannel")?.value);
+  const posts = [...(data.contentPlanFacebook || [])].sort((a,b)=>(a.dataStart || "9999").localeCompare(b.dataStart || "9999"));
+  if(!posts.length){ root.innerHTML = '<div class="marketingPostEmpty">Brak zaplanowanych publikacji. Dodaj pierwszą pozycję albo całą serię.</div>'; return; }
   root.innerHTML = posts.map(post=>{
-    const sent = post.status === "wysłane";
+    const sent = marketingIsPublished(post);
+    const status = sent ? "Opublikowane" : ((post.status || "do przygotowania") === "gotowe" ? "Gotowe" : "Do przygotowania");
     return `
       <article class="fbPostCard ${sent ? "published" : ""}" id="fbpost-${crmEsc(post.id)}">
         <div class="fbPostTop">
-          <div>
-            <div class="fbPostDate">${crmEsc(post.data || "")}</div>
-            <div class="badge">${sent ? "wysłane" : "do wysłania"}</div>
-          </div>
-          <label class="fbPostStatus">
-            <input type="checkbox" ${sent ? "checked" : ""} onchange="toggleFacebookPostStatus('${crmEsc(post.id)}', this.checked)">
-            Opublikowane
-          </label>
+          <div><div class="fbPostDate">${crmEsc(marketingDateLabel(post.dataStart))}</div><div class="marketingPostTitle">${crmEsc(post.tytul || "Planowana publikacja")}</div></div>
+          <label class="fbPostStatus"><input type="checkbox" ${sent ? "checked" : ""} onchange="toggleFacebookPostStatus('${crmEsc(post.id)}',this.checked)"> Opublikowane</label>
         </div>
-        <div class="fbPostText">${crmEsc(post.tresc || "")}</div>
+        <div class="marketingPostMeta"><span class="badge">${crmEsc(post.kanal || "Facebook")}</span><span class="badge">${crmEsc(post.format || "Post")}</span><span class="badge">${crmEsc(status)}</span></div>
+        ${post.tresc ? `<details><summary>Pokaż treść / pomysł</summary><div class="fbPostText" style="margin-top:10px">${crmEsc(post.tresc)}</div></details>` : '<div class="checkDesc">Brak wpisanej treści — pozycja jest szkicem terminu.</div>'}
         <div class="fbPostActions">
-          <button type="button" onclick="copyFacebookPost('${crmEsc(post.id)}')">Kopiuj treść</button>
-          <button type="button" onclick="toggleFacebookPostStatus('${crmEsc(post.id)}', ${sent ? "false" : "true"})">${sent ? "Cofnij status" : "Oznacz jako wysłane"}</button>
+          ${post.tresc ? `<button type="button" onclick="copyFacebookPost('${crmEsc(post.id)}')">Kopiuj treść</button>` : ""}
+          <button type="button" onclick="editMarketingPlanItem('${crmEsc(post.id)}')">Edytuj</button>
+          <button type="button" onclick="toggleFacebookPostStatus('${crmEsc(post.id)}',${sent ? "false" : "true"})">${sent ? "Cofnij status" : "Oznacz jako opublikowane"}</button>
+          <button type="button" class="delBtn" onclick="deleteMarketingPlanItem('${crmEsc(post.id)}')">Usuń</button>
         </div>
-      </article>
-    `;
+      </article>`;
   }).join("");
 }
 
 function toggleFacebookPostStatus(id, published){
   const post = (data.contentPlanFacebook || []).find(item=>item.id === id);
   if(!post) return;
-  post.status = published ? "wysłane" : "do wysłania";
-  logActivity(`${published ? "oznaczył(a) jako wysłany" : "cofnął/cofnęła status"} post FB: ${post.data}`);
+  post.status = published ? "wysłane" : "do przygotowania";
+  logActivity(`${published ? "oznaczył(a) jako opublikowane" : "cofnął/cofnęła status"} działanie marketingowe: ${post.tytul || post.data}`);
   saveData();
   renderFacebookContentPlan();
   renderFacebookReminder();
@@ -10242,16 +10456,13 @@ function toggleFacebookPostStatus(id, published){
 function copyFacebookPost(id){
   const post = (data.contentPlanFacebook || []).find(item=>item.id === id);
   if(!post) return;
-  navigator.clipboard.writeText(post.tresc || "").then(()=>alert("Skopiowano treść posta FB."));
+  navigator.clipboard.writeText(post.tresc || "").then(()=>alert("Skopiowano treść publikacji."));
 }
 
 function openFacebookPost(id){
   switchTab("marketing", {push:false});
   renderFacebookContentPlan();
-  setTimeout(()=>{
-    const el = document.getElementById("fbpost-" + id);
-    if(el) el.scrollIntoView({behavior:"smooth", block:"center"});
-  }, 50);
+  setTimeout(()=>{ const el=document.getElementById("fbpost-"+id); if(el) el.scrollIntoView({behavior:"smooth",block:"center"}); },50);
 }
 
 // ================= Szablony maili po Advisorze =================
