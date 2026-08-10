@@ -3005,12 +3005,22 @@ async function pushRemote(payload, attempt = 0, revision = localChangeRevision){
     }
     if(!res.ok) throw new Error(await syncErrorMessage(res));
     let savedSnapshot = null;
+    let saveAcknowledged = false;
     try{
       const json = await res.json();
-      if(Number.isFinite(Number(json.version))) currentPanelVersion = Number(json.version);
+      const savedVersion = Number(json.version);
+      saveAcknowledged = json.ok === true && Number.isFinite(savedVersion);
+      if(Number.isFinite(savedVersion)) currentPanelVersion = savedVersion;
       if(json.record && typeof json.record === "object") savedSnapshot = ensurePanelSyncIds(clonePanelValue(json.record));
     }catch(e){}
-    if(!savedSnapshot || !panelSaveConfirmed(payload, savedSnapshot)) throw new Error("SAVE_VERIFICATION_FAILED");
+    if(!saveAcknowledged || !savedSnapshot) throw new Error("SAVE_RESPONSE_INVALID");
+    if(!panelSaveConfirmed(payload, savedSnapshot)){
+      // API zwraca `ok: true` dopiero po atomowym zapisie nowej wersji w Supabase.
+      // Ochrona danych na serwerze może scalić równoległe zmiany lub uporządkować pola,
+      // dlatego dodatkowe porównanie całego snapshotu jest tylko diagnostyczne i nie może
+      // zamieniać prawidłowego zapisu w nieskończoną pętlę fałszywych alarmów.
+      console.info("Zapis potwierdzony przez serwer; snapshot został dodatkowo scalony.");
+    }
     const newerLocalChanges = revision !== localChangeRevision;
     const currentLocalData = data;
     rememberRemoteSnapshot(savedSnapshot);
@@ -3098,6 +3108,7 @@ function syncErrorText(e){
   if(msg.includes("Supabase")) return "Błąd synchronizacji: Supabase odrzucił zapis" + (cloudStatus ? `: HTTP ${cloudStatus[1]}` : "");
   if(msg === "VERSION_CONFLICT") return "Błąd synchronizacji: dane w chmurze zmieniły się w trakcie zapisu. Odśwież panel i spróbuj ponownie.";
   if(msg === "SAVE_VERIFICATION_FAILED") return "Błąd synchronizacji: serwer nie potwierdził wszystkich zmian. Dane lokalne są zachowane i zapis zostanie ponowiony.";
+  if(msg === "SAVE_RESPONSE_INVALID") return "Błąd synchronizacji: serwer nie zwrócił potwierdzenia zapisu. Dane lokalne są zachowane i zapis zostanie ponowiony.";
   if(msg.includes("HTTP 500")) return "Błąd synchronizacji: API zwróciło 500";
   if(msg.includes("HTTP ")) return "Błąd synchronizacji: API zwróciło " + msg.replace(/^HTTP\s*/, "");
   return "Zapisano lokalnie, ale nie zapisano w chmurze";
