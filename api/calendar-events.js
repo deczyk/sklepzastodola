@@ -105,12 +105,12 @@ function clamp(value, max) {
   return String(value || "").trim().slice(0, max);
 }
 
-function buildEventBody({ clientName, phone, notes, date }) {
+function buildEventBody({ title, clientName, phone, notes, description, date }) {
   const raw = String(date || "").trim();
   const timed = raw.match(/^(\d{4}-\d{2}-\d{2})T(\d{2}):(\d{2})/);
   const event = {
-    summary: `Kontakt: ${clamp(clientName, 200) || "klient"}`,
-    description: [phone ? `Telefon: ${clamp(phone, 60)}` : "", clamp(notes, 1500)].filter(Boolean).join("\n\n")
+    summary: clamp(title, 200) || `Kontakt: ${clamp(clientName, 180) || "klient"}`,
+    description: [phone ? `Telefon: ${clamp(phone, 60)}` : "", clamp(description || notes, 1500)].filter(Boolean).join("\n\n")
   };
 
   if (timed) {
@@ -133,21 +133,32 @@ function buildEventBody({ clientName, phone, notes, date }) {
   return event;
 }
 
+function deterministicEventId(payload) {
+  const sourceId = clamp(payload.sourceId || payload.clientId, 500);
+  if (!sourceId) return "";
+  return `panel${crypto.createHash("sha256").update(sourceId).digest("hex").slice(0, 40)}`;
+}
+
+async function patchEvent(base, token, eventId, body) {
+  const res = await fetch(`${base}/${encodeURIComponent(eventId)}`, {
+    method: "PATCH",
+    headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+    body: JSON.stringify(body)
+  });
+  const json = await res.json().catch(() => ({}));
+  return { res, json };
+}
+
 async function upsertEvent(token, payload) {
   const body = buildEventBody(payload);
   const base = `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(GOOGLE_CALENDAR_ID)}/events`;
-  const existingId = clamp(payload.eventId, 200);
+  const existingId = clamp(payload.eventId, 200) || deterministicEventId(payload);
 
   if (existingId) {
-    const res = await fetch(`${base}/${encodeURIComponent(existingId)}`, {
-      method: "PATCH",
-      headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
-      body: JSON.stringify(body)
-    });
+    const { res, json } = await patchEvent(base, token, existingId, body);
     if (res.status === 404 || res.status === 410) {
       // Wydarzenie ktoś usunął ręcznie w Kalendarzu — utwórz nowe zamiast się wywalać.
     } else {
-      const json = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(json.error && json.error.message ? json.error.message : "Calendar update failed.");
       return { eventId: json.id, htmlLink: json.htmlLink || "" };
     }
@@ -156,9 +167,14 @@ async function upsertEvent(token, payload) {
   const res = await fetch(base, {
     method: "POST",
     headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
-    body: JSON.stringify(body)
+    body: JSON.stringify(existingId ? { ...body, id: existingId } : body)
   });
   const json = await res.json().catch(() => ({}));
+  if (res.status === 409 && existingId) {
+    const patched = await patchEvent(base, token, existingId, body);
+    if (!patched.res.ok) throw new Error(patched.json.error && patched.json.error.message ? patched.json.error.message : "Calendar update failed.");
+    return { eventId: patched.json.id, htmlLink: patched.json.htmlLink || "" };
+  }
   if (!res.ok) throw new Error(json.error && json.error.message ? json.error.message : "Calendar create failed.");
   return { eventId: json.id, htmlLink: json.htmlLink || "" };
 }

@@ -1936,7 +1936,8 @@
 
     <div class="tabPane" id="tabpane-terminy">
     <div class="section">
-      <h2>Terminy <button class="addBtn" onclick="toggleForm('terminy')">+ Dodaj termin</button></h2>
+      <h2>Terminy <button class="addBtn" onclick="toggleForm('terminy')">+ Dodaj termin</button> <button class="addBtn" onclick="syncAllCalendarTerms({force:true})">↻ Google Calendar</button></h2>
+      <div class="crmHint" id="calendarSyncStatus">Terminy są synchronizowane z firmowym Kalendarzem Google.</div>
       <div class="newItemForm" id="form-terminy">
         <div class="row">
           <input type="text" id="nazwa-terminy" placeholder="Nazwa terminu (np. Fiskalizacja mlekomatów)">
@@ -3097,6 +3098,7 @@ async function initApp(){
   }
   scheduleDriveAutoSync();
   startLivePolling();
+  scheduleCalendarSync(1200);
 }
 
 function normalizePanelDocuments(d){
@@ -3276,7 +3278,7 @@ function showLiveSyncBanner(show){
 }
 
 async function checkForRemoteUpdate(){
-  if(!SYNC_ENABLED || document.hidden || liveCheckInFlight) return;
+  if(!SYNC_ENABLED || document.hidden || liveCheckInFlight || calendarSyncInFlight) return;
   if(hasUnsyncedLocalChanges || !lastCloudSaveOk) return; // nie nadpisujemy niewysłanych zmian
   const password = getPanelPassword();
   if(!password) return;
@@ -7020,44 +7022,141 @@ function updateClient(el){
   commitClientField(el);
 }
 
-// ================= Google Calendar (termin następnego kontaktu) =================
-// Ten sam wzorzec co synchronizacja Drive: best-effort, w tle, nigdy nie blokuje
-// ani nie przerywa zapisu notatki/karty klienta, jeśli Kalendarz akurat nie odpowiada.
-async function syncFollowupToCalendar(c){
+// ================= Google Calendar =================
+// Jeden firmowy kalendarz jest źródłem terminów dla obu kont. Stałe sourceId chroni
+// przed duplikatami, także gdy Kuba i Jarosław otworzą panel w tym samym czasie.
+let calendarSyncInFlight = false;
+let calendarSyncPending = false;
+let calendarSyncTimer = null;
+
+function scheduleCalendarSync(delay = 300){
+  clearTimeout(calendarSyncTimer);
+  calendarSyncTimer = setTimeout(()=>{
+    if(calendarSyncInFlight){ calendarSyncPending = true; return; }
+    syncAllCalendarTerms();
+  }, delay);
+}
+
+function setCalendarSyncStatus(text, warn = false){
+  const el = document.getElementById("calendarSyncStatus");
+  if(el){ el.textContent = text; el.style.color = warn ? "var(--todo)" : "var(--muted)"; }
+}
+
+function calendarPayloadSignature(payload){
+  return JSON.stringify([payload.title || "", payload.description || "", payload.phone || "", payload.date || ""]);
+}
+
+function normalizeCalendarDate(value){
+  const raw = (value || "").toString().trim();
+  const iso = raw.match(/^(\d{4})-(\d{2})-(\d{2})(?:T\d{2}:\d{2})?/);
+  if(iso) return raw.slice(0, 16);
+  const pl = raw.match(/^(\d{2})\.(\d{2})\.(\d{4})$/);
+  return pl ? `${pl[3]}-${pl[2]}-${pl[1]}` : "";
+}
+
+async function deleteCalendarEvent(eventId){
   const password = getPanelPassword();
-  if(!password || !c) return;
+  if(!password || !eventId) return false;
+  const res = await fetch(`/api/calendar-events?eventId=${encodeURIComponent(eventId)}`, {
+    method: "DELETE",
+    headers: { "X-Panel-Password": password }
+  });
+  if(!res.ok) throw new Error(await syncErrorMessage(res));
+  return true;
+}
+
+async function syncCalendarRecord(record, payload, options = {}){
+  if(!record || !payload?.sourceId) return false;
+  const date = normalizeCalendarDate(payload.date);
+  if(!date){
+    if(record.googleCalendarEventId) await deleteCalendarEvent(record.googleCalendarEventId);
+    const changed = Boolean(record.googleCalendarEventId || record.googleCalendarSignature);
+    delete record.googleCalendarEventId;
+    delete record.googleCalendarSignature;
+    return changed;
+  }
+
+  const normalized = {...payload, date};
+  const signature = calendarPayloadSignature(normalized);
+  if(!options.force && record.googleCalendarEventId && record.googleCalendarSignature === signature) return false;
+
+  const password = getPanelPassword();
+  if(!password) return false;
+  const res = await fetch("/api/calendar-events", {
+    method: "POST",
+    headers: { "Content-Type": "application/json", "X-Panel-Password": password },
+    body: JSON.stringify({eventId: record.googleCalendarEventId || "", ...normalized})
+  });
+  if(!res.ok) throw new Error(await syncErrorMessage(res));
+  const json = await res.json().catch(()=>null);
+  if(!json?.eventId) throw new Error("Kalendarz nie zwrócił identyfikatora wydarzenia.");
+  const changed = json.eventId !== record.googleCalendarEventId || signature !== record.googleCalendarSignature;
+  record.googleCalendarEventId = json.eventId;
+  record.googleCalendarSignature = signature;
+  return changed;
+}
+
+function clientCalendarPayload(c){
+  const name = c.firma || c.osoba || "klient";
+  return {
+    sourceId:`client:${c.id}`,
+    title:`Kontakt: ${name}`,
+    phone:c.telefon || "",
+    description:[c.osoba && c.firma ? `Osoba: ${c.osoba}` : "", c.obiekcje || ""].filter(Boolean).join("\n\n"),
+    date:c.nastepnyFollowup || ""
+  };
+}
+
+async function syncFollowupToCalendar(c){
+  if(!c) return;
   try{
-    if(c.nastepnyFollowup){
-      const res = await fetch("/api/calendar-events", {
-        method: "POST",
-        headers: { "Content-Type": "application/json", "X-Panel-Password": password },
-        body: JSON.stringify({
-          eventId: c.googleCalendarEventId || "",
-          clientId: c.id,
-          clientName: c.firma || c.osoba || "klient",
-          phone: c.telefon || "",
-          notes: c.obiekcje || "",
-          date: c.nastepnyFollowup
-        })
-      });
-      if(res.ok){
-        const json = await res.json().catch(()=>null);
-        if(json && json.eventId && json.eventId !== c.googleCalendarEventId){
-          c.googleCalendarEventId = json.eventId;
-          saveData();
-        }
-      }
-    } else if(c.googleCalendarEventId){
-      const eventId = c.googleCalendarEventId;
-      c.googleCalendarEventId = "";
-      saveData();
-      await fetch(`/api/calendar-events?eventId=${encodeURIComponent(eventId)}`, {
-        method: "DELETE",
-        headers: { "X-Panel-Password": password }
-      });
-    }
+    if(await syncCalendarRecord(c, clientCalendarPayload(c), {force:true})) saveData();
   }catch(e){
     console.warn("Nie udało się zsynchronizować terminu kontaktu z Google Calendar:", e);
+  }
+}
+
+async function syncAllCalendarTerms(options = {}){
+  if(calendarSyncInFlight){ calendarSyncPending = true; return; }
+  if(!data) return;
+  calendarSyncInFlight = true;
+  setCalendarSyncStatus("Synchronizuję wszystkie terminy z Google Calendar...");
+  let changed = false;
+  let synced = 0;
+  try{
+    const entries = [];
+    (data.klienci || []).filter(c=>c.nastepnyFollowup || c.googleCalendarEventId).forEach(c=>entries.push([c, clientCalendarPayload(c)]));
+    (data.terminy || []).forEach(t=>entries.push([t, {
+      sourceId:`deadline:${t.id}`, title:`Termin: ${t.nazwa || "sprawa firmowa"}`,
+      description:t.notatka || "", date:t.data || ""
+    }]));
+    (data.instalacje || []).filter(i=>i.dataMontazu || i.googleCalendarEventId).forEach(i=>entries.push([i, {
+      sourceId:`installation:${i.id}`, title:`Montaż: ${i.klient || "klient"}`,
+      description:[i.adres || "", i.notatki || ""].filter(Boolean).join("\n\n"), date:i.dataMontazu || ""
+    }]));
+    (data.contentPlanFacebook || []).forEach(post=>entries.push([post, {
+      sourceId:`facebook:${post.id}`, title:"Facebook: zaplanowana publikacja",
+      description:(post.tresc || "").slice(0, 1500), date:post.dataStart || ""
+    }]));
+    ((data.planLipiec2026 && data.planLipiec2026.formalnosci) || []).filter(item=>normalizeCalendarDate(item.termin) || item.googleCalendarEventId).forEach(item=>entries.push([item, {
+      sourceId:`formality:${item.id}`, title:`Formalność: ${item.nazwa || "zadanie"}`,
+      description:item.notatka || "", date:item.wykonane ? "" : normalizeCalendarDate(item.termin)
+    }]));
+
+    for(const [record, payload] of entries){
+      if(await syncCalendarRecord(record, payload, options)){ changed = true; synced += 1; }
+    }
+    if(changed) await saveData({immediate:true});
+    setCalendarSyncStatus(`Google Calendar: zsynchronizowano ${synced}, bez zmian ${entries.length - synced}.`);
+  }catch(e){
+    console.warn("Nie udało się zsynchronizować wszystkich terminów z Google Calendar:", e);
+    setCalendarSyncStatus(`Błąd Google Calendar: ${e.message || "nie udało się zsynchronizować"}`, true);
+  }finally{
+    calendarSyncInFlight = false;
+    if(calendarSyncPending){
+      calendarSyncPending = false;
+      scheduleCalendarSync(100);
+    }
   }
 }
 
@@ -7830,11 +7929,14 @@ function addTermin(){
   document.getElementById("notatka-terminy").value="";
   toggleForm("terminy");
   renderTerminy();
+  scheduleCalendarSync();
 }
 
 function deleteTermin(id){
+  const removed = (data.terminy || []).find(t=>t.id===id);
   data.terminy = data.terminy.filter(t=>t.id!==id);
   saveData(); renderTerminy();
+  if(removed?.googleCalendarEventId) deleteCalendarEvent(removed.googleCalendarEventId).catch(e=>console.warn("Nie udało się usunąć terminu z Google Calendar:", e));
 }
 
 // ================= Instalacje mlekomatów =================
@@ -7884,11 +7986,14 @@ function addInstalacja(){
   document.getElementById("notatki-instalacje").value="";
   toggleForm("instalacje");
   renderInstalacje();
+  scheduleCalendarSync();
 }
 
 function deleteInstalacja(id){
+  const removed = (data.instalacje || []).find(i=>i.id===id);
   data.instalacje = data.instalacje.filter(i=>i.id!==id);
   saveData(); renderInstalacje();
+  if(removed?.googleCalendarEventId) deleteCalendarEvent(removed.googleCalendarEventId).catch(e=>console.warn("Nie udało się usunąć montażu z Google Calendar:", e));
 }
 
 // ================= Finanse =================
@@ -8569,6 +8674,7 @@ function toggleJulyFormality(id){
   item.wykonane = !item.wykonane;
   saveData();
   renderJulyActionPlan();
+  scheduleCalendarSync();
 }
 
 function updateJulyFormalityNote(id, value){
