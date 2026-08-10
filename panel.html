@@ -3822,13 +3822,21 @@ function renderHistoryAudio(h){
   const name = h.audioName || "notatka głosowa";
   const size = h.audioSize ? ` · ${Math.round(h.audioSize / 1024)} KB` : "";
   const isAmr = /amr/i.test(h.audioType || "") || /\.amr$/i.test(name);
-  const fallback = isAmr
-    ? `<div class="audioHint">Format AMR nie zawsze odtwarza się w przeglądarce na komputerze. Jeśli powyższy odtwarzacz milczy: <a href="${crmEsc(src)}" download="${crmEsc(name)}">Pobierz plik audio</a></div>`
+  const driveId = h.audioUrl ? driveFileId(h.audioUrl) : "";
+  const playerSource = driveId ? "" : ` src="${crmEsc(src)}"`;
+  const driveAttributes = driveId
+    ? ` data-drive-audio-id="${crmEsc(driveId)}" data-audio-name="${crmEsc(name)}"`
+    : "";
+  const downloadControl = driveId
+    ? `<button type="button" class="histBtn" data-drive-audio-id="${crmEsc(driveId)}" data-audio-name="${crmEsc(name)}" onclick="downloadHistoryAudio(this)">Pobierz plik audio</button><span class="audioStatus" data-audio-status></span>`
     : `<a class="audioHint" href="${crmEsc(src)}" download="${crmEsc(name)}">Pobierz plik audio</a>`;
+  const fallback = isAmr
+    ? `<div class="audioHint">Format AMR nie zawsze odtwarza się w przeglądarce na komputerze. Jeśli odtwarzacz milczy, pobierz plik.</div>${downloadControl}`
+    : downloadControl;
   return `
     <div class="historyAudio">
       <div class="historyAudioTitle">Notatka głosowa: ${crmEsc(name)}${crmEsc(size)}</div>
-      <audio controls preload="metadata" src="${crmEsc(src)}"></audio>
+      <audio controls preload="metadata"${playerSource}${driveAttributes}></audio>
       <div class="audioSpeed">
         <span class="audioSpeedLabel">Szybkość:</span>
         <button type="button" class="audioSpeedBtn active" data-speed="1" onclick="setAudioSpeed(this,1)">1x</button>
@@ -3839,6 +3847,73 @@ function renderHistoryAudio(h){
       ${fallback}
     </div>
   `;
+}
+
+const protectedAudioCache = new Map();
+
+async function fetchProtectedAudio(fileId){
+  if(protectedAudioCache.has(fileId)) return protectedAudioCache.get(fileId);
+  const request = (async()=>{
+    const password = getPanelPassword();
+    if(!password) throw new Error("Brak aktywnej sesji panelu.");
+    const res = await fetch(`/api/drive-documents?audioFileId=${encodeURIComponent(fileId)}`, {
+      headers: { "X-Panel-Password": password }
+    });
+    if(res.status === 401) throw new Error("Sesja panelu wygasła.");
+    if(!res.ok){
+      const json = await res.json().catch(()=>({}));
+      throw new Error(json.message || json.error || `HTTP ${res.status}`);
+    }
+    const blob = await res.blob();
+    return {blob, url: URL.createObjectURL(blob)};
+  })();
+  protectedAudioCache.set(fileId, request);
+  try{
+    return await request;
+  }catch(e){
+    protectedAudioCache.delete(fileId);
+    throw e;
+  }
+}
+
+async function hydrateHistoryAudioPlayers(root=document){
+  const players = Array.from(root.querySelectorAll('audio[data-drive-audio-id]:not([data-audio-loading])'));
+  players.forEach(async audioEl=>{
+    audioEl.dataset.audioLoading = "1";
+    const wrap = audioEl.closest(".historyAudio");
+    const statusEl = wrap && wrap.querySelector("[data-audio-status]");
+    if(statusEl) statusEl.textContent = "Ładowanie nagrania...";
+    try{
+      const file = await fetchProtectedAudio(audioEl.dataset.driveAudioId);
+      audioEl.src = file.url;
+      audioEl.load();
+      audioEl.dataset.audioLoaded = "1";
+      if(statusEl) statusEl.textContent = "";
+    }catch(e){
+      if(statusEl) statusEl.textContent = `Nie udało się załadować: ${e.message}`;
+    }
+  });
+}
+
+async function downloadHistoryAudio(button){
+  const fileId = button.dataset.driveAudioId;
+  const statusEl = button.parentElement && button.parentElement.querySelector("[data-audio-status]");
+  button.disabled = true;
+  if(statusEl) statusEl.textContent = "Pobieranie...";
+  try{
+    const file = await fetchProtectedAudio(fileId);
+    const link = document.createElement("a");
+    link.href = file.url;
+    link.download = button.dataset.audioName || "notatka-glosowa";
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    if(statusEl) statusEl.textContent = "";
+  }catch(e){
+    if(statusEl) statusEl.textContent = `Nie udało się pobrać: ${e.message}`;
+  }finally{
+    button.disabled = false;
+  }
 }
 
 function renderHistoryImages(h){
@@ -4268,6 +4343,7 @@ function renderQuickClientUpdate(c){
 function renderHistoryEntries(c){
   const el = document.getElementById("historyEntries");
   el.innerHTML = renderHistoryTimeline(c, true);
+  hydrateHistoryAudioPlayers(el);
 }
 
 async function saveQuickClientUpdate(clientId){
@@ -6463,6 +6539,7 @@ function openClientCard(clientId){
   wireImageDropZone(document.getElementById("quickImageDropZone"), document.getElementById("quickImageFile"), addQuickImageFiles);
   wireClientOfferDropZone(c.id);
   document.getElementById("clientCardModal").classList.add("open");
+  hydrateHistoryAudioPlayers(document.getElementById("clientCardModal"));
   if(!clientOfferDriveSyncDone.has(c.id) && !clientOfferDriveSyncRunning.has(c.id)){
     setTimeout(()=>syncClientOfferPdfsFromDrive(c.id, {silent:true}), 0);
   }

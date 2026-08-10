@@ -260,6 +260,40 @@ async function getNotesAudioFolderId(token) {
   return id;
 }
 
+async function downloadNoteAudioFile(token, fileId) {
+  const safeFileId = String(fileId || "").trim();
+  if (!/^[A-Za-z0-9_-]{10,}$/.test(safeFileId)) throw new Error("Invalid audio file id.");
+
+  const audioFolderId = await getNotesAudioFolderId(token);
+  const metadataParams = new URLSearchParams({
+    fields: "id,name,mimeType,size,parents",
+    supportsAllDrives: "true"
+  });
+  const metadataRes = await fetch(`https://www.googleapis.com/drive/v3/files/${encodeURIComponent(safeFileId)}?${metadataParams.toString()}`, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  const metadata = await metadataRes.json().catch(() => ({}));
+  if (!metadataRes.ok) throw new Error(metadata.error && metadata.error.message ? metadata.error.message : "Google Drive audio lookup failed.");
+  if (!Array.isArray(metadata.parents) || !metadata.parents.includes(audioFolderId)) {
+    const error = new Error("Requested file is not a panel audio note.");
+    error.statusCode = 403;
+    throw error;
+  }
+
+  const contentRes = await fetch(`https://www.googleapis.com/drive/v3/files/${encodeURIComponent(safeFileId)}?alt=media&supportsAllDrives=true`, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  if (!contentRes.ok) {
+    const json = await contentRes.json().catch(() => ({}));
+    throw new Error(json.error && json.error.message ? json.error.message : "Google Drive audio download failed.");
+  }
+  return {
+    content: Buffer.from(await contentRes.arrayBuffer()),
+    name: sanitizeName(metadata.name) || "notatka-glosowa",
+    mimeType: String(metadata.mimeType || "application/octet-stream")
+  };
+}
+
 async function getClientOfferFolderId(token, clientName) {
   if (!clientOffersFolderIdCache) {
     clientOffersFolderIdCache = await findChildFolder(token, GOOGLE_DRIVE_FOLDER_ID, CLIENT_OFFERS_FOLDER_NAME);
@@ -351,6 +385,13 @@ module.exports = async function handler(req, res) {
   try {
     const token = await getAccessToken();
     if (req.method === "GET") {
+      if (req.query && req.query.audioFileId) {
+        const file = await downloadNoteAudioFile(token, req.query.audioFileId);
+        res.setHeader("Content-Type", file.mimeType);
+        res.setHeader("Content-Disposition", `inline; filename*=UTF-8''${encodeURIComponent(file.name)}`);
+        res.setHeader("Content-Length", String(file.content.length));
+        return res.status(200).send(file.content);
+      }
       if (req.query && req.query.clientOffersFor) {
         const folderId = await findClientOfferFolderId(token, req.query.clientOffersFor);
         if (!folderId) return res.status(200).json({ files: [] });
@@ -368,7 +409,7 @@ module.exports = async function handler(req, res) {
       return res.status(201).json({ file: await uploadDriveFile(token, payload) });
     }
   } catch (e) {
-    return res.status(500).json({
+    return res.status(e && e.statusCode ? e.statusCode : 500).json({
       error: "Google Drive operation failed.",
       message: e && e.message ? e.message : "Unknown error"
     });
