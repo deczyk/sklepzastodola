@@ -2629,6 +2629,8 @@ let syncRetryDelay = 5000; // rośnie 5s -> 10s -> 20s -> 30s (max) między nieu
 let lastRemoteSnapshot = loadLastRemoteSnapshot();
 let localChangeRevision = 0;
 let remoteSaveQueue = Promise.resolve();
+let pendingRemoteSave = null;
+let remoteSaveRunning = false;
 
 // Duży, stały pasek na górze (nie mały napis w rogu) - ma być niemożliwy do przegapienia,
 // dopóki coś nie jest bezpiecznie zapisane w chmurze. Wołane z każdego miejsca, które zmienia
@@ -2948,9 +2950,31 @@ async function pushRemote(payload, attempt = 0, revision = localChangeRevision){
 }
 
 function queueRemotePush(payload, revision = localChangeRevision){
-  remoteSaveQueue = remoteSaveQueue
-    .catch(()=>{})
-    .then(()=>pushRemote(payload, 0, revision));
+  // Gdy zapis już trwa, wystarczy zachować najnowszy pełny stan panelu. Każdy kolejny
+  // snapshot zawiera wszystkie wcześniejsze zmiany, więc wysyłanie stanów pośrednich
+  // tylko wydłuża kolejkę i mnoży ciężkie zapisy oraz backupy w Supabase.
+  pendingRemoteSave = { payload, revision };
+  if(remoteSaveRunning) return remoteSaveQueue;
+
+  remoteSaveRunning = true;
+  remoteSaveQueue = (async()=>{
+    try{
+      while(pendingRemoteSave){
+        const nextSave = pendingRemoteSave;
+        pendingRemoteSave = null;
+        await pushRemote(nextSave.payload, 0, nextSave.revision);
+      }
+    }finally{
+      remoteSaveRunning = false;
+      // Zabezpieczenie na wypadek, gdyby nowa zmiana pojawiła się dokładnie przy
+      // kończeniu pętli. W zwykłym przebiegu pętla odbierze ją sama.
+      if(pendingRemoteSave){
+        const nextSave = pendingRemoteSave;
+        pendingRemoteSave = null;
+        return queueRemotePush(nextSave.payload, nextSave.revision);
+      }
+    }
+  })();
   return remoteSaveQueue;
 }
 
@@ -3328,8 +3352,8 @@ function saveData(options = {}){
   markPendingSync(true); // trwałe, żeby zamknięcie karty przed zapisem w chmurze nie zgubiło zmiany
   setSyncStatus("Zapisywanie...", false);
   updateUnsyncedBanner();
-  // Każda akcja trafia do kolejki od razu. Kolejka zapobiega równoległym zapisom
-  // całej paczki danych, które wcześniej mogły kończyć się utratą nowszych zmian.
+  // Zapis trafia do bezpiecznej kolejki. Jeśli kilka zmian nastąpi szybko po sobie,
+  // do chmury leci bieżący zapis i najnowszy stan zamiast wszystkich wersji pośrednich.
   return queueRemotePush(clonePanelValue(data), revision);
 }
 
