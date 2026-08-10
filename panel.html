@@ -1844,6 +1844,7 @@
         <input type="text" id="filterText" placeholder="Szukaj (nazwa, miasto, telefon...)" oninput="renderClients()">
         <select id="sortBy" onchange="renderClients()">
           <option value="">Bez sortowania</option>
+          <option value="ostatnieDzialanie">Sortuj: najnowsze działania</option>
           <option value="priorytet">Sortuj: priorytet</option>
           <option value="status">Sortuj: status</option>
           <option value="miejscowosc">Sortuj: miejscowość</option>
@@ -4064,6 +4065,17 @@ function latestClientActivity(c){
     const byCreatedAt = new Date(b.h.utworzono || 0) - new Date(a.h.utworzono || 0);
     return byCreatedAt || b.index - a.index;
   })[0].h;
+}
+
+function compareClientsByLatestActivity(a, b){
+  const activityA = latestClientActivity(a);
+  const activityB = latestClientActivity(b);
+  const activityTimeA = activityA ? Date.parse(activityA.data || "") || 0 : 0;
+  const activityTimeB = activityB ? Date.parse(activityB.data || "") || 0 : 0;
+  if(activityTimeA !== activityTimeB) return activityTimeB - activityTimeA;
+  const createdTimeA = activityA ? Date.parse(activityA.utworzono || "") || 0 : 0;
+  const createdTimeB = activityB ? Date.parse(activityB.utworzono || "") || 0 : 0;
+  return createdTimeB - createdTimeA;
 }
 
 function clientActivitySummary(c, limit=120){
@@ -6960,6 +6972,7 @@ function renderClients(){
   if(sortBy==="priorytet") list.sort((a,b)=>(a.priorytet||"Z").localeCompare(b.priorytet||"Z"));
   if(sortBy==="status") list.sort((a,b)=>(a.status||"").localeCompare(b.status||""));
   if(sortBy==="miejscowosc") list.sort((a,b)=>(a.miejscowosc||"").localeCompare(b.miejscowosc||""));
+  if(sortBy==="ostatnieDzialanie") list.sort(compareClientsByLatestActivity);
 
   setClientsViewContainers();
   updateClientsViewHint();
