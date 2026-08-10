@@ -2661,6 +2661,34 @@ function valuesEqual(a,b){
   try{ return JSON.stringify(a) === JSON.stringify(b); }catch(e){ return false; }
 }
 
+function panelSaveConfirmed(expected, saved){
+  if(!expected || !saved || typeof expected !== "object" || typeof saved !== "object") return false;
+  const ignoredTopLevel = new Set(["klienci", "_deletedClientIds"]);
+  for(const key of Object.keys(expected)){
+    if(!ignoredTopLevel.has(key) && !valuesEqual(expected[key], saved[key])) return false;
+  }
+
+  const deleted = new Set((expected._deletedClientIds || []).map(String));
+  const savedClients = new Map((saved.klienci || []).filter(Boolean).map(client=>[String(client.id), client]));
+  for(const id of deleted){
+    if(savedClients.has(id)) return false;
+  }
+  for(const client of (expected.klienci || [])){
+    if(!client || !client.id || deleted.has(String(client.id))) continue;
+    const savedClient = savedClients.get(String(client.id));
+    if(!savedClient) return false;
+    for(const key of Object.keys(client)){
+      if(key === "historia" || key === "_deletedHistoryIds") continue;
+      if(!valuesEqual(client[key], savedClient[key])) return false;
+    }
+    const savedHistory = new Set((savedClient.historia || []).map((entry,index)=>mergeArrayItemKey(entry,index,"root.klienci[].historia")));
+    for(const [index, entry] of (client.historia || []).entries()){
+      if(!savedHistory.has(mergeArrayItemKey(entry,index,"root.klienci[].historia"))) return false;
+    }
+  }
+  return true;
+}
+
 function mergeArrayItemKey(item,index,path){
   if(item && typeof item === "object"){
     if(item.id != null) return `id:${item.id}`;
@@ -2823,12 +2851,13 @@ async function pushRemote(payload, attempt = 0, revision = localChangeRevision){
       throw new Error("VERSION_CONFLICT");
     }
     if(!res.ok) throw new Error(await syncErrorMessage(res));
-    let savedSnapshot = payload;
+    let savedSnapshot = null;
     try{
       const json = await res.json();
       if(Number.isFinite(Number(json.version))) currentPanelVersion = Number(json.version);
       if(json.record && typeof json.record === "object") savedSnapshot = ensurePanelSyncIds(clonePanelValue(json.record));
     }catch(e){}
+    if(!savedSnapshot || !panelSaveConfirmed(payload, savedSnapshot)) throw new Error("SAVE_VERIFICATION_FAILED");
     const newerLocalChanges = revision !== localChangeRevision;
     const currentLocalData = data;
     rememberRemoteSnapshot(savedSnapshot);
@@ -2892,6 +2921,7 @@ function syncErrorText(e){
   const cloudStatus = msg.match(/"status"\s*:\s*(\d{3})/) || msg.match(/status[^\d]*(\d{3})/i);
   if(msg.includes("Supabase")) return "Błąd synchronizacji: Supabase odrzucił zapis" + (cloudStatus ? `: HTTP ${cloudStatus[1]}` : "");
   if(msg === "VERSION_CONFLICT") return "Błąd synchronizacji: dane w chmurze zmieniły się w trakcie zapisu. Odśwież panel i spróbuj ponownie.";
+  if(msg === "SAVE_VERIFICATION_FAILED") return "Błąd synchronizacji: serwer nie potwierdził wszystkich zmian. Dane lokalne są zachowane i zapis zostanie ponowiony.";
   if(msg.includes("HTTP 500")) return "Błąd synchronizacji: API zwróciło 500";
   if(msg.includes("HTTP ")) return "Błąd synchronizacji: API zwróciło " + msg.replace(/^HTTP\s*/, "");
   return "Zapisano lokalnie, ale nie zapisano w chmurze";
@@ -3192,6 +3222,29 @@ function saveData(options = {}){
   // Każda akcja trafia do kolejki od razu. Kolejka zapobiega równoległym zapisom
   // całej paczki danych, które wcześniej mogły kończyć się utratą nowszych zmian.
   return queueRemotePush(clonePanelValue(data), revision);
+}
+
+let liveFieldSaveTimer = null;
+let liveFieldSavePending = false;
+
+function persistLiveFieldDraft(){
+  ensurePanelSyncIds(data);
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  hasUnsyncedLocalChanges = true;
+  liveFieldSavePending = true;
+  markPendingSync(true);
+  setSyncStatus("Zapisywanie...", false);
+  updateUnsyncedBanner();
+  clearTimeout(liveFieldSaveTimer);
+  liveFieldSaveTimer = setTimeout(flushLiveFieldSave, 700);
+}
+
+function flushLiveFieldSave(){
+  clearTimeout(liveFieldSaveTimer);
+  liveFieldSaveTimer = null;
+  if(!liveFieldSavePending) return Promise.resolve(false);
+  liveFieldSavePending = false;
+  return saveData();
 }
 
 initTheme();
@@ -4226,7 +4279,7 @@ function renderItemCard(item, cat){
     ${docActions}
     ${quickEditHtml}
     ${dateCaption}
-    <textarea placeholder="Notatki..." data-cat="${cat}" data-id="${item.id}" onblur="updateNotes(this)">${crmEsc(item.notes||"")}</textarea>
+    <textarea placeholder="Notatki..." data-cat="${cat}" data-id="${item.id}" oninput="stageItemNotes(this)" onblur="commitItemNotes(this)">${crmEsc(item.notes||"")}</textarea>
   `;
   return div;
 }
@@ -4796,10 +4849,23 @@ function updateStatus(sel){
   }
 }
 
-function updateNotes(ta){
+function stageItemNotes(ta){
   const cat = ta.dataset.cat, id = ta.dataset.id;
   const item = data[cat].find(i=>i.id===id);
-  if(item){ item.notes = ta.value; item.zaktualizowano = new Date().toISOString(); saveData(); renderStatsBar(); }
+  if(!item || item.notes === ta.value) return;
+  item.notes = ta.value;
+  item.zaktualizowano = new Date().toISOString();
+  persistLiveFieldDraft();
+}
+
+function commitItemNotes(){
+  if(liveFieldSavePending) flushLiveFieldSave();
+  renderStatsBar();
+}
+
+function updateNotes(ta){
+  stageItemNotes(ta);
+  commitItemNotes();
 }
 
 function updateDocumentMeta(sel){
@@ -4885,9 +4951,9 @@ function clientField(c, field, type){
     return `<input type="date" value="${historyDateInputValue(c[field])}" data-field="${field}" data-id="${c.id}" onblur="updateClient(this)" onchange="updateClient(this)">`;
   }
   if(type==="textarea"){
-    return `<textarea data-field="${field}" data-id="${c.id}" onblur="updateClient(this)">${c[field]||""}</textarea>`;
+    return `<textarea data-field="${field}" data-id="${c.id}" oninput="stageClientField(this)" onblur="commitClientField(this)">${c[field]||""}</textarea>`;
   }
-  return `<input type="text" value="${(c[field]||"").toString().replace(/"/g,'&quot;')}" data-field="${field}" data-id="${c.id}" onblur="updateClient(this)">`;
+  return `<input type="text" value="${(c[field]||"").toString().replace(/"/g,'&quot;')}" data-field="${field}" data-id="${c.id}" oninput="stageClientField(this)" onblur="commitClientField(this)">`;
 }
 
 function populateFilterOptions(){
@@ -6354,24 +6420,50 @@ function deleteClient(id){
   render();
 }
 
-function updateClient(el){
+function clientFieldValue(el, normalize = false){
+  return normalize && el.dataset.field === "telefon" ? formatPhonePL(el.value) : el.value;
+}
+
+function stageClientField(el){
   const id = el.dataset.id, field = el.dataset.field;
   const c = data.klienci.find(x=>x.id===id);
-  if(c){
-    const oldVal = c[field];
-    c[field] = field === "telefon" ? formatPhonePL(el.value) : el.value;
+  if(!c || !field) return;
+  const value = clientFieldValue(el, false);
+  if(c[field] === value) return;
+  c[field] = value;
+  c.zaktualizowano = new Date().toISOString();
+  persistLiveFieldDraft();
+}
+
+function commitClientField(el){
+  const id = el.dataset.id, field = el.dataset.field;
+  const c = data.klienci.find(x=>x.id===id);
+  if(!c || !field) return;
+  const oldVal = c[field];
+  const value = clientFieldValue(el, true);
+  const changed = oldVal !== value;
+  if(changed){
+    c[field] = value;
     c.zaktualizowano = new Date().toISOString();
-    if(field==="status" && oldVal!==el.value){
-      logActivity(`zmienił(a) status klienta „${c.firma||c.osoba||'bez nazwy'}” na ${STATUS_OPTS.find(s=>s[0]===el.value)[1]}`);
-    }
-    saveData();
-    if(field==="nastepnyFollowup" && oldVal!==el.value) syncFollowupToCalendar(c);
-    if(field==="status" || field==="priorytet") renderStatsBar();
-    if(["firma","osoba","telefon","email","wojewodztwo","miejscowosc","ulica","zainteresowanie","produkt","nastepnyFollowup","zrodloLeada","obiekcje","status","priorytet"].includes(field)){
-      renderClients();
-      if(currentClientCardId===id) openClientCard(id);
-    }
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
   }
+  if(field === "telefon" && el.value !== value) el.value = value;
+  if(field==="status" && changed){
+    const status = STATUS_OPTS.find(s=>s[0]===value);
+    logActivity(`zmienił(a) status klienta „${c.firma||c.osoba||'bez nazwy'}” na ${status ? status[1] : value}`);
+  }
+  if(liveFieldSavePending) flushLiveFieldSave();
+  else if(changed) saveData();
+  if(field==="nastepnyFollowup" && changed) syncFollowupToCalendar(c);
+  if(field==="status" || field==="priorytet") renderStatsBar();
+  if(["firma","osoba","telefon","email","wojewodztwo","miejscowosc","ulica","zainteresowanie","produkt","nastepnyFollowup","zrodloLeada","obiekcje","status","priorytet"].includes(field)){
+    renderClients();
+    if(currentClientCardId===id) openClientCard(id);
+  }
+}
+
+function updateClient(el){
+  commitClientField(el);
 }
 
 // ================= Google Calendar (termin następnego kontaktu) =================
@@ -7858,7 +7950,7 @@ function renderJulyActionPlan(){
           ${item.pilne ? '<span class="actionBadge urgent">PILNE</span>' : ""}
         </div>
       </div>
-      <textarea placeholder="Notatka statusu..." onchange="updateJulyFormalityNote('${crmEsc(item.id)}', this.value)">${crmEsc(item.notatka || "")}</textarea>
+      <textarea placeholder="Notatka statusu..." oninput="stageJulyFormalityNote('${crmEsc(item.id)}', this.value)" onblur="commitJulyFormalityNote()">${crmEsc(item.notatka || "")}</textarea>
     </div>
   `).join("");
 
@@ -7926,10 +8018,19 @@ function toggleJulyFormality(id){
 }
 
 function updateJulyFormalityNote(id, value){
+  stageJulyFormalityNote(id, value);
+  commitJulyFormalityNote();
+}
+
+function stageJulyFormalityNote(id, value){
   const item = (getJulyPlan().formalnosci || []).find(entry => entry.id === id);
-  if(!item) return;
+  if(!item || item.notatka === value) return;
   item.notatka = value;
-  saveData();
+  persistLiveFieldDraft();
+}
+
+function commitJulyFormalityNote(){
+  if(liveFieldSavePending) flushLiveFieldSave();
 }
 
 function updateJulyChannelStatus(id, value){

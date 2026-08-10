@@ -137,14 +137,12 @@ function mergePanelClients(currentData, incomingData) {
       return;
     }
 
-    const currentUpdated = timestampValue(pair.current.zaktualizowano || pair.current.utworzono);
-    const incomingUpdated = timestampValue(pair.incoming.zaktualizowano || pair.incoming.utworzono);
-    const preferred = incomingUpdated >= currentUpdated ? pair.incoming : pair.current;
-    const secondary = preferred === pair.incoming ? pair.current : pair.incoming;
     const history = mergeClientHistory(pair.current, pair.incoming);
+    // Wersja całego magazynu chroni zapis przed konfliktem. Pola z żądania muszą wygrać;
+    // czas z telefonu lub komputera nie może po cichu przywrócić starszej karty klienta.
     clients.push({
-      ...secondary,
-      ...preferred,
+      ...pair.current,
+      ...pair.incoming,
       historia: history.historia,
       _deletedHistoryIds: history.deletedHistoryIds
     });
