@@ -2250,7 +2250,7 @@
         <div><label class="addClientLabel">Źródło leada</label>
           <select id="ac_zrodloLeada"></select>
         </div>
-        <div><label class="addClientLabel">Czym zainteresowany</label>
+        <div><label class="addClientLabel">Zainteresowanie</label>
           <select id="ac_produkt"></select>
         </div>
       </div>
@@ -4005,6 +4005,26 @@ function inferFollowupFromNote(text){
   return "";
 }
 
+function interestProductKeys(value){
+  const text = normalizeAutomationText(value);
+  if(!text) return [];
+  if(noteHas(text, [/\bcaly system\b/, /\bpelny system\b/, /\bwszystko\b/])) return ["mlekomat","pawilon","butelki","automat"];
+  const keys = [];
+  if(noteHas(text, [/\bmlekomat\b/, /\bbrunimat\b/])) keys.push("mlekomat");
+  if(noteHas(text, [/\bpawilon\b/, /\bpunkt sprzedazy\b/, /\bsklep gospodarczy\b/])) keys.push("pawilon");
+  if(noteHas(text, [/\bbutelk/])) keys.push("butelki");
+  if(noteHas(text, [/\bsielaff\b/, /\bautomat chlodniczy\b/, /\bautomat na (jajka|sery|produkty|butelki)\b/])) keys.push("automat");
+  return keys;
+}
+
+function interestProductLabel(keys){
+  const order = ["mlekomat","pawilon","butelki","automat"];
+  const labels = {mlekomat:"Mlekomat", pawilon:"Pawilon", butelki:"Butelki", automat:"Automat chłodniczy"};
+  const selected = order.filter(key => keys.includes(key));
+  if(selected.length === order.length) return "Wszystko: mlekomat + pawilon + butelki + automat chłodniczy";
+  return selected.map(key => labels[key]).join(" + ");
+}
+
 function inferClientAutomation(note, client){
   const text = normalizeAutomationText(note);
   const changes = [];
@@ -4062,9 +4082,15 @@ function inferClientAutomation(note, client){
     if(client.status === "nowy") set("status", "zglosil_sie", "status: Zgłosił się sam");
   }
 
-  if(noteHas(text, [/\bmlekomat\b/, /\bbrunimat\b/])) set("produkt", "BRUNIMAT / mlekomat", "produkt: BRUNIMAT / mlekomat");
-  if(noteHas(text, [/\bpawilon\b/, /\bpunkt sprzedazy\b/])) set("produkt", "Pawilon / punkt sprzedaży", "produkt: Pawilon / punkt sprzedaży");
-  if(noteHas(text, [/\bcaly system\b/, /\bpelny system\b/, /\bsklep przy gospodarstwie\b/])) set("produkt", "Cały system", "produkt: Cały system");
+  const mentionedProducts = interestProductKeys(text);
+  if(noteHas(text, [/\bcaly system\b/, /\bpelny system\b/, /\bsklep przy gospodarstwie\b/])){
+    mentionedProducts.splice(0, mentionedProducts.length, "mlekomat", "pawilon", "butelki", "automat");
+  }
+  if(mentionedProducts.length){
+    const currentProducts = interestProductKeys(client.produkt || client.zainteresowanie || "");
+    const product = interestProductLabel([...new Set([...currentProducts, ...mentionedProducts])]);
+    set("produkt", product, `zainteresowanie: ${product}`);
+  }
   if(noteHas(text, [/\bfinansowanie\b/, /\bleasing\b/, /\bdotacj/, /\barimr\b/])) set("produkt", client.produkt || "Finansowanie / leasing / dotacja", `produkt: ${client.produkt || "Finansowanie / leasing / dotacja"}`);
   if(noteHas(text, [/\bnie wie\b/, /\bnie wiadomo\b/, /\bdobor pakietu\b/, /\bdobór pakietu\b/])){
     set("produkt", "Jeszcze nie wie", "produkt: Jeszcze nie wie");
@@ -5187,7 +5213,28 @@ const PRIO_OPTS = [["A","A – wysoki"],["B","B – średni"],["C","C – niski"
 const PRIO_MAP = {"A – wysoki":"A","B – średni":"B","C – niski":"C"};
 const ZAIN_OPTS = ["Mlekomat","Sklep gospodarczy","Pakiet: sklep + mlekomat","Serwis","Inne urządzenie","Inne"];
 const LEAD_SOURCE_OPTS = ["OLX","Facebook / grupy rolnicze","Polecenie","Zadzwonił sam","Tata pojechał osobiście z ofertą","Strona internetowa","brunimat.ch","ODR / gmina / doradca rolniczy","Targi / wydarzenie","Inne"];
-const PRODUCT_OPTS = ["Cały system","BRUNIMAT / mlekomat","Pawilon / punkt sprzedaży","Finansowanie / leasing / dotacja","Marketing lokalny","Serwis / wsparcie","Jeszcze nie wie","Inne"];
+const PRODUCT_OPTS = [
+  "Mlekomat",
+  "Pawilon",
+  "Butelki",
+  "Automat chłodniczy",
+  "Mlekomat + Pawilon",
+  "Mlekomat + Butelki",
+  "Mlekomat + Automat chłodniczy",
+  "Pawilon + Butelki",
+  "Pawilon + Automat chłodniczy",
+  "Butelki + Automat chłodniczy",
+  "Mlekomat + Pawilon + Butelki",
+  "Mlekomat + Pawilon + Automat chłodniczy",
+  "Mlekomat + Butelki + Automat chłodniczy",
+  "Pawilon + Butelki + Automat chłodniczy",
+  "Wszystko: mlekomat + pawilon + butelki + automat chłodniczy",
+  "Finansowanie / leasing / dotacja",
+  "Marketing lokalny",
+  "Serwis / wsparcie",
+  "Jeszcze nie wie",
+  "Inne"
+];
 const OBJECTION_OPTS = ["Cena","Niepewność co do popytu","Obawa o serwis / awarie","Brak miejsca / lokalizacji","Chce zobaczyć przykład / referencje","Czeka na kredyt / dotację","Czekamy na polskie oprogramowanie","Musi skonsultować z rodziną / wspólnikiem","Brak formalności","Inne"];
 const OFFER_VARIANT_OPTS = ["Premium","Standard","Podstawowy","BRUNIMAT 650 Premium DUO","Pawilon / punkt sprzedaży","Pełny punkt sprzedaży","Inne"];
 const OFFER_STATUS_OPTS = ["Robocza","Wysłana","Czeka na decyzję","Do poprawy","Zaakceptowana","Odrzucona","Archiwalna"];
@@ -6212,8 +6259,7 @@ function openClientCard(clientId){
       <div class="clientCardField"><b>Miejscowość</b>${clientField(c,"miejscowosc")}</div>
       <div class="clientCardField"><b>Adres / lokalizacja</b>${clientField(c,"ulica")}</div>
       <div class="clientCardField"><b>Skąd trafił</b>${clientField(c,null,"source")}</div>
-      <div class="clientCardField"><b>Czym zainteresowany</b>${clientField(c,null,"product")}</div>
-      <div class="clientCardField"><b>Zainteresowanie</b>${clientField(c,null,"zain")}</div>
+      <div class="clientCardField"><b>Zainteresowanie</b>${clientField(c,null,"product")}</div>
       <div class="clientCardField"><b>Co go powstrzymuje</b>${clientField(c,null,"objection")}</div>
       <div class="clientCardField"><b>Termin następnego kontaktu</b>${clientField(c,"nastepnyFollowup","datetime")}</div>
       <div class="clientCardField"><b>Status</b>${clientField(c,null,"status")}</div>
