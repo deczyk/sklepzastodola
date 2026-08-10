@@ -7,7 +7,9 @@ const SUPABASE_SECRET_KEY =
 const PANEL_STORE_ID = process.env.PANEL_STORE_ID || "main";
 const PANEL_STORE_TABLE = process.env.PANEL_STORE_TABLE || "panel_store";
 const PANEL_STORE_SAVE_RPC = process.env.PANEL_STORE_SAVE_RPC || "save_panel_store";
-const PANEL_STORE_BACKUP_LIMIT = 10;
+// Zachowujemy więcej kolejnych wersji, aby szybkie serie edycji na dwóch urządzeniach
+// nie wypchnęły ostatniej poprawnej kopii zanim ktokolwiek zauważy problem.
+const PANEL_STORE_BACKUP_LIMIT = 25;
 
 function hasPanelStoreConfig() {
   return Boolean(SUPABASE_URL && SUPABASE_SECRET_KEY);
@@ -187,7 +189,7 @@ async function createPanelStoreBackup(store) {
   }
 
   // Sprzątanie jest techniczne i nie musi blokować każdego zapisu użytkownika.
-  // Robimy je partiami co 10 wersji; kopia bezpieczeństwa nadal powstaje przed KAŻDYM zapisem.
+  // Robimy je partiami; kopia bezpieczeństwa nadal powstaje przed KAŻDYM zapisem.
   if (Number(store.version || 0) % PANEL_STORE_BACKUP_LIMIT !== 0) return;
 
   const listUrl = `${SUPABASE_URL}/rest/v1/${encodeURIComponent(PANEL_STORE_TABLE)}?id=like.${encodeURIComponent(`backup_${PANEL_STORE_ID}_*`)}&select=id&order=updated_at.desc&offset=${PANEL_STORE_BACKUP_LIMIT}`;

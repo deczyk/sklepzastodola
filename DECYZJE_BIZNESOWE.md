@@ -362,3 +362,10 @@ Następne kroki:
 - Przy poprawkach strony używać tej strategii jako punktu odniesienia.
 - Przygotować bezpieczny publiczny język oferty bez kosztów zakupu, marż i cenników partnerskich.
 - Dopiero później zdecydować, czy i jak pokazywać publicznie pakiety Podstawowy / Standard / Premium.
+
+## Bezpieczeństwo danych panelu
+
+- Panel jest używany równocześnie przez Jakuba i Jarosława na różnych urządzeniach.
+- Automatyczne odświeżanie nie może przerywać aktywnej edycji ani nadpisywać niezapisanych danych lokalnych.
+- Równoległe notatki i klienci muszą być scalane, a zapis ma korzystać z wersjonowania, ponawiania konfliktów i kopii bezpieczeństwa.
+- Klient ani wpis historii nie może zniknąć bez jawnego użycia funkcji usuwania.

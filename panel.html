@@ -1334,7 +1334,7 @@
       <p>Prywatne centrum CRM, dokumentów, kontaktów i operacji.</p>
     </div>
     <span id="syncStatus" style="font-size:11px;color:#cfe8d6;margin-left:auto;margin-right:4px"></span>
-    <button id="liveSyncBanner" class="lockBtn" onclick="refreshFromRemote()" style="display:none;background:#c9a24a;border-color:#c9a24a;color:#22331f;font-weight:bold">🔄 Nowe dane — odśwież</button>
+    <span id="liveSyncBanner" class="lockBtn" style="display:none;background:#c9a24a;border-color:#c9a24a;color:#22331f;font-weight:bold;pointer-events:none">Nowe dane z drugiego urządzenia — zostaną scalone automatycznie</span>
     <a class="lockBtn" href="index.html">Strona główna</a>
     <button class="lockBtn" onclick="refreshFromRemote()">⟳ Odśwież</button>
     <div class="themeToggleGroup" aria-label="Motyw panelu">
@@ -2844,7 +2844,7 @@ async function pushRemote(payload, attempt = 0, revision = localChangeRevision){
       // lokalne zmiany zawieszone w powietrzu, dociągamy najnowszą wersję i próbujemy zapisać jeszcze
       // raz — dane lokalne (z nowo dodaną notatką) i tak są najbardziej aktualne z punktu widzenia
       // tego, co user właśnie wpisał, więc mają pierwszeństwo przy retry.
-      if(attempt < 3){
+      if(attempt < 8){
         try{
           const freshRes = await fetch("/api/panel-data", { headers: { "X-Panel-Password": password } });
           if(freshRes.ok){
@@ -2857,7 +2857,8 @@ async function pushRemote(payload, attempt = 0, revision = localChangeRevision){
             }
           }
         }catch(e){}
-        await new Promise(r => setTimeout(r, 300 * (attempt + 1)));
+        const retryDelay = Math.min(200 * (2 ** attempt), 1800) + Math.floor(Math.random() * 180);
+        await new Promise(r => setTimeout(r, retryDelay));
         return pushRemote(payload, attempt + 1, revision);
       }
       throw new Error("VERSION_CONFLICT");
@@ -2877,6 +2878,7 @@ async function pushRemote(payload, attempt = 0, revision = localChangeRevision){
       ? ensurePanelSyncIds(mergePanelSnapshots(payload, currentLocalData, savedSnapshot))
       : ensurePanelSyncIds(clonePanelValue(savedSnapshot));
     localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    notifyOtherPanelTabs(currentPanelVersion);
     lastCloudSaveOk = true;
     if(!newerLocalChanges){
       hasUnsyncedLocalChanges = false;
@@ -3125,9 +3127,15 @@ async function refreshFromRemote(options = {}){
   showLiveSyncBanner(false);
   if(!SYNC_ENABLED){ setSyncStatus("Synchronizacja wyłączona", true); return; }
   if(hasUnsyncedLocalChanges || !lastCloudSaveOk){
-    if(options.silent) return; // nie przerywamy cichego pollingu confirmem
-    const ok = confirm("Masz lokalne zmiany niezapisane w chmurze. Odświeżenie może je nadpisać. Kontynuować?");
-    if(!ok) return;
+    if(options.silent) return;
+    setSyncStatus("Najpierw zabezpieczam lokalne zmiany...", true);
+    await flushLiveFieldSave();
+    await remoteSaveQueue.catch(()=>{});
+    if(hasUnsyncedLocalChanges || !lastCloudSaveOk){
+      setSyncStatus("Odświeżenie wstrzymane — najpierw zapiszę lokalne zmiany", true);
+      updateUnsyncedBanner();
+      return;
+    }
   }
   if(!options.silent) setSyncStatus("Odświeżanie...", false);
   let remote = null;
@@ -3160,7 +3168,10 @@ async function refreshFromRemote(options = {}){
 
 // ================= Live sync (polling odświeżania) =================
 let livePollTimer = null;
-const LIVE_POLL_MS = 20000;
+let liveCheckInFlight = false;
+let liveSyncListenersBound = false;
+let panelSyncChannel = null;
+const LIVE_POLL_MS = 5000;
 
 function isSomethingLikelyBeingEdited(){
   const openModal = document.querySelector(".previewModal.open");
@@ -3176,16 +3187,21 @@ function showLiveSyncBanner(show){
 }
 
 async function checkForRemoteUpdate(){
-  if(!SYNC_ENABLED || document.hidden) return;
+  if(!SYNC_ENABLED || document.hidden || liveCheckInFlight) return;
   if(hasUnsyncedLocalChanges || !lastCloudSaveOk) return; // nie nadpisujemy niewysłanych zmian
   const password = getPanelPassword();
   if(!password) return;
+  liveCheckInFlight = true;
   try{
     const res = await fetch("/api/panel-data?versionOnly=1", { headers: { "X-Panel-Password": password } });
     if(!res.ok) return;
     const json = await res.json();
     const remoteVersion = Number(json.version);
-    if(!Number.isFinite(remoteVersion) || currentPanelVersion === null) return;
+    if(!Number.isFinite(remoteVersion)) return;
+    if(currentPanelVersion === null){
+      if(!isSomethingLikelyBeingEdited()) await refreshFromRemote({silent:true});
+      return;
+    }
     if(remoteVersion <= currentPanelVersion) { showLiveSyncBanner(false); return; }
     // Są nowsze dane w chmurze niż to, co mamy załadowane.
     if(isSomethingLikelyBeingEdited()){
@@ -3195,15 +3211,43 @@ async function checkForRemoteUpdate(){
       await refreshFromRemote({silent:true});
     }
   }catch(e){
-    // Cichy brak sieci — nie przeszkadzamy użytkownikowi co 20 sekund.
+    // Cichy brak sieci — lokalny cache nadal chroni wpisane dane.
+  }finally{
+    liveCheckInFlight = false;
+  }
+}
+
+function scheduleLiveUpdateCheck(delay = 0){
+  setTimeout(()=>checkForRemoteUpdate(), delay);
+}
+
+function notifyOtherPanelTabs(version){
+  try{ panelSyncChannel?.postMessage({type:"panel-saved", version:Number(version)}); }catch(e){}
+}
+
+function bindLiveSyncListeners(){
+  if(liveSyncListenersBound) return;
+  liveSyncListenersBound = true;
+  document.addEventListener("visibilitychange", ()=>{ if(!document.hidden) scheduleLiveUpdateCheck(50); });
+  window.addEventListener("focus", ()=>scheduleLiveUpdateCheck(50));
+  window.addEventListener("online", ()=>scheduleLiveUpdateCheck(50));
+  document.addEventListener("focusout", ()=>{
+    if(document.getElementById("liveSyncBanner")?.style.display !== "none") scheduleLiveUpdateCheck(500);
+  });
+  if("BroadcastChannel" in window){
+    panelSyncChannel = new BroadcastChannel("sklepzastodola-panel-sync");
+    panelSyncChannel.addEventListener("message", event=>{
+      if(event.data?.type === "panel-saved") scheduleLiveUpdateCheck(50);
+    });
   }
 }
 
 function startLivePolling(){
   stopLivePolling();
   if(!SYNC_ENABLED) return;
+  bindLiveSyncListeners();
   livePollTimer = setInterval(checkForRemoteUpdate, LIVE_POLL_MS);
-  document.addEventListener("visibilitychange", ()=>{ if(!document.hidden) checkForRemoteUpdate(); });
+  scheduleLiveUpdateCheck(100);
 }
 
 function stopLivePolling(){
@@ -3406,6 +3450,7 @@ function openPreview(link){
 function closePreview(){
   document.getElementById("previewModal").classList.remove("open");
   document.getElementById("previewFrame").src = "";
+  scheduleLiveUpdateCheck(100);
 }
 
 // ================= Historia kontaktu =================
@@ -3441,6 +3486,7 @@ function closeHistoryModal(){
   renderPendingHistoryImages();
   currentHistoryEditIndex = null;
   currentHistoryClientId = null;
+  scheduleLiveUpdateCheck(100);
 }
 
 function historyDateValue(value){
@@ -5961,6 +6007,7 @@ function closeClientCard(){
   document.getElementById("clientCardContent").innerHTML = "";
   currentClientCardId = null;
   currentOfferEdit = null;
+  scheduleLiveUpdateCheck(100);
 }
 
 function toggleOfferForm(clientId){
@@ -6518,6 +6565,7 @@ function openAddClientModal(){
 
 function closeAddClientModal(){
   document.getElementById("addClientModal").classList.remove("open");
+  scheduleLiveUpdateCheck(100);
 }
 
 function submitAddClient(){
