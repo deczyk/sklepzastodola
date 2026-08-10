@@ -183,6 +183,10 @@ async function createPanelStoreBackup(store) {
     throw new Error(`Supabase BACKUP ${response.status}: ${(await responseText(response)).slice(0, 500)}`);
   }
 
+  // Sprzątanie jest techniczne i nie musi blokować każdego zapisu użytkownika.
+  // Robimy je partiami co 10 wersji; kopia bezpieczeństwa nadal powstaje przed KAŻDYM zapisem.
+  if (Number(store.version || 0) % PANEL_STORE_BACKUP_LIMIT !== 0) return;
+
   const listUrl = `${SUPABASE_URL}/rest/v1/${encodeURIComponent(PANEL_STORE_TABLE)}?id=like.${encodeURIComponent(`backup_${PANEL_STORE_ID}_*`)}&select=id&order=updated_at.desc&offset=${PANEL_STORE_BACKUP_LIMIT}`;
   const listResponse = await fetch(listUrl, { headers: headers() });
   if (!listResponse.ok) return;
@@ -238,7 +242,12 @@ async function savePanelStore(expectedVersion, data) {
 
   const result = await response.json();
   const row = Array.isArray(result) ? result[0] : result;
-  return Boolean(row && row.ok);
+  if (!row || !row.ok) return false;
+  return {
+    ok: true,
+    data: protectedData,
+    version: Number(row.version || (Number(expectedVersion || 0) + 1))
+  };
 }
 
 async function mutatePanelStore(mutator, attempts = 5) {
@@ -248,8 +257,9 @@ async function mutatePanelStore(mutator, attempts = 5) {
       ? structuredClone(store.data || {})
       : JSON.parse(JSON.stringify(store.data || {}));
     const result = await mutator(data, store);
-    if (await savePanelStore(store.version, data)) {
-      return { result, data, version: store.version + 1 };
+    const saved = await savePanelStore(store.version, data);
+    if (saved) {
+      return { result, data: saved.data, version: saved.version };
     }
   }
 

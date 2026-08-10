@@ -106,16 +106,14 @@ module.exports = async function handler(req, res) {
       const expectedVersion = parseVersionHeader(req);
       const current = expectedVersion === null ? await readPanelStore() : null;
       const versionToSave = expectedVersion === null ? current.version : expectedVersion;
-      const ok = await savePanelStore(versionToSave, payload);
+      const saved = await savePanelStore(versionToSave, payload);
 
-      if (!ok) {
+      if (!saved) {
         return res.status(409).json({
           error: "Panel data version conflict.",
           message: "Dane w Supabase zmienily sie w trakcie zapisu. Odswiez panel i sprobuj ponownie."
         });
       }
-
-      const saved = await readPanelStore();
 
       return res.status(200).json({
         ok: true,

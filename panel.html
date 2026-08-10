@@ -3248,7 +3248,7 @@ function persistLiveFieldDraft(){
   setSyncStatus("Zapisywanie...", false);
   updateUnsyncedBanner();
   clearTimeout(liveFieldSaveTimer);
-  liveFieldSaveTimer = setTimeout(flushLiveFieldSave, 700);
+  liveFieldSaveTimer = setTimeout(flushLiveFieldSave, 300);
 }
 
 function flushLiveFieldSave(){
