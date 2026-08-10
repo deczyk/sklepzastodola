@@ -2256,6 +2256,7 @@ const PANEL_SESSION_KEY = "panel_session_password";
 const PENDING_SYNC_KEY = "panel_pending_sync_v1";
 const LAST_REMOTE_SNAPSHOT_KEY = "panel_last_remote_snapshot_v1";
 const SYNC_ENABLED = true;
+const ACTIVE_DRIVE_CATALOG_ID = "shared_drive_0ACFzxkUrgaMkUk9PVA_20260810";
 
 // Flaga niezapisanych zmian musi przeżyć odświeżenie strony — inaczej po F5/zamknięciu karty
 // w trakcie zapisu (debounce, słabe łącze, konflikt wersji) panel ładuje dane z chmury i ubija
@@ -2696,7 +2697,9 @@ function valuesEqual(a,b){
 function panelSaveConfirmed(expected, saved){
   if(!expected || !saved || typeof expected !== "object" || typeof saved !== "object") return false;
   const ignoredTopLevel = new Set(["klienci", "_deletedClientIds"]);
+  const serverHasNewerDriveCatalog = saved.driveCatalogId === ACTIVE_DRIVE_CATALOG_ID && expected.driveCatalogId !== ACTIVE_DRIVE_CATALOG_ID;
   for(const key of Object.keys(expected)){
+    if(serverHasNewerDriveCatalog && (key === "dokumenty" || key === "driveCatalogId")) continue;
     if(!ignoredTopLevel.has(key) && !valuesEqual(expected[key], saved[key])) return false;
   }
 
@@ -3022,6 +3025,13 @@ async function initApp(){
   if(remote) rememberRemoteSnapshot(remote);
   const repairedMojibake = repairMojibakeDeep(data);
   const wasIncomplete = fillMissingDefaults(data);
+  const resetDriveCatalog = data.driveCatalogId !== ACTIVE_DRIVE_CATALOG_ID;
+  if(resetDriveCatalog){
+    const removedCount = Array.isArray(data.dokumenty) ? data.dokumenty.length : 0;
+    data.dokumenty = [];
+    data.driveCatalogId = ACTIVE_DRIVE_CATALOG_ID;
+    logActivity(`zresetował(a) katalog dokumentów po zmianie Google Drive (${removedCount} starych wpisów); pliki źródłowe nie zostały usunięte`);
+  }
   localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
   if(SYNC_ENABLED){
     if(pendingFromBefore){
@@ -3030,10 +3040,14 @@ async function initApp(){
     } else {
       setSyncStatus(preferLocal ? "Dane lokalne - chmura była pusta ⚠" : (remote ? "Dane z chmury ✓" : "Dane lokalne - chmura niedostępna ⚠"), !remote || preferLocal);
     }
-    if(pendingFromBefore || wasIncomplete || preferLocal || repairedMojibake) queueRemotePush(clonePanelValue(data)); // dosyłamy zaległe/brakujące dane do chmury
+    if(pendingFromBefore || wasIncomplete || preferLocal || repairedMojibake || resetDriveCatalog) await queueRemotePush(clonePanelValue(data)); // dosyłamy zaległe/brakujące dane do chmury
   }
   updateUnsyncedBanner();
   render();
+  if(resetDriveCatalog){
+    sessionStorage.setItem("panel_drive_auto_sync_done","1");
+    await syncDocumentsFromDrive({silent:true, auto:true});
+  }
   scheduleDriveAutoSync();
   startLivePolling();
 }

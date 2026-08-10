@@ -7,6 +7,7 @@ const SUPABASE_SECRET_KEY =
 const PANEL_STORE_ID = process.env.PANEL_STORE_ID || "main";
 const PANEL_STORE_TABLE = process.env.PANEL_STORE_TABLE || "panel_store";
 const PANEL_STORE_SAVE_RPC = process.env.PANEL_STORE_SAVE_RPC || "save_panel_store";
+const ACTIVE_DRIVE_CATALOG_ID = "shared_drive_0ACFzxkUrgaMkUk9PVA_20260810";
 // Zachowujemy więcej kolejnych wersji, aby szybkie serie edycji na dwóch urządzeniach
 // nie wypchnęły ostatniej poprawnej kopii zanim ktokolwiek zauważy problem.
 const PANEL_STORE_BACKUP_LIMIT = 25;
@@ -193,6 +194,12 @@ function protectPanelData(currentData, incomingData) {
   const mergedClients = mergePanelClients(current, incoming);
   incoming.klienci = mergedClients.clients;
   incoming._deletedClientIds = mergedClients.deletedClientIds;
+  // Po zmianie głównego Drive starsza, nadal otwarta karta panelu nie może przywrócić
+  // katalogu dokumentów z poprzedniego dysku. Pozostałe dane tej karty nadal zapisujemy.
+  if (current.driveCatalogId === ACTIVE_DRIVE_CATALOG_ID && incoming.driveCatalogId !== ACTIVE_DRIVE_CATALOG_ID) {
+    incoming.dokumenty = cloneJson(current.dokumenty || []);
+    incoming.driveCatalogId = ACTIVE_DRIVE_CATALOG_ID;
+  }
   return incoming;
 }
 
