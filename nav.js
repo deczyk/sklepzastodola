@@ -24,6 +24,7 @@
     window.gtag = gtag;
     gtag('js', new Date());
     gtag('config', GA_ID);
+    trackPendingLead();
   }
   window.__loadGA = loadGA;
 
@@ -77,6 +78,17 @@
     });
   });
 
+  document.addEventListener('click', function(e){
+    const a = e.target.closest('a[href]');
+    if(!a) return;
+    const href = a.getAttribute('href') || '';
+    if(href.includes('advisor.html')){
+      track('advisor_click', { link_url: href, page_path: location.pathname });
+    } else if(href.includes('oferta.html')){
+      track('offer_click', { link_url: href, page_path: location.pathname });
+    }
+  });
+
   // Wysłanie formularza kontaktowego (liczy próbę wysyłki — moment kliknięcia "Wyślij")
   document.addEventListener('submit', function(e){
     const form = e.target;
@@ -100,10 +112,75 @@
   if(document.getElementById('nav') && !document.getElementById('sticky-mobile-cta')){
     document.body.insertAdjacentHTML('beforeend',
       '<div class="sticky-mobile-cta" id="sticky-mobile-cta">' +
-        '<a href="tel:+48735115427" class="smc-call">📞 Zadzwoń</a>' +
-        '<a href="index.html#kalkulator" class="smc-calc">📊 Policz opłacalność</a>' +
+        '<a href="tel:+48735115427" class="smc-call" aria-label="Zadzwoń do Sklepu za Stodołą">Zadzwoń</a>' +
+        '<a href="advisor.html" class="smc-calc">Sprawdź gospodarstwo</a>' +
       '</div>'
     );
+  }
+
+  function trackPendingLead(){
+    if(!window.__gaLoaded || typeof window.gtag !== 'function') return;
+    if(!/\/dziekujemy\.html$/i.test(location.pathname)) return;
+    const source = sessionStorage.getItem('lead_conversion_source');
+    if(!source || sessionStorage.getItem('lead_conversion_tracked') === source) return;
+    track('generate_lead', { form_source: source, page_path: location.pathname });
+    sessionStorage.setItem('lead_conversion_tracked', source);
+    sessionStorage.removeItem('lead_conversion_source');
+  }
+
+  trackPendingLead();
+
+  // ── OKRUSZKI I LINKOWANIE WEWNĘTRZNE ──
+  const pageName = (location.pathname.split('/').pop() || 'index.html').toLowerCase();
+  const pageData = {
+    'oferta.html': { trail:[['Oferta','']], links:[['Mlekomat BRUNIMAT','mlekomat.html'],['Automaty Sielaff','automat-chlodniczy.html'],['Sprawdź gospodarstwo','advisor.html']] },
+    'mlekomat.html': { trail:[['Oferta','oferta.html'],['Mlekomat BRUNIMAT','']], links:[['Ile kosztuje mlekomat?','poradnik-ile-kosztuje-mlekomat.html'],['Czy mlekomat jest legalny?','poradnik-czy-mlekomat-jest-legalny.html'],['Sprawdź gospodarstwo','advisor.html']] },
+    'automat-chlodniczy.html': { trail:[['Oferta','oferta.html'],['Automaty chłodnicze Sielaff','']], links:[['Pełny system sprzedaży','oferta.html'],['Jak działamy','jak-dzialamy.html'],['Dobierz rozwiązanie','advisor.html']] },
+    'pawilony.html': { trail:[['Oferta','oferta.html'],['Pawilony sprzedażowe','']], links:[['Mlekomat BRUNIMAT','mlekomat.html'],['Automaty Sielaff','automat-chlodniczy.html'],['Zapytaj o projekt','kontakt.html']] },
+    'butelki.html': { trail:[['Oferta','oferta.html'],['Butelki szklane','']], links:[['Mlekomat BRUNIMAT','mlekomat.html'],['Automaty Sielaff','automat-chlodniczy.html'],['Zapytaj o wycenę','kontakt.html']] },
+    'certyfikaty.html': { trail:[['Oferta','oferta.html'],['Certyfikaty','']], links:[['Mlekomaty BRUNIMAT','mlekomat.html'],['Jak działamy','jak-dzialamy.html'],['Kontakt','kontakt.html']] },
+    'jak-dzialamy.html': { trail:[['Jak działamy','']], links:[['Zobacz pełną ofertę','oferta.html'],['Sprawdź gospodarstwo','advisor.html'],['Najczęstsze pytania','faq.html']] },
+    'dlaczego.html': { trail:[['Dlaczego to działa?','']], links:[['Jak uruchomić punkt','jak-dzialamy.html'],['Poradniki','poradnik.html'],['Sprawdź gospodarstwo','advisor.html']] },
+    'poradnik.html': { trail:[['Poradnik','']], links:[['Ile kosztuje mlekomat?','poradnik-ile-kosztuje-mlekomat.html'],['Mlekomat a RHD','poradnik-mlekomat-a-rhd.html'],['Pełna oferta','oferta.html']] },
+    'faq.html': { trail:[['FAQ','']], links:[['Jak działamy','jak-dzialamy.html'],['Poradniki','poradnik.html'],['Bezpłatna konsultacja','kontakt.html']] },
+    'kontakt.html': { trail:[['Kontakt','']], links:[] },
+    'polityka.html': { trail:[['Polityka prywatności','']], links:[] }
+  };
+
+  const currentPage = pageData[pageName];
+  if(currentPage && !document.querySelector('.site-breadcrumb, .breadcrumb')){
+    const heroWrap = document.querySelector('.page-hero .wrap');
+    if(heroWrap){
+      const items = [['Start','index.html']].concat(currentPage.trail);
+      const html = items.map((item, index)=>{
+        const last = index === items.length - 1;
+        return last ? '<span aria-current="page">' + item[0] + '</span>' : '<a href="' + item[1] + '">' + item[0] + '</a><span aria-hidden="true">/</span>';
+      }).join('');
+      heroWrap.insertAdjacentHTML('afterbegin', '<nav class="site-breadcrumb" aria-label="Okruszki">' + html + '</nav>');
+
+      const schema = {
+        '@context':'https://schema.org',
+        '@type':'BreadcrumbList',
+        itemListElement:items.map((item,index)=>({
+          '@type':'ListItem',
+          position:index + 1,
+          name:item[0],
+          item:item[1] ? new URL(item[1], location.origin + '/').href : location.href.split('#')[0]
+        }))
+      };
+      const script = document.createElement('script');
+      script.type = 'application/ld+json';
+      script.textContent = JSON.stringify(schema);
+      document.head.appendChild(script);
+    }
+  }
+
+  if(currentPage && currentPage.links.length && !document.getElementById('related-links')){
+    const footer = document.querySelector('.footer');
+    if(footer){
+      const links = currentPage.links.map(item=>'<a href="' + item[1] + '">' + item[0] + '<span aria-hidden="true">→</span></a>').join('');
+      footer.insertAdjacentHTML('beforebegin', '<section class="related-links" id="related-links" aria-labelledby="related-links-title"><div class="wrap"><p class="sec-label">Warto zobaczyć</p><h2 id="related-links-title">Kolejny krok</h2><div class="related-links-grid">' + links + '</div></div></section>');
+    }
   }
 
   // ── NAV SCROLL ──
@@ -181,7 +258,6 @@
   // dopóki użytkownik nie kliknie akceptuj/odrzuć
   function setCk(v){
     localStorage.setItem('cookie_consent', v);
-    sessionStorage.setItem('cookie_seen', '1');
     const el = document.getElementById('cookie');
     if(el){
       el.classList.remove('show');
@@ -190,6 +266,7 @@
     if(v === 'yes' || v === 'accept' || v === 'marketing'){
       loadGA();
       loadMetaPixel();
+      trackPendingLead();
     }
   }
   window.setCk = setCk;
@@ -206,13 +283,10 @@
     );
   }
 
-  // Pokaż jeśli nigdy nie zaakceptował (brak cookie_consent w localStorage)
-  // lub jeśli ta sesja jeszcze nie widziała banera
+  // Pokazuj na każdej podstronie, dopóki użytkownik świadomie nie wybierze opcji.
   const hasConsent   = localStorage.getItem('cookie_consent');
-  const seenThisSession = sessionStorage.getItem('cookie_seen');
 
-  if(!hasConsent && !seenThisSession){
-    sessionStorage.setItem('cookie_seen', '1'); // oznacz że już pokazano
+  if(!hasConsent){
     setTimeout(()=>{
       const el = document.getElementById('cookie');
       if(el){

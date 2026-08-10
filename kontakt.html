@@ -43,6 +43,9 @@
 .company-details h3 { font-size: .9rem; text-transform: uppercase; letter-spacing: .08em; color: var(--wheat); margin-bottom: .75rem; }
 .company-details p { font-size: .86rem; color: var(--muted); line-height: 1.7; margin: 0; }
 .company-details strong { color: var(--ink); font-weight: 800; }
+.directions-actions { display: flex; flex-wrap: wrap; gap: .65rem; margin-top: 1rem; }
+.directions-actions a { display: inline-flex; align-items: center; min-height: 42px; padding: .65rem .9rem; border-radius: var(--r); border: 1px solid var(--line); color: var(--forest); font-size: .82rem; font-weight: 800; text-decoration: none; }
+.directions-actions a:first-child { background: var(--forest); border-color: var(--forest); color: #fff; }
 .regional-offices .sec-title { max-width: 760px; margin-left: auto; margin-right: auto; text-align: center; }
 .regional-offices .sec-body { max-width: 780px; margin: .9rem auto 0; text-align: center; }
 .regional-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; margin-top: 2.4rem; }
@@ -56,12 +59,14 @@
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
-  "@type": "Organization",
+  "@type": ["Organization", "ProfessionalService"],
   "name": "Sklep za Stodołą Sp. z o.o.",
   "url": "https://www.sklepzastodola.pl/",
   "logo": "https://www.sklepzastodola.pl/favicon-192.png",
   "description": "Sklep za Stodołą pomaga rolnikom uruchamiać gotowe systemy sprzedaży bezpośredniej: mlekomat BRUNIMAT, pawilon, wdrożenie, dokumenty, finansowanie, marketing lokalny i opiekę po starcie.",
   "taxID": "9542911300",
+  "telephone": "+48 735 115 427",
+  "email": "kontakt@sklepzastodola.pl",
   "identifier": [
     {
       "@type": "PropertyValue",
@@ -82,6 +87,13 @@
     "addressCountry": "PL"
   },
   "areaServed": "PL",
+  "contactPoint": {
+    "@type": "ContactPoint",
+    "telephone": "+48 735 115 427",
+    "contactType": "sales",
+    "areaServed": "PL",
+    "availableLanguage": "pl"
+  },
   "sameAs": [
     "https://www.facebook.com/profile.php?id=61591710038575",
     "https://www.instagram.com/sklepzastodola/"
@@ -225,6 +237,10 @@
           REGON: 54519126800000<br>
           Adres biura: ul. Warszawska 40-2A, 40-008 Katowice
         </p>
+        <div class="directions-actions">
+          <a href="https://www.google.com/maps/dir/?api=1&destination=Warszawska+40%2F2A%2C+40-008+Katowice" target="_blank" rel="noopener">Wyznacz trasę do biura</a>
+          <a href="tel:+48735115427">Umów spotkanie</a>
+        </div>
       </div>
 
       <div style="margin-top:2.5rem;padding:1.6rem;background:var(--sage);border:1px solid rgba(45,90,39,.25);border-radius:var(--r-lg)">
@@ -385,6 +401,7 @@ document.getElementById('cform').addEventListener('submit', async function(e){
       msg.style.display='block';
       msg.style.color='var(--moss)';
       form.reset();
+      sessionStorage.setItem('lead_conversion_source', 'kontakt');
       window.location.href='dziekujemy.html';
     }catch(err){
       txt.textContent='Wyślij wiadomość →';

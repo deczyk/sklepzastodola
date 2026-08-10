@@ -3,7 +3,21 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Sklep za Stodołą Advisor® EU</title>
+  <title>Advisor gospodarstwa — bezpłatna analiza sprzedaży bezpośredniej</title>
+  <meta name="description" content="Sprawdź potencjał sprzedaży bezpośredniej w gospodarstwie. Bezpłatny Advisor dobierze wariant: mlekomat BRUNIMAT, automat Sielaff, pawilon i wdrożenie.">
+  <meta name="robots" content="index,follow">
+  <link rel="canonical" href="https://www.sklepzastodola.pl/advisor.html">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Sklep za Stodołą">
+  <meta property="og:title" content="Bezpłatny Advisor gospodarstwa | Sklep za Stodołą">
+  <meta property="og:description" content="Odpowiedz na kilka pytań i sprawdź potencjał sprzedaży bezpośredniej w swoim gospodarstwie.">
+  <meta property="og:url" content="https://www.sklepzastodola.pl/advisor.html">
+  <meta property="og:image" content="https://www.sklepzastodola.pl/pawilon-1.jpg">
+  <meta property="og:locale" content="pl_PL">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Bezpłatny Advisor gospodarstwa | Sklep za Stodołą">
+  <meta name="twitter:description" content="Sprawdź potencjał sprzedaży bezpośredniej i dobierz system do gospodarstwa.">
+  <meta name="twitter:image" content="https://www.sklepzastodola.pl/pawilon-1.jpg">
   <style>
     :root{
       --green-950:#102b23;--green-900:#173a2f;--green-800:#245344;--green-700:#2e6754;
@@ -522,6 +536,7 @@ async function sendToUs(){
   if (formspreeOk) {
     statusEl.textContent = "Dziękujemy. Wynik wysłany — skontaktujemy się z Tobą.";
     statusEl.style.color = "#2f7a45";
+    sessionStorage.setItem('lead_conversion_source', location.search.includes('mode=short') ? 'advisor_olx' : 'advisor');
     window.location.href = "dziekujemy.html";
   } else {
     statusEl.textContent = "Nie udało się wysłać. Zadzwoń: +48 735 115 427 albo napisz: kontakt@sklepzastodola.pl";
