@@ -4759,6 +4759,78 @@ function driveDocumentDuplicate(file, existingDocs){
   return Boolean(findDriveDocumentMatch(file, existingDocs));
 }
 
+function normalizeDriveOfferText(value){
+  return (value || "").toString().normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
+}
+
+function clientDriveMatchTokens(client){
+  const ignored = new Set(["gospodarstwo","rolne","rolnik","rolnicze","firma","klient","pan","pani","sp","zoo"]);
+  const fieldTokens = [client.firma, client.osoba].filter(Boolean).map(value =>
+    normalizeDriveOfferText(value).split(" ").filter(token => token.length >= 4 && !ignored.has(token))
+  ).filter(tokens => tokens.length);
+  return {
+    all:[...new Set(fieldTokens.flat())],
+    distinctive:new Set(fieldTokens.map(tokens => tokens[tokens.length - 1]))
+  };
+}
+
+function findClientForDriveOffer(file){
+  const fileText = normalizeDriveOfferText([file.name, file.folderPath].filter(Boolean).join(" "));
+  const isPdf = file.mimeType === "application/pdf" || /\.pdf$/i.test(file.name || "");
+  if(!isPdf || !/(^| )(ofert\w*|wycen\w*|propozycj\w*)( |$)/.test(fileText)) return null;
+
+  const matches = (data.klienci || []).map(client => {
+    const tokens = clientDriveMatchTokens(client);
+    const fileTokens = fileText.split(" ");
+    const matched = tokens.all.filter(token => fileTokens.includes(token));
+    const hasDistinctiveMatch = matched.some(token => tokens.distinctive.has(token));
+    return {client, score:matched.reduce((sum, token) => sum + token.length, 0), matched, hasDistinctiveMatch};
+  }).filter(result => result.hasDistinctiveMatch && result.score >= 4)
+    .sort((a,b) => b.score - a.score || b.matched.length - a.matched.length);
+
+  if(!matches.length || (matches[1] && matches[1].score === matches[0].score)) return null;
+  return matches[0].client;
+}
+
+function clientOfferFromDriveFile(file, note){
+  const now = new Date().toISOString();
+  return {
+    id:`o_drive_${file.id}`,
+    dataWyslania:"",
+    wariant:(file.name || "Oferta PDF").replace(/\.pdf$/i, "").replace(/[_-]+/g, " ").trim(),
+    kwota:"",
+    waluta:"",
+    status:"Robocza",
+    linkOferta:driveDocumentLink(file),
+    nazwaPliku:file.name || "Oferta PDF",
+    googleDriveId:file.id || "",
+    mimeType:file.mimeType || "application/pdf",
+    nastepnyFollowup:"",
+    notatka:note || "Oferta PDF zsynchronizowana z Google Drive.",
+    dataUtworzenia:file.createdTime || now,
+    dataAktualizacji:file.modifiedTime || now
+  };
+}
+
+function assignDriveOfferToClient(file){
+  if(!file.id) return null;
+  const existingOwner = (data.klienci || []).find(client =>
+    (client.oferty || []).some(offer => driveOfferId(offer) === String(file.id))
+  );
+  if(existingOwner) return {client:existingOwner, added:false};
+
+  const client = findClientForDriveOffer(file);
+  if(!client) return null;
+  if(!Array.isArray(client.oferty)) client.oferty = [];
+  client.oferty.push(clientOfferFromDriveFile(
+    file,
+    "Oferta PDF automatycznie przypisana z Google Drive na podstawie nazwy pliku."
+  ));
+  client.zaktualizowano = new Date().toISOString();
+  return {client, added:true};
+}
+
 function mergeDriveDocument(doc, file){
   let changed = false;
   const link = driveDocumentLink(file);
@@ -4894,7 +4966,14 @@ async function syncDocumentsFromDrive(options={}){
     let added = 0;
     let updated = 0;
     let skipped = 0;
+    let assignedOffers = 0;
     files.forEach(file => {
+      const offerAssignment = assignDriveOfferToClient(file);
+      if(offerAssignment){
+        if(offerAssignment.added) assignedOffers++;
+        else skipped++;
+        return;
+      }
       const existing = findDriveDocumentMatch(file, data.dokumenty);
       if(existing){
         if(mergeDriveDocument(existing, file)){
@@ -4913,16 +4992,17 @@ async function syncDocumentsFromDrive(options={}){
         added++;
       }
     });
-    if(added || updated){
+    if(added || updated || assignedOffers){
       const parts = [];
       if(added) parts.push(`dodano ${added}`);
       if(updated) parts.push(`zaktualizowano ${updated}`);
+      if(assignedOffers) parts.push(`przypisano ${assignedOffers} ${assignedOffers === 1 ? "ofertę" : "oferty"} do klientów`);
       logActivity(`zsynchronizował(a) dokumenty z Google Drive: ${parts.join(", ")}`);
       saveData();
     }
     driveLastAutoSyncAt = Date.now();
     render();
-    if(!options.silent) setDriveStatus("driveSyncStatus", `Drive: dodano ${added}, zaktualizowano ${updated}, pominięto ${skipped}.`, "ok");
+    if(!options.silent) setDriveStatus("driveSyncStatus", `Drive: dodano ${added}, zaktualizowano ${updated}, przypisano ofert ${assignedOffers}, pominięto ${skipped}.`, "ok");
   }catch(e){
     if(!options.silent) setDriveStatus("driveSyncStatus", `Błąd Drive: ${e.message || e}`, "error");
   }finally{
@@ -5639,7 +5719,6 @@ function renderClientOffers(c){
       </div>
       <div class="offerForm" data-offer-form-for="${crmEsc(c.id)}">
         <div class="offerFormGrid">
-          <label>Data wysłania<input type="date" data-offer-field="dataWyslania"></label>
           <label>Wariant<select data-offer-field="wariant"><option value="">—</option>${renderOfferOptions(OFFER_VARIANT_OPTS,"")}</select></label>
           <label>Kwota<input type="text" data-offer-field="kwota" placeholder="np. 14500"></label>
           <label>Waluta<select data-offer-field="waluta">${renderOfferOptions(OFFER_CURRENCY_OPTS,"EUR")}</select></label>
@@ -5709,7 +5788,6 @@ function renderOfferCard(o, clientId, offerIndex){
         </div>
         <div class="offerForm offerEditInline open" data-offer-edit-for="${crmEsc(clientId)}" data-offer-index="${offerIndex}">
           <div class="offerFormGrid">
-            <label>Data wysłania<input type="date" data-offer-edit-field="dataWyslania" value="${crmEsc(o.dataWyslania || "")}"></label>
             <label>Wariant<select data-offer-edit-field="wariant"><option value="">—</option>${renderOfferOptionsWithCurrent(OFFER_VARIANT_OPTS,o.wariant || "")}</select></label>
             <label>Kwota<input type="text" data-offer-edit-field="kwota" value="${crmEsc(o.kwota || "")}"></label>
             <label>Waluta<select data-offer-edit-field="waluta">${renderOfferOptions(OFFER_CURRENCY_OPTS,o.waluta || "EUR")}</select></label>
@@ -5726,7 +5804,7 @@ function renderOfferCard(o, clientId, offerIndex){
       </div>
     `;
   }
-  const amount = [o.kwota, o.waluta].filter(Boolean).join(" ");
+  const amount = o.kwota ? [o.kwota, o.waluta].filter(Boolean).join(" ") : "";
   const href = safeOfferHref(o.linkOferta);
   const previewHref = href && isPreviewable(href) ? drivePreviewHref(href) : "";
   const downloadHref = href ? driveDownloadHref(href) : "";
@@ -5736,10 +5814,7 @@ function renderOfferCard(o, clientId, offerIndex){
       <div class="offerTop">
         <div>
           <div class="offerTitle">${crmEsc(o.wariant || "Oferta bez wariantu")}</div>
-          <div class="offerMeta">
-            <span>Data wysłania: ${crmEsc(o.dataWyslania || "brak")}</span>
-            ${amount ? `<span>Kwota: ${crmEsc(amount)}</span>` : ""}
-          </div>
+          ${amount ? `<div class="offerMeta"><span>Kwota: ${crmEsc(amount)}</span></div>` : ""}
         </div>
         <span class="offerBadge">${crmEsc(o.status || "Robocza")}</span>
       </div>
@@ -6098,22 +6173,7 @@ async function syncClientOfferPdfsFromDrive(clientId, options={}){
     const added = files.filter(file => file.id && !existingIds.has(String(file.id)));
     const now = new Date().toISOString();
     added.forEach((file,index)=>{
-      c.oferty.push({
-        id:`o_drive_${file.id}`,
-        dataWyslania:"",
-        wariant:(file.name || "Oferta PDF").replace(/\.pdf$/i, "").replace(/[_-]+/g, " ").trim(),
-        kwota:"",
-        waluta:"PLN",
-        status:"Robocza",
-        linkOferta:driveDocumentLink(file),
-        nazwaPliku:file.name || "Oferta PDF",
-        googleDriveId:file.id,
-        mimeType:file.mimeType || "application/pdf",
-        nastepnyFollowup:"",
-        notatka:"PDF zsynchronizowany z folderu klienta na Google Drive.",
-        dataUtworzenia:file.createdTime || now,
-        dataAktualizacji:file.modifiedTime || now
-      });
+      c.oferty.push(clientOfferFromDriveFile(file, "PDF zsynchronizowany z folderu klienta na Google Drive."));
     });
     clientOfferDriveSyncDone.add(clientId);
     if(added.length){
@@ -6480,7 +6540,6 @@ function readOfferEditForm(clientId, offerIndex){
   if(!form) return null;
   const get = field => (form.querySelector(`[data-offer-edit-field="${field}"]`)?.value || "").trim();
   return {
-    dataWyslania: normalizeImportOfferDate(get("dataWyslania")),
     wariant: get("wariant"),
     kwota: get("kwota"),
     waluta: get("waluta"),
@@ -6512,7 +6571,7 @@ function saveClientOfferEdit(clientId, offerIndex){
   const updated = {
     ...existing,
     id: existing.id || `o_${Date.now()}`,
-    dataWyslania: values.dataWyslania,
+    dataWyslania: existing.dataWyslania || "",
     wariant: values.wariant,
     kwota: amount.value,
     waluta: currency.value,
