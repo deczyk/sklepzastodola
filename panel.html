@@ -3812,7 +3812,12 @@ function renderHistoryTimeline(c, editable=false){
 function latestClientActivity(c){
   const hist = Array.isArray(c.historia) ? c.historia.filter(h=>h && (h.tekst || h.data || h.kto)) : [];
   if(hist.length===0) return null;
-  return hist.slice().sort((a,b)=>new Date(b.data || 0) - new Date(a.data || 0))[0];
+  return hist.map((h,index)=>({h,index})).sort((a,b)=>{
+    const byActivityDate = new Date(b.h.data || 0) - new Date(a.h.data || 0);
+    if(byActivityDate) return byActivityDate;
+    const byCreatedAt = new Date(b.h.utworzono || 0) - new Date(a.h.utworzono || 0);
+    return byCreatedAt || b.index - a.index;
+  })[0].h;
 }
 
 function clientActivitySummary(c, limit=120){
@@ -4002,7 +4007,7 @@ async function saveQuickClientUpdate(clientId){
     ? await uploadPendingImages(pendingQuickImages, "quickImageStatus")
     : { uploaded: [], failed: [] };
   if(!Array.isArray(c.historia)) c.historia = [];
-  c.historia.push({tekst: note || "[notatka głosowa]", kto: who, data: historyDateValue(date), ...(audioToSave || {}), ...(images.length ? {images} : {})});
+  c.historia.push({tekst: note || "[notatka głosowa]", kto: who, data: historyDateValue(date), utworzono: new Date().toISOString(), ...(audioToSave || {}), ...(images.length ? {images} : {})});
   const automation = inferClientAutomation(note, c);
   c.zaktualizowano = new Date().toISOString();
   logActivity(`dodał(a) ręczną notatkę klienta „${c.firma||c.osoba||'bez nazwy'}”${automation.length ? ` i panel ustawił: ${automation.join(", ")}` : ""}`);
@@ -4044,7 +4049,7 @@ async function addHistoryEntry(){
     ? await uploadPendingImages(pendingHistoryImages, "historyImageStatus")
     : { uploaded: [], failed: [] };
   if(!c.historia) c.historia = [];
-  c.historia.push({tekst: tekst || "[notatka głosowa]", kto: (whoEl.value || getWhoAmI()).trim(), data: historyDateValue(dateEl.value), ...(audioToSave || {}), ...(images.length ? {images} : {})});
+  c.historia.push({tekst: tekst || "[notatka głosowa]", kto: (whoEl.value || getWhoAmI()).trim(), data: historyDateValue(dateEl.value), utworzono: new Date().toISOString(), ...(audioToSave || {}), ...(images.length ? {images} : {})});
   pendingHistoryImages = [];
   const followupBefore = c.nastepnyFollowup || "";
   const automation = inferClientAutomation(tekst, c);

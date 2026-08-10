@@ -103,7 +103,10 @@ function mergeClientHistory(currentClient, incomingClient) {
     merged.push(entry);
   });
 
-  merged.sort((a, b) => timestampValue(a && a.data) - timestampValue(b && b.data));
+  merged.sort((a, b) => {
+    const byActivityDate = timestampValue(a && a.data) - timestampValue(b && b.data);
+    return byActivityDate || timestampValue(a && a.utworzono) - timestampValue(b && b.utworzono);
+  });
   return { historia: merged, deletedHistoryIds: Array.from(deleted) };
 }
 
