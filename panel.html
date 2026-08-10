@@ -2171,8 +2171,8 @@
         </div>
         <textarea id="historyNewEntry" placeholder="Np. [kontakt] Dzwoniłem, zainteresowany, oddzwaniam za tydzień..."></textarea>
         <label>Termin następnego kontaktu (opcjonalnie)
-          <input type="date" id="historyNewFollowup">
-          <span class="audioHint">Ustaw, jeśli chcesz przesunąć termin kontaktu — inaczej klient zostanie w „Zaległe”, dopóki nie wpiszesz nowej daty.</span>
+          <input type="datetime-local" id="historyNewFollowup" step="900">
+          <span class="audioHint">Wybierz datę i godzinę. Panel zapisze termin w karcie klienta, a Kalendarz Google przypomni o kontakcie o wskazanej godzinie.</span>
         </label>
         <label>Notatka głosowa / nagranie z telefonu
           <input type="file" id="historyNewAudio" accept="audio/amr,audio/*,.amr,.m4a">
@@ -3356,7 +3356,7 @@ function openHistoryModal(clientId){
   document.getElementById("historyNewDate").value = todayInputValue();
   document.getElementById("historyNewWho").value = getWhoAmI();
   const followupEl0 = document.getElementById("historyNewFollowup");
-  followupEl0.value = historyDateInputValue(c.nastepnyFollowup);
+  followupEl0.value = followupDateTimeInputValue(c.nastepnyFollowup);
   followupEl0.dataset.initial = followupEl0.value;
   renderHistoryEntries(c);
   pendingHistoryImages = [];
@@ -3391,6 +3391,21 @@ function todayInputValue(){
 function historyDateInputValue(value){
   const raw = (value || "").toString();
   return /^\d{4}-\d{2}-\d{2}/.test(raw) ? raw.slice(0,10) : "";
+}
+
+function followupDateTimeInputValue(value){
+  const raw = (value || "").toString().trim();
+  if(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/.test(raw)) return raw.slice(0,16);
+  if(/^\d{4}-\d{2}-\d{2}/.test(raw)) return `${raw.slice(0,10)}T09:00`;
+  return "";
+}
+
+function formatFollowupDateTime(value){
+  const raw = (value || "").toString().trim();
+  const match = raw.match(/^(\d{4})-(\d{2})-(\d{2})(?:T(\d{2}):(\d{2}))?/);
+  if(!match) return "brak terminu";
+  const date = `${match[3]}.${match[2]}.${match[1]}`;
+  return match[4] ? `${date}, ${match[4]}:${match[5]}` : date;
 }
 
 function parseHistoryText(value){
@@ -3989,7 +4004,7 @@ async function addHistoryEntry(){
   audioEl.value = "";
   dateEl.value = todayInputValue();
   whoEl.value = getWhoAmI();
-  followupEl.value = historyDateInputValue(c.nastepnyFollowup);
+  followupEl.value = followupDateTimeInputValue(c.nastepnyFollowup);
   followupEl.dataset.initial = followupEl.value;
   renderPendingHistoryImages();
   renderHistoryEntries(c);
@@ -4863,8 +4878,11 @@ function clientField(c, field, type){
       ${opts.map(v=>`<option value="${crmEsc(v)}" ${value===v?"selected":""}>${crmEsc(v)}</option>`).join("")}
     </select>`;
   }
+  if(type==="datetime"){
+    return `<input type="datetime-local" step="900" value="${followupDateTimeInputValue(c[field])}" data-field="${field}" data-id="${c.id}" onblur="updateClient(this)" onchange="updateClient(this)">`;
+  }
   if(type==="date"){
-    return `<input type="date" value="${c[field]||""}" data-field="${field}" data-id="${c.id}" onblur="updateClient(this)" onchange="updateClient(this)">`;
+    return `<input type="date" value="${historyDateInputValue(c[field])}" data-field="${field}" data-id="${c.id}" onblur="updateClient(this)" onchange="updateClient(this)">`;
   }
   if(type==="textarea"){
     return `<textarea data-field="${field}" data-id="${c.id}" onblur="updateClient(this)">${c[field]||""}</textarea>`;
@@ -5377,7 +5395,8 @@ function followupInfo(dateStr){
   if(!dateStr) return {label:"brak terminu", group:"none", days:null};
   const days = safeDaysUntil(dateStr);
   if(days === null) return {label:"brak terminu", group:"none", days:null};
-  if(days <= 0) return {label:days < 0 ? "po terminie" : "dzisiaj", group:"today", days};
+  const time = /^\d{4}-\d{2}-\d{2}T(\d{2}:\d{2})/.exec(dateStr)?.[1] || "";
+  if(days <= 0) return {label:days < 0 ? "po terminie" : `dzisiaj${time ? ` o ${time}` : ""}`, group:"today", days};
   if(days <= 7) return {label:`za ${days} dni`, group:"soon", days};
   return {label:`za ${days} dni`, group:"later", days};
 }
@@ -5770,6 +5789,7 @@ function renderFollowupItem(c){
       <div><b>${crmEsc(clientName(c))}</b><br><span class="kanbanContact">${renderClientContactLinks(c) || crmEsc(clientContact(c) || clientLocation(c) || "brak kontaktu")}</span></div>
       <div>${crmEsc(product || labelFrom(STATUS_OPTS, c.status))}</div>
       <div class="followAction"><button class="histBtn" onclick="openClientCard('${crmEsc(c.id)}')">Karta klienta</button></div>
+      <div class="kanbanNote" style="grid-column:1/-1"><b>Termin:</b> ${crmEsc(formatFollowupDateTime(clientFollowup(c)))}</div>
       ${last ? `<div class="kanbanNote" style="grid-column:1/-1"><b>Ostatnie działanie:</b> ${crmEsc(last)}</div>` : ""}
       ${note ? `<div class="kanbanNote" style="grid-column:1/-1">${crmEsc(note)}</div>` : ""}
       <div class="kanbanNote" style="grid-column:1/-1"><b>Co powiedzieć:</b> ${crmEsc(prompt)}</div>
@@ -5815,7 +5835,7 @@ function openClientCard(clientId){
       <div class="clientCardField"><b>Czym zainteresowany</b>${clientField(c,null,"product")}</div>
       <div class="clientCardField"><b>Zainteresowanie</b>${clientField(c,null,"zain")}</div>
       <div class="clientCardField"><b>Co go powstrzymuje</b>${clientField(c,null,"objection")}</div>
-      <div class="clientCardField"><b>Termin następnego kontaktu</b>${clientField(c,"nastepnyFollowup","date")}</div>
+      <div class="clientCardField"><b>Termin następnego kontaktu</b>${clientField(c,"nastepnyFollowup","datetime")}</div>
       <div class="clientCardField"><b>Status</b>${clientField(c,null,"status")}</div>
       <div class="clientCardField"><b>Priorytet</b>${clientField(c,null,"prio")}</div>
     </div>

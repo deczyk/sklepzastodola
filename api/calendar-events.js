@@ -105,18 +105,32 @@ function clamp(value, max) {
   return String(value || "").trim().slice(0, max);
 }
 
-// Wydarzenie całodniowe na dzień następnego kontaktu — prostsze niż zgadywanie godziny,
-// a mniej podatne na pomyłki ze strefą czasową niż wydarzenie z konkretną godziną.
 function buildEventBody({ clientName, phone, notes, date }) {
-  const start = String(date || "").slice(0, 10);
+  const raw = String(date || "").trim();
+  const timed = raw.match(/^(\d{4}-\d{2}-\d{2})T(\d{2}):(\d{2})/);
+  const event = {
+    summary: `Kontakt: ${clamp(clientName, 200) || "klient"}`,
+    description: [phone ? `Telefon: ${clamp(phone, 60)}` : "", clamp(notes, 1500)].filter(Boolean).join("\n\n")
+  };
+
+  if (timed) {
+    const start = `${timed[1]}T${timed[2]}:${timed[3]}:00`;
+    const [year, month, day] = timed[1].split("-").map(Number);
+    const endDate = new Date(Date.UTC(year, month - 1, day, Number(timed[2]), Number(timed[3]) + 30));
+    const end = `${endDate.getUTCFullYear()}-${String(endDate.getUTCMonth() + 1).padStart(2, "0")}-${String(endDate.getUTCDate()).padStart(2, "0")}T${String(endDate.getUTCHours()).padStart(2, "0")}:${String(endDate.getUTCMinutes()).padStart(2, "0")}:00`;
+    event.start = { dateTime: start, timeZone: "Europe/Warsaw" };
+    event.end = { dateTime: end, timeZone: "Europe/Warsaw" };
+    event.reminders = { useDefault: false, overrides: [{ method: "popup", minutes: 0 }] };
+    return event;
+  }
+
+  const start = raw.slice(0, 10);
   const end = new Date(start + "T00:00:00Z");
   end.setUTCDate(end.getUTCDate() + 1);
-  return {
-    summary: `Kontakt: ${clamp(clientName, 200) || "klient"}`,
-    description: [phone ? `Telefon: ${clamp(phone, 60)}` : "", clamp(notes, 1500)].filter(Boolean).join("\n\n"),
-    start: { date: start },
-    end: { date: end.toISOString().slice(0, 10) }
-  };
+  event.start = { date: start };
+  event.end = { date: end.toISOString().slice(0, 10) };
+  event.reminders = { useDefault: true };
+  return event;
 }
 
 async function upsertEvent(token, payload) {
