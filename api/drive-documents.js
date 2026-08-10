@@ -7,15 +7,18 @@ const GOOGLE_SERVICE_ACCOUNT_EMAIL = process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL;
 const GOOGLE_PRIVATE_KEY = process.env.GOOGLE_PRIVATE_KEY;
 const GOOGLE_DRIVE_FOLDER_ID = process.env.GOOGLE_DRIVE_FOLDER_ID || "1FMmp6qdMuMl13vkdfhpddeHH46kTgDy0";
 const DRIVE_FOLDER_MIME_TYPE = "application/vnd.google-apps.folder";
-// Zdjęcia i nagrania głosowe dołączone do notatek klienta lądują w tych podfolderach, żeby NIE
-// mieszały się z dokumentami firmowymi w zakładce "Dokumenty" panelu - listDriveFiles() celowo
-// pomija te podfoldery przy skanowaniu pod kątem auto-synchronizacji dokumentów.
+// Załączniki notatek i oferty klientów lądują w osobnych podfolderach, żeby NIE mieszały się
+// z dokumentami firmowymi w zakładce "Dokumenty" panelu. listDriveFiles() celowo pomija je
+// przy automatycznej synchronizacji, bo są już przypisane do właściwej sekcji karty klienta.
 const NOTES_PHOTOS_FOLDER_NAME = "Zdjęcia z notatek";
 const NOTES_AUDIO_FOLDER_NAME = "Nagrania z notatek";
+const CLIENT_OFFERS_FOLDER_NAME = "Oferty klientów";
 
 let tokenCache = { token: "", expiresAt: 0 };
 let notesPhotosFolderIdCache = "";
 let notesAudioFolderIdCache = "";
+let clientOffersFolderIdCache = "";
+const clientOfferFolderIdsCache = new Map();
 
 function getBasicAuth(req) {
   const header = req.headers.authorization || "";
@@ -190,10 +193,14 @@ async function listDriveFiles(token) {
     files.forEach(file => {
       const folderPath = folder.path;
       if (file.mimeType === DRIVE_FOLDER_MIME_TYPE) {
-        // Zdjęcia z notatek mają świadomie NIE trafiać do zakładki "Dokumenty" -
-        // pomijamy ten podfolder przy skanowaniu (tylko na najwyższym poziomie, żeby
-        // nazwa podfolderu użytkownika gdzieś głębiej w drzewie nie została przypadkiem ucięta).
-        if (!folderPath && (file.name === NOTES_PHOTOS_FOLDER_NAME || file.name === NOTES_AUDIO_FOLDER_NAME)) return;
+        // Załączniki z kart klientów mają świadomie NIE trafiać do zakładki "Dokumenty".
+        // Pomijamy te foldery tylko na najwyższym poziomie, żeby identyczna nazwa folderu
+        // użytkownika gdzieś głębiej w drzewie nie została przypadkiem ucięta.
+        if (!folderPath && (
+          file.name === NOTES_PHOTOS_FOLDER_NAME ||
+          file.name === NOTES_AUDIO_FOLDER_NAME ||
+          file.name === CLIENT_OFFERS_FOLDER_NAME
+        )) return;
         queue.push({
           id: file.id,
           path: folderPath ? `${folderPath} / ${file.name}` : file.name
@@ -253,6 +260,22 @@ async function getNotesAudioFolderId(token) {
   return id;
 }
 
+async function getClientOfferFolderId(token, clientName) {
+  if (!clientOffersFolderIdCache) {
+    clientOffersFolderIdCache = await findChildFolder(token, GOOGLE_DRIVE_FOLDER_ID, CLIENT_OFFERS_FOLDER_NAME);
+    if (!clientOffersFolderIdCache) {
+      clientOffersFolderIdCache = await createChildFolder(token, GOOGLE_DRIVE_FOLDER_ID, CLIENT_OFFERS_FOLDER_NAME);
+    }
+  }
+
+  const safeClientName = sanitizeName(clientName) || "Klient bez nazwy";
+  if (clientOfferFolderIdsCache.has(safeClientName)) return clientOfferFolderIdsCache.get(safeClientName);
+  let id = await findChildFolder(token, clientOffersFolderIdCache, safeClientName);
+  if (!id) id = await createChildFolder(token, clientOffersFolderIdCache, safeClientName);
+  clientOfferFolderIdsCache.set(safeClientName, id);
+  return id;
+}
+
 async function uploadDriveFile(token, payload) {
   const name = sanitizeName(payload.name) || "Dokument";
   const mimeType = String(payload.mimeType || "application/octet-stream").slice(0, 120);
@@ -264,7 +287,9 @@ async function uploadDriveFile(token, payload) {
     ? await getNotesPhotosFolderId(token)
     : payload.forNoteAudio
       ? await getNotesAudioFolderId(token)
-      : GOOGLE_DRIVE_FOLDER_ID;
+      : payload.forClientOffer
+        ? await getClientOfferFolderId(token, payload.clientName)
+        : GOOGLE_DRIVE_FOLDER_ID;
   const metadata = {
     name,
     mimeType,

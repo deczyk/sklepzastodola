@@ -244,7 +244,7 @@
   .mapPin:hover{opacity:0.7}
 
   .histBtn{background:var(--light);border:1px solid var(--line);border-radius:8px;padding:5px 8px;
-           font-size:12px;cursor:pointer;color:var(--green);font-weight:bold}
+           font-size:12px;cursor:pointer;color:var(--green);font-weight:bold;text-decoration:none;display:inline-flex;align-items:center;justify-content:center}
   .histBtn:hover{background:#dcebe0}
   .historyBox{background:var(--surface);border:1px solid var(--border);border-radius:12px;width:720px;max-width:92vw;max-height:84vh;
               padding:22px 24px;position:relative;overflow-y:auto}
@@ -768,6 +768,16 @@
   .offerForm input,.offerForm select,.offerForm textarea{width:100%;box-sizing:border-box;border:1px solid var(--border);border-radius:8px;background:var(--input-bg);color:var(--text);padding:7px 9px;font:inherit;margin-top:4px}
   .offerForm textarea{min-height:70px;resize:vertical}
   .offerActions{display:flex;gap:8px;justify-content:flex-end;margin-top:10px}
+  .offerPdfDrop{display:flex;align-items:center;gap:12px;margin:0 0 10px;padding:12px;border:2px dashed var(--border);border-radius:10px;background:var(--surface);cursor:pointer;transition:border-color .18s ease,background .18s ease,transform .18s ease}
+  .offerPdfDrop:hover,.offerPdfDrop:focus-visible,.offerPdfDrop.dragover{border-color:var(--green);background:var(--surface-soft);outline:none}
+  .offerPdfDrop.dragover{transform:translateY(-1px)}
+  .offerPdfIcon{display:grid;place-items:center;flex:0 0 42px;height:42px;border-radius:8px;background:#a33b33;color:#fff;font-size:11px;font-weight:900}
+  .offerPdfCopy{min-width:0;flex:1;display:grid;gap:3px}
+  .offerPdfCopy b{color:var(--text);font-size:13px}
+  .offerPdfCopy span{color:var(--text-muted);font-size:12px;line-height:1.35}
+  .offerPdfStatus{min-height:17px;margin:-4px 0 10px;color:var(--text-muted);font-size:12px}
+  .offerPdfStatus.ok{color:var(--done)}
+  .offerPdfStatus.error{color:var(--todo)}
   .dashHeroMeta{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
   .dashSyncPill{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;background:var(--surface-muted);border:1px solid var(--border);font-size:12px;font-weight:bold;color:var(--text)}
   .dashSecondary{opacity:.92}
@@ -1252,6 +1262,8 @@
     .clientDocs,
     .clientOffers,
     .quickUpdate{padding:10px}
+    .offerPdfDrop{align-items:flex-start;flex-wrap:wrap}
+    .offerPdfCopy{flex-basis:calc(100% - 58px)}
     .historyMeta,
     .clientDocMeta,
     .offerMeta,
@@ -5516,6 +5528,13 @@ function renderClientOffers(c){
         <button class="histBtn" onclick="generateOfferPdf('${crmEsc(c.id)}')">📄 Generuj ofertę PDF</button>
         <button class="histBtn" onclick="toggleOfferForm('${crmEsc(c.id)}')">+ Dodaj ofertę</button>
       </div>
+      <div class="offerPdfDrop" data-offer-pdf-drop-for="${crmEsc(c.id)}" role="button" tabindex="0" aria-label="Dodaj ofertę PDF dla klienta">
+        <span class="offerPdfIcon" aria-hidden="true">PDF</span>
+        <span class="offerPdfCopy"><b>Przeciągnij ofertę PDF tutaj</b><span>albo kliknij, aby wybrać plik. PDF trafi do folderu klienta na Google Drive.</span></span>
+        <button type="button" class="histBtn" data-offer-pdf-pick>Wybierz PDF</button>
+        <input type="file" data-offer-pdf-input accept="application/pdf,.pdf" multiple hidden>
+      </div>
+      <div class="offerPdfStatus" data-offer-pdf-status-for="${crmEsc(c.id)}" aria-live="polite"></div>
       <div class="offerForm" data-offer-form-for="${crmEsc(c.id)}">
         <div class="offerFormGrid">
           <label>Data wysłania<input type="date" data-offer-field="dataWyslania"></label>
@@ -5610,6 +5629,8 @@ function renderOfferCard(o, clientId, offerIndex){
   }
   const amount = [o.kwota, o.waluta].filter(Boolean).join(" ");
   const href = safeOfferHref(o.linkOferta);
+  const previewHref = href && isPreviewable(href) ? drivePreviewHref(href) : "";
+  const downloadHref = href ? driveDownloadHref(href) : "";
   const linkText = o.nazwaPliku || o.linkOferta || "";
   return `
     <div class="offerCard">
@@ -5626,6 +5647,9 @@ function renderOfferCard(o, clientId, offerIndex){
       ${linkText ? `<div class="kanbanNote">${href ? `<a href="${crmEsc(href)}" target="_blank" rel="noopener">${crmEsc(linkText)}</a>` : crmEsc(linkText)}</div>` : ""}
       ${o.notatka ? `<div class="kanbanNote">${crmEsc(o.notatka)}</div>` : ""}
       <div class="offerCardActions">
+        ${previewHref ? `<button class="histBtn" onclick="openPreview('${crmEsc(previewHref)}')">Podgląd</button>` : ""}
+        ${href ? `<a class="histBtn" href="${crmEsc(href)}" target="_blank" rel="noopener">Otwórz</a>` : ""}
+        ${downloadHref ? `<a class="histBtn" href="${crmEsc(downloadHref)}" target="_blank" rel="noopener">Pobierz</a>` : ""}
         <button class="histBtn" onclick="editClientOffer('${crmEsc(clientId)}', ${offerIndex})">Edytuj</button>
         <button class="cancel" onclick="deleteClientOffer('${crmEsc(clientId)}', ${offerIndex})">Usuń</button>
       </div>
@@ -5923,6 +5947,7 @@ function openClientCard(clientId){
   `;
   pendingQuickImages = [];
   wireImageDropZone(document.getElementById("quickImageDropZone"), document.getElementById("quickImageFile"), addQuickImageFiles);
+  wireClientOfferDropZone(c.id);
   document.getElementById("clientCardModal").classList.add("open");
 }
 
@@ -5936,6 +5961,124 @@ function closeClientCard(){
 function toggleOfferForm(clientId){
   const form = document.querySelector(`.offerForm[data-offer-form-for="${clientId}"]`);
   if(form) form.classList.toggle("open");
+}
+
+const CLIENT_OFFER_PDF_MAX_BYTES = 25 * 1024 * 1024;
+let clientOfferUploadRunning = false;
+
+function setClientOfferPdfStatus(clientId, text, type=""){
+  const el = document.querySelector(`[data-offer-pdf-status-for="${clientId}"]`);
+  if(!el) return;
+  el.textContent = text || "";
+  el.className = `offerPdfStatus${type ? ` ${type}` : ""}`;
+}
+
+function wireClientOfferDropZone(clientId){
+  const zone = document.querySelector(`[data-offer-pdf-drop-for="${clientId}"]`);
+  if(!zone) return;
+  const input = zone.querySelector("[data-offer-pdf-input]");
+  const picker = zone.querySelector("[data-offer-pdf-pick]");
+  const openPicker = () => { if(!clientOfferUploadRunning) input?.click(); };
+
+  zone.addEventListener("click", e => {
+    if(e.target === input || e.target.closest("[data-offer-pdf-pick]")) return;
+    openPicker();
+  });
+  zone.addEventListener("keydown", e => {
+    if(e.key === "Enter" || e.key === " "){
+      e.preventDefault();
+      openPicker();
+    }
+  });
+  picker?.addEventListener("click", e => { e.stopPropagation(); openPicker(); });
+  input?.addEventListener("change", () => {
+    uploadClientOfferPdfs(clientId, input.files);
+    input.value = "";
+  });
+  zone.addEventListener("dragover", e => { e.preventDefault(); zone.classList.add("dragover"); });
+  zone.addEventListener("dragleave", () => zone.classList.remove("dragover"));
+  zone.addEventListener("drop", e => {
+    e.preventDefault();
+    zone.classList.remove("dragover");
+    uploadClientOfferPdfs(clientId, e.dataTransfer.files);
+  });
+}
+
+async function uploadClientOfferPdfs(clientId, fileList){
+  if(clientOfferUploadRunning) return;
+  const c = data.klienci.find(x=>x.id===clientId);
+  if(!c) return;
+  const files = Array.from(fileList || []);
+  if(!files.length) return;
+  const invalid = files.find(file => !/\.pdf$/i.test(file.name || ""));
+  if(invalid){
+    setClientOfferPdfStatus(clientId, `„${invalid.name}” nie jest plikiem PDF.`, "error");
+    return;
+  }
+  const tooLarge = files.find(file => file.size > CLIENT_OFFER_PDF_MAX_BYTES);
+  if(tooLarge){
+    setClientOfferPdfStatus(clientId, `„${tooLarge.name}” przekracza limit 25 MB.`, "error");
+    return;
+  }
+
+  clientOfferUploadRunning = true;
+  const uploaded = [];
+  try{
+    for(let i=0; i<files.length; i++){
+      const file = files[i];
+      setClientOfferPdfStatus(clientId, `Wysyłam ${i+1} z ${files.length}: ${file.name}...`);
+      const json = await driveApi("/api/drive-documents", {
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({
+          name:file.name,
+          mimeType:"application/pdf",
+          contentBase64:arrayBufferToBase64(await file.arrayBuffer()),
+          forClientOffer:true,
+          clientName:getClientDisplayName(c)
+        })
+      });
+      uploaded.push({file, driveFile:json.file});
+    }
+
+    const now = new Date().toISOString();
+    if(!Array.isArray(c.oferty)) c.oferty = [];
+    uploaded.forEach(({file, driveFile}, index) => {
+      c.oferty.push({
+        id:`o_${Date.now()}_${index}`,
+        dataWyslania:"",
+        wariant:file.name.replace(/\.pdf$/i, "").replace(/[_-]+/g, " ").trim(),
+        kwota:"",
+        waluta:"PLN",
+        status:"Robocza",
+        linkOferta:driveDocumentLink(driveFile),
+        nazwaPliku:file.name,
+        googleDriveId:driveFile.id || "",
+        mimeType:"application/pdf",
+        nastepnyFollowup:"",
+        notatka:"PDF dodany do Google Drive z karty klienta.",
+        dataUtworzenia:now,
+        dataAktualizacji:now
+      });
+    });
+    if(!Array.isArray(c.historia)) c.historia = [];
+    c.historia.push({
+      tekst:`[Oferta PDF] Dodano ${uploaded.length === 1 ? `ofertę „${uploaded[0].file.name}”` : `${uploaded.length} oferty PDF`} do Google Drive.`,
+      kto:getWhoAmI(),
+      data:now
+    });
+    c.zaktualizowano = now;
+    logActivity(`dodał(a) ${uploaded.length === 1 ? "ofertę PDF" : `${uploaded.length} oferty PDF`} klienta „${c.firma||c.osoba||"bez nazwy"}”`);
+    setClientOfferPdfStatus(clientId, "Zapisuję ofertę w panelu...");
+    await saveData();
+    renderClients();
+    openClientCard(clientId);
+    setClientOfferPdfStatus(clientId, `${uploaded.length === 1 ? "Oferta została" : "Oferty zostały"} dodane i zapisane na Drive.`, "ok");
+  }catch(e){
+    setClientOfferPdfStatus(clientId, `Nie udało się dodać oferty: ${e.message || e}`, "error");
+  }finally{
+    clientOfferUploadRunning = false;
+  }
 }
 
 function findLatestBriefHistory(c){
@@ -6202,6 +6345,7 @@ function saveClientOfferEdit(clientId, offerIndex){
   const now = new Date().toISOString();
   const existing = c.oferty[offerIndex];
   const updated = {
+    ...existing,
     id: existing.id || `o_${Date.now()}`,
     dataWyslania: values.dataWyslania,
     wariant: values.wariant,
