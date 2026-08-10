@@ -778,6 +778,14 @@
   .offerPdfStatus{min-height:17px;margin:-4px 0 10px;color:var(--text-muted);font-size:12px}
   .offerPdfStatus.ok{color:var(--done)}
   .offerPdfStatus.error{color:var(--todo)}
+  .offerPdfLibrary{display:grid;gap:8px;margin:0 0 10px}
+  .offerPdfLibraryHead{display:flex;align-items:center;justify-content:space-between;gap:10px;color:var(--text);font-size:12px;font-weight:bold}
+  .offerPdfFile{display:flex;align-items:center;gap:12px;padding:10px;border:1px solid var(--border);border-radius:10px;background:var(--surface-soft)}
+  .offerPdfFileIcon{display:grid;place-items:center;flex:0 0 42px;height:48px;border-radius:7px;background:#a33b33;color:#fff;font-size:11px;font-weight:900}
+  .offerPdfFileInfo{min-width:0;flex:1}
+  .offerPdfFileName{overflow-wrap:anywhere;color:var(--text);font-weight:bold;font-size:13px}
+  .offerPdfFileMeta{margin-top:3px;color:var(--text-muted);font-size:11px}
+  .offerPdfFileActions{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
   .dashHeroMeta{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
   .dashSyncPill{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;background:var(--surface-muted);border:1px solid var(--border);font-size:12px;font-weight:bold;color:var(--text)}
   .dashSecondary{opacity:.92}
@@ -1116,6 +1124,10 @@
     .actionTask textarea{grid-column:1/-1}
     .goalProgress{grid-template-columns:1fr}
     .lockBtn{padding:6px 10px}
+    .offerPdfDrop,.offerPdfFile{align-items:flex-start;flex-wrap:wrap}
+    .offerPdfCopy,.offerPdfFileInfo{min-width:calc(100% - 58px)}
+    .offerPdfFileActions{width:100%;justify-content:stretch}
+    .offerPdfFileActions .histBtn{flex:1;text-align:center}
   }
   @media(max-width:900px){
   .tableWrap{display:none}
@@ -2659,11 +2671,19 @@ function syncHash(value){
 function ensurePanelSyncIds(payload){
   if(!payload || !Array.isArray(payload.klienci)) return payload;
   payload.klienci.forEach(client=>{
-    if(!client || !client.id || !Array.isArray(client.historia)) return;
-    client.historia.forEach((entry,index)=>{
-      if(!entry || entry._syncId) return;
-      entry._syncId = `hist_${client.id}_${syncHash([entry.data||"",entry.kto||"",entry.tekst||"",entry.audioName||"",index].join("|"))}`;
-    });
+    if(!client || !client.id) return;
+    if(Array.isArray(client.historia)){
+      client.historia.forEach((entry,index)=>{
+        if(!entry || entry._syncId) return;
+        entry._syncId = `hist_${client.id}_${syncHash([entry.data||"",entry.kto||"",entry.tekst||"",entry.audioName||"",index].join("|"))}`;
+      });
+    }
+    if(Array.isArray(client.oferty)){
+      client.oferty.forEach((offer,index)=>{
+        if(!offer || offer.id) return;
+        offer.id = `offer_${client.id}_${syncHash([offer.googleDriveId||"",offer.linkOferta||"",offer.nazwaPliku||"",offer.dataUtworzenia||"",index].join("|"))}`;
+      });
+    }
   });
   return payload;
 }
@@ -2690,12 +2710,20 @@ function panelSaveConfirmed(expected, saved){
     const savedClient = savedClients.get(String(client.id));
     if(!savedClient) return false;
     for(const key of Object.keys(client)){
-      if(key === "historia" || key === "_deletedHistoryIds") continue;
+      if(key === "historia" || key === "_deletedHistoryIds" || key === "oferty" || key === "_deletedOfferIds") continue;
       if(!valuesEqual(client[key], savedClient[key])) return false;
     }
     const savedHistory = new Set((savedClient.historia || []).map((entry,index)=>mergeArrayItemKey(entry,index,"root.klienci[].historia")));
     for(const [index, entry] of (client.historia || []).entries()){
       if(!savedHistory.has(mergeArrayItemKey(entry,index,"root.klienci[].historia"))) return false;
+    }
+    const savedOffers = new Set((savedClient.oferty || []).map((offer,index)=>mergeArrayItemKey(offer,index,"root.klienci[].oferty")));
+    for(const [index, offer] of (client.oferty || []).entries()){
+      if(!savedOffers.has(mergeArrayItemKey(offer,index,"root.klienci[].oferty"))) return false;
+    }
+    const savedOfferIds = new Set((savedClient.oferty || []).map((offer,index)=>mergeArrayItemKey(offer,index,"root.klienci[].oferty").replace(/^(id:|sync:)/,"")));
+    for(const deletedId of (client._deletedOfferIds || [])){
+      if(savedOfferIds.has(String(deletedId))) return false;
     }
   }
   return true;
@@ -5586,6 +5614,15 @@ function renderClientOffers(c){
         <input type="file" data-offer-pdf-input accept="application/pdf,.pdf" multiple hidden>
       </div>
       <div class="offerPdfStatus" data-offer-pdf-status-for="${crmEsc(c.id)}" aria-live="polite"></div>
+      <div class="offerPdfLibrary">
+        <div class="offerPdfLibraryHead">
+          <span>Pliki ofert klienta</span>
+          <button type="button" class="histBtn" onclick="syncClientOfferPdfsFromDrive('${crmEsc(c.id)}')">Odśwież z Drive</button>
+        </div>
+        <div class="offerList">
+          ${offers.length ? offers.map((offer,index)=>({offer,index})).reverse().map(({offer,index})=>renderOfferCard(offer, c.id, index)).join("") : '<div class="empty">Brak zapisanych ofert. Przeciągnij PDF powyżej.</div>'}
+        </div>
+      </div>
       <div class="offerForm" data-offer-form-for="${crmEsc(c.id)}">
         <div class="offerFormGrid">
           <label>Data wysłania<input type="date" data-offer-field="dataWyslania"></label>
@@ -5601,9 +5638,6 @@ function renderClientOffers(c){
           <button class="cancel" onclick="toggleOfferForm('${crmEsc(c.id)}')">Anuluj</button>
           <button class="save" onclick="addClientOffer('${crmEsc(c.id)}')">Zapisz ofertę</button>
         </div>
-      </div>
-      <div class="offerList">
-        ${offers.length ? offers.map((offer,index)=>({offer,index})).reverse().map(({offer,index})=>renderOfferCard(offer, c.id, index)).join("") : '<div class="empty">Brak zapisanych ofert dla tego klienta.</div>'}
       </div>
     </div>
   `;
@@ -5695,12 +5729,21 @@ function renderOfferCard(o, clientId, offerIndex){
         </div>
         <span class="offerBadge">${crmEsc(o.status || "Robocza")}</span>
       </div>
-      ${linkText ? `<div class="kanbanNote">${href ? `<a href="${crmEsc(href)}" target="_blank" rel="noopener">${crmEsc(linkText)}</a>` : crmEsc(linkText)}</div>` : ""}
+      ${linkText ? `
+        <div class="offerPdfFile">
+          <span class="offerPdfFileIcon" aria-hidden="true">PDF</span>
+          <div class="offerPdfFileInfo">
+            <div class="offerPdfFileName">${crmEsc(linkText)}</div>
+            <div class="offerPdfFileMeta">${o.googleDriveId ? "Zapisano na Google Drive" : "Plik lub link przypisany do klienta"}</div>
+          </div>
+          <div class="offerPdfFileActions">
+            ${previewHref ? `<button class="histBtn" onclick="openPreview('${crmEsc(previewHref)}')">Podgląd PDF</button>` : ""}
+            ${downloadHref ? `<a class="histBtn" href="${crmEsc(downloadHref)}" target="_blank" rel="noopener">Pobierz PDF</a>` : ""}
+          </div>
+        </div>` : ""}
       ${o.notatka ? `<div class="kanbanNote">${crmEsc(o.notatka)}</div>` : ""}
       <div class="offerCardActions">
-        ${previewHref ? `<button class="histBtn" onclick="openPreview('${crmEsc(previewHref)}')">Podgląd</button>` : ""}
         ${href ? `<a class="histBtn" href="${crmEsc(href)}" target="_blank" rel="noopener">Otwórz</a>` : ""}
-        ${downloadHref ? `<a class="histBtn" href="${crmEsc(downloadHref)}" target="_blank" rel="noopener">Pobierz</a>` : ""}
         <button class="histBtn" onclick="editClientOffer('${crmEsc(clientId)}', ${offerIndex})">Edytuj</button>
         <button class="cancel" onclick="deleteClientOffer('${crmEsc(clientId)}', ${offerIndex})">Usuń</button>
       </div>
@@ -6000,6 +6043,9 @@ function openClientCard(clientId){
   wireImageDropZone(document.getElementById("quickImageDropZone"), document.getElementById("quickImageFile"), addQuickImageFiles);
   wireClientOfferDropZone(c.id);
   document.getElementById("clientCardModal").classList.add("open");
+  if(!clientOfferDriveSyncDone.has(c.id) && !clientOfferDriveSyncRunning.has(c.id)){
+    setTimeout(()=>syncClientOfferPdfsFromDrive(c.id, {silent:true}), 0);
+  }
 }
 
 function closeClientCard(){
@@ -6017,6 +6063,59 @@ function toggleOfferForm(clientId){
 
 const CLIENT_OFFER_PDF_MAX_BYTES = 25 * 1024 * 1024;
 let clientOfferUploadRunning = false;
+const clientOfferDriveSyncDone = new Set();
+const clientOfferDriveSyncRunning = new Set();
+
+function driveOfferId(offer){
+  return String((offer && (offer.googleDriveId || driveFileId(offer.linkOferta))) || "");
+}
+
+async function syncClientOfferPdfsFromDrive(clientId, options={}){
+  if(clientOfferDriveSyncRunning.has(clientId)) return;
+  const c = data.klienci.find(x=>x.id===clientId);
+  if(!c) return;
+  clientOfferDriveSyncRunning.add(clientId);
+  if(!options.silent) setClientOfferPdfStatus(clientId, "Sprawdzam folder klienta na Drive...");
+  try{
+    const json = await driveApi(`/api/drive-documents?clientOffersFor=${encodeURIComponent(getClientDisplayName(c))}`);
+    const files = (json.files || []).filter(file => file.mimeType === "application/pdf" || /\.pdf$/i.test(file.name || ""));
+    if(!Array.isArray(c.oferty)) c.oferty = [];
+    const existingIds = new Set(c.oferty.map(driveOfferId).filter(Boolean));
+    const added = files.filter(file => file.id && !existingIds.has(String(file.id)));
+    const now = new Date().toISOString();
+    added.forEach((file,index)=>{
+      c.oferty.push({
+        id:`o_drive_${file.id}`,
+        dataWyslania:"",
+        wariant:(file.name || "Oferta PDF").replace(/\.pdf$/i, "").replace(/[_-]+/g, " ").trim(),
+        kwota:"",
+        waluta:"PLN",
+        status:"Robocza",
+        linkOferta:driveDocumentLink(file),
+        nazwaPliku:file.name || "Oferta PDF",
+        googleDriveId:file.id,
+        mimeType:file.mimeType || "application/pdf",
+        nastepnyFollowup:"",
+        notatka:"PDF zsynchronizowany z folderu klienta na Google Drive.",
+        dataUtworzenia:file.createdTime || now,
+        dataAktualizacji:file.modifiedTime || now
+      });
+    });
+    clientOfferDriveSyncDone.add(clientId);
+    if(added.length){
+      c.zaktualizowano = now;
+      await saveData();
+      if(currentClientCardId === clientId) openClientCard(clientId);
+      setClientOfferPdfStatus(clientId, `${added.length === 1 ? "Odnaleziono i dodano 1 ofertę" : `Odnaleziono i dodano ${added.length} oferty`} z Drive.`, "ok");
+    }else if(!options.silent){
+      setClientOfferPdfStatus(clientId, "Panel ma już wszystkie oferty z folderu klienta na Drive.", "ok");
+    }
+  }catch(e){
+    if(!options.silent) setClientOfferPdfStatus(clientId, `Nie udało się odświeżyć ofert z Drive: ${e.message || e}`, "error");
+  }finally{
+    clientOfferDriveSyncRunning.delete(clientId);
+  }
+}
 
 function setClientOfferPdfStatus(clientId, text, type=""){
   const el = document.querySelector(`[data-offer-pdf-status-for="${clientId}"]`);
@@ -6425,6 +6524,12 @@ function deleteClientOffer(clientId, offerIndex){
   const c = data.klienci.find(x=>x.id===clientId);
   if(!c || !Array.isArray(c.oferty) || !c.oferty[offerIndex]) return;
   if(!confirm("Usunąć tę ofertę?")) return;
+  ensurePanelSyncIds(data);
+  const deletedId = c.oferty[offerIndex].id;
+  if(deletedId){
+    if(!Array.isArray(c._deletedOfferIds)) c._deletedOfferIds = [];
+    if(!c._deletedOfferIds.includes(deletedId)) c._deletedOfferIds.push(deletedId);
+  }
   c.oferty.splice(offerIndex, 1);
   c.zaktualizowano = new Date().toISOString();
   currentOfferEdit = null;

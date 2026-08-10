@@ -276,6 +276,19 @@ async function getClientOfferFolderId(token, clientName) {
   return id;
 }
 
+async function findClientOfferFolderId(token, clientName) {
+  if (!clientOffersFolderIdCache) {
+    clientOffersFolderIdCache = await findChildFolder(token, GOOGLE_DRIVE_FOLDER_ID, CLIENT_OFFERS_FOLDER_NAME);
+  }
+  if (!clientOffersFolderIdCache) return "";
+
+  const safeClientName = sanitizeName(clientName) || "Klient bez nazwy";
+  if (clientOfferFolderIdsCache.has(safeClientName)) return clientOfferFolderIdsCache.get(safeClientName);
+  const id = await findChildFolder(token, clientOffersFolderIdCache, safeClientName);
+  if (id) clientOfferFolderIdsCache.set(safeClientName, id);
+  return id;
+}
+
 async function uploadDriveFile(token, payload) {
   const name = sanitizeName(payload.name) || "Dokument";
   const mimeType = String(payload.mimeType || "application/octet-stream").slice(0, 120);
@@ -338,6 +351,14 @@ module.exports = async function handler(req, res) {
   try {
     const token = await getAccessToken();
     if (req.method === "GET") {
+      if (req.query && req.query.clientOffersFor) {
+        const folderId = await findClientOfferFolderId(token, req.query.clientOffersFor);
+        if (!folderId) return res.status(200).json({ files: [] });
+        const files = (await listDriveFolder(token, folderId))
+          .filter(file => file.mimeType !== DRIVE_FOLDER_MIME_TYPE)
+          .map(file => normalizeDriveFile({ ...file, folderPath: CLIENT_OFFERS_FOLDER_NAME }));
+        return res.status(200).json({ files });
+      }
       return res.status(200).json({ files: await listDriveFiles(token) });
     }
     if (req.method === "POST") {

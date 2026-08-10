@@ -112,6 +112,34 @@ function mergeClientHistory(currentClient, incomingClient) {
   return { historia: merged, deletedHistoryIds: Array.from(deleted) };
 }
 
+function offerEntryKey(offer) {
+  if (!offer || typeof offer !== "object") return "";
+  if (offer.id) return String(offer.id);
+  if (offer.googleDriveId) return `drive:${offer.googleDriveId}`;
+  return [offer.linkOferta || "", offer.nazwaPliku || "", offer.dataUtworzenia || ""]
+    .map(value => String(value).trim())
+    .join("|");
+}
+
+function mergeClientOffers(currentClient, incomingClient) {
+  const deleted = new Set([
+    ...(Array.isArray(currentClient._deletedOfferIds) ? currentClient._deletedOfferIds : []),
+    ...(Array.isArray(incomingClient._deletedOfferIds) ? incomingClient._deletedOfferIds : [])
+  ].map(String));
+  const byId = new Map();
+
+  [...(currentClient.oferty || []), ...(incomingClient.oferty || [])].forEach(offer => {
+    const key = offerEntryKey(offer);
+    if (!key || deleted.has(key)) return;
+    byId.set(key, offer);
+  });
+
+  const offers = Array.from(byId.values()).sort((a, b) =>
+    timestampValue(a && a.dataUtworzenia) - timestampValue(b && b.dataUtworzenia)
+  );
+  return { offers, deletedOfferIds: Array.from(deleted) };
+}
+
 function mergePanelClients(currentData, incomingData) {
   const currentClients = Array.isArray(currentData.klienci) ? currentData.klienci : [];
   const incomingClients = Array.isArray(incomingData.klienci) ? incomingData.klienci : [];
@@ -143,13 +171,16 @@ function mergePanelClients(currentData, incomingData) {
     }
 
     const history = mergeClientHistory(pair.current, pair.incoming);
+    const offers = mergeClientOffers(pair.current, pair.incoming);
     // Wersja całego magazynu chroni zapis przed konfliktem. Pola z żądania muszą wygrać;
     // czas z telefonu lub komputera nie może po cichu przywrócić starszej karty klienta.
     clients.push({
       ...pair.current,
       ...pair.incoming,
       historia: history.historia,
-      _deletedHistoryIds: history.deletedHistoryIds
+      _deletedHistoryIds: history.deletedHistoryIds,
+      oferty: offers.offers,
+      _deletedOfferIds: offers.deletedOfferIds
     });
   });
 
