@@ -699,6 +699,14 @@
   .kanbanPill{font-size:11px;background:#f3f8f4;color:#2d5a27;border:1px solid #d8e7db;border-radius:999px;padding:3px 7px}
   .kanbanPill.gold{background:#fff8df;color:#755c15;border-color:#ead99a}
   .kanbanContact,.kanbanNote{font-size:12px;color:#647066;line-height:1.35}
+  .clientFollowupPreview{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:7px 9px;border:1px solid var(--line);border-radius:8px;background:var(--surface-soft);font-size:12px;line-height:1.35;color:var(--text-muted)}
+  .clientFollowupPreview b{color:var(--text);font-size:11px;text-transform:uppercase;letter-spacing:.04em}
+  .clientFollowupPreview.scheduled span{color:var(--green);font-weight:bold}
+  .clientFollowupPreview.today{border-color:#d7bd65;background:#fff8df}
+  .clientFollowupPreview.today span{color:#755c15;font-weight:bold}
+  .clientFollowupPreview.overdue{border-color:#e0a49d;background:#fff3f1}
+  .clientFollowupPreview.overdue span{color:#9d3026;font-weight:bold}
+  .clientFollowupPreview.compact{min-width:145px;align-items:flex-start;flex-direction:column;gap:2px}
   .clientsFollowups{display:none}
   .followGroup{background:var(--surface);border:1px solid var(--line);border-radius:12px;margin-bottom:12px;padding:12px}
   .followGroup h3{margin:0 0 8px;font-size:14px;color:#355b3a}
@@ -1060,6 +1068,10 @@
     color:#ffb4b2 !important;
     border-color:rgba(239,83,80,.3) !important;
   }
+  body.dark-theme .clientFollowupPreview.today{background:rgba(214,179,90,.14)}
+  body.dark-theme .clientFollowupPreview.today span{color:#f0d991}
+  body.dark-theme .clientFollowupPreview.overdue{background:rgba(239,83,80,.12)}
+  body.dark-theme .clientFollowupPreview.overdue span{color:#ffb4b2}
   body.dark-theme .backupPreviewStatus.warn,
   body.dark-theme .privateNotice,
   body.dark-theme .vendorIntro,
@@ -1814,7 +1826,7 @@
           <thead>
             <tr>
               <th>Firma / gospodarstwo</th><th>Imię i nazwisko</th><th>Województwo</th><th>Miejscowość</th>
-              <th>Ulica</th><th>Telefon</th><th>E-mail</th><th>Czym zainteresowany</th>
+              <th>Ulica</th><th>Telefon</th><th>E-mail</th><th>Czym zainteresowany</th><th>Następny kontakt</th>
               <th>Priorytet</th><th>Status</th>
               <th>Historia</th><th>Usuń</th>
             </tr>
@@ -5767,6 +5779,7 @@ function renderLeadViewCard(c){
         <span class="kanbanPill gold">${crmEsc(clientLeadSource(c) || getLeadCategory(c) || "Lead")}</span>
       </div>
       <div class="commandReason"><b>Czym zainteresowany:</b> ${crmEsc(product)}</div>
+      ${renderClientFollowupPreview(c)}
       <div class="commandReason" style="margin-top:8px"><b>Ostatnie działanie:</b> ${crmEsc(last)}</div>
       <div class="commandActions">
         <button class="histBtn" onclick="addQuickClientActivity('${id}','tata-call')">Tata dzwonił</button>
@@ -5804,6 +5817,15 @@ function followupInfo(dateStr){
   if(days <= 0) return {label:days < 0 ? "po terminie" : `dzisiaj${time ? ` o ${time}` : ""}`, group:"today", days};
   if(days <= 7) return {label:`za ${days} dni`, group:"soon", days};
   return {label:`za ${days} dni`, group:"later", days};
+}
+
+function renderClientFollowupPreview(c, compact = false){
+  const value = clientFollowup(c);
+  const info = followupInfo(value);
+  const state = !value ? "none" : (info.days < 0 ? "overdue" : (info.days === 0 ? "today" : "scheduled"));
+  const when = value ? formatFollowupDateTime(value) : "nie ustawiono";
+  const status = value && info.label ? ` (${info.label})` : "";
+  return `<div class="clientFollowupPreview ${state}${compact ? " compact" : ""}"><b>Następny kontakt</b><span>${crmEsc(when + status)}</span></div>`;
 }
 
 function objectionPrompt(objection){
@@ -6087,6 +6109,7 @@ function renderClientDirectory(list){
           ${product ? `<span class="kanbanPill">${crmEsc(product)}</span>` : ""}
         </div>
         <div class="clientMobileContact">${contact}</div>
+        ${renderClientFollowupPreview(c)}
         <div class="kanbanNote"><b>Ostatnie działanie:</b> ${crmEsc(last)}</div>
         <div class="clientDirectoryActions">
           <button class="histBtn" onclick="openClientCard('${id}')">Otwórz klienta</button>
@@ -6133,6 +6156,7 @@ function renderClientKanbanCard(c){
         ${product ? `<span class="kanbanPill">${crmEsc(product)}</span>` : ""}
       </div>
       ${contact ? `<div class="kanbanContact">${renderClientContactLinks(c) || crmEsc(contact)}</div>` : ""}
+      ${renderClientFollowupPreview(c)}
       ${objection ? `<div class="kanbanNote">Obiekcja: ${crmEsc(objection)}</div>` : ""}
       ${last ? `<div class="kanbanNote">Ostatnie działanie: ${crmEsc(last)}</div>` : ""}
     </div>
@@ -6195,6 +6219,7 @@ function renderClientsMobileCards(list){
           <span class="kanbanPill">${crmEsc(labelFrom(PRIO_OPTS, c.priorytet))}</span>
         </div>
         <div class="clientMobileContact">${contact}</div>
+        ${renderClientFollowupPreview(c)}
         <div class="kanbanNote"><b>Ostatnie działanie:</b> ${crmEsc(last)}</div>
         <div class="clientMobileActions">
           <button class="histBtn" onclick="openClientCard('${id}')">Otwórz klienta</button>
@@ -6852,6 +6877,7 @@ function renderClients(){
       <td>${clientField(c,"telefon")}</td>
       <td>${clientField(c,"email")}</td>
       <td>${clientField(c,null,"product")}</td>
+      <td>${renderClientFollowupPreview(c, true)}</td>
       <td>${clientField(c,null,"prio")}</td>
       <td>${clientField(c,null,"status")}</td>
       <td><button class="histBtn" onclick="openHistoryModal('${id}')">📜 ${(c.historia||[]).length}</button>${lastActivity ? `<div class="lastActivity">Ostatnie: ${crmEsc(lastActivity)}</div>` : ""}</td>
