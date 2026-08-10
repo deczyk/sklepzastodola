@@ -5,7 +5,7 @@ const PANEL_BASIC_USER = process.env.PANEL_BASIC_USER;
 const PANEL_BASIC_PASSWORD = process.env.PANEL_BASIC_PASSWORD;
 const GOOGLE_SERVICE_ACCOUNT_EMAIL = process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL;
 const GOOGLE_PRIVATE_KEY = process.env.GOOGLE_PRIVATE_KEY;
-const GOOGLE_DRIVE_FOLDER_ID = process.env.GOOGLE_DRIVE_FOLDER_ID || "1FMmp6qdMuMl13vkdfhpddeHH46kTgDy0";
+const GOOGLE_DRIVE_FOLDER_ID = "0ACFzxkUrgaMkUk9PVA";
 const DRIVE_FOLDER_MIME_TYPE = "application/vnd.google-apps.folder";
 // Załączniki notatek i oferty klientów lądują w osobnych podfolderach, żeby NIE mieszały się
 // z dokumentami firmowymi w zakładce "Dokumenty" panelu. listDriveFiles() celowo pomija je
