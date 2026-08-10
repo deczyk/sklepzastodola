@@ -8,6 +8,11 @@ create table if not exists public.panel_store (
   updated_at timestamptz not null default now()
 );
 
+-- Rekord `main` przechowuje aktualne dane. API zapisuje poprzednie wersje jako
+-- `backup_main_*` w tej samej tabeli, więc historia działa bez dodatkowej migracji.
+create index if not exists panel_store_updated_at_idx
+  on public.panel_store (updated_at desc);
+
 alter table public.panel_store enable row level security;
 
 insert into public.panel_store (id, data, version)

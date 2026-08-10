@@ -6,6 +6,8 @@ const {
   panelStoreConfigStatus,
   readPanelStore,
   readPanelStoreVersion,
+  listPanelStoreBackups,
+  readPanelStoreBackup,
   savePanelStore
 } = require("./_panel-store");
 
@@ -78,6 +80,15 @@ module.exports = async function handler(req, res) {
 
   try {
     if (req.method === "GET") {
+      if (req.query && (req.query.backups === "1" || req.query.backups === "true")) {
+        const backups = await listPanelStoreBackups();
+        return res.status(200).json({ backups, database: "supabase" });
+      }
+      if (req.query && req.query.backupId) {
+        const backup = await readPanelStoreBackup(req.query.backupId);
+        if (!backup) return res.status(404).json({ error: "Backup not found." });
+        return res.status(200).json({ backup, database: "supabase" });
+      }
       if ((req.query && (req.query.versionOnly === "1" || req.query.versionOnly === "true"))) {
         const version = await readPanelStoreVersion();
         return res.status(200).json({ version, database: "supabase" });
@@ -104,9 +115,12 @@ module.exports = async function handler(req, res) {
         });
       }
 
+      const saved = await readPanelStore();
+
       return res.status(200).json({
         ok: true,
-        version: versionToSave + 1,
+        version: saved.version,
+        record: saved.data || {},
         database: "supabase"
       });
     }

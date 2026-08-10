@@ -2230,6 +2230,7 @@
 const STORAGE_KEY = "panel_items_v2";
 const PANEL_SESSION_KEY = "panel_session_password";
 const PENDING_SYNC_KEY = "panel_pending_sync_v1";
+const LAST_REMOTE_SNAPSHOT_KEY = "panel_last_remote_snapshot_v1";
 const SYNC_ENABLED = true;
 
 // Flaga niezapisanych zmian musi przeżyć odświeżenie strony — inaczej po F5/zamknięciu karty
@@ -2589,6 +2590,9 @@ let lastCloudSaveOk = true;
 let hasUnsyncedLocalChanges = false;
 let syncRetryTimer = null;
 let syncRetryDelay = 5000; // rośnie 5s -> 10s -> 20s -> 30s (max) między nieudanymi próbami
+let lastRemoteSnapshot = loadLastRemoteSnapshot();
+let localChangeRevision = 0;
+let remoteSaveQueue = Promise.resolve();
 
 // Duży, stały pasek na górze (nie mały napis w rogu) - ma być niemożliwy do przegapienia,
 // dopóki coś nie jest bezpiecznie zapisane w chmurze. Wołane z każdego miejsca, które zmienia
@@ -2605,13 +2609,111 @@ function updateUnsyncedBanner(){
     ? "⏳ Zapisywanie zmian do chmury..."
     : "⚠ Nie udało się zapisać zmian w chmurze — NIE zamykaj karty i nie loguj się teraz na innym urządzeniu. Panel próbuje ponownie automatycznie.";
 }
-
 function loadLocalCache(){
   try{
     const raw = localStorage.getItem(STORAGE_KEY);
     if(raw) return JSON.parse(raw);
   }catch(e){}
   return null;
+}
+
+function clonePanelValue(value){
+  return JSON.parse(JSON.stringify(value == null ? null : value));
+}
+
+function loadLastRemoteSnapshot(){
+  try{
+    const raw = localStorage.getItem(LAST_REMOTE_SNAPSHOT_KEY);
+    return raw ? JSON.parse(raw) : null;
+  }catch(e){ return null; }
+}
+
+function rememberRemoteSnapshot(snapshot){
+  if(!snapshot || typeof snapshot !== "object") return;
+  try{ localStorage.setItem(LAST_REMOTE_SNAPSHOT_KEY, JSON.stringify(snapshot)); }catch(e){}
+  lastRemoteSnapshot = clonePanelValue(snapshot);
+}
+
+function syncHash(value){
+  let hash = 2166136261;
+  const text = String(value || "");
+  for(let i=0;i<text.length;i++){
+    hash ^= text.charCodeAt(i);
+    hash = Math.imul(hash, 16777619);
+  }
+  return (hash >>> 0).toString(36);
+}
+
+function ensurePanelSyncIds(payload){
+  if(!payload || !Array.isArray(payload.klienci)) return payload;
+  payload.klienci.forEach(client=>{
+    if(!client || !client.id || !Array.isArray(client.historia)) return;
+    client.historia.forEach((entry,index)=>{
+      if(!entry || entry._syncId) return;
+      entry._syncId = `hist_${client.id}_${syncHash([entry.data||"",entry.kto||"",entry.tekst||"",entry.audioName||"",index].join("|"))}`;
+    });
+  });
+  return payload;
+}
+
+function valuesEqual(a,b){
+  if(a === b) return true;
+  try{ return JSON.stringify(a) === JSON.stringify(b); }catch(e){ return false; }
+}
+
+function mergeArrayItemKey(item,index,path){
+  if(item && typeof item === "object"){
+    if(item.id != null) return `id:${item.id}`;
+    if(item._syncId) return `sync:${item._syncId}`;
+    if(path.endsWith(".historia")) return `history:${item.data||""}|${item.kto||""}|${item.tekst||""}|${item.audioName||""}`;
+  }
+  return `value:${JSON.stringify(item)}:${index}`;
+}
+
+function mergePanelSnapshots(base, local, remote, path="root"){
+  if(valuesEqual(local, base)) return clonePanelValue(remote);
+  if(valuesEqual(remote, base)) return clonePanelValue(local);
+  if(local == null) return clonePanelValue(remote);
+  if(remote == null) return clonePanelValue(local);
+
+  if(Array.isArray(local) && Array.isArray(remote)){
+    const objectArray = local.concat(remote).some(item=>item && typeof item === "object");
+    if(!objectArray){
+      return Array.from(new Set(remote.concat(local).map(item=>JSON.stringify(item)))).map(item=>JSON.parse(item));
+    }
+    const baseMap = new Map();
+    const localMap = new Map();
+    const remoteMap = new Map();
+    (Array.isArray(base) ? base : []).forEach((item,index)=>baseMap.set(mergeArrayItemKey(item,index,path),item));
+    local.forEach((item,index)=>localMap.set(mergeArrayItemKey(item,index,path),item));
+    remote.forEach((item,index)=>remoteMap.set(mergeArrayItemKey(item,index,path),item));
+    const result = [];
+    const keys = new Set([...remoteMap.keys(),...localMap.keys()]);
+    keys.forEach(key=>{
+      const baseItem = baseMap.get(key);
+      const localItem = localMap.get(key);
+      const remoteItem = remoteMap.get(key);
+      if(localItem === undefined && baseItem !== undefined){
+        if(!valuesEqual(remoteItem,baseItem)) result.push(clonePanelValue(remoteItem));
+        return;
+      }
+      if(remoteItem === undefined){ result.push(clonePanelValue(localItem)); return; }
+      if(localItem === undefined){ result.push(clonePanelValue(remoteItem)); return; }
+      result.push(mergePanelSnapshots(baseItem,localItem,remoteItem,`${path}[]`));
+    });
+    return result;
+  }
+
+  if(typeof local === "object" && typeof remote === "object"){
+    const result = {};
+    const baseObject = base && typeof base === "object" && !Array.isArray(base) ? base : {};
+    new Set([...Object.keys(remote),...Object.keys(local)]).forEach(key=>{
+      result[key] = mergePanelSnapshots(baseObject[key],local[key],remote[key],`${path}.${key}`);
+    });
+    return result;
+  }
+
+  return clonePanelValue(local);
 }
 
 const MOJIBAKE_REPLACEMENTS = [
@@ -2682,7 +2784,7 @@ async function fetchRemote(password = getPanelPassword()){
   return json.record;
 }
 
-async function pushRemote(payload, attempt = 0){
+async function pushRemote(payload, attempt = 0, revision = localChangeRevision){
   if(!SYNC_ENABLED) return;
   try{
     const password = getPanelPassword();
@@ -2708,25 +2810,41 @@ async function pushRemote(payload, attempt = 0){
           if(freshRes.ok){
             const freshJson = await freshRes.json();
             if(Number.isFinite(Number(freshJson.version))) currentPanelVersion = Number(freshJson.version);
+            if(freshJson.record && typeof freshJson.record === "object"){
+              const freshRecord = ensurePanelSyncIds(clonePanelValue(freshJson.record));
+              payload = ensurePanelSyncIds(mergePanelSnapshots(lastRemoteSnapshot, payload, freshRecord));
+              rememberRemoteSnapshot(freshRecord);
+            }
           }
         }catch(e){}
         await new Promise(r => setTimeout(r, 300 * (attempt + 1)));
-        return pushRemote(payload, attempt + 1);
+        return pushRemote(payload, attempt + 1, revision);
       }
       throw new Error("VERSION_CONFLICT");
     }
     if(!res.ok) throw new Error(await syncErrorMessage(res));
+    let savedSnapshot = payload;
     try{
       const json = await res.json();
       if(Number.isFinite(Number(json.version))) currentPanelVersion = Number(json.version);
+      if(json.record && typeof json.record === "object") savedSnapshot = ensurePanelSyncIds(clonePanelValue(json.record));
     }catch(e){}
+    const newerLocalChanges = revision !== localChangeRevision;
+    const currentLocalData = data;
+    rememberRemoteSnapshot(savedSnapshot);
+    data = newerLocalChanges
+      ? ensurePanelSyncIds(mergePanelSnapshots(payload, currentLocalData, savedSnapshot))
+      : ensurePanelSyncIds(clonePanelValue(savedSnapshot));
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
     lastCloudSaveOk = true;
-    hasUnsyncedLocalChanges = false;
-    markPendingSync(false);
-    setSyncStatus("Zsynchronizowano ✓", false);
-    clearTimeout(syncRetryTimer);
-    syncRetryDelay = 5000;
-    updateUnsyncedBanner();
+    if(!newerLocalChanges){
+      hasUnsyncedLocalChanges = false;
+      markPendingSync(false);
+      setSyncStatus("Zsynchronizowano ✓", false);
+      clearTimeout(syncRetryTimer);
+      syncRetryDelay = 5000;
+      updateUnsyncedBanner();
+    }
   }catch(e){
     console.warn("Nie udało się zapisać do wspólnego magazynu:", e);
     lastCloudSaveOk = false;
@@ -2737,9 +2855,18 @@ async function pushRemote(payload, attempt = 0){
     // Nie czekamy aż user ręcznie odświeży - próbujemy sami, ze wzrastającym odstępem,
     // dopóki się nie uda albo dopóki coś innego nie zastąpi tej zmiany świeższym zapisem.
     clearTimeout(syncRetryTimer);
-    syncRetryTimer = setTimeout(()=>{ if(hasUnsyncedLocalChanges) pushRemote(data); }, syncRetryDelay);
+    syncRetryTimer = setTimeout(()=>{
+      if(hasUnsyncedLocalChanges) queueRemotePush(clonePanelValue(data), localChangeRevision);
+    }, syncRetryDelay);
     syncRetryDelay = Math.min(syncRetryDelay * 2, 30000);
   }
+}
+
+function queueRemotePush(payload, revision = localChangeRevision){
+  remoteSaveQueue = remoteSaveQueue
+    .catch(()=>{})
+    .then(()=>pushRemote(payload, 0, revision));
+  return remoteSaveQueue;
 }
 
 async function syncErrorMessage(res){
@@ -2809,13 +2936,18 @@ async function initApp(){
       console.warn("Chmura niedostępna, używam danych lokalnych:", e);
     }
   }
-  const local = loadLocalCache();
+  const local = ensurePanelSyncIds(loadLocalCache());
+  remote = ensurePanelSyncIds(remote);
   // Jeśli poprzednia sesja skończyła się z niezapisanymi zmianami (zamknięta karta / odświeżenie
   // w trakcie debounce / błąd sieci), NIE wolno ich ubić świeżymi danymi z chmury — to właśnie
   // powodowało znikanie notatek. Lokalne dane wygrywają, dopóki nie zostaną skutecznie wysłane.
   const pendingFromBefore = hasPendingSyncFromPreviousSession();
   const preferLocal = pendingFromBefore || shouldPreferLocalCache(remote, local);
-  data = preferLocal ? (local || remote || defaultData()) : (remote || local || defaultData());
+  data = preferLocal && local && remote
+    ? mergePanelSnapshots(lastRemoteSnapshot, local, remote)
+    : (preferLocal ? (local || remote || defaultData()) : (remote || local || defaultData()));
+  data = ensurePanelSyncIds(data);
+  if(remote) rememberRemoteSnapshot(remote);
   const repairedMojibake = repairMojibakeDeep(data);
   const wasIncomplete = fillMissingDefaults(data);
   localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
@@ -2826,7 +2958,7 @@ async function initApp(){
     } else {
       setSyncStatus(preferLocal ? "Dane lokalne - chmura była pusta ⚠" : (remote ? "Dane z chmury ✓" : "Dane lokalne - chmura niedostępna ⚠"), !remote || preferLocal);
     }
-    if(pendingFromBefore || wasIncomplete || preferLocal || repairedMojibake) pushRemote(data); // dosyłamy zaległe/brakujące dane do chmury
+    if(pendingFromBefore || wasIncomplete || preferLocal || repairedMojibake) queueRemotePush(clonePanelValue(data)); // dosyłamy zaległe/brakujące dane do chmury
   }
   updateUnsyncedBanner();
   render();
@@ -2964,11 +3096,21 @@ async function refreshFromRemote(options = {}){
     return;
   }
   if(remote){
-    data = remote;
+    const hadLocalChanges = hasUnsyncedLocalChanges || hasPendingSyncFromPreviousSession();
+    const freshRemote = ensurePanelSyncIds(clonePanelValue(remote));
+    data = hadLocalChanges
+      ? ensurePanelSyncIds(mergePanelSnapshots(lastRemoteSnapshot, data, freshRemote))
+      : freshRemote;
+    rememberRemoteSnapshot(freshRemote);
     fillMissingDefaults(data);
     localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
     render();
-    setSyncStatus("Zsynchronizowano ✓", false);
+    if(hadLocalChanges){
+      setSyncStatus("Scalono dane, zapisuję zmiany...", true);
+      await saveData({immediate:true});
+    } else {
+      setSyncStatus("Zsynchronizowano ✓", false);
+    }
   } else {
     setSyncStatus("Nie udało się odświeżyć", true);
   }
@@ -3038,16 +3180,18 @@ window.addEventListener("beforeunload", (e)=>{
 });
 
 function saveData(options = {}){
+  ensurePanelSyncIds(data);
   localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
   if(!SYNC_ENABLED) return Promise.resolve(false);
+  localChangeRevision += 1;
+  const revision = localChangeRevision;
   hasUnsyncedLocalChanges = true;
   markPendingSync(true); // trwałe, żeby zamknięcie karty przed zapisem w chmurze nie zgubiło zmiany
   setSyncStatus("Zapisywanie...", false);
   updateUnsyncedBanner();
-  // Bez debounce: każda zmiana (dodanie/edycja/usunięcie) idzie do chmury natychmiast, nie po 500ms.
-  // Wszystkie akcje w panelu to pojedyncze kliknięcia/eventy (nie pisanie znak-po-znaku), więc nie ma
-  // ryzyka zalania API - jedno wywołanie saveData() = jeden request od razu.
-  return pushRemote(data);
+  // Każda akcja trafia do kolejki od razu. Kolejka zapobiega równoległym zapisom
+  // całej paczki danych, które wcześniej mogły kończyć się utratą nowszych zmian.
+  return queueRemotePush(clonePanelValue(data), revision);
 }
 
 initTheme();
@@ -3891,6 +4035,12 @@ function deleteHistoryEntry(index){
   const c = data.klienci.find(x=>x.id===currentHistoryClientId);
   if(!c || !Array.isArray(c.historia) || !c.historia[index]) return;
   if(!confirm("Usunąć tę notatkę z historii klienta?")) return;
+  ensurePanelSyncIds(data);
+  const deletedId = c.historia[index]._syncId;
+  if(deletedId){
+    if(!Array.isArray(c._deletedHistoryIds)) c._deletedHistoryIds = [];
+    if(!c._deletedHistoryIds.includes(deletedId)) c._deletedHistoryIds.push(deletedId);
+  }
   c.historia.splice(index, 1);
   c.zaktualizowano = new Date().toISOString();
   currentHistoryEditIndex = null;
@@ -6174,6 +6324,8 @@ function deleteClient(id){
   if(!confirm("Na pewno trwale usunąć tego klienta? Usunięte zostaną też jego oferty i historia.")) return;
   const typed = prompt("To jest trwałe usunięcie klienta. Wpisz USUŃ, aby potwierdzić.");
   if(typed !== "USUŃ") return;
+  if(!Array.isArray(data._deletedClientIds)) data._deletedClientIds = [];
+  if(!data._deletedClientIds.includes(String(id))) data._deletedClientIds.push(String(id));
   data.klienci.splice(index, 1);
   logActivity(`trwale usunął(-ęła) klienta „${c.firma||c.osoba||'bez nazwy'}”`);
   if(currentClientCardId === id) closeClientCard();
