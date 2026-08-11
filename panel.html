@@ -6813,6 +6813,54 @@ function renderFollowupItem(c){
 // oferty...) - na telefonie robi się z tego długie przewijanie. Zwijamy mniej pilne sekcje
 // w natywne <details> (bez JS, nic nie znika - tylko domyślnie schowane) zamiast budować
 // osobny system zakładek, żeby nie ruszać logiki renderowania w środku każdej sekcji.
+// Wysyłka maila z panelu przez prawdziwy Gmail (api/mail-send.js), nie przez zewnętrzny
+// serwis transakcyjny - Kuba/tata boją się, że mail wysłany przez coś innego niż normalna
+// skrzynka firmowa częściej trafia do spamu.
+function renderMailComposeSection(c){
+  if(!c || !c.email) return `<p style="font-size:13px;color:var(--text-muted)">Klient nie ma zapisanego adresu e-mail - dodaj go w polu "E-mail" wyżej, żeby móc stąd wysłać maila.</p>`;
+  return `
+    <div class="clientCardGrid">
+      <div class="clientCardField"><b>Wyślij z</b>
+        <select id="mailComposeFrom-${c.id}">
+          <option value="kontakt">kontakt@sklepzastodola.pl</option>
+          <option value="jdeczynski">j.deczynski@sklepzastodola.pl</option>
+        </select>
+      </div>
+      <div class="clientCardField"><b>Do</b><input type="email" id="mailComposeTo-${c.id}" value="${crmEsc(c.email)}"></div>
+    </div>
+    <div class="clientCardField" style="margin-top:8px"><b>Temat</b><input type="text" id="mailComposeSubject-${c.id}" placeholder="Temat maila"></div>
+    <div class="clientCardField" style="margin-top:8px"><b>Treść</b><textarea id="mailComposeBody-${c.id}" rows="8" placeholder="Treść maila..."></textarea></div>
+    <div class="advisorScenarioDofin" style="border:0;padding:10px 0 0">
+      <button class="save" onclick="sendClientMail('${c.id}')">Wyślij mail</button>
+      <span id="mailComposeStatus-${c.id}" style="font-size:13px;color:var(--text-muted)"></span>
+    </div>
+  `;
+}
+
+async function sendClientMail(clientId){
+  const statusEl = document.getElementById(`mailComposeStatus-${clientId}`);
+  const to = document.getElementById(`mailComposeTo-${clientId}`)?.value.trim();
+  const subject = document.getElementById(`mailComposeSubject-${clientId}`)?.value.trim();
+  const body = document.getElementById(`mailComposeBody-${clientId}`)?.value.trim();
+  const mailboxKey = document.getElementById(`mailComposeFrom-${clientId}`)?.value;
+  if(!to || !subject || !body){
+    if(statusEl) statusEl.textContent = "Wypełnij adresata, temat i treść.";
+    return;
+  }
+  if(statusEl) statusEl.textContent = "Wysyłam...";
+  try{
+    await driveApi("/api/mail-send", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ mailboxKey, to, subject, body, clientId, senderName: getWhoAmI() })
+    });
+    logActivity(`wysłał(a) maila do ${to}`);
+    if(currentClientCardId === clientId) openClientCard(clientId); // odśwież - pokaże się w historii
+  }catch(e){
+    if(statusEl) statusEl.textContent = `Błąd wysyłki: ${e.message}`;
+  }
+}
+
 function wrapCollapsible(title, html, openByDefault){
   if(!html || !html.trim()) return "";
   return `<details class="clientCardSection"${openByDefault ? " open" : ""}><summary>${crmEsc(title)}</summary>${html}</details>`;
@@ -6863,6 +6911,7 @@ function openClientCard(clientId){
     ${wrapCollapsible("Brief (konfigurator)", renderBriefConfigSection(c), false)}
     ${wrapCollapsible("Advisor (ankieta i kalkulator scenariuszy)", renderAdvisorResultSection(c), false)}
     ${wrapCollapsible("✏️ Szybka aktualizacja", renderQuickClientUpdate(c), true)}
+    ${wrapCollapsible("✉️ Napisz maila", renderMailComposeSection(c), false)}
     ${wrapCollapsible("📁 Dokumenty", renderClientDocuments(c), false)}
     <details class="clientCardSection" open>
       <summary>Historia kontaktu (${historyCount})</summary>
