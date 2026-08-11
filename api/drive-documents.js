@@ -233,6 +233,27 @@ async function findChildFolder(token, parentId, name) {
   return (json.files && json.files[0] && json.files[0].id) || "";
 }
 
+// Jak findChildFolder, ale zwraca WSZYSTKIE dopasowania. Używane tam, gdzie musimy
+// rozpoznać przynależność pliku do folderu niezależnie od lokalnego cache ID folderu
+// (np. gdyby na skutek równoległych cold startów serverless powstał zduplikowany
+// folder o tej samej nazwie — cache w jednej instancji mógłby wskazywać na inny ID
+// niż ten, do którego trafił konkretny plik).
+async function findChildFolders(token, parentId, name) {
+  const params = new URLSearchParams({
+    q: `'${parentId}' in parents and trashed = false and mimeType = '${DRIVE_FOLDER_MIME_TYPE}' and name = '${name.replace(/'/g, "\\'")}'`,
+    fields: "files(id,name)",
+    pageSize: "50",
+    supportsAllDrives: "true",
+    includeItemsFromAllDrives: "true"
+  });
+  const res = await fetch(`https://www.googleapis.com/drive/v3/files?${params.toString()}`, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  const json = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(json.error && json.error.message ? json.error.message : "Google Drive folder lookup failed.");
+  return (json.files || []).map(file => file.id).filter(Boolean);
+}
+
 async function createChildFolder(token, parentId, name) {
   const res = await fetch("https://www.googleapis.com/drive/v3/files?supportsAllDrives=true&fields=id", {
     method: "POST",
@@ -264,7 +285,6 @@ async function downloadNoteAudioFile(token, fileId) {
   const safeFileId = String(fileId || "").trim();
   if (!/^[A-Za-z0-9_-]{10,}$/.test(safeFileId)) throw new Error("Invalid audio file id.");
 
-  const audioFolderId = await getNotesAudioFolderId(token);
   const metadataParams = new URLSearchParams({
     fields: "id,name,mimeType,size,parents",
     supportsAllDrives: "true"
@@ -274,7 +294,13 @@ async function downloadNoteAudioFile(token, fileId) {
   });
   const metadata = await metadataRes.json().catch(() => ({}));
   if (!metadataRes.ok) throw new Error(metadata.error && metadata.error.message ? metadata.error.message : "Google Drive audio lookup failed.");
-  if (!Array.isArray(metadata.parents) || !metadata.parents.includes(audioFolderId)) {
+
+  // Sprawdzamy przynależność do folderu audio przez świeże zapytanie o WSZYSTKIE foldery
+  // o tej nazwie, a nie przez porównanie z jednym cache'owanym ID (patrz komentarz przy
+  // findChildFolders) — inaczej legalna notatka mogła dostać fałszywe 403.
+  const audioFolderIds = await findChildFolders(token, GOOGLE_DRIVE_FOLDER_ID, NOTES_AUDIO_FOLDER_NAME);
+  const parents = Array.isArray(metadata.parents) ? metadata.parents : [];
+  if (!audioFolderIds.length || !parents.some(parentId => audioFolderIds.includes(parentId))) {
     const error = new Error("Requested file is not a panel audio note.");
     error.statusCode = 403;
     throw error;
