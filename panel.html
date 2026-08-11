@@ -43,6 +43,20 @@
          display:flex;align-items:center;gap:14px}
   header .logo{width:42px;height:42px;flex-shrink:0}
   header h1{margin:0;font-size:22px} header p{margin:4px 0 0;color:#e6efe8;font-size:13px}
+  .globalSearchBox{position:relative;flex:1 1 220px;min-width:160px;max-width:340px}
+  .globalSearchBox input{width:100%;box-sizing:border-box;padding:8px 12px;border-radius:999px;border:1px solid rgba(255,255,255,.35);
+    background:rgba(255,255,255,.14);color:#fff;font:inherit;font-size:13px}
+  .globalSearchBox input::placeholder{color:rgba(255,255,255,.75)}
+  .globalSearchResults{display:none;position:absolute;top:calc(100% + 6px);left:0;right:0;background:var(--surface);color:var(--text);
+    border:1px solid var(--border);border-radius:10px;box-shadow:0 12px 30px rgba(0,0,0,.25);max-height:360px;overflow-y:auto;z-index:1000}
+  .globalSearchResults.open{display:block}
+  .globalSearchItem{display:flex;flex-direction:column;gap:2px;padding:8px 12px;cursor:pointer;border-bottom:1px solid var(--border)}
+  .globalSearchItem:last-child{border-bottom:none}
+  .globalSearchItem:hover{background:var(--surface-soft)}
+  .globalSearchType{font-size:10px;text-transform:uppercase;letter-spacing:.05em;color:#6b766f;font-weight:700}
+  .globalSearchLabel{font-size:14px;font-weight:600}
+  .globalSearchMeta{font-size:12px;color:var(--text-muted)}
+  .globalSearchEmpty{padding:12px;font-size:13px;color:var(--text-muted)}
   .wrap{max-width:1180px;margin:0 auto;padding:24px 20px 60px}
 
   .section{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px 22px;margin-bottom:20px;
@@ -1409,6 +1423,10 @@
       <h1>Panel — centrum pracy firmy</h1>
       <p>Prywatne centrum CRM, dokumentów, kontaktów i operacji.</p>
     </div>
+    <div class="globalSearchBox">
+      <input type="text" id="globalSearchInput" placeholder="🔍 Szukaj wszędzie: telefon, e-mail, nazwa..." oninput="renderGlobalSearch()" onfocus="renderGlobalSearch()" onblur="setTimeout(closeGlobalSearch, 150)">
+      <div id="globalSearchResults" class="globalSearchResults"></div>
+    </div>
     <span id="syncStatus" style="font-size:11px;color:#cfe8d6;margin-left:auto;margin-right:4px"></span>
     <span id="liveSyncBanner" class="lockBtn" style="display:none;background:#c9a24a;border-color:#c9a24a;color:#22331f;font-weight:bold;pointer-events:none">Nowe dane z drugiego urządzenia — zostaną scalone automatycznie</span>
     <a class="lockBtn" href="index.html">Strona główna</a>
@@ -2442,6 +2460,112 @@ function scrollToPanelTarget(targetId){
     const el = document.getElementById(targetId);
     if(el) el.scrollIntoView({behavior:"smooth", block:"start"});
   }, 50);
+}
+
+// ================= Globalne wyszukiwanie (klienci, podwykonawcy, doradcy rolni) =================
+// Jeden pasek w nagłówku zamiast osobnych wyszukiwarek per zakładka - żeby łatwo sprawdzić,
+// czy dany telefon/mail już gdzieś jest w bazie, zanim doda się duplikat.
+function globalSearchCandidates(){
+  const items = [];
+  (data.klienci || []).forEach(c => {
+    if(!c || c.segment === "olx_potencjalny") return; // ci mają własną, osobną listę
+    items.push({
+      type:"klient", id:c.id,
+      label: getClientDisplayName(c) || "Klient bez nazwy",
+      meta: [c.telefon, c.email, c.miejscowosc].filter(Boolean).join(" · "),
+      haystack: [c.firma,c.osoba,c.telefon,c.email,c.miejscowosc,c.wojewodztwo].filter(Boolean).join(" ").toLowerCase()
+    });
+  });
+  (data.klienci || []).forEach(c => {
+    if(!c || c.segment !== "olx_potencjalny") return;
+    items.push({
+      type:"olx", id:c.id,
+      label: c.osoba || c.telefon || "Potencjalny klient OLX",
+      meta: [c.telefon, c.miejscowosc, c.wojewodztwo].filter(Boolean).join(" · "),
+      haystack: [c.osoba,c.telefon,c.miejscowosc,c.wojewodztwo].filter(Boolean).join(" ").toLowerCase()
+    });
+  });
+  (data.podwykonawcy || []).forEach(p => {
+    if(!p) return;
+    items.push({
+      type:"podwykonawca", id:p.id,
+      label: p.nazwa || p.osoba || "Podwykonawca",
+      meta: [p.telefon, p.email, p.lokalizacja].filter(Boolean).join(" · "),
+      haystack: [p.nazwa,p.osoba,p.telefon,p.email,p.lokalizacja,p.coRobia].filter(Boolean).join(" ").toLowerCase()
+    });
+  });
+  (data.doradcyRolni || []).forEach(d => {
+    if(!d) return;
+    const label = [d.imie, d.nazwisko].filter(Boolean).join(" ") || "Doradca rolny";
+    items.push({
+      type:"doradca", id:"", searchValue: d.telefon || d.nazwisko || label,
+      label,
+      meta: [d.telefon, d.email, d.powiat || d.wojewodztwo].filter(Boolean).join(" · "),
+      haystack: [d.imie,d.nazwisko,d.telefon,d.email,d.powiat,d.wojewodztwo].filter(Boolean).join(" ").toLowerCase()
+    });
+  });
+  return items;
+}
+
+function renderGlobalSearch(){
+  const input = document.getElementById("globalSearchInput");
+  const host = document.getElementById("globalSearchResults");
+  if(!input || !host) return;
+  const q = input.value.trim().toLowerCase();
+  if(q.length < 2){ host.classList.remove("open"); host.innerHTML = ""; return; }
+  const digits = q.replace(/\D/g,"");
+  const results = globalSearchCandidates().filter(item =>
+    item.haystack.includes(q) || (digits.length >= 3 && item.haystack.replace(/\D/g,"").includes(digits))
+  ).slice(0, 12);
+  const typeLabel = {klient:"Klient", olx:"Potencjalny OLX", podwykonawca:"Podwykonawca", doradca:"Doradca rolny"};
+  host.innerHTML = results.length
+    ? results.map((r,i) => `
+      <div class="globalSearchItem" onmousedown="openGlobalSearchResult(${i})">
+        <span class="globalSearchType">${crmEsc(typeLabel[r.type] || r.type)}</span>
+        <span class="globalSearchLabel">${crmEsc(r.label)}</span>
+        ${r.meta ? `<span class="globalSearchMeta">${crmEsc(r.meta)}</span>` : ""}
+      </div>
+    `).join("")
+    : '<div class="globalSearchEmpty">Brak wyników.</div>';
+  window.__globalSearchResults = results;
+  host.classList.add("open");
+}
+
+function closeGlobalSearch(){
+  document.getElementById("globalSearchResults")?.classList.remove("open");
+}
+
+function openGlobalSearchResult(index){
+  const r = (window.__globalSearchResults || [])[index];
+  if(!r) return;
+  const input = document.getElementById("globalSearchInput");
+  if(input) input.value = "";
+  closeGlobalSearch();
+
+  if(r.type === "klient" || r.type === "olx"){
+    switchTab("klienci");
+    openClientCard(r.id);
+    return;
+  }
+  if(r.type === "podwykonawca"){
+    switchTab("podwykonawcy");
+    const search = document.getElementById("searchPodwykonawcy");
+    const category = document.getElementById("filterPodwykonawcy");
+    if(category) category.value = "";
+    if(search){ search.value = r.label; renderPodwykonawcy(); }
+    scrollToPanelTarget("list-podwykonawcy");
+    return;
+  }
+  if(r.type === "doradca"){
+    switchTab("doradcy");
+    ["filterDoradcyWoj","filterDoradcyTyp","filterDoradcyStatus"].forEach(id => {
+      const el = document.getElementById(id);
+      if(el) el.value = "";
+    });
+    const search = document.getElementById("searchDoradcy");
+    if(search){ search.value = r.searchValue || r.label; renderDoradcyRolni(); }
+    scrollToPanelTarget("doradcyBody");
+  }
 }
 
 function renderNavigation(){
