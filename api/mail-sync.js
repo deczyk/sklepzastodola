@@ -38,6 +38,21 @@ function findClientByEmail(klienci, email) {
   return (klienci || []).find(c => (c.email || "").toLowerCase().trim() === needle) || null;
 }
 
+function findPodwykonawcaByEmail(podwykonawcy, email) {
+  const needle = String(email || "").toLowerCase().trim();
+  if (!needle) return null;
+  return (podwykonawcy || []).find(p => (p.email || "").toLowerCase().trim() === needle) || null;
+}
+
+// Automatyczne skrzynki (no-reply, powiadomienia systemowe itd.) nie są potencjalnymi
+// klientami/podwykonawcami - nie chcemy zaśmiecać dashboardu takimi "zapytaniami".
+const AUTOMATED_SENDER_PATTERN = /(no-?reply|do-?not-?reply|mailer-daemon|notifications?|postmaster|newsletter)@/i;
+
+function displayNameFromHeader(headerText) {
+  const match = String(headerText || "").match(/^"?([^"<]+?)"?\s*<[^>]+>$/);
+  return match ? match[1].trim() : "";
+}
+
 async function syncMailbox(mailboxKey, mailboxEmail, data, log) {
   const state = data.mailSyncState[mailboxKey] || {};
   const afterEpoch = Number(state.lastInternalDateSec) > 0
@@ -48,8 +63,12 @@ async function syncMailbox(mailboxKey, mailboxEmail, data, log) {
   const ids = await listMessageIdsAfter(mailboxEmail, afterEpoch);
   const newIds = ids.filter(id => !alreadyProcessed.has(id));
 
+  if (!Array.isArray(data.podwykonawcy)) data.podwykonawcy = [];
+  if (!Array.isArray(data.powiadomienia)) data.powiadomienia = [];
+
   let maxInternalDateSec = Number(state.lastInternalDateSec) || 0;
   let matched = 0;
+  let notified = 0;
 
   for (const id of newIds) {
     let message;
@@ -70,18 +89,20 @@ async function syncMailbox(mailboxKey, mailboxEmail, data, log) {
     const otherPartyEmails = (isOutgoing ? toEmails : fromEmails)
       .filter(e => !OWN_ADDRESSES.has(e.toLowerCase()));
 
-    const matchedClients = new Set();
-    otherPartyEmails.forEach(email => {
-      const client = findClientByEmail(data.klienci, email);
-      if (client) matchedClients.add(client);
-    });
-    if (!matchedClients.size) continue;
-
     const tag = isOutgoing ? "Mail wychodzący" : "Mail przychodzący";
     const subject = message.subject || "(bez tematu)";
     const body = clampBody(message.body) || "(brak treści / tylko załączniki)";
     const entryDate = new Date(message.internalDate).toISOString();
     const tekst = `[${tag}] Temat: ${subject}\n\n${body}`;
+
+    const matchedClients = new Set();
+    const matchedVendors = new Set();
+    otherPartyEmails.forEach(email => {
+      const client = findClientByEmail(data.klienci, email);
+      if (client) matchedClients.add(client);
+      const vendor = findPodwykonawcaByEmail(data.podwykonawcy, email);
+      if (vendor) matchedVendors.add(vendor);
+    });
 
     matchedClients.forEach(client => {
       if (!Array.isArray(client.historia)) client.historia = [];
@@ -97,6 +118,45 @@ async function syncMailbox(mailboxKey, mailboxEmail, data, log) {
       client.zaktualizowano = new Date().toISOString();
       matched += 1;
     });
+
+    // Podwykonawcy nie mają osobnej historii (tekstowe pole notatki) - dopisujemy tam,
+    // żeby przynajmniej było widać ślad kontaktu, bez zaśmiecania dashboardu powiadomieniem
+    // o kimś, kogo już znamy.
+    matchedVendors.forEach(vendor => {
+      const marker = `[Mail ${new Date(message.internalDate).toISOString().slice(0, 10)}] ${subject}`;
+      if ((vendor.notatki || "").includes(marker)) return;
+      const note = `${marker}\n${body}`;
+      vendor.notatki = vendor.notatki ? `${vendor.notatki}\n\n${note}` : note;
+      matched += 1;
+    });
+
+    // Nierozpoznany, przychodzący mail (nie od automatu) - trafia na dashboard z przyciskami
+    // do rozesłania: klient / podwykonawca / potencjalny podwykonawca. Maile WYCHODZĄCE do
+    // nieznanych adresów pomijamy - to zwykle korespondencja z dostawcami/urzędami, nie leady.
+    if (!matchedClients.size && !matchedVendors.size && !isOutgoing && otherPartyEmails.length) {
+      const otherEmail = otherPartyEmails[0];
+      if (!AUTOMATED_SENDER_PATTERN.test(otherEmail)) {
+        data.powiadomienia.unshift({
+          id: `n_mail_${id}`,
+          typ: "mail_unmatched",
+          zrodlo: "Mail",
+          tytul: `Nierozpoznany mail od ${otherEmail}`,
+          tekst,
+          data: entryDate,
+          przeczytane: false,
+          klientId: null,
+          mailboxKey,
+          mailMessageId: id,
+          mailFrom: message.from,
+          mailOtherEmail: otherEmail,
+          mailDisplayName: displayNameFromHeader(message.from),
+          mailSubject: subject,
+          mailBody: body
+        });
+        data.powiadomienia = data.powiadomienia.slice(0, 200);
+        notified += 1;
+      }
+    }
   }
 
   data.mailSyncState[mailboxKey] = {
@@ -107,7 +167,7 @@ async function syncMailbox(mailboxKey, mailboxEmail, data, log) {
     processedIds: Array.from(alreadyProcessed).slice(-MAX_PROCESSED_IDS_KEPT)
   };
 
-  return { checked: ids.length, new: newIds.length, matched };
+  return { checked: ids.length, new: newIds.length, matched, notified };
 }
 
 module.exports = async function handler(req, res) {

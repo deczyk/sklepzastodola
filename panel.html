@@ -5925,7 +5925,7 @@ function isAdvisorClient(c){
 }
 
 function getLeadNotifications(){
-  return (Array.isArray(data.powiadomienia) ? data.powiadomienia : []).filter(item => item && item.typ === "lead");
+  return (Array.isArray(data.powiadomienia) ? data.powiadomienia : []).filter(item => item && (item.typ === "lead" || item.typ === "mail_unmatched"));
 }
 
 function renderDashboardNotifications(){
@@ -5936,6 +5936,7 @@ function renderDashboardNotifications(){
   const unreadCount = notifications.filter(item => !item.przeczytane).length;
   badge.textContent = `${unreadCount} nieprzeczytanych`;
   host.innerHTML = notifications.length ? notifications.slice(0,5).map(item => {
+    if(item.typ === "mail_unmatched") return renderMailUnmatchedNotification(item);
     const client = (data.klienci || []).find(c => c.id === item.klientId);
     const clientLabel = client ? getClientDisplayName(client) : "Klient spoza bazy";
     const clientMeta = client ? (clientContact(client) || clientLocation(client) || "brak kontaktu") : "brak danych klienta";
@@ -5956,6 +5957,77 @@ function renderDashboardNotifications(){
     `;
   }).join("") + (unreadCount ? `<div class="notifyActions" style="margin-top:10px"><button class="histBtn" onclick="markAllNotificationsRead()">Oznacz wszystkie jako przeczytane</button></div>` : "")
   : '<div class="dashEmpty">Brak nowych powiadomień leadowych.</div>';
+}
+
+// Nierozpoznany mail (nadawca nie pasuje do żadnego klienta ani podwykonawcy) - Kuba/tata
+// decydują ręcznie czym to jest, zamiast panelu zgadującego automatycznie.
+function renderMailUnmatchedNotification(item){
+  const preview = crmShort((item.mailBody || item.tekst || "").replace(/^\[[^\]]*\]\s*/, ""), 220);
+  return `
+    <div class="notifyCard">
+      <div class="notifyTop">
+        <span class="notifySource">✉️ Mail</span>
+        <span class="notifyDate">${crmEsc(formatDT(item.data))}</span>
+      </div>
+      <div class="notifyClient">${crmEsc(item.mailDisplayName || item.mailOtherEmail || "Nieznany nadawca")}</div>
+      <div class="notifyMeta">${crmEsc(item.mailOtherEmail || "")}</div>
+      <div class="notifyMeta">${crmEsc(item.mailSubject || "")}</div>
+      <div class="notifyMeta" style="color:var(--text-muted)">${crmEsc(preview)}</div>
+      ${item.przeczytane ? '<span class="kanbanPill gold">Rozesłane / przeczytane</span>' : `
+      <div class="notifyActions">
+        <button class="histBtn" onclick="routeMailNotification('${crmEsc(item.id)}','klient')">→ Klient</button>
+        <button class="histBtn" onclick="routeMailNotification('${crmEsc(item.id)}','podwykonawca')">→ Podwykonawca</button>
+        <button class="histBtn" onclick="routeMailNotification('${crmEsc(item.id)}','potencjalny_podwykonawca')">→ Potencjalny podwykonawca</button>
+        <button class="doneBtn" onclick="markNotificationRead('${crmEsc(item.id)}')">Ignoruj / przeczytane</button>
+      </div>`}
+    </div>
+  `;
+}
+
+// target: "klient" | "podwykonawca" | "potencjalny_podwykonawca" (to samo co podwykonawca,
+// tylko status "do sprawdzenia" - w bazie podwykonawców to już istniejące, osobne pole,
+// więc nie zakładamy dla tego osobnej struktury danych).
+function routeMailNotification(notificationId, target){
+  const item = (data.powiadomienia || []).find(entry => entry.id === notificationId);
+  if(!item || item.typ !== "mail_unmatched") return;
+  const email = item.mailOtherEmail || "";
+  const name = item.mailDisplayName || email || "Kontakt z maila";
+  const now = new Date().toISOString();
+  const tekst = item.tekst || `[Mail] Temat: ${item.mailSubject || ""}\n\n${item.mailBody || ""}`;
+
+  if(target === "klient"){
+    if(!Array.isArray(data.klienci)) data.klienci = [];
+    data.klienci.push({
+      id: `c_${Date.now()}_${Math.random().toString(36).slice(2,7)}`,
+      firma: "", osoba: name, email, telefon: "",
+      wojewodztwo: "", miejscowosc: "", ulica: "",
+      zainteresowanie: "", produkt: "",
+      zrodloLeada: "Mail", kategoriaLeada: "Mail",
+      status: "kontakt", priorytet: "B",
+      notatki: "", nastepnyFollowup: "",
+      utworzono: now, zaktualizowano: now,
+      historia: [{tekst, kto: `System (${item.mailboxKey || "mail"})`, data: item.data || now, utworzono: now}],
+      oferty: []
+    });
+    logActivity(`rozesłał(a) mail od ${email || name} jako nowego klienta`);
+  } else {
+    const status = target === "potencjalny_podwykonawca" ? "do sprawdzenia" : "aktywny";
+    if(!Array.isArray(data.podwykonawcy)) data.podwykonawcy = [];
+    data.podwykonawcy.push({
+      id: `v_${Date.now()}_${Math.random().toString(36).slice(2,7)}`,
+      nazwa: name, kategoria: "inne", status,
+      osoba: name, telefon: "", email,
+      strona: "", lokalizacja: "",
+      coRobia: "", cennik: "",
+      notatki: tekst,
+      utworzono: now, zaktualizowano: now
+    });
+    logActivity(`rozesłał(a) mail od ${email || name} jako ${status === "do sprawdzenia" ? "potencjalnego podwykonawcę" : "podwykonawcę"}`);
+  }
+
+  item.przeczytane = true;
+  saveData();
+  render();
 }
 
 function markNotificationRead(notificationId){
