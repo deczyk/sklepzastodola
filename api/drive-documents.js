@@ -301,7 +301,12 @@ async function downloadNoteAudioFile(token, fileId) {
   const audioFolderIds = await findChildFolders(token, GOOGLE_DRIVE_FOLDER_ID, NOTES_AUDIO_FOLDER_NAME);
   const parents = Array.isArray(metadata.parents) ? metadata.parents : [];
   if (!audioFolderIds.length || !parents.some(parentId => audioFolderIds.includes(parentId))) {
-    const error = new Error("Requested file is not a panel audio note.");
+    // Tymczasowa diagnostyka (do usunięcia po znalezieniu przyczyny): pokazujemy w komunikacie
+    // błędu co faktycznie zwrócił Drive, żeby nie zgadywać na ślepo dlaczego plik jest odrzucany.
+    const error = new Error(
+      `Requested file is not a panel audio note. [debug: parents=${JSON.stringify(parents)} ` +
+      `audioFolders=${JSON.stringify(audioFolderIds)} root=${GOOGLE_DRIVE_FOLDER_ID}]`
+    );
     error.statusCode = 403;
     throw error;
   }
