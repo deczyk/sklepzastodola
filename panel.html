@@ -7663,7 +7663,7 @@ function renderOlxPotencjalni(list){
     <div class="terminItem">
       <div class="terminDate">${c.telefon ? `<a href="tel:${crmEsc(phoneDigits(c.telefon))}">${crmEsc(c.telefon)}</a>` : "—"}</div>
       <div class="terminInfo">
-        <div class="nazwa">${c.wojewodztwo ? crmEsc(c.wojewodztwo)+" · " : ""}${c.linkOlx ? `<a href="${crmEsc(c.linkOlx)}" target="_blank" rel="noopener">Ogłoszenie OLX ↗</a>` : "Bez linku OLX"}</div>
+        <div class="nazwa">${c.osoba ? crmEsc(c.osoba)+" — " : ""}${c.miejscowosc ? crmEsc(c.miejscowosc)+(c.wojewodztwo?", ":"") : ""}${c.wojewodztwo ? crmEsc(c.wojewodztwo)+" · " : ""}${c.linkOlx ? `<a href="${crmEsc(c.linkOlx)}" target="_blank" rel="noopener">Ogłoszenie OLX ↗</a>` : "Bez linku OLX"}</div>
         <div class="notatka">${crmEsc(c.notatki || "")}</div>
       </div>
       <button class="doneBtn" onclick="graduateOlxLead('${crmEsc(c.id)}')" title="Klient zainteresowany — przenieś do zwykłej bazy">→ Do bazy klientów</button>
@@ -7733,7 +7733,9 @@ function addOlxLead(){
 
 function exportOlxLeadsToXlsx(){
   const rows = (data.klienci||[]).filter(c => c.segment === "olx_potencjalny").map(c => ({
+    "Sprzedawca / nick OLX": c.osoba || "",
     "Telefon": c.telefon || "",
+    "Miejscowość": c.miejscowosc || "",
     "Województwo": c.wojewodztwo || "",
     "Link OLX": c.linkOlx || "",
     "Status": STATUS_OPTS.find(s=>s[0]===c.status)?.[1] || c.status || "",
@@ -7779,15 +7781,20 @@ async function importOlxLeadsFromSelectedXlsx(input){
     let added = 0, updated = 0, skipped = 0;
     const now = new Date().toISOString();
     rows.forEach(r => {
-      const telefon = formatPhonePL(xlsxLooseVal(r, ["Telefon","Tel","Numer","Numer telefonu","Nr telefonu","Phone"]));
+      const telefon = formatPhonePL(xlsxLooseVal(r, ["Telefon","Tel","Nr tel","Nr tel.","Numer","Numer telefonu","Nr telefonu","Phone"]));
       const wojewodztwo = xlsxLooseVal(r, ["Wojewodztwo","Województwo","Region"]);
+      const miejscowosc = xlsxLooseVal(r, ["Miejscowosc","Miejscowość","Miasto","Lokalizacja"]);
+      const osoba = xlsxLooseVal(r, ["Sprzedawca","Nick OLX","Sprzedawca / nick OLX","Sprzedawca/nick OLX","Nick","Sprzedawca / Nick"]);
+      const dataOgloszenia = xlsxLooseVal(r, ["Data ogloszenia / odswiezenia","Data ogłoszenia / odświeżenia","Data ogloszenia","Data ogłoszenia","Data"]);
       const linkOlx = xlsxLooseVal(r, ["Link","Link OLX","OLX","Ogloszenie","Ogłoszenie","URL","Link do ogloszenia","Link do ogłoszenia"]);
-      const notatka = xlsxLooseVal(r, ["Notatka","Notatki","Uwagi","Opis"]);
+      const notatka = xlsxLooseVal(r, ["Notatka","Notatki","Uwagi","Opis"]) || (dataOgloszenia ? `Ogłoszenie z: ${dataOgloszenia}` : "");
       if(!telefon){ skipped++; return; }
       const existing = findClientByPhone(telefon);
       if(existing){
         if(!existing.linkOlx && linkOlx) existing.linkOlx = linkOlx;
         if(!existing.wojewodztwo && wojewodztwo) existing.wojewodztwo = wojewodztwo;
+        if(!existing.miejscowosc && miejscowosc) existing.miejscowosc = miejscowosc;
+        if(!existing.osoba && osoba) existing.osoba = osoba;
         const importNote = notatka || "Import OLX: wysłano wiadomość na OLX.";
         if(!(existing.notatki||"").includes(importNote)) existing.notatki = existing.notatki ? `${existing.notatki}\n\n${importNote}` : importNote;
         existing.zaktualizowano = now;
@@ -7796,7 +7803,7 @@ async function importOlxLeadsFromSelectedXlsx(input){
       }
       data.klienci.push({
         id:"c_"+Date.now()+"_"+added,
-        telefon, wojewodztwo, linkOlx,
+        telefon, wojewodztwo, miejscowosc, osoba, linkOlx,
         segment:"olx_potencjalny",
         zrodloLeada:"OLX",
         kategoriaLeada:"Potencjalny OLX",
