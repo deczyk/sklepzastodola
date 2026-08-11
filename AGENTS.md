@@ -128,6 +128,13 @@ Zasady:
 - Cenniki od Alfreda Bruni i partnerskie trzymaj tylko w panelu jako wewnętrzne.
 - Publiczne materiały mogą iść na stronę tylko po wyraźnej zgodzie.
 
+## Maile do klientów (api/_email.js, api/mail-send.js)
+
+Panel nie zna i nie zgaduje płci klienta. Nigdy nie używaj „Szanowny Panie” / „Szanowna Pani”
+ani czasowników zależnych od rodzaju („zrobiłeś”/„zrobiłaś”). Zawsze forma neutralna:
+„Dzień dobry, {imię},” + „Ty/Twój” + tryb rozkazujący („Skonfiguruj swój projekt”) — te formy
+nie odmieniają się przez rodzaj w polskim.
+
 ## Strona publiczna
 
 Nie dodawaj na publiczną stronę:

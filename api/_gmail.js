@@ -12,13 +12,19 @@ const crypto = require("crypto");
 //    konto serwisowe -> zakładka "Szczegóły" -> skopiuj "Unikalny identyfikator" (długi
 //    numer, NIE e-mail konta serwisowego).
 // 2. admin.google.com -> Bezpieczeństwo -> Kontrola dostępu do API -> Delegowanie
-//    dostępu na poziomie domeny -> Dodaj nowe -> ID klienta = ten numer z kroku 1,
-//    zakresy OAuth = https://www.googleapis.com/auth/gmail.readonly
-// Bez tego GMAIL_SYNC_ENABLED zwróci błąd 403 "unauthorized_client" przy próbie
-// synchronizacji - to nie jest błąd w kodzie, tylko brak tego kroku.
+//    dostępu na poziomie domeny -> znajdź wpis z tym ID klienta (jeśli już był dodany
+//    tylko z gmail.readonly - EDYTUJ go, nie dodawaj drugiego wpisu) -> zakresy OAuth:
+//    https://www.googleapis.com/auth/gmail.readonly,https://www.googleapis.com/auth/gmail.send
+// Bez tego zapytania do Gmail API zwrócą błąd 403 "unauthorized_client" - to nie jest
+// błąd w kodzie, tylko brak tego kroku (albo brak zakresu gmail.send przy wysyłce).
 const GOOGLE_SERVICE_ACCOUNT_EMAIL = process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL;
 const GOOGLE_PRIVATE_KEY = process.env.GOOGLE_PRIVATE_KEY;
-const GMAIL_READONLY_SCOPE = "https://www.googleapis.com/auth/gmail.readonly";
+// Jeden token na skrzynkę obejmuje oba zakresy naraz - prościej niż osobne tokeny do
+// czytania i wysyłki, i wymaga tylko jednej listy zakresów po stronie Workspace Admin.
+const GMAIL_SCOPES = [
+  "https://www.googleapis.com/auth/gmail.readonly",
+  "https://www.googleapis.com/auth/gmail.send"
+].join(" ");
 
 // Skrzynki, które panel ma obserwować. Nazwa po lewej to tylko klucz do zapisu stanu
 // synchronizacji (data.mailSyncState) - nie musi się zmieniać, nawet gdyby adres kiedyś
@@ -58,7 +64,7 @@ async function getGmailAccessToken(mailboxEmail) {
 
   const jwt = signJwt({
     iss: GOOGLE_SERVICE_ACCOUNT_EMAIL,
-    scope: GMAIL_READONLY_SCOPE,
+    scope: GMAIL_SCOPES,
     aud: "https://oauth2.googleapis.com/token",
     sub: mailboxEmail,
     iat: now,
@@ -87,11 +93,16 @@ async function getGmailAccessToken(mailboxEmail) {
   return json.access_token;
 }
 
-async function gmailFetch(mailboxEmail, path, params) {
+async function gmailFetch(mailboxEmail, path, params, postBody) {
   const token = await getGmailAccessToken(mailboxEmail);
   const query = params ? `?${new URLSearchParams(params).toString()}` : "";
   const res = await fetch(`https://gmail.googleapis.com/gmail/v1/users/me/${path}${query}`, {
-    headers: { Authorization: `Bearer ${token}` }
+    method: postBody ? "POST" : "GET",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      ...(postBody ? { "Content-Type": "application/json" } : {})
+    },
+    ...(postBody ? { body: JSON.stringify(postBody) } : {})
   });
   const json = await res.json().catch(() => ({}));
   if (!res.ok) {
@@ -207,6 +218,42 @@ async function getAttachmentData(mailboxEmail, messageId, attachmentId) {
   return { size: Number(json.size || 0), data: json.data || "" };
 }
 
+// Nagłówki z polskimi znakami (temat, imię i nazwisko nadawcy) muszą być zakodowane wg
+// RFC 2047, inaczej Gmail API/serwery odbiorcy mogą je pokazać jako krzaki. Czysty ASCII
+// zostaje bez zmian (nie ma sensu owijać go w =?UTF-8?B?...?= bez potrzeby).
+function encodeRfc2047(text) {
+  const value = String(text || "");
+  if (/^[\x00-\x7F]*$/.test(value)) return value;
+  return `=?UTF-8?B?${Buffer.from(value, "utf8").toString("base64")}?=`;
+}
+
+function buildRawMessage({ fromEmail, fromName, to, subject, body, inReplyToMessageId, references }) {
+  const headerLines = [
+    `From: ${fromName ? `${encodeRfc2047(fromName)} <${fromEmail}>` : fromEmail}`,
+    `To: ${to}`,
+    `Subject: ${encodeRfc2047(subject)}`,
+    "MIME-Version: 1.0",
+    'Content-Type: text/plain; charset="UTF-8"',
+    "Content-Transfer-Encoding: 8bit"
+  ];
+  if (inReplyToMessageId) headerLines.push(`In-Reply-To: ${inReplyToMessageId}`);
+  if (references) headerLines.push(`References: ${references}`);
+  const raw = `${headerLines.join("\r\n")}\r\n\r\n${body}`;
+  return base64url(Buffer.from(raw, "utf8"));
+}
+
+// mailboxEmail wysyła JAKO siebie (impersonacja przez "sub" w tokenie) - to jest prawdziwa
+// wysyłka z konta Gmail, nie przez zewnętrzny serwis, więc trafia do Wysłanych na tej
+// skrzynce i ma normalną reputację nadawcy zamiast transakcyjnej.
+async function sendMessage(mailboxEmail, { fromName, to, subject, body, threadId }) {
+  const raw = buildRawMessage({ fromEmail: mailboxEmail, fromName, to, subject, body });
+  const json = await gmailFetch(mailboxEmail, "messages/send", null, {
+    raw,
+    ...(threadId ? { threadId } : {})
+  });
+  return { id: json.id, threadId: json.threadId };
+}
+
 module.exports = {
   hasGmailConfig,
   WATCHED_MAILBOXES,
@@ -214,6 +261,7 @@ module.exports = {
   listMessageIdsAfter,
   getMessage,
   getAttachmentData,
+  sendMessage,
   decodeBase64UrlToBuffer,
   extractEmails
 };

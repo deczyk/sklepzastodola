@@ -116,6 +116,7 @@ Dokument KRS traktować jako poufny i przechowywać wyłącznie prywatnie.
 - Nie dublować dokumentów. Panel ma mieć jeden aktualny plik dla każdej ważnej rzeczy.
 - Dokumenty podpisane i formalne mają być w panelu, żeby nic nie zginęło.
 - Cenniki od Alfreda Bruni, cenniki partnerskie, marże, podpisane dokumenty KRS i umowy są wewnętrzne — nie publikować ich na stronie publicznej.
+- Panel nie zna i nie zgaduje płci klienta. W automatycznych mailach do klientów (api/_email.js, wszystko generowane przez AI) nigdy nie używać „Szanowny Panie" / „Szanowna Pani" ani czasowników w formie zależnej od rodzaju („zrobiłeś”/„zrobiłaś”, „przygotował”/„przygotowała”). Zawsze forma neutralna: „Dzień dobry, {imię},” + zwrot „Ty/Twój” i tryb rozkazujący („Skonfiguruj swój projekt”) — te formy nie odmieniają się przez rodzaj w polskim, więc nie ma ryzyka złego zaimka.
 
 ## Aktualne liczby robocze
 Kurs planistyczny: 1 EUR = 4,30 zł.
