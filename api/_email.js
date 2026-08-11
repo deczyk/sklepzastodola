@@ -407,5 +407,6 @@ module.exports = {
   buildAdvisorEmailHtml,
   buildAdvisorEmailText,
   buildOfferShowcaseEmailHtml,
-  buildOfferShowcaseEmailText
+  buildOfferShowcaseEmailText,
+  htmlToPlainFallback
 };
