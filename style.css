@@ -86,3 +86,20 @@
 .error-shortcuts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.65rem;margin-top:2.2rem}
 .error-shortcuts a{padding:.85rem 1rem;background:var(--paper);border:1px solid var(--line);border-radius:var(--r);font-weight:700;color:var(--forest);text-decoration:none}
 @media(max-width:720px){.related-links-grid,.error-shortcuts{grid-template-columns:1fr}.related-links-grid a{border-right:0;border-bottom:1px solid var(--line)}.related-links-grid a:last-child{border-bottom:0}.site-breadcrumb{margin-bottom:1rem}}
+
+/* Baner cookies (statyczny div #cookie wbudowany w każdą stronę - patrz nav.js dla logiki
+   pokaż/ukryj i przesunięcia nad mobilny pasek "Zadzwoń"). Reguły przywrócone po regresji
+   z 5d41e7e, która błędnie usunęła je jako "martwe" - w rzeczywistości to jedyny styling
+   tego diva, bo JS-owa w pełni inline'owana wersja w nav.js nigdy się nie tworzy (element
+   #cookie zawsze już istnieje w statycznym HTML). */
+.cookie{position:fixed;bottom:1.3rem;left:50%;transform:translateX(-50%) translateY(140px);z-index:9999;background:var(--paper);border:1px solid var(--line);border-radius:var(--r-lg);padding:1.1rem 1.4rem;display:flex;align-items:center;gap:1.3rem;flex-wrap:wrap;max-width:660px;width:calc(100% - 2.5rem);box-shadow:var(--shadow-lg);transition:transform .4s cubic-bezier(.22,1,.36,1)}
+.cookie.show{transform:translateX(-50%) translateY(0)}
+.cookie p{font-size:.81rem;color:var(--muted);line-height:1.55;flex:1;min-width:160px}
+.cookie a{color:var(--forest);text-decoration:underline}
+.cookie-btns{display:flex;gap:.5rem;flex-shrink:0}
+.ck-yes,.ck-no{font-size:.76rem;font-weight:700;padding:.45rem 1rem;border-radius:var(--r);border:none;cursor:pointer;transition:background .18s}
+.ck-yes{background:var(--forest);color:#fff}
+.ck-yes:hover{background:var(--moss)}
+.ck-no{background:var(--bg2);color:var(--muted);border:1px solid var(--line)}
+.ck-no:hover{background:var(--bg3);color:var(--ink)}
+@media(max-width:600px){.cookie{bottom:calc(64px + .8rem)}}
