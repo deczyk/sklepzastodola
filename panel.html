@@ -210,6 +210,15 @@
                 align-items:center;justify-content:center}
   .previewModal.open{display:flex}
   #historyModal{z-index:210}
+  #followupReminderModal{z-index:220}
+  .followupReminderBox{border:3px solid #c0392b}
+  .followupReminderTitle{margin:0 0 14px;color:#c0392b;font-size:20px}
+  .followupReminderItem{border:1px solid #e6b3ad;background:#fdecea;border-radius:10px;padding:12px 14px;margin-bottom:10px}
+  body.dark-theme .followupReminderItem{background:rgba(239,83,80,.12);border-color:#7a3530}
+  .followupReminderItem b{display:block;margin-bottom:4px;color:#9d3026}
+  body.dark-theme .followupReminderItem b{color:#ffb4b2}
+  .followupReminderItem p{margin:0 0 10px;font-size:14px;line-height:1.4}
+  .followupReminderActions{display:flex;gap:8px;flex-wrap:wrap}
   .previewBox{background:var(--surface);border-radius:10px;width:90vw;height:88vh;position:relative;overflow:hidden}
   .previewBox iframe{width:100%;height:100%;border:none}
   .previewClose{position:absolute;top:10px;right:10px;z-index:5;background:var(--green);color:white;
@@ -2343,6 +2352,14 @@
     </div>
   </div>
 
+  <div id="followupReminderModal" class="previewModal" onclick="if(event.target===this) closeFollowupReminder()">
+    <div class="clientCardBox followupReminderBox">
+      <button class="previewClose" onclick="closeFollowupReminder()">Zamknij</button>
+      <h2 class="followupReminderTitle">⚠️ Wymaga działania</h2>
+      <div id="followupReminderList"></div>
+    </div>
+  </div>
+
   <div id="clientCardModal" class="previewModal" onclick="if(event.target===this) closeClientCard()">
     <div class="clientCardBox">
       <button class="previewClose" onclick="closeClientCard()">Zamknij</button>
@@ -3331,6 +3348,7 @@ async function initApp(){
   }
   updateUnsyncedBanner();
   render();
+  showFollowupReminderPopup();
   if(resetDriveCatalog){
     sessionStorage.setItem("panel_drive_auto_sync_done","1");
     await syncDocumentsFromDrive({silent:true, auto:true});
@@ -5867,6 +5885,90 @@ function isOverdueFollowup(c){
 function isTodayFollowup(c){
   const followup = dateOnlyLocal(c.nastepnyFollowup);
   return !!followup && followup.getTime() === startOfToday().getTime();
+}
+
+// Klient bez ustawionego następnego kontaktu, u którego nic się nie działo od dłuższego
+// czasu - to inny przypadek niż "po terminie" (tam termin był i minął), tu w ogóle nikt
+// nie zaplanował następnego kroku, więc łatwo o nim po prostu zapomnieć.
+const STALE_NO_FOLLOWUP_DAYS = 5;
+function isStaleNoFollowup(c){
+  if(c.nastepnyFollowup) return false;
+  const last = getLastClientActivity(c);
+  const lastDate = last ? dateOnlyLocal(last.data || last.utworzono) : dateOnlyLocal(c.utworzono);
+  if(!lastDate) return false;
+  const days = Math.round((startOfToday().getTime() - lastDate.getTime()) / 86400000);
+  return days >= STALE_NO_FOLLOWUP_DAYS;
+}
+
+// Popup przypomnień (patrz showFollowupReminderPopup) - zamknięte dziś pozycje nie wracają
+// do jutra, ale JEŚLI klient nadal nic nie ma ustawione, przypomnienie samo wróci następnego
+// dnia. To NIE jest trwałe "wyciszenie na zawsze" - tylko "dziś już widziałem, odczep się".
+function isFollowupReminderDismissedToday(c){
+  return c._reminderDismissedAt === formatDateOnly(startOfToday());
+}
+
+function getFollowupReminderItems(){
+  const clients = (Array.isArray(data.klienci) ? data.klienci : [])
+    .filter(c => c.segment !== "olx_potencjalny" && !["wygrany","przegrany"].includes(c.status))
+    .filter(c => !isFollowupReminderDismissedToday(c));
+  const items = [];
+  clients.filter(isOverdueFollowup).forEach(c => {
+    items.push({
+      client: c,
+      text: `${getClientDisplayName(c)} — kontakt po terminie (był ustawiony na ${formatDT(c.nastepnyFollowup)})!! Napisz co zrobiłeś i uzupełnij następny kontakt.`
+    });
+  });
+  clients.filter(isStaleNoFollowup).forEach(c => {
+    const last = getLastClientActivity(c);
+    const lastDateStr = formatDT((last && (last.data || last.utworzono)) || c.utworzono);
+    items.push({
+      client: c,
+      text: `Ostatni kontakt z ${getClientDisplayName(c)}: ${lastDateStr} — napisz co z nim zrobiłeś albo zadzwoń!`
+    });
+  });
+  return items;
+}
+
+function renderFollowupReminderList(){
+  const host = document.getElementById("followupReminderList");
+  if(!host) return;
+  const items = getFollowupReminderItems();
+  if(!items.length){ closeFollowupReminder(); return; }
+  host.innerHTML = items.map((item,index) => `
+    <div class="followupReminderItem">
+      <b>${crmEsc(item.client.firma || item.client.osoba || "Klient")}</b>
+      <p>${crmEsc(item.text)}</p>
+      <div class="followupReminderActions">
+        <button class="histBtn" onclick="openFollowupReminderClient('${crmEsc(item.client.id)}')">Otwórz klienta</button>
+        <button class="doneBtn" onclick="dismissFollowupReminder(${index})">Zamknij tę notatkę</button>
+      </div>
+    </div>
+  `).join("");
+}
+
+function showFollowupReminderPopup(){
+  if(!getFollowupReminderItems().length) return;
+  renderFollowupReminderList();
+  document.getElementById("followupReminderModal")?.classList.add("open");
+}
+
+function closeFollowupReminder(){
+  document.getElementById("followupReminderModal")?.classList.remove("open");
+}
+
+function dismissFollowupReminder(index){
+  const items = getFollowupReminderItems();
+  const item = items[index];
+  if(item) item.client._reminderDismissedAt = formatDateOnly(startOfToday());
+  saveData();
+  renderFollowupReminderList();
+  if(!getFollowupReminderItems().length) closeFollowupReminder();
+}
+
+function openFollowupReminderClient(clientId){
+  closeFollowupReminder();
+  switchTab("klienci");
+  openClientCard(clientId);
 }
 
 function isRecentLead(c){
