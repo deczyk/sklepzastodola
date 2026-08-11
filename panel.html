@@ -765,6 +765,15 @@
   .followAction{white-space:nowrap}
   .clientCardBox{background:var(--surface);border:1px solid var(--border);border-radius:14px;max-width:780px;width:calc(100vw - 36px);max-height:88vh;overflow:auto;padding:22px;
                  box-shadow:0 24px 70px #10201833}
+  .clientCardSection{margin-top:14px;border:1px solid var(--border);border-radius:12px;background:var(--surface-soft)}
+  .clientCardSection > summary{list-style:none;cursor:pointer;padding:10px 14px;font-weight:700;font-size:14px;color:var(--text);
+    display:flex;align-items:center;gap:8px;user-select:none}
+  .clientCardSection > summary::-webkit-details-marker{display:none}
+  .clientCardSection > summary::before{content:"▸";font-size:11px;color:var(--text-muted);transition:transform .15s}
+  .clientCardSection[open] > summary::before{transform:rotate(90deg)}
+  .clientCardSection > summary + *{margin-top:0}
+  .clientCardSection > *:not(summary){padding:0 14px 14px}
+  .clientCardSection .clientBriefSection,.clientCardSection .clientAdvisorSection{margin-top:0;border:0;background:transparent;padding:0}
   .clientCardTop{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;border-bottom:1px solid var(--line);
                  padding-bottom:14px;margin-bottom:14px}
   .clientCardTop h2{margin:0 0 4px;color:var(--text)}
@@ -6698,6 +6707,15 @@ function renderFollowupItem(c){
   `;
 }
 
+// Karta klienta urosła (Advisor, kalkulator scenariuszy, Brief, dokumenty, historia,
+// oferty...) - na telefonie robi się z tego długie przewijanie. Zwijamy mniej pilne sekcje
+// w natywne <details> (bez JS, nic nie znika - tylko domyślnie schowane) zamiast budować
+// osobny system zakładek, żeby nie ruszać logiki renderowania w środku każdej sekcji.
+function wrapCollapsible(title, html, openByDefault){
+  if(!html || !html.trim()) return "";
+  return `<details class="clientCardSection"${openByDefault ? " open" : ""}><summary>${crmEsc(title)}</summary>${html}</details>`;
+}
+
 function openClientCard(clientId){
   currentClientCardId = clientId;
   const c = data.klienci.find(x=>x.id===clientId);
@@ -6740,18 +6758,20 @@ function openClientCard(clientId){
       <div class="clientCardField"><b>Priorytet</b>${clientField(c,null,"prio")}</div>
       <div class="clientCardField"><b>Strona internetowa</b>${clientField(c,"strona")}${c.strona ? ` <a href="${crmEsc(safeDocumentHref(c.strona) || ("https://"+c.strona))}" target="_blank" rel="noopener" class="mapPin" title="Otwórz stronę klienta">↗</a>` : ""}</div>
     </div>
-    ${renderBriefConfigSection(c)}
-    ${renderAdvisorResultSection(c)}
-    ${renderQuickClientUpdate(c)}
-    ${renderClientDocuments(c)}
-    <div class="clientCardHistory">
-      <div class="clientCardHistoryHead">
-        <b>Historia kontaktu (${historyCount})</b>
-        <button class="histBtn" onclick="openHistoryModal(currentClientCardId)">Zarządzaj historią</button>
+    ${wrapCollapsible("Brief (konfigurator)", renderBriefConfigSection(c), false)}
+    ${wrapCollapsible("Advisor (ankieta i kalkulator scenariuszy)", renderAdvisorResultSection(c), false)}
+    ${wrapCollapsible("✏️ Szybka aktualizacja", renderQuickClientUpdate(c), true)}
+    ${wrapCollapsible("📁 Dokumenty", renderClientDocuments(c), false)}
+    <details class="clientCardSection" open>
+      <summary>Historia kontaktu (${historyCount})</summary>
+      <div class="clientCardHistory">
+        <div class="clientCardHistoryHead">
+          <button class="histBtn" onclick="openHistoryModal(currentClientCardId)">Zarządzaj historią</button>
+        </div>
+        ${renderHistoryTimeline(c, false)}
       </div>
-      ${renderHistoryTimeline(c, false)}
-    </div>
-    ${renderClientOffers(c)}
+    </details>
+    ${wrapCollapsible("💼 Oferty", renderClientOffers(c), false)}
     <div class="clientDangerZone">
       <button class="dangerBtn" onclick="deleteClient('${crmEsc(c.id)}')">Usuń klienta</button>
     </div>
