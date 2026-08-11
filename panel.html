@@ -773,6 +773,7 @@
   .advisorScenarioDofin .advisorScenarioField{max-width:340px}
   .advisorScenarioResults{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:4px 16px;font-size:13px;line-height:1.5}
   .advisorScenarioResults b{color:#6b766f;font-weight:600}
+  .advisorScenarioMeta{margin-top:8px;font-size:11px;color:var(--text-muted);font-style:italic}
   .lastActivity{margin-top:6px;font-size:12px;color:var(--text-muted);line-height:1.35}
   .lastActivityBadge{display:inline-flex;max-width:100%;border:1px solid #ead99a;background:#fff8df;color:#755c15;border-radius:8px;
       padding:4px 7px;font-size:12px;line-height:1.3}
@@ -6883,6 +6884,7 @@ function renderAdvisorScenarioCalculator(c, entry){
         </label>
       </div>
       <div class="advisorScenarioResults" id="advisorScenarioResults-${c.id}">${renderAdvisorScenarioResults(results)}</div>
+      <div class="advisorScenarioMeta" id="advisorScenarioMeta-${c.id}">${crmEsc(advisorScenarioMetaText(c.advisorScenarioMeta))}</div>
     </div>
   `;
 }
@@ -6908,8 +6910,19 @@ function commitAdvisorScenario(clientId){
   const c = data.klienci.find(x=>x.id===clientId);
   if(!c) return;
   c.advisorScenario = readAdvisorScenarioFromDom(clientId);
+  // Dyskretny ślad korekty - żeby było widać, że to nie jest to, co realnie wysłał klient,
+  // tylko poprawiony przez nas scenariusz. Nie idzie do historii kontaktu (za dużo szumu przy
+  // każdej drobnej zmianie liczby), tylko cichy znacznik przy samym kalkulatorze.
+  c.advisorScenarioMeta = { kiedy: new Date().toISOString(), kto: getWhoAmI() };
   c.zaktualizowano = new Date().toISOString();
   saveData();
+  const noteEl = document.getElementById(`advisorScenarioMeta-${clientId}`);
+  if(noteEl) noteEl.textContent = advisorScenarioMetaText(c.advisorScenarioMeta);
+}
+
+function advisorScenarioMetaText(meta){
+  if(!meta || !meta.kiedy) return "";
+  return `Poprawione ręcznie: ${formatDT(meta.kiedy)} (${meta.kto || "?"})`;
 }
 
 function renderAdvisorResultSection(c){
