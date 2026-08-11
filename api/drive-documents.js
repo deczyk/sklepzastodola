@@ -233,16 +233,19 @@ async function findChildFolder(token, parentId, name) {
   return (json.files && json.files[0] && json.files[0].id) || "";
 }
 
-// Jak findChildFolder, ale zwraca WSZYSTKIE dopasowania. Używane tam, gdzie musimy
-// rozpoznać przynależność pliku do folderu niezależnie od lokalnego cache ID folderu
-// (np. gdyby na skutek równoległych cold startów serverless powstał zduplikowany
-// folder o tej samej nazwie — cache w jednej instancji mógłby wskazywać na inny ID
-// niż ten, do którego trafił konkretny plik).
-async function findChildFolders(token, parentId, name) {
+// Szuka WSZYSTKICH folderów o danej nazwie w całym wspólnym dysku firmowym (nie tylko
+// bezpośrednich dzieci jednego folderu-rodzica). Używane tam, gdzie musimy rozpoznać
+// przynależność pliku do folderu "logicznie", niezależnie od tego, jak głęboko dany
+// folder jest obecnie zagnieżdżony — np. stare notatki audio sprzed przeniesienia panelu
+// na wspólny dysk firmowy leżą w folderze "Nagrania z notatek" zagnieżdżonym głębiej
+// (w starym, przeniesionym drzewie), a nie bezpośrednio pod głównym folderem panelu.
+async function findFoldersAnywhereInDrive(token, driveId, name) {
   const params = new URLSearchParams({
-    q: `'${parentId}' in parents and trashed = false and mimeType = '${DRIVE_FOLDER_MIME_TYPE}' and name = '${name.replace(/'/g, "\\'")}'`,
+    q: `trashed = false and mimeType = '${DRIVE_FOLDER_MIME_TYPE}' and name = '${name.replace(/'/g, "\\'")}'`,
     fields: "files(id,name)",
-    pageSize: "50",
+    pageSize: "100",
+    corpora: "drive",
+    driveId,
     supportsAllDrives: "true",
     includeItemsFromAllDrives: "true"
   });
@@ -250,7 +253,7 @@ async function findChildFolders(token, parentId, name) {
     headers: { Authorization: `Bearer ${token}` }
   });
   const json = await res.json().catch(() => ({}));
-  if (!res.ok) throw new Error(json.error && json.error.message ? json.error.message : "Google Drive folder lookup failed.");
+  if (!res.ok) throw new Error(json.error && json.error.message ? json.error.message : "Google Drive folder search failed.");
   return (json.files || []).map(file => file.id).filter(Boolean);
 }
 
@@ -295,31 +298,13 @@ async function downloadNoteAudioFile(token, fileId) {
   const metadata = await metadataRes.json().catch(() => ({}));
   if (!metadataRes.ok) throw new Error(metadata.error && metadata.error.message ? metadata.error.message : "Google Drive audio lookup failed.");
 
-  // Sprawdzamy przynależność do folderu audio przez świeże zapytanie o WSZYSTKIE foldery
-  // o tej nazwie, a nie przez porównanie z jednym cache'owanym ID (patrz komentarz przy
-  // findChildFolders) — inaczej legalna notatka mogła dostać fałszywe 403.
-  const audioFolderIds = await findChildFolders(token, GOOGLE_DRIVE_FOLDER_ID, NOTES_AUDIO_FOLDER_NAME);
+  // Sprawdzamy przynależność do folderu audio przez zapytanie o WSZYSTKIE foldery o tej
+  // nazwie w całym wspólnym dysku (patrz komentarz przy findFoldersAnywhereInDrive) —
+  // obejmuje to też stare notatki zagnieżdżone głębiej sprzed migracji na wspólny dysk.
+  const audioFolderIds = await findFoldersAnywhereInDrive(token, GOOGLE_DRIVE_FOLDER_ID, NOTES_AUDIO_FOLDER_NAME);
   const parents = Array.isArray(metadata.parents) ? metadata.parents : [];
   if (!audioFolderIds.length || !parents.some(parentId => audioFolderIds.includes(parentId))) {
-    // Tymczasowa diagnostyka (do usunięcia po znalezieniu przyczyny): sprawdzamy też czym
-    // faktycznie jest folder-rodzic pliku (nazwa, jego własny rodzic), żeby ustalić czy to
-    // stary/przeniesiony folder audio, czy plik trafił gdzieś zupełnie indziej.
-    const parentInfo = await Promise.all(parents.map(async (parentId) => {
-      try {
-        const params = new URLSearchParams({ fields: "id,name,parents", supportsAllDrives: "true" });
-        const r = await fetch(`https://www.googleapis.com/drive/v3/files/${encodeURIComponent(parentId)}?${params.toString()}`, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-        const j = await r.json().catch(() => ({}));
-        return r.ok ? { id: parentId, name: j.name, parents: j.parents } : { id: parentId, error: j.error && j.error.message };
-      } catch (e) {
-        return { id: parentId, error: e.message };
-      }
-    }));
-    const error = new Error(
-      `Requested file is not a panel audio note. [debug: parentInfo=${JSON.stringify(parentInfo)} ` +
-      `audioFolders=${JSON.stringify(audioFolderIds)} root=${GOOGLE_DRIVE_FOLDER_ID}]`
-    );
+    const error = new Error("Requested file is not a panel audio note.");
     error.statusCode = 403;
     throw error;
   }
