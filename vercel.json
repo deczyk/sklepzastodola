@@ -1,6 +1,6 @@
 {
   "crons": [
-    { "path": "/api/mail-sync", "schedule": "*/15 * * * *" }
+    { "path": "/api/mail-sync", "schedule": "0 4 * * *" }
   ],
   "redirects": [
     { "source": "/oferta", "destination": "/oferta.html", "statusCode": 301 }
