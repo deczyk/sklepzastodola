@@ -6542,6 +6542,7 @@ function openClientCard(clientId){
       <div class="clientCardField"><b>Termin następnego kontaktu</b>${clientField(c,"nastepnyFollowup","datetime")}</div>
       <div class="clientCardField"><b>Status</b>${clientField(c,null,"status")}</div>
       <div class="clientCardField"><b>Priorytet</b>${clientField(c,null,"prio")}</div>
+      <div class="clientCardField"><b>Strona internetowa</b>${clientField(c,"strona")}${c.strona ? ` <a href="${crmEsc(safeDocumentHref(c.strona) || ("https://"+c.strona))}" target="_blank" rel="noopener" class="mapPin" title="Otwórz stronę klienta">↗</a>` : ""}</div>
     </div>
     ${renderBriefConfigSection(c)}
     ${renderAdvisorResultSection(c)}
@@ -7627,6 +7628,7 @@ function exportClientsToXlsx(){
     "Co go powstrzymuje": clientObjections(c),
     "Priorytet": PRIO_OPTS.find(p=>p[0]===c.priorytet)?.[1] || c.priorytet,
     "Status": STATUS_OPTS.find(s=>s[0]===c.status)?.[1] || c.status,
+    "Strona internetowa": c.strona || "",
     "Notatki": c.notatki
   }));
   const ws = XLSX.utils.json_to_sheet(rows);
