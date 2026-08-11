@@ -301,10 +301,23 @@ async function downloadNoteAudioFile(token, fileId) {
   const audioFolderIds = await findChildFolders(token, GOOGLE_DRIVE_FOLDER_ID, NOTES_AUDIO_FOLDER_NAME);
   const parents = Array.isArray(metadata.parents) ? metadata.parents : [];
   if (!audioFolderIds.length || !parents.some(parentId => audioFolderIds.includes(parentId))) {
-    // Tymczasowa diagnostyka (do usunięcia po znalezieniu przyczyny): pokazujemy w komunikacie
-    // błędu co faktycznie zwrócił Drive, żeby nie zgadywać na ślepo dlaczego plik jest odrzucany.
+    // Tymczasowa diagnostyka (do usunięcia po znalezieniu przyczyny): sprawdzamy też czym
+    // faktycznie jest folder-rodzic pliku (nazwa, jego własny rodzic), żeby ustalić czy to
+    // stary/przeniesiony folder audio, czy plik trafił gdzieś zupełnie indziej.
+    const parentInfo = await Promise.all(parents.map(async (parentId) => {
+      try {
+        const params = new URLSearchParams({ fields: "id,name,parents", supportsAllDrives: "true" });
+        const r = await fetch(`https://www.googleapis.com/drive/v3/files/${encodeURIComponent(parentId)}?${params.toString()}`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        const j = await r.json().catch(() => ({}));
+        return r.ok ? { id: parentId, name: j.name, parents: j.parents } : { id: parentId, error: j.error && j.error.message };
+      } catch (e) {
+        return { id: parentId, error: e.message };
+      }
+    }));
     const error = new Error(
-      `Requested file is not a panel audio note. [debug: parents=${JSON.stringify(parents)} ` +
+      `Requested file is not a panel audio note. [debug: parentInfo=${JSON.stringify(parentInfo)} ` +
       `audioFolders=${JSON.stringify(audioFolderIds)} root=${GOOGLE_DRIVE_FOLDER_ID}]`
     );
     error.statusCode = 403;
