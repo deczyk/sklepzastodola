@@ -886,6 +886,8 @@
   .settingsCard{background:var(--surface-soft);border:1px solid var(--border);border-radius:12px;padding:14px}
   .settingsCard h3{margin:0 0 8px;color:var(--green);font-size:15px}
   .settingsCard p{margin:0;color:var(--text-muted);line-height:1.5;font-size:13px}
+  .settingsCard textarea{width:100%;box-sizing:border-box;margin-top:6px;border:1px solid #d8e7db;border-radius:8px;
+    background:var(--input-bg);color:var(--text);padding:8px 10px;font:inherit;font-size:13px;resize:vertical}
   .themeSwitchRow{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
   .themeChoiceBtn{padding:8px 12px;border-radius:10px;border:1px solid var(--border);background:var(--input-bg);color:var(--text);font-weight:bold;cursor:pointer}
   .themeChoiceBtn.active{background:var(--green);color:#fff;border-color:transparent}
@@ -2311,6 +2313,14 @@
             <p>Tu masz szybki podgląd synchronizacji, autora zmian i trybu pracy bez wchodzenia w backup.</p>
             <div class="settingsMeta" id="panelSettingsMeta"></div>
           </div>
+          <div class="settingsCard">
+            <h3>Podpisy w mailach z panelu</h3>
+            <p>Doklejane automatycznie na końcu maila wysyłanego przez „Napisz maila” w karcie klienta — osobny podpis dla każdej skrzynki.</p>
+            <label class="addClientLabel">kontakt@sklepzastodola.pl</label>
+            <textarea id="mailSignatureKontakt" rows="4" placeholder="Np. Pozdrawiam, Jakub Deczyński, Sklep za Stodołą, +48 735 115 427" oninput="stageMailSignature('kontakt', this.value)" onblur="commitMailSignatures()"></textarea>
+            <label class="addClientLabel" style="margin-top:10px;display:block">j.deczynski@sklepzastodola.pl</label>
+            <textarea id="mailSignatureJdeczynski" rows="4" placeholder="Np. Pozdrawiam, Jarosław Deczyński, Prezes Zarządu, Sklep za Stodołą Sp. z o.o." oninput="stageMailSignature('jdeczynski', this.value)" onblur="commitMailSignatures()"></textarea>
+          </div>
         </div>
       </div>
     </div>
@@ -3297,6 +3307,20 @@ function renderPanelSettings(){
     <div class="settingsMetaRow"><span>Tryb danych</span><strong>${crmEsc(modeText)}</strong></div>
     <div class="settingsMetaRow"><span>Piszesz jako</span><strong>${crmEsc(getWhoAmI())}</strong></div>
   `;
+  const sigKontakt = document.getElementById("mailSignatureKontakt");
+  const sigJdeczynski = document.getElementById("mailSignatureJdeczynski");
+  const signatures = (data && data.mailSignatures) || {};
+  if(sigKontakt && document.activeElement !== sigKontakt) sigKontakt.value = signatures.kontakt || "";
+  if(sigJdeczynski && document.activeElement !== sigJdeczynski) sigJdeczynski.value = signatures.jdeczynski || "";
+}
+
+function stageMailSignature(key, value){
+  if(!data.mailSignatures) data.mailSignatures = {};
+  data.mailSignatures[key] = value;
+}
+
+function commitMailSignatures(){
+  saveData();
 }
 
 async function initApp(){

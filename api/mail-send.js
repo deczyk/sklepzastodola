@@ -4,7 +4,7 @@
 // nadawcy. Wymaga zakresu gmail.send dodanego do delegacji domenowej - patrz komentarz
 // na górze api/_gmail.js.
 const { hasGmailConfig, WATCHED_MAILBOXES, sendMessage } = require("./_gmail");
-const { mutatePanelStore, hasPanelStoreConfig } = require("./_panel-store");
+const { readPanelStore, mutatePanelStore, hasPanelStoreConfig } = require("./_panel-store");
 
 const PANEL_PASSWORD = process.env.PANEL_PASSWORD;
 const PANEL_BASIC_USER = process.env.PANEL_BASIC_USER;
@@ -71,9 +71,23 @@ module.exports = async function handler(req, res) {
   const senderName = String(payload.senderName || "").trim() || SENDER_DISPLAY_NAME;
   const clientId = payload.clientId ? String(payload.clientId) : "";
 
+  // Podpis zależny od skrzynki (kontakt@ vs j.deczynski@) - edytowalny w panelu (Ustawienia),
+  // czytany tu na świeżo z tego samego magazynu co reszta danych panelu, więc zmiana w
+  // ustawieniach działa od razu przy kolejnej wysyłce, bez osobnego wdrożenia.
+  let fullBody = body;
+  if (hasPanelStoreConfig()) {
+    try {
+      const store = await readPanelStore();
+      const signature = String((store.data && store.data.mailSignatures && store.data.mailSignatures[mailboxKey]) || "").trim();
+      if (signature) fullBody = `${body}\n\n${signature}`;
+    } catch (e) {
+      // Brak podpisu nie powinien blokować wysyłki - wyślij bez niego.
+    }
+  }
+
   let sent;
   try {
-    sent = await sendMessage(mailboxEmail, { fromName: senderName, to, subject, body });
+    sent = await sendMessage(mailboxEmail, { fromName: senderName, to, subject, body: fullBody });
   } catch (e) {
     return res.status(502).json({ error: "Gmail send failed.", message: e && e.message ? e.message : String(e) });
   }
@@ -90,7 +104,7 @@ module.exports = async function handler(req, res) {
         if (!Array.isArray(client.historia)) client.historia = [];
         const now = new Date().toISOString();
         client.historia.push({
-          tekst: `[Mail wychodzący] Temat: ${subject}\n\n${body}`,
+          tekst: `[Mail wychodzący] Temat: ${subject}\n\n${fullBody}`,
           kto: `${senderName} (panel, ${mailboxEmail})`,
           data: now,
           utworzono: now,
