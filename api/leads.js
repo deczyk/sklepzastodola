@@ -264,6 +264,24 @@ function readString(payload, keys, max = 120) {
   return "";
 }
 
+// Surowe liczby z kalkulatora Advisor (nie tylko sformatowany tekst wyniku) - trzymamy je
+// przy notatce, żeby panel mógł odtworzyć ten sam kalkulator i przeliczać scenariusze zamiast
+// tylko czytać zamrożony wynik z chwili wysyłki. Białalistowane klucze + walidacja liczb, bo
+// to pole trafia tu wprost z publicznego formularza.
+const CALC_INPUT_NUMERIC_KEYS = ["cows", "yield", "priceDairy", "priceDirect", "litersDirect", "investment", "sellThrough", "opCosts", "days", "down", "years", "rate"];
+function sanitizeCalcInputs(raw) {
+  if (!raw || typeof raw !== "object") return null;
+  const out = {};
+  let hasAny = false;
+  for (const key of CALC_INPUT_NUMERIC_KEYS) {
+    const n = Number(raw[key]);
+    if (Number.isFinite(n)) { out[key] = n; hasAny = true; }
+  }
+  if (!hasAny) return null;
+  out.euEnabled = Boolean(raw.euEnabled);
+  return out;
+}
+
 function buildLeadData(payload, source) {
   const sourceCfg = ALLOWED_SOURCES[source];
   const firma = readString(payload, ["firma", "farm", "gospodarstwo", "Nazwa gospodarstwa"], 120);
@@ -296,6 +314,7 @@ function buildLeadData(payload, source) {
     answersText = sanitizeLongText(detale);
   }
   const priorytet = inferPriority(source, payload, answersText);
+  const calcInputs = (source === "advisor" || source === "advisor_olx") ? sanitizeCalcInputs(payload.calcInputs) : null;
 
   let historyText = "";
   if (source === "kontakt") {
@@ -323,7 +342,8 @@ function buildLeadData(payload, source) {
     notes,
     answersText,
     historyText,
-    priorytet
+    priorytet,
+    calcInputs
   };
 }
 
@@ -416,7 +436,7 @@ module.exports = async function handler(req, res) {
         if (!Array.isArray(existing.historia)) existing.historia = [];
         if (!Array.isArray(existing.oferty)) existing.oferty = [];
         const priorHistoria = existing.historia.slice();
-        existing.historia.push({ tekst: lead.historyText, kto: "System", data: now });
+        existing.historia.push({ tekst: lead.historyText, kto: "System", data: now, ...(lead.calcInputs ? { calcInputs: lead.calcInputs } : {}) });
         existing.zaktualizowano = now;
         if (!existing.zrodloLeada) existing.zrodloLeada = lead.sourceCfg.zrodloLeada;
         if (!existing.kategoriaLeada) existing.kategoriaLeada = lead.sourceCfg.kategoriaLeada;
@@ -463,7 +483,7 @@ module.exports = async function handler(req, res) {
         nastepnyFollowup: "",
         utworzono: now,
         zaktualizowano: now,
-        historia: [{ tekst: lead.historyText, kto: "System", data: now }],
+        historia: [{ tekst: lead.historyText, kto: "System", data: now, ...(lead.calcInputs ? { calcInputs: lead.calcInputs } : {}) }],
         oferty: []
       };
 

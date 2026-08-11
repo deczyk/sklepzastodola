@@ -266,6 +266,25 @@ function getAuditAnswersText(interest){
 function v(id){return parseFloat(document.getElementById(id).value)||0;} function money(x){return Math.round(x).toLocaleString("pl-PL")+" zł";}
 function clamp(x,min,max){return Math.min(Math.max(x,min),max);}
 
+// Surowe liczby z kalkulatora (nie tylko sformatowany wynik tekstowy) - lecą razem z leadem,
+// żeby w panelu można było odtworzyć ten sam kalkulator i przeliczać różne scenariusze dla
+// klienta zamiast tylko czytać zamrożony wynik z chwili wysyłki formularza.
+function safeV(id){
+  const el = document.getElementById(id);
+  if(!el) return null;
+  const n = parseFloat(el.value);
+  return Number.isNaN(n) ? null : n;
+}
+function getCalcInputs(){
+  return {
+    cows: safeV("cows"), yield: safeV("yield"),
+    priceDairy: safeV("priceDairy"), priceDirect: safeV("priceDirect"), litersDirect: safeV("litersDirect"),
+    investment: safeV("investment"), sellThrough: safeV("sellThrough"), opCosts: safeV("opCosts"), days: safeV("days"),
+    down: safeV("down"), years: safeV("years"), rate: safeV("rate"),
+    euEnabled: Boolean(document.getElementById("euEnable") && document.getElementById("euEnable").checked)
+  };
+}
+
 function isShortMode(){return document.body.classList.contains("mode-short");}
 
 function setMode(mode){
@@ -522,6 +541,7 @@ async function sendToUs(){
       roiLata: document.getElementById("roiTxt").innerText,
       roiLataZDofinansowaniem: document.getElementById("roiEuTxt").innerText,
       potencjalRoczny: document.getElementById("profitYearTxt").innerText,
+      calcInputs: getCalcInputs(),
       website: ""
     };
     await fetch('/api/leads', {

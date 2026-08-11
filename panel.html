@@ -765,6 +765,14 @@
   .clientCardField textarea{min-height:82px;resize:vertical}
   .advisorAnalizaBox{margin-top:12px}
   .advisorAnalizaHint{font-size:12px;color:var(--text-muted);margin-bottom:6px;line-height:1.35}
+  .advisorScenarioGrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:8px;margin-bottom:10px}
+  .advisorScenarioField{display:flex;flex-direction:column;font-size:11px;color:#6b766f;text-transform:uppercase;letter-spacing:.04em;gap:3px}
+  .advisorScenarioField input{width:100%;box-sizing:border-box;border:1px solid #d8e7db;border-radius:8px;background:var(--input-bg);color:var(--text);padding:6px 8px;font:inherit;text-transform:none;letter-spacing:normal}
+  .advisorScenarioDofin{display:flex;flex-wrap:wrap;align-items:end;gap:14px;margin-bottom:10px;padding:8px 0;border-top:1px dashed var(--border);border-bottom:1px dashed var(--border)}
+  .advisorScenarioDofin label:first-child{text-transform:none;font-size:13px;display:flex;align-items:center;gap:6px}
+  .advisorScenarioDofin .advisorScenarioField{max-width:340px}
+  .advisorScenarioResults{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:4px 16px;font-size:13px;line-height:1.5}
+  .advisorScenarioResults b{color:#6b766f;font-weight:600}
   .lastActivity{margin-top:6px;font-size:12px;color:var(--text-muted);line-height:1.35}
   .lastActivityBadge{display:inline-flex;max-width:100%;border:1px solid #ead99a;background:#fff8df;color:#755c15;border-radius:8px;
       padding:4px 7px;font-size:12px;line-height:1.3}
@@ -6753,6 +6761,144 @@ function renderBriefConfigSection(c){
 // Wynik z Advisor (advisor.html) trafia do historii jako notatka [Advisor] / [Advisor OLX],
 // z pełną, wieloliniową treścią ankiety i wyników kalkulatora. Rozpisujemy to linia po linii,
 // zamiast zostawiać schowane w jednym bloku tekstu w chronologicznej historii kontaktu.
+// ================= Kalkulator scenariuszy Advisor (panel, prywatne) =================
+// Ten sam silnik ekonomii co advisor.html (produkcja/sprzedaż/marża/ROI/dofinansowanie/rata),
+// tylko bez audytu 19 pytań - Kuba chciał "same cyfry + dofinansowanie", żeby móc przeliczać
+// różne scenariusze klienta, a nie tylko czytać zamrożony wynik z chwili wysyłki formularza.
+const ADVISOR_CALC_KEYS = ["cows","yield","priceDairy","priceDirect","litersDirect","investment","sellThrough","opCosts","days","down","years","rate"];
+const ADVISOR_CALC_DEFAULTS = {cows:15,yield:25,priceDairy:1.90,priceDirect:5.50,litersDirect:100,investment:70000,sellThrough:70,opCosts:12000,days:365,down:20,years:5,rate:8,dofinansowaniePct:50,euEnabled:true};
+const ADVISOR_CALC_FIELDS = [
+  ["cows","Krowy (szt.)"],["yield","Wydajność (l/krowę/dzień)"],
+  ["priceDairy","Cena do mleczarni (zł/l)"],["priceDirect","Cena sprzedaży bezpośredniej (zł/l)"],
+  ["litersDirect","Cel sprzedaży bezpośredniej (l/dzień)"],["sellThrough","Wykorzystanie celu (%)"],
+  ["investment","Inwestycja brutto (zł)"],["opCosts","Roczne koszty eksploatacyjne (zł)"],["days","Dni sprzedaży w roku"],
+  ["down","Wkład własny (%)"],["years","Okres finansowania (lata)"],["rate","Oprocentowanie (%/rok)"]
+];
+
+// Priorytet: zapisany scenariusz Kuby (jeśli już coś poprawiał) > surowe liczby z faktycznego
+// zgłoszenia klienta (jeśli formularz je wysłał) > wartości przykładowe z advisor.html.
+function advisorScenarioInputs(c, entry){
+  const out = {...ADVISOR_CALC_DEFAULTS};
+  const fromEntry = entry && entry.calcInputs && typeof entry.calcInputs === "object" ? entry.calcInputs : null;
+  if(fromEntry){
+    ADVISOR_CALC_KEYS.forEach(k=>{ if(Number.isFinite(fromEntry[k])) out[k] = fromEntry[k]; });
+    if(typeof fromEntry.euEnabled === "boolean") out.euEnabled = fromEntry.euEnabled;
+  }
+  const saved = c && c.advisorScenario && typeof c.advisorScenario === "object" ? c.advisorScenario : null;
+  if(saved){
+    ADVISOR_CALC_KEYS.concat(["dofinansowaniePct"]).forEach(k=>{ if(Number.isFinite(saved[k])) out[k] = saved[k]; });
+    if(typeof saved.euEnabled === "boolean") out.euEnabled = saved.euEnabled;
+  }
+  return out;
+}
+
+function advisorMoney(x){ return Math.round(x||0).toLocaleString("pl-PL") + " zł"; }
+
+function computeAdvisorScenario(inputs){
+  const cows = Number(inputs.cows)||0, yieldL = Number(inputs.yield)||0;
+  const priceDairy = Number(inputs.priceDairy)||0, priceDirect = Number(inputs.priceDirect)||0;
+  const litersDirect = Number(inputs.litersDirect)||0;
+  const investment = Number(inputs.investment)||0;
+  const opCostsRaw = Number(inputs.opCosts)||0;
+  const days = Number(inputs.days)||0;
+  const down = Number(inputs.down)||0;
+  const years = Number(inputs.years)||0;
+  const rate = Number(inputs.rate)||0;
+  const dofinansowaniePct = Math.min(65, Math.max(0, Number(inputs.dofinansowaniePct)||0));
+  const euEnabled = Boolean(inputs.euEnabled);
+
+  const prod = cows*yieldL;
+  const targetLiters = Math.min(litersDirect, prod || litersDirect);
+  const sellThrough = Math.min(100, Math.max(0, Number(inputs.sellThrough)||0))/100;
+  const liters = targetLiters*sellThrough;
+  const extraMargin = priceDirect-priceDairy;
+  const marginYear = extraMargin*liters*days;
+  const opCosts = Math.max(0, opCostsRaw);
+  const netYear = marginYear-opCosts;
+  const roi = netYear>0 ? investment/netYear : 0;
+  const euGrant = euEnabled ? investment*(dofinansowaniePct/100) : 0;
+  const ownAfterEu = Math.max(0, investment-euGrant);
+  const roiEu = netYear>0 ? ownAfterEu/netYear : 0;
+  const principal = ownAfterEu*(1-down/100);
+  const months = years*12, mr = rate/100/12;
+  const payment = mr>0 ? principal*(mr*Math.pow(1+mr,months))/(Math.pow(1+mr,months)-1) : (months>0 ? principal/months : 0);
+  const cashAfterFinance = netYear-payment*12;
+  const wkladWlasny = ownAfterEu*down/100;
+
+  return {prod, targetLiters, liters, marginYear, opCosts, netYear, investment, roi, euGrant, ownAfterEu, roiEu, payment, cashAfterFinance, wkladWlasny};
+}
+
+function renderAdvisorScenarioResults(r){
+  return `
+    <div><b>Produkcja mleka:</b> ${Math.round(r.prod).toLocaleString("pl-PL")} l/dzień</div>
+    <div><b>Realna sprzedaż:</b> ${Math.round(r.liters).toLocaleString("pl-PL")} l/dzień (cel ${Math.round(r.targetLiters).toLocaleString("pl-PL")} l/dzień)</div>
+    <div><b>Potencjał przed kosztami:</b> ${advisorMoney(r.marginYear)}</div>
+    <div><b>Roczne koszty eksploatacyjne:</b> −${advisorMoney(r.opCosts)}</div>
+    <div><b>Wynik po kosztach:</b> ${advisorMoney(r.netYear)}</div>
+    <div><b>Zwrot bez dofinansowania:</b> ${r.roi.toFixed(1)} lat</div>
+    <div><b>Dofinansowanie:</b> ${advisorMoney(r.euGrant)}</div>
+    <div><b>Do sfinansowania po dofinansowaniu:</b> ${advisorMoney(r.ownAfterEu)}</div>
+    <div><b>Zwrot z dofinansowaniem:</b> ${r.roiEu.toFixed(1)} lat</div>
+    <div><b>Wkład własny:</b> ${advisorMoney(r.wkladWlasny)}</div>
+    <div><b>Rata finansowania:</b> ${advisorMoney(r.payment)}/mies.</div>
+    <div><b>Cashflow roczny po finansowaniu:</b> ${advisorMoney(r.cashAfterFinance)}</div>
+  `;
+}
+
+function advisorScenarioInputEl(clientId, key, value, step){
+  return `<label class="advisorScenarioField">${ADVISOR_CALC_FIELDS.find(f=>f[0]===key)?.[1] || key}
+    <input type="number" step="${step||1}" value="${value}" data-scenario-id="${clientId}" data-scenario-field="${key}"
+      oninput="recalcAdvisorScenario('${clientId}')" onchange="commitAdvisorScenario('${clientId}')">
+  </label>`;
+}
+
+function renderAdvisorScenarioCalculator(c, entry){
+  const inputs = advisorScenarioInputs(c, entry);
+  const results = computeAdvisorScenario(inputs);
+  const stepFor = {priceDairy:0.05, priceDirect:0.05, rate:0.1, sellThrough:5, down:5};
+  return `
+    <div class="advisorScenarioBox" data-scenario-client="${c.id}">
+      <div class="advisorScenarioGrid">
+        ${ADVISOR_CALC_KEYS.map(k=>advisorScenarioInputEl(c.id, k, inputs[k], stepFor[k]||1)).join("")}
+      </div>
+      <div class="advisorScenarioDofin">
+        <label><input type="checkbox" data-scenario-id="${c.id}" data-scenario-field="euEnabled" ${inputs.euEnabled?"checked":""}
+          onchange="recalcAdvisorScenario('${c.id}');commitAdvisorScenario('${c.id}')"> Licz z dofinansowaniem</label>
+        <label class="advisorScenarioField">Dofinansowanie (%) — orientacyjnie 50-65%, zależnie od programu
+          <input type="number" min="0" max="65" step="1" value="${inputs.dofinansowaniePct}" data-scenario-id="${c.id}" data-scenario-field="dofinansowaniePct"
+            oninput="recalcAdvisorScenario('${c.id}')" onchange="commitAdvisorScenario('${c.id}')">
+        </label>
+      </div>
+      <div class="advisorScenarioResults" id="advisorScenarioResults-${c.id}">${renderAdvisorScenarioResults(results)}</div>
+    </div>
+  `;
+}
+
+function readAdvisorScenarioFromDom(clientId){
+  const out = {};
+  document.querySelectorAll(`[data-scenario-id="${clientId}"]`).forEach(el=>{
+    const field = el.dataset.scenarioField;
+    if(!field) return;
+    out[field] = el.type === "checkbox" ? el.checked : (parseFloat(el.value)||0);
+  });
+  return out;
+}
+
+function recalcAdvisorScenario(clientId){
+  const inputs = readAdvisorScenarioFromDom(clientId);
+  const results = computeAdvisorScenario(inputs);
+  const box = document.getElementById(`advisorScenarioResults-${clientId}`);
+  if(box) box.innerHTML = renderAdvisorScenarioResults(results);
+}
+
+function commitAdvisorScenario(clientId){
+  const c = data.klienci.find(x=>x.id===clientId);
+  if(!c) return;
+  c.advisorScenario = readAdvisorScenarioFromDom(clientId);
+  c.zaktualizowano = new Date().toISOString();
+  saveData();
+}
+
 function renderAdvisorResultSection(c){
   const hist = Array.isArray(c.historia) ? c.historia : [];
   const entry = hist.find(h => /^advisor/i.test(parseHistoryText(h.tekst || "").type || ""));
@@ -6766,6 +6912,11 @@ function renderAdvisorResultSection(c){
       <div class="sectionHead"><b>🧮 Wynik z kalkulatora Advisor</b><span class="sectionDate">${crmEsc(historyDateInputValue(entry.data) || "")}</span></div>
       <div class="advisorResultBox">
         ${lines.map(l => `<div class="advisorResultLine">${crmEsc(l)}</div>`).join("")}
+      </div>
+      <div class="clientCardField advisorAnalizaBox">
+        <b>🧮 Kalkulator scenariuszy (tylko dla Ciebie)</b>
+        <div class="advisorAnalizaHint">${entry.calcInputs ? "Wypełnione realnymi liczbami z formularza klienta." : "Klient wypełnił formularz przed wdrożeniem tej funkcji, więc nie mamy jego surowych liczb — poniżej wartości przykładowe, popraw je ręcznie."} Zmieniaj dowolnie, żeby sprawdzić inny scenariusz — zapisuje się automatycznie i zostaje przy kliencie.</div>
+        ${renderAdvisorScenarioCalculator(c, entry)}
       </div>
       <div class="clientCardField advisorAnalizaBox">
         <b>📝 Robocza analiza Advisor (tylko dla Ciebie)</b>
