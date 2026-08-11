@@ -101,9 +101,15 @@ async function gmailFetch(mailboxEmail, path, params) {
   return json;
 }
 
+function decodeBase64UrlToBuffer(value) {
+  if (!value) return Buffer.alloc(0);
+  return Buffer.from(value.replace(/-/g, "+").replace(/_/g, "/"), "base64");
+}
+
+// Dla treści tekstowej wiadomości (text/plain, text/html) - NIE używać do załączników
+// binarnych (obrazy, PDF), bo toString("utf8") zniszczyłby ich zawartość.
 function decodeBase64Url(value) {
-  if (!value) return "";
-  return Buffer.from(value.replace(/-/g, "+").replace(/_/g, "/"), "base64").toString("utf8");
+  return decodeBase64UrlToBuffer(value).toString("utf8");
 }
 
 // Wiadomości bywają multipart (text/plain + text/html + załączniki zagnieżdżone w
@@ -157,6 +163,27 @@ async function listMessageIdsAfter(mailboxEmail, afterEpochSeconds, pageLimit = 
   return ids;
 }
 
+// Część MIME jest załącznikiem, jeśli ma nazwę pliku - to samo rozróżnienie, którego
+// używa Gmail we własnym UI (treść wiadomości ma pusty "filename").
+function extractAttachmentMeta(payload) {
+  const attachments = [];
+  const walk = node => {
+    if (!node) return;
+    if (node.filename && node.body && (node.body.attachmentId || node.body.data)) {
+      attachments.push({
+        filename: node.filename,
+        mimeType: node.mimeType || "application/octet-stream",
+        attachmentId: node.body.attachmentId || "",
+        size: Number(node.body.size || 0),
+        inlineData: node.body.attachmentId ? null : node.body.data
+      });
+    }
+    (node.parts || []).forEach(walk);
+  };
+  walk(payload);
+  return attachments;
+}
+
 async function getMessage(mailboxEmail, id, htmlToPlainFallback) {
   const json = await gmailFetch(mailboxEmail, `messages/${encodeURIComponent(id)}`, { format: "full" });
   const headers = (json.payload && json.payload.headers) || [];
@@ -167,8 +194,17 @@ async function getMessage(mailboxEmail, id, htmlToPlainFallback) {
     from: headerValue(headers, "From"),
     to: headerValue(headers, "To"),
     subject: headerValue(headers, "Subject"),
-    body: extractPlainTextBody(json.payload, htmlToPlainFallback)
+    body: extractPlainTextBody(json.payload, htmlToPlainFallback),
+    attachments: extractAttachmentMeta(json.payload)
   };
+}
+
+// Osobne wywołanie - treść załącznika ściągamy TYLKO dla wiadomości, które faktycznie
+// dopasowaliśmy do klienta (patrz mail-sync.js), żeby nie marnować czasu/limitów Gmail API
+// na maile, które i tak zostaną odrzucone.
+async function getAttachmentData(mailboxEmail, messageId, attachmentId) {
+  const json = await gmailFetch(mailboxEmail, `messages/${encodeURIComponent(messageId)}/attachments/${encodeURIComponent(attachmentId)}`);
+  return { size: Number(json.size || 0), data: json.data || "" };
 }
 
 module.exports = {
@@ -177,5 +213,7 @@ module.exports = {
   getGmailAccessToken,
   listMessageIdsAfter,
   getMessage,
+  getAttachmentData,
+  decodeBase64UrlToBuffer,
   extractEmails
 };

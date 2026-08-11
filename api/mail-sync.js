@@ -4,9 +4,10 @@
 // przy którymś kliencie w panelu. Jeśli tak, dopisuje pełną treść wiadomości do historii
 // tego klienta. Wymaga jednorazowej konfiguracji delegacji domenowej w Google Workspace -
 // patrz komentarz na górze api/_gmail.js.
-const { hasGmailConfig, WATCHED_MAILBOXES, listMessageIdsAfter, getMessage, extractEmails } = require("./_gmail");
+const { hasGmailConfig, WATCHED_MAILBOXES, listMessageIdsAfter, getMessage, getAttachmentData, decodeBase64UrlToBuffer, extractEmails } = require("./_gmail");
 const { htmlToPlainFallback } = require("./_email");
 const { mutatePanelStore, hasPanelStoreConfig } = require("./_panel-store");
+const { hasDriveConfig, getDriveAccessToken, getMailAttachmentsFolderId, uploadBufferToDrive } = require("./_drive");
 
 const CRON_SECRET = process.env.CRON_SECRET;
 const OWN_ADDRESSES = new Set(Object.values(WATCHED_MAILBOXES).map(a => a.toLowerCase()));
@@ -19,6 +20,11 @@ const DEFAULT_LOOKBACK_SECONDS = 7 * 24 * 3600;
 const OVERLAP_BUFFER_SECONDS = 6 * 3600;
 const MAX_PROCESSED_IDS_KEPT = 500;
 const MAX_BODY_CHARS = 20000;
+// Załączniki tylko dla dopasowanych klientów (nie podwykonawców/nierozpoznanych - tam i tak
+// nie mamy gdzie ich pokazać w ten sam sposób). Limity chronią przed jednym olbrzymim mailem
+// zjadającym cały czas wykonania crona.
+const MAX_ATTACHMENTS_PER_MESSAGE = 5;
+const MAX_ATTACHMENT_BYTES = 20 * 1024 * 1024;
 
 function clampBody(text) {
   const value = String(text || "").trim();
@@ -51,6 +57,35 @@ const AUTOMATED_SENDER_PATTERN = /(no-?reply|do-?not-?reply|mailer-daemon|notifi
 function displayNameFromHeader(headerText) {
   const match = String(headerText || "").match(/^"?([^"<]+?)"?\s*<[^>]+>$/);
   return match ? match[1].trim() : "";
+}
+
+// Ściąga i wgrywa na Drive załączniki jednej wiadomości - RAZ na wiadomość (nie per
+// dopasowany klient, treść jest ta sama), zwraca kształt {link,name} identyczny jak przy
+// zdjęciach w notatkach (renderHistoryImages/fileChip już to umieją wyrenderować bez zmian).
+async function uploadMessageAttachments(mailboxEmail, messageId, attachments, log) {
+  if (!hasDriveConfig() || !Array.isArray(attachments) || !attachments.length) return [];
+  const usable = attachments.filter(a => a.attachmentId && a.size <= MAX_ATTACHMENT_BYTES).slice(0, MAX_ATTACHMENTS_PER_MESSAGE);
+  if (!usable.length) return [];
+
+  const images = [];
+  try {
+    const token = await getDriveAccessToken();
+    const folderId = await getMailAttachmentsFolderId(token);
+    for (const att of usable) {
+      try {
+        const { data: b64 } = await getAttachmentData(mailboxEmail, messageId, att.attachmentId);
+        const buffer = decodeBase64UrlToBuffer(b64);
+        if (!buffer.length) continue;
+        const uploaded = await uploadBufferToDrive(token, { name: att.filename, mimeType: att.mimeType, buffer, parentId: folderId });
+        images.push({ link: uploaded.link, name: uploaded.name });
+      } catch (e) {
+        log.errors.push(`${mailboxEmail} ${messageId} attachment "${att.filename}": ${e.message}`);
+      }
+    }
+  } catch (e) {
+    log.errors.push(`${mailboxEmail} ${messageId} Drive auth: ${e.message}`);
+  }
+  return images;
 }
 
 async function syncMailbox(mailboxKey, mailboxEmail, data, log) {
@@ -104,6 +139,10 @@ async function syncMailbox(mailboxKey, mailboxEmail, data, log) {
       if (vendor) matchedVendors.add(vendor);
     });
 
+    const attachmentImages = matchedClients.size
+      ? await uploadMessageAttachments(mailboxEmail, id, message.attachments, log)
+      : [];
+
     matchedClients.forEach(client => {
       if (!Array.isArray(client.historia)) client.historia = [];
       const alreadyThere = client.historia.some(h => h && h._mailMessageId === id);
@@ -113,7 +152,8 @@ async function syncMailbox(mailboxKey, mailboxEmail, data, log) {
         kto: `System (${mailboxEmail})`,
         data: entryDate,
         utworzono: new Date().toISOString(),
-        _mailMessageId: id
+        _mailMessageId: id,
+        ...(attachmentImages.length ? { images: attachmentImages } : {})
       });
       client.zaktualizowano = new Date().toISOString();
       matched += 1;
