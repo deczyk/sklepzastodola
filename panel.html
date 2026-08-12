@@ -5,6 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="robots" content="noindex, nofollow">
 <title>Panel — Sklep za Stodołą</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
   :root{--green:#244b2f;--light:#eef5ef;--accent:#c9a24a;--ink:#1e1e1e;--muted:#666;--line:#d8ded8;
         --done:#2f7a45;--progress:#c9a24a;--todo:#b5493f;
@@ -1508,6 +1511,32 @@
   .dashActivityCard:before{background:linear-gradient(90deg,#3f7ec4,#7bb0e8)}
   .dashNotifications:before,.dashAi:before{background:linear-gradient(90deg,var(--progress),#e8c876)}
   .dashSecondary:before{background:linear-gradient(90deg,var(--muted),#9db3a1);opacity:.35}
+
+  /* ============================================================
+     DESIGN PASS — Faza 1, Donezo-inspired (2026-08-12): Start/
+     Dashboard. CSS-only, dopisane na końcu — nic nie zmienia w
+     HTML/JS/id/klasach. Buduje na warstwie "Etap 1: SaaS/CRM
+     polish" (linia ~595) i "sidebar/dashboard stage 2" (wyżej):
+     większy promień kart, ciaśniejszy/subtelniejszy cień, więcej
+     oddechu w kartach dashboardu, nowy font. Zieleń/złoto marki
+     bez zmian.
+     ============================================================ */
+  :root{
+    --radius-donezo:16px;
+    --shadow-donezo:0 4px 20px rgba(20,50,30,.08);
+  }
+  body.dark-theme{--shadow-donezo:0 4px 20px rgba(0,0,0,.35)}
+
+  body{font-family:'Inter',Arial,Helvetica,sans-serif}
+
+  .section,.dashCard,.dashKpiCard,.statCard{
+    border-radius:var(--radius-donezo);
+    box-shadow:var(--shadow-donezo);
+  }
+  .dashCard{padding:24px}
+  .dashKpiCard{padding:24px;padding-top:22px}
+
+  .mainCategoryBtn,.subCategoryBtn,.sidebar .mainCategoryBtn{border-radius:12px}
 
 </style>
 </head>
