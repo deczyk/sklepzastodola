@@ -1429,13 +1429,12 @@
   .appMain{min-width:0}
 
   @media(min-width:981px){
-    .appShell{flex-direction:row;align-items:stretch}
+    .appShell{flex-direction:row;align-items:flex-start}
     .sidebar{
-      flex:0 0 252px;width:252px;
+      flex:0 0 252px;width:252px;min-height:100vh;
       display:flex;flex-direction:column;gap:16px;
       padding:20px 14px 24px;
       border-right:1px solid var(--border);border-bottom:none;
-      box-shadow:2px 0 14px #0000000a;
     }
     .appMain{flex:1}
     .sidebarBrand{padding:2px 8px 4px}
@@ -1957,9 +1956,6 @@
       <div class="crmViewBar">
         <div class="crmViewToggle" aria-label="Widok klientow">
           <button class="crmViewBtn active" id="clientsViewDirectoryBtn" onclick="setClientsView('directory')">Klienci</button>
-          <button class="crmViewBtn" id="clientsViewTableBtn" onclick="setClientsView('table')">Tabela</button>
-          <button class="crmViewBtn" id="clientsViewKanbanBtn" onclick="setClientsView('kanban')">Kanban</button>
-          <button class="crmViewBtn" id="clientsViewFollowBtn" onclick="setClientsView('followups')">Do kontaktu</button>
           <button class="crmViewBtn" id="clientsViewAdvisorBtn" onclick="setClientsView('advisor')">Advisor</button>
           <button class="crmViewBtn" id="clientsViewAdvisorOlxBtn" onclick="setClientsView('advisorolx')">Advisor OLX</button>
           <button class="crmViewBtn" id="clientsViewOlxBtn" onclick="setClientsView('olxpotencjalni')">Potencjalni (OLX)</button>
@@ -5816,7 +5812,6 @@ const PANEL_NAV = {
     label: "KLIENCI",
     views: [
       {key:"clients-directory", label:"Lista klientów", tab:"klienci", clientsView:"directory", priority:true},
-      {key:"clients-followups", label:"Do kontaktu", tab:"klienci", clientsView:"followups"},
       {key:"clients-advisor", label:"Advisor", tab:"klienci", clientsView:"advisor"},
       {key:"clients-advisorolx", label:"Advisor OLX", tab:"klienci", clientsView:"advisorolx"},
       {key:"clients-olx-potential", label:"Potencjalni (OLX)", tab:"klienci", clientsView:"olxpotencjalni"},
@@ -5827,8 +5822,6 @@ const PANEL_NAV = {
     label: "SPRZEDAŻ",
     views: [
       {key:"sales-advisors-db", label:"Baza doradców", tab:"doradcy", priority:true},
-      {key:"sales-kanban", label:"Kanban CRM", tab:"klienci", clientsView:"kanban"},
-      {key:"sales-offers", label:"Oferty", tab:"klienci", clientsView:"table", focusId:"section-klienci"},
       {key:"sales-mail-templates", label:"Szablony maili", tab:"mailtemplates", priority:true}
     ]
   },
