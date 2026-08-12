@@ -255,6 +255,7 @@
   .mainCategoryBtn,.subCategoryBtn{background:transparent;border:1px solid transparent;color:var(--text-muted);cursor:pointer;border-radius:10px;font-weight:bold}
   .mainCategoryBtn{padding:10px 14px;font-size:13px}
   .subCategoryBtn{padding:8px 12px;font-size:12px}
+  .mainCategoryIcon{display:inline-block;margin-right:7px;font-size:14px;filter:saturate(.9)}
   .mainCategoryBtn:hover,.subCategoryBtn:hover{background:var(--surface-muted);color:var(--green);border-color:var(--border)}
   .mainCategoryBtn.active{background:linear-gradient(135deg,var(--green),#2f7a45);color:#fff;border-color:transparent;box-shadow:0 8px 18px #1d3b2420}
   .subCategoryBtn.active{background:var(--surface-muted);color:var(--green);border-color:var(--border)}
@@ -2741,7 +2742,7 @@ function renderNavigation(){
   const subNav = document.getElementById("subNav");
   if(!mainNav || !subNav) return;
   mainNav.innerHTML = Object.entries(PANEL_NAV).map(([key, section]) => `
-    <button class="mainCategoryBtn ${currentMainCategory===key?"active":""}" onclick="setMainCategory('${key}')">${crmEsc(section.label)}</button>
+    <button class="mainCategoryBtn ${currentMainCategory===key?"active":""}" onclick="setMainCategory('${key}')">${section.icon ? `<span class="mainCategoryIcon">${section.icon}</span>` : ""}${crmEsc(section.label)}</button>
   `).join("");
   const activeSection = PANEL_NAV[currentMainCategory] || PANEL_NAV.start;
   const openZadania = (data.zadania||[]).filter(z=>!z.zrobione).length;
@@ -5853,6 +5854,7 @@ let currentSubView = "dashboard";
 const PANEL_NAV = {
   start: {
     label: "START",
+    icon: "🏠",
     views: [
       {key:"dashboard", label:"Dashboard", tab:"dashboard"},
       {key:"diary", label:"Dziennik dnia", tab:"dziennik", priority:true},
@@ -5861,6 +5863,7 @@ const PANEL_NAV = {
   },
   clients: {
     label: "KLIENCI",
+    icon: "👥",
     views: [
       {key:"clients-directory", label:"Lista klientów", tab:"klienci", clientsView:"directory", priority:true},
       {key:"clients-advisor", label:"Advisor", tab:"klienci", clientsView:"advisor"},
@@ -5871,6 +5874,7 @@ const PANEL_NAV = {
   },
   sales: {
     label: "SPRZEDAŻ",
+    icon: "📈",
     views: [
       {key:"sales-advisors-db", label:"Baza doradców", tab:"doradcy", priority:true},
       {key:"sales-mail-templates", label:"Szablony maili", tab:"mailtemplates", priority:true}
@@ -5878,6 +5882,7 @@ const PANEL_NAV = {
   },
   company: {
     label: "FIRMA",
+    icon: "🏢",
     views: [
       {key:"docs-home", label:"Dokumenty", tab:"dokumenty"},
       {key:"docs-price", label:"Cenniki", tab:"cenniki"},
@@ -5889,6 +5894,7 @@ const PANEL_NAV = {
   },
   operations: {
     label: "OPERACJE",
+    icon: "⚙️",
     views: [
       {key:"ops-tasks", label:"Zadania", tab:"zadania"},
       {key:"ops-checklists", label:"Checklisty", tab:"checklisty"},
@@ -5902,6 +5908,7 @@ const PANEL_NAV = {
   },
   ai: {
     label: "AI / SYSTEM",
+    icon: "🤖",
     views: [
       {key:"ai-workflow", label:"AI Workflow", tab:"aiworkflow"},
       {key:"ai-backup", label:"Backup / Import / Eksport", tab:"backup"},
