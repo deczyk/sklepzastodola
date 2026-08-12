@@ -369,3 +369,20 @@ Następne kroki:
 - Automatyczne odświeżanie nie może przerywać aktywnej edycji ani nadpisywać niezapisanych danych lokalnych.
 - Równoległe notatki i klienci muszą być scalane, a zapis ma korzystać z wersjonowania, ponawiania konfliktów i kopii bezpieczeństwa.
 - Klient ani wpis historii nie może zniknąć bez jawnego użycia funkcji usuwania.
+
+## 2026-08-12 — Claude wdraża zmiany techniczne bezpośrednio, nie tylko przez Codexa
+
+Status: potwierdzone
+Źródło: wyraźne polecenie użytkownika w rozmowie ("ty masz to robić tutaj, nie Codex")
+
+Decyzja / założenie:
+- Zmieniono dotychczasową zasadę workflow AI: Claude nie ogranicza się już do przygotowywania „Zadania dla Codexa” przy pracy technicznej (repo, `panel.html`, strona, GitHub, Vercel) — wdraża takie zmiany sam, bezpośrednio w sesji.
+- Sekcja „Zadanie dla Codexa” zostaje jako wyjątek: używana tylko gdy użytkownik wyraźnie o to poprosi, zmiana jest zbyt duża/ryzykowna na bieżącą sesję, albo Claude technicznie czegoś nie może zrobić w danej sesji.
+- Zaktualizowano `CLAUDE.md` (sekcje "Czego nie robisz", "Bardzo ważne: kiedy dawać Zadanie dla Codexa", "Zasada oszczędzania limitów") i `AGENTS.md` (sekcja "Workflow AI i podział ról", "Oszczędzanie limitów AI") zgodnie z tą decyzją.
+
+Uzasadnienie:
+- Użytkownik chce szybszej iteracji bez ręcznego przeklejania zadań między narzędziami.
+
+Do sprawdzenia / następne kroki:
+- `CODEX_CLAUDE_INSTRUKCJA.md` wciąż opisuje stary podział ról (Claude = tylko strateg, nie pisze kodu) w wielu miejscach — wymaga osobnej, większej aktualizacji, jeszcze nie zrobionej.
+- Codex nadal jest dostępny jako opcja, gdy użytkownik chce osobnej sesji technicznej albo większego budżetu kontekstu.

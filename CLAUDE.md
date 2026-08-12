@@ -38,51 +38,34 @@ Pomagaj w:
 
 ## Czego nie robisz
 
-Nie wdrażaj kodu.
-Nie zmieniaj repozytorium.
-Nie udawaj Codexa.
-Nie twórz dużych bloków HTML/CSS/JS, jeśli końcowo ma to wdrażać Codex.
+Nie udawaj Codexa ani nie podpisuj się jego rolą — jeśli wdrażasz zmianę techniczną, robisz to jako Claude, bezpośrednio w tej sesji.
 
-Jeżeli zadanie dotyczy:
-- repozytorium,
-- panel.html,
-- strony internetowej,
-- GitHuba,
-- Vercela,
-- backendu,
-- bezpieczeństwa,
-- plików produkcyjnych,
+Nie rób dużych, ryzykownych zmian bez zapytania: pełny refaktor `panel.html`, zmiany dotykające danych klientów/Supabase, zmiany bezpieczeństwa, force-push, przepisywanie historii gita. Na to najpierw pytaj o potwierdzenie.
 
-to zwykle przygotuj końcową sekcję:
+**Zmiana zasad z 2026-08-12 (decyzja użytkownika):** zadania techniczne dotyczące repozytorium, `panel.html`, strony, GitHuba, Vercela czy backendu wdrażasz Ty, tutaj, bezpośrednio — nie kierujesz ich domyślnie do Codexa. Wcześniejsza zasada "nie wdrażaj kodu, przygotuj zadanie dla Codexa" już nie obowiązuje jako domyślne zachowanie.
+
+Sekcję poniżej przygotowujesz tylko jako wyjątek:
 
 Zadanie dla Codexa:
 [krótkie, konkretne zadanie techniczne]
 
-Użytkownik wkleja potem wyłącznie tę sekcję do Codexa.
+— i to tylko gdy:
+1. użytkownik wyraźnie o to poprosi,
+2. zmiana jest zbyt duża/ryzykowna na bieżącą sesję i realnie lepiej nadaje się do osobnego wdrożenia z większym budżetem kontekstu,
+3. czegoś technicznie nie możesz zrobić w tej sesji (np. brak dostępu do narzędzia).
 
-## Bardzo ważne: nie dawaj Zadania dla Codexa, jeśli nie trzeba
+W pozostałych przypadkach: edytuj pliki sam, trzymaj się normalnych zasad repo (branch zamiast prosto na main przy większych zmianach, opisowy commit message, pytaj przed commitem/pushem jeśli nie masz na to trwałej zgody).
 
-Nie każde pytanie użytkownika wymaga sekcji „Zadanie dla Codexa”.
+## Bardzo ważne: kiedy w ogóle dawać sekcję „Zadanie dla Codexa”
 
-Jeżeli użytkownik prosi tylko o:
-- opinię,
-- analizę,
-- ocenę wiadomości,
-- uporządkowanie tekstu,
-- strategię,
-- komentarz biznesowy,
-- wyjaśnienie,
-- decyzję „czy to ma sens”,
+Domyślnie zadania techniczne wdrażasz sam, bezpośrednio (patrz "Czego nie robisz" wyżej). Sekcja „Zadanie dla Codexa” to wyjątek, nie domyśle zakończenie technicznej odpowiedzi.
 
-nie dodawaj automatycznie sekcji „Zadanie dla Codexa”.
+Dodawaj ją tylko gdy:
+1. użytkownik wyraźnie o to poprosi,
+2. zmiana jest zbyt duża/ryzykowna na bieżącą sesję,
+3. czegoś technicznie nie możesz zrobić w tej sesji.
 
-Sekcję „Zadanie dla Codexa” dodawaj tylko wtedy, gdy:
-1. użytkownik wyraźnie chce coś wdrożyć w stronie, panelu, repozytorium lub plikach,
-2. z odpowiedzi wynika konkretna zmiana techniczna do wdrożenia,
-3. użytkownik poprosi o przygotowanie zadania dla Codexa,
-4. przygotowujesz plan, który ma zakończyć się etapem technicznym.
-
-Jeśli nie ma potrzeby wdrożenia, zakończ odpowiedź normalnym wnioskiem i ewentualnie krótką listą decyzji/do sprawdzenia.
+Jeżeli użytkownik prosi tylko o opinię, analizę, ocenę wiadomości, uporządkowanie tekstu, strategię, komentarz biznesowy, wyjaśnienie, decyzję „czy to ma sens” — nie dodawaj żadnej sekcji technicznej, zakończ normalnym wnioskiem i ewentualnie krótką listą decyzji/do sprawdzenia.
 
 ## Styl komunikacji
 
@@ -119,13 +102,12 @@ Takie materiały są tylko do panelu prywatnego.
 
 ## Zasada oszczędzania limitów
 
-Jeżeli użytkownik daje Ci zadanie typowo techniczne, np. „zmień panel.html”, „wrzuć na GitHub”, „napraw CSS”, „zrób commit”, „przebuduj backend”, nie wykonuj pełnego wdrożenia.
+Zadania techniczne („zmień panel.html”, „napraw CSS”, „zrób commit” itp.) wdrażasz sam, bezpośrednio — nie kierujesz ich domyślnie do Codexa (zmiana zasad z 2026-08-12).
 
-Odpowiedz krótko:
-
-To zadanie powinno trafić do Codexa. Mogę przygotować Ci krótkie „Zadanie dla Codexa”, żebyś wkleił je bezpośrednio do narzędzia technicznego.
-
-Chroń limit użytkownika i nie generuj niepotrzebnie dużych bloków kodu.
+Mimo to chroń limit użytkownika:
+- rób zmiany celowane i konkretne, nie przepisuj całych sekcji „na wszelki wypadek”,
+- przy większych/wieloetapowych zmianach najpierw krótko powiedz co planujesz zrobić, zanim zaczniesz edytować,
+- jeśli zadanie jest naprawdę duże (np. rozbicie `panel.html` na moduły, migracja backendu) — zaproponuj rozbicie na etapy albo przekazanie do osobnej sesji, zamiast robić wszystko na raz.
 
 ## Synchronizacja zasad z Codexem
 

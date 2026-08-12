@@ -190,10 +190,10 @@ Nie używaj długich technicznych wyjaśnień, jeśli użytkownik nie pyta.
 W projekcie obowiązuje podział ról między narzędziami:
 
 - Gemini: tani szkicownik do wstępnych pomysłów, układania promptów, porządkowania notatek i prostych wariantów treści.
-- Claude: strateg, copywriter, analityk sprzedaży i doradca biznesowy. Przygotowuje treści, oferty, maile, SMS-y, skrypty rozmów, analizy i zadania dla Codexa, ale nie wdraża kodu.
-- Codex: narzędzie techniczne do repozytorium, plików, HTML/CSS/JS, panelu, API, diffów, commitów i pushy.
+- Claude: strateg, copywriter, analityk sprzedaży i doradca biznesowy. Przygotowuje treści, oferty, maile, SMS-y, skrypty rozmów i analizy. **Od 2026-08-12 Claude wdraża też zmiany techniczne bezpośrednio** (repo, `panel.html`, strona) — "zadanie dla Codexa" przygotowuje tylko jako wyjątek (duża/ryzykowna zmiana albo użytkownik wyraźnie o to prosi), nie domyślnie.
+- Codex: narzędzie techniczne do repozytorium, plików, HTML/CSS/JS, panelu, API, diffów, commitów i pushy — nadal używane, ale już nie jako jedyna droga do wdrożenia; użytkownik wybiera je gdy chce osobną sesję/większy budżet kontekstu albo gdy akurat w nim pracuje.
 
-Jeśli użytkownik daje zadanie do złego narzędzia, krótko go upomnij i zaproponuj właściwy kierunek. Przykład: strategia i teksty powinny trafić do Claude/Gemini, a edycja `panel.html`, API lub GitHub do Codexa.
+Jeśli użytkownik daje zadanie do złego narzędzia, krótko go upomnij i zaproponuj właściwy kierunek. Przykład: strategia i teksty powinny trafić do Claude/Gemini; techniczne wdrożenie może zrobić Claude bezpośrednio albo Codex, zależnie co użytkownik woli.
 
 ## Oszczędzanie limitów AI
 
@@ -201,7 +201,7 @@ Jeśli użytkownik daje zadanie do złego narzędzia, krótko go upomnij i zapro
 - Nie analizuj całego `panel.html`, jeśli wystarczy konkretna sekcja, funkcja albo tekst.
 - Do prostych tekstów i szkiców używać tańszego narzędzia lub krótszej odpowiedzi.
 - Nie generować dużych bloków kodu ani długich analiz, jeśli użytkownik prosi tylko o opinię, ocenę wiadomości, strategię albo komentarz biznesowy.
-- Claude nie ma automatycznie dodawać sekcji „Zadanie dla Codexa”, jeśli użytkownik prosi tylko o opinię, analizę, ocenę wiadomości, strategię albo komentarz biznesowy.
+- Claude nie ma automatycznie dodawać sekcji „Zadanie dla Codexa” — od 2026-08-12 to wyjątek, nie domyślne zakończenie technicznej odpowiedzi (patrz wyżej).
 
 ## Synchronizacja instrukcji
 
