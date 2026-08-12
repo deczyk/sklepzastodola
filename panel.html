@@ -1548,6 +1548,12 @@
   /* Faza 3 (2026-08-12): Firma — dokumenty/oferty, cenniki, podwykonawcy. */
   .fileCard,.priceCard,.vendorCard{border-radius:var(--radius-donezo);box-shadow:var(--shadow-donezo)}
 
+  /* Faza 4 (2026-08-12): Operacje — wiersze list dostają mniejszy promień
+     (12px, nie pełny token karty) bo to gęste listy, nie karty na siatce.
+     AI/System — .aiWorkflowCard to prawdziwa karta na siatce, pełny token. */
+  .item,.terminItem,.instItem,.finItem,.linkCard,.loanScenario,.zadanieItem{border-radius:12px}
+  .aiWorkflowCard{border-radius:var(--radius-donezo);box-shadow:var(--shadow-donezo)}
+
 </style>
 </head>
 <body>
