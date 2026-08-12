@@ -386,3 +386,21 @@ Uzasadnienie:
 Do sprawdzenia / następne kroki:
 - `CODEX_CLAUDE_INSTRUKCJA.md` wciąż opisuje stary podział ról (Claude = tylko strateg, nie pisze kodu) w wielu miejscach — wymaga osobnej, większej aktualizacji, jeszcze nie zrobionej.
 - Codex nadal jest dostępny jako opcja, gdy użytkownik chce osobnej sesji technicznej albo większego budżetu kontekstu.
+
+## 2026-08-12 — nowy kierunek wizualny panelu: redesign w stylu "Donezo" (Dribbble), fazami
+
+Status: potwierdzone (Faza 1 wdrożona)
+Źródło: rozmowa, referencja użytkownika — obrazek z Dribbble (szablon dashboardu "Donezo")
+
+Decyzja / założenie:
+- Panel prywatny (`panel.html`) ma zostać przebudowany wizualnie w duchu wzorca "Donezo" — czyste białe karty, duże zaokrąglenia, miękkie cienie, dużo przestrzeni, cienki sidebar z ikonami — ale z zachowaniem zielono-złotej palety marki (nie 1:1 kolorystyka wzorca).
+- Praca idzie fazami, nie jednym dużym refaktorem: Faza 1 = Start/Dashboard (zrobione i wdrożone 2026-08-12), kolejne fazy = Klienci, Sprzedaż, Firma, Operacje, AI/System — każda ma dostać własny cykl brainstorm → spec → plan.
+- Zasada bezpieczeństwa: zmiany tylko CSS, zero ruszania struktury HTML/JS/id/klas używanych przez skrypt — panel ma dane klientów na żywo.
+- Spec: `docs/superpowers/specs/2026-08-12-panel-donezo-redesign-design.md`. Plan Fazy 1: `docs/superpowers/plans/2026-08-12-panel-donezo-redesign-phase1.md`.
+
+Uzasadnienie:
+- Użytkownik chce, żeby panel wyglądał bardziej nowocześnie/profesjonalnie, jak gotowe narzędzie SaaS, bez tracenia tożsamości marki.
+
+Do sprawdzenia / następne kroki:
+- Zaplanować i wdrożyć Fazę 2 (Klienci) i kolejne, w osobnych sesjach.
+- Panel-sidebar-dashboard-refresh (poprzedni refresh z sierpnia 2026) i ten redesign to dwie różne, następujące po sobie fazy tego samego kierunku — nie mylić ich w przyszłych rozmowach.
