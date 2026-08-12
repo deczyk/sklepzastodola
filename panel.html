@@ -1410,6 +1410,75 @@
     .clientMobileName{font-size:14px}
   }
 
+  /* ============================================================
+     SIDEBAR LAYOUT (etap 1) — dodatkowa warstwa nad istniejącym
+     navShell/mainNav/subNav. Nie usuwa i nie zmienia żadnej klasy
+     bazowej — tylko dokłada układ 2-kolumnowy od 981px w górę.
+     Poniżej 981px .sidebar zachowuje się jak dawny .navShell
+     (te same klasy mainCategoryNav/subCategoryNav, ten sam scroll
+     poziomy z istniejących media queries) — nic na mobile się nie
+     zmienia w zachowaniu, tylko drobna kolejność wizualna.
+     ============================================================ */
+  .appShell{display:flex;flex-direction:column}
+  .sidebar{background:var(--nav-panel);border-bottom:1px solid var(--border)}
+  .sidebarBrand{display:flex;align-items:center;gap:10px;padding:12px 16px}
+  .sidebarBrand .logo{width:28px;height:28px;flex-shrink:0}
+  .sidebarBrandText{display:flex;flex-direction:column;line-height:1.3}
+  .sidebarBrandText strong{font-size:13px;color:var(--green)}
+  .sidebarBrandText span{font-size:11px;color:var(--text-muted)}
+  .appMain{min-width:0}
+
+  @media(min-width:981px){
+    .appShell{flex-direction:row;align-items:stretch}
+    .sidebar{
+      flex:0 0 252px;width:252px;
+      display:flex;flex-direction:column;gap:16px;
+      padding:20px 14px 24px;
+      border-right:1px solid var(--border);border-bottom:none;
+      box-shadow:2px 0 14px #0000000a;
+    }
+    .appMain{flex:1}
+    .sidebarBrand{padding:2px 8px 4px}
+    .sidebar .navShell{display:flex;flex-direction:column;gap:16px;margin-bottom:0}
+    .sidebar .mainCategoryNav,
+    .sidebar .subCategoryNav{
+      display:flex;flex-direction:column;gap:3px;
+      background:transparent;border:none;box-shadow:none;padding:0;overflow:visible
+    }
+    .sidebar .mainCategoryBtn{
+      justify-content:flex-start;text-align:left;padding:10px 12px;
+      border-radius:10px;font-size:13.5px
+    }
+    .sidebar .mainCategoryBtn.active{box-shadow:0 6px 16px #1d3b2426}
+    .sidebar .subCategoryNav{
+      padding:8px 4px 4px 12px;border-left:2px solid var(--border);
+      margin-left:2px
+    }
+    .sidebar .subCategoryBtn{text-align:left;padding:7px 10px;font-size:12.5px}
+  }
+
+  @media(max-width:980px){
+    .sidebarBrand{display:none}
+  }
+
+  /* ============================================================
+     DASHBOARD — drobny refresh kart KPI (etap 2), bez zmiany
+     żadnego id/funkcji renderującej — tylko wygląd .dashKpiCard
+     i lekki hover na .dashCard.
+     ============================================================ */
+  .dashCard{transition:transform .14s ease,box-shadow .14s ease}
+  .dashCard:hover{transform:translateY(-2px);box-shadow:0 14px 28px #1d3b2416}
+  .dashKpiCard{position:relative;overflow:hidden;padding-top:18px}
+  .dashKpiCard:before{
+    content:"";position:absolute;top:0;left:0;right:0;height:4px;
+    background:linear-gradient(90deg,var(--green),#6fae74)
+  }
+  .dashKpiCard:nth-child(2):before{background:linear-gradient(90deg,var(--progress),#e8c876)}
+  .dashKpiCard:nth-child(3):before{background:linear-gradient(90deg,#3f7ec4,#7bb0e8)}
+  .dashKpiCard:nth-child(4):before{background:linear-gradient(90deg,var(--todo),#e08880)}
+  .dashKpiCard:nth-child(5):before{background:linear-gradient(90deg,var(--green),#6fae74)}
+  .dashKpiCard .num{font-size:28px}
+
 </style>
 </head>
 <body>
@@ -1432,6 +1501,7 @@
 
 <div id="app" style="display:none">
   <div id="unsyncedBanner" style="display:none;position:sticky;top:0;z-index:9999;background:#b23b3b;color:#fff;font-weight:bold;text-align:center;padding:10px 14px;font-size:14px;line-height:1.4"></div>
+
   <header>
     <svg class="logo" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
       <rect width="100" height="100" rx="22" fill="#2d5a27"/>
@@ -1458,22 +1528,35 @@
     <button class="lockBtn" onclick="lock()">Zablokuj</button>
   </header>
 
-  <div class="wrap">
-    <div class="statsBar" id="statsBar"></div>
-    <div class="whoRow">
-      Piszesz jako:
-      <select id="whoAmI" onchange="setWhoAmI(this.value)">
-        <option value="Jakub">Jakub</option>
-        <option value="Jarosław">Jarosław</option>
-      </select>
-    </div>
+  <div class="appShell" id="appShell">
+    <aside class="sidebar" id="panelSidebar">
+      <div class="sidebarBrand">
+        <svg class="logo" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+          <rect width="100" height="100" rx="22" fill="#2d5a27"/>
+          <line x1="50" y1="85" x2="50" y2="48" stroke="rgba(255,255,255,0.7)" stroke-width="5" stroke-linecap="round"/>
+          <path d="M50 55 C42 50 20 48 14 28 C14 28 36 20 50 42 Z" fill="#a8d4a4"/>
+          <path d="M50 44 C56 38 76 28 82 10 C82 10 60 8 50 30 Z" fill="rgba(255,255,255,0.88)"/>
+        </svg>
+        <div class="sidebarBrandText"><strong>Sklep za Stodołą</strong><span>Panel pracy</span></div>
+      </div>
+      <div class="navShell">
+        <div id="mainNav" class="mainCategoryNav"></div>
+        <div id="subNav" class="subCategoryNav"></div>
+      </div>
+    </aside>
 
-    <div class="navShell">
-      <div id="mainNav" class="mainCategoryNav"></div>
-      <div id="subNav" class="subCategoryNav"></div>
-    </div>
+    <div class="appMain">
+      <div class="wrap">
+        <div class="statsBar" id="statsBar"></div>
+        <div class="whoRow">
+          Piszesz jako:
+          <select id="whoAmI" onchange="setWhoAmI(this.value)">
+            <option value="Jakub">Jakub</option>
+            <option value="Jarosław">Jarosław</option>
+          </select>
+        </div>
 
-    <div class="tabPane active" id="tabpane-dashboard">
+        <div class="tabPane active" id="tabpane-dashboard">
       <div class="dashGrid">
         <div class="dashCard dashHero">
           <div class="dashHeroTitle">Cześć, <span id="dashWho">Jakub</span> 👋</div>
@@ -2403,7 +2486,9 @@
       <button class="save" onclick="submitAddClient()">Zapisz klienta</button>
     </div>
   </div>
-</div>
+</div><!-- /.wrap -->
+    </div><!-- /.appMain -->
+  </div><!-- /.appShell -->
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script>
