@@ -1491,6 +1491,23 @@
   .dashKpiCard:nth-child(5):before{background:linear-gradient(90deg,var(--green),#6fae74)}
   .dashKpiCard .num{font-size:28px}
 
+  /* ============================================================
+     Stage 2/2 dopisek: ten sam akcent (cienki pasek u góry) co na
+     .dashKpiCard, rozszerzony na resztę kart dashboardu, żeby całość
+     była jednym spójnym systemem, nie tylko KPI. .dashHero i
+     .commandCenter mają już własne pełne tło/obramowanie — dostają
+     content:none, żeby się nie dublowało z paskiem.
+     ============================================================ */
+  .dashCard:before{
+    content:"";position:absolute;top:0;left:0;right:0;height:4px;
+    background:linear-gradient(90deg,var(--green),#6fae74);opacity:.55
+  }
+  .dashHero:before,.commandCenter:before{content:none}
+  .dashToday:before{background:linear-gradient(90deg,var(--todo),#e08880)}
+  .dashActivityCard:before{background:linear-gradient(90deg,#3f7ec4,#7bb0e8)}
+  .dashNotifications:before,.dashAi:before{background:linear-gradient(90deg,var(--progress),#e8c876)}
+  .dashSecondary:before{background:linear-gradient(90deg,var(--muted),#9db3a1);opacity:.35}
+
 </style>
 </head>
 <body>
