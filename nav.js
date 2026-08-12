@@ -134,7 +134,7 @@
   const pageName = (location.pathname.split('/').pop() || 'index.html').toLowerCase();
   const pageData = {
     'oferta.html': { trail:[['Oferta','']], links:[['Mlekomat BRUNIMAT','mlekomat.html'],['Automaty Sielaff','automat-chlodniczy.html'],['Sprawdź gospodarstwo','advisor.html']] },
-    'mlekomat.html': { trail:[['Oferta','oferta.html'],['Mlekomat BRUNIMAT','']], links:[['Ile kosztuje mlekomat?','poradnik-ile-kosztuje-mlekomat.html'],['Czy mlekomat jest legalny?','poradnik-czy-mlekomat-jest-legalny.html'],['Sprawdź gospodarstwo','advisor.html']] },
+    'mlekomat.html': { trail:[['Oferta','oferta.html'],['Mlekomat BRUNIMAT','']], links:[['Ile kosztuje mlekomat?','poradnik-ile-kosztuje-mlekomat.html'],['Czy mlekomat jest legalny?','poradnik-czy-mlekomat-jest-legalny.html'],['Jak sprzedawać mleko bezpośrednio','poradnik-jak-sprzedac-mleko-bezposrednio.html'],['Sprawdź gospodarstwo','advisor.html']] },
     'automat-chlodniczy.html': { trail:[['Oferta','oferta.html'],['Automaty chłodnicze Sielaff','']], links:[['Pełny system sprzedaży','oferta.html'],['Jak działamy','jak-dzialamy.html'],['Dobierz rozwiązanie','advisor.html']] },
     'pawilony.html': { trail:[['Oferta','oferta.html'],['Pawilony sprzedażowe','']], links:[['Mlekomat BRUNIMAT','mlekomat.html'],['Automaty Sielaff','automat-chlodniczy.html'],['Zapytaj o projekt','kontakt.html']] },
     'butelki.html': { trail:[['Oferta','oferta.html'],['Butelki szklane','']], links:[['Mlekomat BRUNIMAT','mlekomat.html'],['Automaty Sielaff','automat-chlodniczy.html'],['Zapytaj o wycenę','kontakt.html']] },

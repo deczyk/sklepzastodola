@@ -43,6 +43,12 @@
     <priority>0.7</priority>
   </url>
   <url>
+    <loc>https://www.sklepzastodola.pl/cennik.html</loc>
+    <lastmod>2026-08-12</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>https://www.sklepzastodola.pl/butelki.html</loc>
     <lastmod>2026-07-10</lastmod>
     <changefreq>monthly</changefreq>
@@ -71,6 +77,12 @@
     <lastmod>2026-08-02</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.sklepzastodola.pl/poradnik-jak-sprzedac-mleko-bezposrednio.html</loc>
+    <lastmod>2026-08-12</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://www.sklepzastodola.pl/poradnik-ile-kosztuje-mlekomat.html</loc>
@@ -131,5 +143,11 @@
     <lastmod>2026-08-02</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://www.sklepzastodola.pl/polityka.html</loc>
+    <lastmod>2026-08-12</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
   </url>
 </urlset>
