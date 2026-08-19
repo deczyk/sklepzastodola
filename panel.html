@@ -8744,6 +8744,14 @@ function doradcaKey(item){
   ].map(v => normalizeXlsxHeader(v)).join("|");
 }
 
+// Klucz tożsamości BEZ telefonu — używany przy re-imporcie tej samej listy z dopisanymi
+// telefonami. Gdyby klucz zawierał telefon, taki re-import tworzyłby duplikaty (stary wpis
+// bez telefonu + nowy z telefonem) zamiast dopisać telefon do istniejącej osoby.
+function doradcaIdentityKey(item){
+  return [item.imie, item.nazwisko, item.miejsce, item.powiat, item.wojewodztwo, item.email]
+    .map(v => normalizeXlsxHeader(v)).join("|");
+}
+
 function mapDoradcaRow(row, index){
   const imie = doradcyCell(row, 1);
   const nazwisko = doradcyCell(row, 2);
@@ -8843,26 +8851,44 @@ async function importDoradcyFromSelectedXlsx(input){
       : mapDoradcaRow;
     if(!data.doradcyRolni) data.doradcyRolni = [];
     const existingKeys = new Set(data.doradcyRolni.map(doradcaKey));
-    let added = 0, skipped = 0;
+    const byIdentity = new Map();
+    data.doradcyRolni.forEach(d => byIdentity.set(doradcaIdentityKey(d), d));
+    let added = 0, skipped = 0, updated = 0;
     dataRows.forEach((row, index) => {
       const item = mapRow(row, index);
       if(!item) return;
       const key = doradcaKey(item);
       if(existingKeys.has(key)){ skipped++; return; }
+      // Ta sama osoba (imię+nazwisko+miejsce+powiat+województwo+email) już jest w bazie, ale
+      // z innym telefonem (np. re-import listy, do której dopisano telefony) — dopisujemy
+      // brakujące pola do istniejącego rekordu zamiast tworzyć duplikat.
+      const existing = byIdentity.get(doradcaIdentityKey(item));
+      if(existing){
+        let filled = false;
+        ["telefon","email","urlCdr","statusKontaktu","podmiotKontaktowy"].forEach(field => {
+          if(item[field] && !existing[field]){ existing[field] = item[field]; filled = true; }
+        });
+        if(filled){ existing.zaktualizowano = new Date().toISOString(); updated++; }
+        else skipped++;
+        return;
+      }
       existingKeys.add(key);
+      byIdentity.set(doradcaIdentityKey(item), item);
       data.doradcyRolni.push(item);
       added++;
     });
-    if(added){
-      logActivity(`zaimportował(a) ${added} doradców rolnych z Excela`);
+    if(added || updated){
+      logActivity(`zaimportował(a) ${added} doradców rolnych z Excela${updated?` (dopisano dane do ${updated} istniejących)`:""}`);
       saveData();
     }
     renderDoradcyRolni();
     renderStatsBar();
     if(msg){
-      msg.textContent = added > 0
-        ? `Zaimportowano ${added} doradców.${skipped>0?` Pominięto duplikaty: ${skipped}.`:""}`
-        : (skipped>0 ? `Nie dodano nowych doradców. Duplikaty: ${skipped}.` : "Nie znaleziono rekordów do importu.");
+      const parts = [];
+      if(added>0) parts.push(`Zaimportowano ${added} nowych.`);
+      if(updated>0) parts.push(`Dopisano dane (np. telefon) do ${updated} istniejących.`);
+      if(skipped>0) parts.push(`Pominięto duplikaty: ${skipped}.`);
+      msg.textContent = parts.length ? parts.join(" ") : "Nie znaleziono rekordów do importu.";
     }
   }catch(e){
     if(msg) msg.textContent = "Błąd importu bazy doradców: " + (e.message || e);
