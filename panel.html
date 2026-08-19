@@ -1593,7 +1593,7 @@
       <div id="globalSearchResults" class="globalSearchResults"></div>
     </div>
     <span id="syncStatus" style="font-size:11px;color:#cfe8d6;margin-left:auto;margin-right:4px"></span>
-    <span id="liveSyncBanner" class="lockBtn" style="display:none;background:#c9a24a;border-color:#c9a24a;color:#22331f;font-weight:bold;pointer-events:none">Nowe dane z drugiego urządzenia — zostaną scalone automatycznie</span>
+    <button type="button" id="liveSyncBanner" class="lockBtn" style="display:none;background:#c9a24a;border-color:#c9a24a;color:#22331f;font-weight:bold" onclick="refreshFromRemote()" title="Kliknij, aby od razu wczytać nowe dane">Nowe dane z drugiego urządzenia — kliknij, aby wczytać</button>
     <a class="lockBtn" href="index.html">Strona główna</a>
     <button class="lockBtn" onclick="refreshFromRemote()">⟳ Odśwież</button>
     <div class="themeToggleGroup" aria-label="Motyw panelu">
@@ -2592,6 +2592,21 @@ const LAST_REMOTE_SNAPSHOT_KEY = "panel_last_remote_snapshot_v1";
 const SYNC_ENABLED = true;
 const ACTIVE_DRIVE_CATALOG_ID = "shared_drive_0ACFzxkUrgaMkUk9PVA_20260810";
 
+// Lokalny cache w localStorage ma limit (zwykle ~5-10MB na domenę). Przy dużych importach
+// (np. baza doradców) potrafi się przepełnić. Chmura (Supabase) i tak jest źródłem prawdy,
+// więc przepełniony lokalny cache nie może przerywać zapisu ani gubić danych w pamięci —
+// tylko ostrzega, że lokalna kopia offline może być niepełna.
+function persistLocalCache(payload){
+  try{
+    localStorage.setItem(STORAGE_KEY, payload);
+    return true;
+  }catch(e){
+    console.warn("Lokalny cache (localStorage) jest pełny — dane pójdą tylko do chmury:", e);
+    setSyncStatus?.("Lokalna pamięć przeglądarki jest pełna — zapisuję tylko do chmury", true);
+    return false;
+  }
+}
+
 // Flaga niezapisanych zmian musi przeżyć odświeżenie strony — inaczej po F5/zamknięciu karty
 // w trakcie zapisu (debounce, słabe łącze, konflikt wersji) panel ładuje dane z chmury i ubija
 // notatkę, która jeszcze nie zdążyła tam dotrzeć. Dlatego trzymamy ją też w localStorage.
@@ -3377,7 +3392,7 @@ async function pushRemote(payload, attempt = 0, revision = localChangeRevision){
     data = newerLocalChanges
       ? ensurePanelSyncIds(mergePanelSnapshots(payload, currentLocalData, savedSnapshot))
       : ensurePanelSyncIds(clonePanelValue(savedSnapshot));
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    persistLocalCache(JSON.stringify(data));
     notifyOtherPanelTabs(currentPanelVersion);
     lastCloudSaveOk = true;
     if(!newerLocalChanges){
@@ -3538,7 +3553,7 @@ async function initApp(){
     data.driveCatalogId = ACTIVE_DRIVE_CATALOG_ID;
     logActivity(`zresetował(a) katalog dokumentów po zmianie Google Drive (${removedCount} starych wpisów); pliki źródłowe nie zostały usunięte`);
   }
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  persistLocalCache(JSON.stringify(data));
   if(SYNC_ENABLED){
     if(pendingFromBefore){
       setSyncStatus("Dosyłam niezapisane zmiany z poprzedniej sesji...", true);
@@ -3718,7 +3733,7 @@ async function refreshFromRemote(options = {}){
       : freshRemote;
     rememberRemoteSnapshot(freshRemote);
     fillMissingDefaults(data);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    persistLocalCache(JSON.stringify(data));
     render();
     if(hadLocalChanges){
       setSyncStatus("Scalono dane, zapisuję zmiany...", true);
@@ -3742,7 +3757,15 @@ function isSomethingLikelyBeingEdited(){
   const openModal = document.querySelector(".previewModal.open");
   if(openModal) return true;
   const active = document.activeElement;
-  if(active && ["INPUT","TEXTAREA","SELECT"].includes(active.tagName)) return true;
+  if(active && ["INPUT","TEXTAREA","SELECT"].includes(active.tagName)){
+    // Pola wyszukiwania/filtrów (id zaczyna się od "search"/"filter", plus globalSearchInput)
+    // nie liczą się jako edycja danych — inaczej wpisanie zapytania w szukajkę blokowało
+    // ciche wczytanie nowych danych z drugiej karty/urządzenia (dane wgrane gdzie indziej
+    // "nie wrzucały się" dopóki user nie kliknął poza pole wyszukiwania).
+    const id = active.id || "";
+    const isSearchOrFilter = id === "globalSearchInput" || /^(search|filter)/i.test(id);
+    if(!isSearchOrFilter) return true;
+  }
   return false;
 }
 
@@ -3832,7 +3855,7 @@ window.addEventListener("beforeunload", (e)=>{
 
 function saveData(options = {}){
   ensurePanelSyncIds(data);
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  persistLocalCache(JSON.stringify(data));
   if(!SYNC_ENABLED) return Promise.resolve(false);
   localChangeRevision += 1;
   const revision = localChangeRevision;
@@ -3850,7 +3873,7 @@ let liveFieldSavePending = false;
 
 function persistLiveFieldDraft(){
   ensurePanelSyncIds(data);
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  persistLocalCache(JSON.stringify(data));
   hasUnsyncedLocalChanges = true;
   liveFieldSavePending = true;
   markPendingSync(true);
@@ -4457,7 +4480,12 @@ function renderHistoryTimeline(c, editable=false){
   if(hist.length===0 && !legacyNote){
     return '<div class="empty">Brak historii dla tego klienta</div>';
   }
-  const entries = hist.map((h,index)=>({h,index})).reverse().map(({h,index}) => {
+  const entries = hist.map((h,index)=>({h,index})).sort((a,b)=>{
+    const byDate = new Date(b.h.data || 0) - new Date(a.h.data || 0);
+    if(byDate) return byDate;
+    const byCreatedAt = new Date(b.h.utworzono || 0) - new Date(a.h.utworzono || 0);
+    return byCreatedAt || b.index - a.index;
+  }).map(({h,index}) => {
     const parsed = parseHistoryText(h.tekst);
     if(editable && currentHistoryEditIndex === index){
       return `
@@ -5210,6 +5238,7 @@ function render(){
   renderTelefony();
   renderDiary();
   renderDoradcyRolni();
+  renderGlobalSearch(); // odśwież wyniki, gdyby refresh danych (np. z drugiej karty) przyszedł w trakcie wpisywania
   fillDocumentClientOptions();
 
   // --- Dokumenty: grupowane wg kategorii, z wyszukiwarką ---
@@ -8006,7 +8035,7 @@ function commitClientField(el){
   if(changed){
     c[field] = value;
     c.zaktualizowano = new Date().toISOString();
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    persistLocalCache(JSON.stringify(data));
   }
   if(field === "telefon" && el.value !== value) el.value = value;
   if(field==="status" && changed){
@@ -8652,9 +8681,33 @@ function importDoradcyFromXlsx(){
 }
 
 function doradcySheetName(wb){
-  return wb.SheetNames.includes("Baza_Z_KONTAKTAMI")
-    ? "Baza_Z_KONTAKTAMI"
-    : (wb.SheetNames.find(name => normalizeXlsxHeader(name).includes("kontakt")) || wb.SheetNames[0]);
+  // "Baza_Z_KONTAKTAMI" to stary format (telefon-first, CDR). "Wyniki" to nowy format
+  // (indywidualne maile/telefony doradców) — jeśli oba są w pliku, wybieramy jawnie,
+  // zamiast polegać na kolejności arkuszy (plik ma też robocze/testowe arkusze: Arkusz1, 30, @, 10).
+  const preferred = ["Baza_Z_KONTAKTAMI", "Wyniki"];
+  const exact = preferred.find(name => wb.SheetNames.includes(name));
+  if(exact) return exact;
+  return wb.SheetNames.find(name => normalizeXlsxHeader(name).includes("kontakt")) || wb.SheetNames[0];
+}
+
+// Mapowanie po nazwach nagłówków (odporne na kolejność kolumn) — używane dla nowego
+// formatu importu (lista indywidualnych maili/telefonów), gdzie kolumny różnią się
+// od starego, sztywnego układu Baza_Z_KONTAKTAMI.
+function doradcyHeaderIndexMap(headerRow){
+  const map = {};
+  (headerRow || []).forEach((cell, idx) => {
+    const key = normalizeXlsxHeader(cell);
+    if(key && map[key] === undefined) map[key] = idx;
+  });
+  return map;
+}
+
+function doradcyHeaderValue(headerMap, row, candidates){
+  for(const label of candidates){
+    const idx = headerMap[normalizeXlsxHeader(label)];
+    if(idx !== undefined) return doradcyCell(row, idx);
+  }
+  return "";
 }
 
 function doradcyCell(row, index){
@@ -8725,12 +8778,49 @@ function mapDoradcaRow(row, index){
   };
 }
 
+// Nowy format importu: "indywidualne adresy e-mail (z telefonami)" — inny układ kolumn
+// niż stary Baza_Z_KONTAKTAMI (rozpoznawany po kolumnie "Instytucja źródłowa", której
+// stary format nie ma). Mapujemy tylko pola, które mają tu sens: imię, nazwisko, miejsce,
+// e-mail, status, instytucja źródłowa, źródło URL (jako klik, nie surowy link) i telefon.
+function mapDoradcaRowFromEmailList(headerMap, row, index){
+  const imie = doradcyHeaderValue(headerMap, row, ["Imię (auto)", "Imię"]);
+  const nazwisko = doradcyHeaderValue(headerMap, row, ["Nazwisko (auto)", "Nazwisko"]);
+  const miejsce = doradcyHeaderValue(headerMap, row, ["Miejsce świadczenia usług (auto)", "Miejsce świadczenia usług", "Miejsce"]);
+  const email = doradcyHeaderValue(headerMap, row, ["Indywidualny e-mail", "E-mail indywidualny", "E-mail", "Email"]);
+  const telefon = doradcyHeaderValue(headerMap, row, ["Telefon", "Indywidualny telefon", "Nr telefonu"]);
+  if(!imie && !nazwisko && !miejsce && !email && !telefon) return null;
+  return {
+    id:`dr_${Date.now()}_${index}`,
+    imie,
+    nazwisko,
+    miejsce,
+    powiat: "",
+    wojewodztwo: "",
+    typPodmiotu: "",
+    telefon,
+    email,
+    adres: "",
+    podmiotKontaktowy: doradcyHeaderValue(headerMap, row, ["Instytucja źródłowa"]),
+    rodzajKontaktu: "",
+    statusKontaktu: doradcyHeaderValue(headerMap, row, ["Status", "Status e-mail"]),
+    pelnyWpis: "",
+    stronaRejestru: "",
+    urlCdr: doradcyHeaderValue(headerMap, row, ["Źródło URL", "URL źródła"]),
+    zrodloKontaktu: "",
+    dataWeryfikacji: "",
+    uwagi: "",
+    utworzono: new Date().toISOString(),
+    zaktualizowano: new Date().toISOString()
+  };
+}
+
 function rowsFromDoradcyWorkbook(wb){
   const sheetName = doradcySheetName(wb);
   const ws = wb.Sheets[sheetName];
   const rows = XLSX.utils.sheet_to_json(ws, {header:1, defval:"", raw:false});
   const firstDataRow = rows.findIndex(row => normalizeXlsxHeader(row && row[0]) === "lp");
-  return rows.slice((firstDataRow >= 0 ? firstDataRow : 0) + 1);
+  const headerRow = firstDataRow >= 0 ? rows[firstDataRow] : (rows[0] || []);
+  return { headerRow, dataRows: rows.slice((firstDataRow >= 0 ? firstDataRow : 0) + 1) };
 }
 
 async function importDoradcyFromSelectedXlsx(input){
@@ -8743,12 +8833,19 @@ async function importDoradcyFromSelectedXlsx(input){
   try{
     const buf = await file.arrayBuffer();
     const wb = XLSX.read(buf, {type:"array", cellDates:true});
-    const rows = rowsFromDoradcyWorkbook(wb);
+    const { headerRow, dataRows } = rowsFromDoradcyWorkbook(wb);
+    const headerMap = doradcyHeaderIndexMap(headerRow);
+    // "Instytucja źródłowa" jest tylko w nowym formacie (lista maili/telefonów) — stary
+    // format Baza_Z_KONTAKTAMI ma sztywny układ kolumn bez tej nazwy.
+    const isEmailListFormat = headerMap[normalizeXlsxHeader("Instytucja źródłowa")] !== undefined;
+    const mapRow = isEmailListFormat
+      ? (row, index) => mapDoradcaRowFromEmailList(headerMap, row, index)
+      : mapDoradcaRow;
     if(!data.doradcyRolni) data.doradcyRolni = [];
     const existingKeys = new Set(data.doradcyRolni.map(doradcaKey));
     let added = 0, skipped = 0;
-    rows.forEach((row, index) => {
-      const item = mapDoradcaRow(row, index);
+    dataRows.forEach((row, index) => {
+      const item = mapRow(row, index);
       if(!item) return;
       const key = doradcaKey(item);
       if(existingKeys.has(key)){ skipped++; return; }
@@ -8826,7 +8923,14 @@ function renderDoradcyRolni(){
     ["Zweryfikowane", verified],
     ["Prywatni doradcy", privateAdvisors]
   ].map(([label, value]) => `<div class="statCard"><div class="num">${value}</div><div class="lbl">${crmEsc(label)}</div></div>`).join("");
-  const visible = filtered.slice(0, 250);
+  // Doradcy z bezpośrednim kontaktem (telefon/email) mają iść na górę listy, reszta (sam
+  // adres instytucji, bez indywidualnego kontaktu) na dół — łatwiej trafić do właściwych osób.
+  const sorted = filtered.slice().sort((a, b) => {
+    const aHas = (a.telefon || a.email) ? 1 : 0;
+    const bHas = (b.telefon || b.email) ? 1 : 0;
+    return bHas - aHas;
+  });
+  const visible = sorted.slice(0, 250);
   body.innerHTML = visible.map(item => {
     const name = [item.imie, item.nazwisko].filter(Boolean).join(" ") || "Bez nazwiska";
     const contact = [
