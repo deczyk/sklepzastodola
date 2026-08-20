@@ -251,14 +251,19 @@
     '.quote-card'
   ].join(',');
 
-  document.querySelectorAll(autoRevealSelectors).forEach((el, index)=>{
-    if(!el.hasAttribute('data-r')) el.setAttribute('data-r', 'fade-up');
-    if(!el.hasAttribute('data-d')) el.style.setProperty('--reveal-delay', `${Math.min(index % 6, 5) * 55}ms`);
-  });
+  const mobileHome = window.matchMedia('(max-width: 600px)').matches &&
+    (location.pathname === '/' || location.pathname.endsWith('/index.html'));
+
+  if(!mobileHome){
+    document.querySelectorAll(autoRevealSelectors).forEach((el, index)=>{
+      if(!el.hasAttribute('data-r')) el.setAttribute('data-r', 'fade-up');
+      if(!el.hasAttribute('data-d')) el.style.setProperty('--reveal-delay', `${Math.min(index % 6, 5) * 55}ms`);
+    });
+  }
 
   const revealItems = document.querySelectorAll('[data-r]');
   const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  if(reduceMotion || !('IntersectionObserver' in window)){
+  if(mobileHome || reduceMotion || !('IntersectionObserver' in window)){
     revealItems.forEach(el=> el.classList.add('on'));
   } else {
     const obs = new IntersectionObserver(entries=>{
