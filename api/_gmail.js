@@ -237,7 +237,7 @@ function safeAttachmentName(value) {
     .slice(0, 160) || "zalacznik";
 }
 
-function buildRawMessage({ fromEmail, fromName, to, subject, body, attachments = [], inReplyToMessageId, references }) {
+function buildRawMessage({ fromEmail, fromName, to, subject, body, html, attachments = [], inReplyToMessageId, references }) {
   const headerLines = [
     `From: ${fromName ? `${encodeRfc2047(fromName)} <${fromEmail}>` : fromEmail}`,
     `To: ${to}`,
@@ -246,16 +246,41 @@ function buildRawMessage({ fromEmail, fromName, to, subject, body, attachments =
   ];
   if (inReplyToMessageId) headerLines.push(`In-Reply-To: ${inReplyToMessageId}`);
   if (references) headerLines.push(`References: ${references}`);
+
+  // Bez html: dokładnie jak wcześniej - czysty text/plain. Z html (graficzna stopka z logo)
+  // dokładamy text/html jako multipart/alternative - klient poczty wybiera wersję, którą
+  // umie wyświetlić, text/plain zostaje jako fallback (i jako sygnał antyspamowy, patrz
+  // komentarz w _email.js).
+  let contentTypeLine;
+  let bodySection;
+  if (html) {
+    const altBoundary = `szs_alt_${crypto.randomBytes(12).toString("hex")}`;
+    contentTypeLine = `Content-Type: multipart/alternative; boundary="${altBoundary}"`;
+    bodySection = [
+      `--${altBoundary}`,
+      'Content-Type: text/plain; charset="UTF-8"',
+      "Content-Transfer-Encoding: 8bit",
+      "",
+      body,
+      `--${altBoundary}`,
+      'Content-Type: text/html; charset="UTF-8"',
+      "Content-Transfer-Encoding: 8bit",
+      "",
+      html,
+      `--${altBoundary}--`
+    ].join("\r\n");
+  } else {
+    contentTypeLine = 'Content-Type: text/plain; charset="UTF-8"\r\nContent-Transfer-Encoding: 8bit';
+    bodySection = body;
+  }
+
   let raw;
   if (!attachments.length) {
-    headerLines.push('Content-Type: text/plain; charset="UTF-8"', "Content-Transfer-Encoding: 8bit");
-    raw = `${headerLines.join("\r\n")}\r\n\r\n${body}`;
+    raw = `${headerLines.join("\r\n")}\r\n${contentTypeLine}\r\n\r\n${bodySection}`;
   } else {
     const boundary = `szs_${crypto.randomBytes(18).toString("hex")}`;
     headerLines.push(`Content-Type: multipart/mixed; boundary="${boundary}"`);
-    const parts = [
-      `--${boundary}\r\nContent-Type: text/plain; charset="UTF-8"\r\nContent-Transfer-Encoding: 8bit\r\n\r\n${body}`
-    ];
+    const parts = [`--${boundary}\r\n${contentTypeLine}\r\n\r\n${bodySection}`];
     attachments.forEach(attachment => {
       const filename = safeAttachmentName(attachment.filename);
       const encodedName = encodeURIComponent(filename);
@@ -275,8 +300,8 @@ function buildRawMessage({ fromEmail, fromName, to, subject, body, attachments =
 // mailboxEmail wysyła JAKO siebie (impersonacja przez "sub" w tokenie) - to jest prawdziwa
 // wysyłka z konta Gmail, nie przez zewnętrzny serwis, więc trafia do Wysłanych na tej
 // skrzynce i ma normalną reputację nadawcy zamiast transakcyjnej.
-async function sendMessage(mailboxEmail, { fromName, to, subject, body, attachments, threadId }) {
-  const raw = buildRawMessage({ fromEmail: mailboxEmail, fromName, to, subject, body, attachments });
+async function sendMessage(mailboxEmail, { fromName, to, subject, body, html, attachments, threadId }) {
+  const raw = buildRawMessage({ fromEmail: mailboxEmail, fromName, to, subject, body, html, attachments });
   const json = await gmailFetch(mailboxEmail, "messages/send", null, {
     raw,
     ...(threadId ? { threadId } : {})

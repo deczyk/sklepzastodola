@@ -15,9 +15,44 @@ const MAX_SUBJECT_CHARS = 300;
 const MAX_ATTACHMENTS = 4;
 const MAX_ATTACHMENTS_BYTES = Math.floor(2.6 * 1024 * 1024);
 const DEFAULT_MAIL_SIGNATURES = {
-  kontakt: "Pozdrawiam\nSklep za Stodołą Sp. z o.o.\n+48 735 115 427\nkontakt@sklepzastodola.pl\nwww.sklepzastodola.pl",
-  jdeczynski: "Pozdrawiam\nJakub Deczyński\nSklep za Stodołą Sp. z o.o.\n+48 735 115 427\nj.deczynski@sklepzastodola.pl\nwww.sklepzastodola.pl"
+  kontakt: "Pozdrawiam\nJakub Deczyński\nSklep za Stodołą Sp. z o.o.\n+48 690 000 923\nkontakt@sklepzastodola.pl\nwww.sklepzastodola.pl",
+  jdeczynski: "Pozdrawiam\nJarosław Deczyński\nSklep za Stodołą Sp. z o.o.\n+48 735 115 427\nj.deczynski@sklepzastodola.pl\nwww.sklepzastodola.pl"
 };
+// Dane do graficznej stopki (logo + imię/nazwisko/telefon w stylu Google Workspace),
+// dokładana jako alternatywna wersja html obok zwykłego tekstu - patrz buildHtmlSignature.
+const SIGNATURE_PEOPLE = {
+  kontakt: { name: "Jakub Deczyński", phone: "+48 690 000 923", phoneHref: "+48690000923" },
+  jdeczynski: { name: "Jarosław Deczyński", phone: "+48 735 115 427", phoneHref: "+48735115427" }
+};
+const LOGO_URL = "https://www.sklepzastodola.pl/favicon-192.png";
+
+function escapeHtml(value) {
+  return String(value || "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
+function buildHtmlSignature(mailboxKey, mailboxEmail) {
+  const person = SIGNATURE_PEOPLE[mailboxKey];
+  if (!person) return "";
+  return [
+    '<table cellpadding="0" cellspacing="0" style="margin-top:18px;border-collapse:collapse;font-family:Arial,Helvetica,sans-serif;">',
+    "<tr>",
+    '<td style="padding-right:14px;vertical-align:top;">',
+    `<img src="${LOGO_URL}" width="46" height="46" alt="Sklep za Stodołą" style="display:block;border-radius:10px;">`,
+    "</td>",
+    '<td style="border-left:2px solid #d0aa3d;padding-left:14px;vertical-align:top;">',
+    '<div style="font-size:11px;letter-spacing:.5px;color:#8a8070;text-transform:uppercase;font-weight:bold;">Sklep za Stodołą</div>',
+    `<div style="font-size:16px;font-weight:bold;color:#0f4a2f;margin:2px 0 6px;">${escapeHtml(person.name)}</div>`,
+    `<div style="font-size:13px;color:#3d3b35;margin:2px 0;">&#9993; <a href="mailto:${mailboxEmail}" style="color:#3d3b35;text-decoration:none;">${mailboxEmail}</a></div>`,
+    `<div style="font-size:13px;color:#3d3b35;margin:2px 0;">&#9742; <a href="tel:${person.phoneHref}" style="color:#3d3b35;text-decoration:none;">${escapeHtml(person.phone)}</a></div>`,
+    "</td>",
+    "</tr>",
+    "</table>"
+  ].join("");
+}
 
 function getBasicAuth(req) {
   const header = req.headers.authorization || "";
@@ -114,9 +149,20 @@ module.exports = async function handler(req, res) {
     }
   }
 
+  // Graficzna stopka (logo + imię/nazwisko/telefon) tylko jako alternatywna wersja html -
+  // treść tekstowa (fullBody, z podpisem tekstowym powyżej) zostaje głównym źródłem prawdy
+  // i tym, co ląduje w historii klienta w panelu.
+  let htmlBody = null;
+  if (SIGNATURE_PEOPLE[mailboxKey]) {
+    const htmlSignature = buildHtmlSignature(mailboxKey, mailboxEmail);
+    if (htmlSignature) {
+      htmlBody = `<div style="font-family:Arial,Helvetica,sans-serif;font-size:14px;line-height:22px;color:#1e1e1a;white-space:pre-wrap;">${escapeHtml(body)}</div>${htmlSignature}`;
+    }
+  }
+
   let sent;
   try {
-    sent = await sendMessage(mailboxEmail, { fromName: senderName, to, subject, body: fullBody, attachments });
+    sent = await sendMessage(mailboxEmail, { fromName: senderName, to, subject, body: fullBody, html: htmlBody, attachments });
   } catch (e) {
     return res.status(502).json({ error: "Gmail send failed.", message: e && e.message ? e.message : String(e) });
   }
@@ -134,7 +180,7 @@ module.exports = async function handler(req, res) {
         const now = new Date().toISOString();
         client.historia.push({
           tekst: `[Mail wychodzący] Temat: ${subject}${attachments.length ? `\nZałączone zdjęcia: ${attachments.map(item => item.filename).join(", ")}` : ""}\n\n${fullBody}`,
-          kto: `${senderName} (panel, ${mailboxEmail})`,
+          kto: `${senderName} (panel, ${mailboxEmail} → ${to})`,
           data: now,
           utworzono: now,
           _mailMessageId: sent.id

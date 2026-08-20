@@ -3551,12 +3551,13 @@ function stageMailSignature(key, value){
 
 const DEFAULT_MAIL_SIGNATURES = {
   kontakt:`Pozdrawiam
+Jakub Deczyński
 Sklep za Stodołą Sp. z o.o.
-+48 735 115 427
++48 690 000 923
 kontakt@sklepzastodola.pl
 www.sklepzastodola.pl`,
   jdeczynski:`Pozdrawiam
-Jakub Deczyński
+Jarosław Deczyński
 Sklep za Stodołą Sp. z o.o.
 +48 735 115 427
 j.deczynski@sklepzastodola.pl
@@ -7315,7 +7316,7 @@ function renderMailComposeSection(c){
     </div>
     <div class="clientCardField" style="margin-top:8px"><b>Temat</b><input type="text" id="mailComposeSubject-${c.id}" placeholder="Temat maila"></div>
     <div class="clientCardField" style="margin-top:8px"><b>Treść</b><textarea id="mailComposeBody-${c.id}" rows="8" placeholder="Treść maila..."></textarea></div>
-    <div class="mailSignaturePreview" id="mailSignaturePreview-${c.id}"><b>Podpis dodawany automatycznie:</b>\n${crmEsc(mailSignatureFor("kontakt"))}</div>
+    <div class="mailSignaturePreview" id="mailSignaturePreview-${c.id}"><b>Podpis dodawany automatycznie:</b>\n${crmEsc(mailSignatureFor("kontakt"))}\n\n<i>W mailu dojdzie też graficzna wersja stopki (logo + dane), widoczna u odbiorcy.</i></div>
     <div class="mailAttachmentBox">
       <b>Zdjęcia do wiadomości</b>
       <div class="formHint">Możesz dodać maksymalnie 4 zdjęcia JPG, PNG lub WebP. Panel zmniejszy je przed wysłaniem, żeby mail nie był zbyt ciężki.</div>
@@ -7335,7 +7336,7 @@ function renderMailComposeSection(c){
 function updateClientMailSignaturePreview(clientId){
   const mailboxKey = document.getElementById(`mailComposeFrom-${clientId}`)?.value || "kontakt";
   const preview = document.getElementById(`mailSignaturePreview-${clientId}`);
-  if(preview) preview.innerHTML = `<b>Podpis dodawany automatycznie:</b>\n${crmEsc(mailSignatureFor(mailboxKey))}`;
+  if(preview) preview.innerHTML = `<b>Podpis dodawany automatycznie:</b>\n${crmEsc(mailSignatureFor(mailboxKey))}\n\n<i>W mailu dojdzie też graficzna wersja stopki (logo + dane), widoczna u odbiorcy.</i>`;
 }
 
 function updateClientMailImageList(clientId){
