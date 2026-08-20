@@ -292,7 +292,7 @@
 
   if(!document.getElementById('cookie')){
     document.body.insertAdjacentHTML('beforeend',
-      '<div class="cookie" id="cookie" style="position:fixed;left:16px;right:16px;bottom:16px;z-index:9999;max-width:760px;margin:auto;background:#173a2f;color:#fff;border:1px solid rgba(255,255,255,.18);border-radius:16px;box-shadow:0 18px 50px rgba(0,0,0,.24);padding:14px 16px;display:none;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap">' +
+      '<div class="cookie" id="cookie" style="position:fixed;left:16px;right:16px;bottom:16px;z-index:9999;max-width:760px;margin:auto;background:#173a2f;color:#fff;border:1px solid rgba(255,255,255,.18);border-radius:16px;box-shadow:0 18px 50px rgba(0,0,0,.24);padding:14px 16px;display:flex;visibility:hidden;opacity:0;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap">' +
         '<p style="margin:0;font-size:14px;line-height:1.45">Ta strona używa plików cookies. Piksel Meta i analityka włączają się dopiero po zgodzie. <a href="polityka.html" style="color:#f1d18a;text-decoration:underline">Polityka prywatności</a></p>' +
         '<div class="cookie-btns" style="display:flex;gap:8px;flex-wrap:wrap">' +
           '<button class="ck-yes" onclick="setCk(&quot;yes&quot;)" style="border:0;border-radius:999px;padding:9px 13px;background:#d8a94f;color:#102b23;font-weight:800;cursor:pointer">Akceptuję</button>' +
@@ -306,18 +306,15 @@
   const hasConsent   = localStorage.getItem('cookie_consent');
 
   if(!hasConsent){
-    setTimeout(()=>{
-      const el = document.getElementById('cookie');
-      if(el){
-        el.classList.add('show');
-        el.style.display = 'flex';
-        // Na mobile sticky-mobile-cta zajmuje pasek na samym dole ekranu - podnosimy baner
-        // ciasteczek nad niego, żeby przyciski akceptacji się z nim nie nakładały/nie chowały.
-        const stickyCta = document.getElementById('sticky-mobile-cta');
-        const stickyHeight = stickyCta ? stickyCta.offsetHeight : 0;
-        el.style.bottom = stickyHeight > 0 ? `calc(${stickyHeight}px + 16px)` : '16px';
-      }
-    }, 800);
+    const el = document.getElementById('cookie');
+    if(el){
+      el.style.bottom = window.matchMedia('(max-width: 600px)').matches
+        ? 'calc(4.5rem + env(safe-area-inset-bottom))'
+        : '16px';
+      el.classList.add('show');
+      el.style.visibility = 'visible';
+      el.style.opacity = '1';
+    }
   }
 
   // ── LINK DO OPINII GOOGLE (w stopce, na każdej stronie) ──

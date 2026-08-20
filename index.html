@@ -27,16 +27,22 @@
 <meta name="twitter:description" content="Gotowy system sprzedaży bezpośredniej 24/7 dla rolników: mlekomat BRUNIMAT, automaty chłodnicze Sielaff, pawilon, finansowanie i opieka po starcie.">
 <meta name="twitter:image" content="https://www.sklepzastodola.pl/pawilon-1.jpg">
 
-<link rel="preload" as="image" href="pawilon-1.webp" imagesrcset="pawilon-1-800.webp 800w, pawilon-1.webp 1200w" imagesizes="100vw" fetchpriority="high">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="preload" href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,700;1,400;1,700&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
-<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,700;1,400;1,700&display=swap"></noscript>
+<link rel="preload" as="image" href="pawilon-1-mobile.avif" type="image/avif" media="(max-width: 600px)" fetchpriority="high">
+<link rel="preload" as="image" href="pawilon-1.webp" imagesrcset="pawilon-1-800.webp 800w, pawilon-1.webp 1200w" imagesizes="100vw" media="(min-width: 601px)" fetchpriority="high">
+<script>
+if (window.matchMedia('(min-width: 601px)').matches) {
+  var desktopFont = document.createElement('link');
+  desktopFont.rel = 'stylesheet';
+  desktopFont.href = 'https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,700;1,400;1,700&display=swap';
+  document.head.appendChild(desktopFont);
+}
+</script>
 <link rel="stylesheet" href="style.css">
 <style>
 /* HOME-ONLY */
 .hero { min-height: 90vh; display: flex; flex-direction: column; justify-content: flex-end; padding: 0 5vw 8vh; position: relative; overflow: hidden; background: var(--bg); }
 .hero-photo { position: absolute; inset: 0; z-index: 0; }
+.hero-photo picture { display: block; width: 100%; height: 100%; }
 .hero-photo img { width: 100%; height: 100%; object-fit: cover; opacity: .45; }
 .hero-photo::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to top, rgba(247,244,238,1) 12%, rgba(247,244,238,.6) 45%, rgba(247,244,238,.15) 100%); }
 .hero-content { position: relative; z-index: 1; }
@@ -47,6 +53,7 @@
 .hero-sub { font-size: clamp(.95rem, 1.4vw, 1.1rem); color: var(--muted); max-width: 52ch; line-height: 1.75; margin-bottom: 2.2rem; }
 .hero-sub strong { color: var(--ink); font-weight: 700; }
 .hero-actions { display: flex; flex-wrap: wrap; gap: .9rem; align-items: center; }
+.hero [data-r] { opacity: 1; transform: none; transition: none; }
 .hero-scroll { position: absolute; bottom: 2.5rem; right: 5vw; z-index: 1; writing-mode: vertical-rl; font-size: .65rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); display: flex; align-items: center; gap: .55rem; }
 .hero-scroll::after { content: ''; display: block; width: 1px; height: 2.8rem; background: linear-gradient(to bottom, var(--forest), transparent); animation: sc 2s ease-in-out infinite; }
 @keyframes sc { 0%,100%{opacity:.4} 50%{opacity:1} }
@@ -55,7 +62,7 @@
 .distributor-band { background: var(--wheat-bg); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); padding: 2rem 5vw 2.2rem; text-align: center; }
 .distributor-inner { display: flex; flex-direction: column; align-items: center; gap: 1.1rem; }
 .distributor-label { font-size: clamp(.74rem, 1.4vw, .88rem); font-weight: 800; letter-spacing: .13em; line-height: 1.35; text-transform: uppercase; color: var(--forest); margin-bottom: 0; }
-.distributor-logo { display: flex; align-items: center; justify-content: center; max-width: min(420px, 82vw); }
+.distributor-logo { display: flex; align-items: center; justify-content: center; width: min(420px, 82vw); }
 .distributor-logo img { width: 100%; height: auto; object-fit: contain; }
 .trust-sec { background: var(--wheat-bg); }
 .trust-swiss { display: inline-flex; align-items: center; gap: .45rem; padding: .4rem .9rem; border-radius: 999px; background: var(--paper); border: 1px solid rgba(184,144,42,.35); color: var(--wheat); font-size: .78rem; font-weight: 800; letter-spacing: .04em; margin-top: 1.4rem; }
@@ -188,6 +195,7 @@
   .practice-card { min-height: auto; }
   .practice-outcome { padding: 1.5rem; }
 }
+@supports(content-visibility:auto){body>section:nth-of-type(n+3){content-visibility:auto;contain-intrinsic-size:auto 900px}}
 
 .cta-band { padding: 5.5rem 5vw; border-top: 1px solid var(--line); }
 .cta-band-inner { max-width: 680px; }
@@ -265,6 +273,21 @@
 </head>
 <body>
 
+<div class="cookie show" id="cookie" style="position:fixed;left:50%;right:auto;bottom:calc(4.5rem + env(safe-area-inset-bottom));z-index:9999;width:calc(100% - 32px);max-width:660px;transform:translateX(-50%);background:#173a2f;color:#fff;border:1px solid rgba(255,255,255,.18);border-radius:16px;box-shadow:0 18px 50px rgba(0,0,0,.24);padding:14px 16px;display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap">
+  <p style="margin:0;font-size:14px;line-height:1.45">Ta strona używa plików cookies. Piksel Meta i analityka włączają się dopiero po zgodzie. <a href="polityka.html" style="color:#f1d18a;text-decoration:underline">Polityka prywatności</a></p>
+  <div class="cookie-btns" style="display:flex;gap:8px;flex-wrap:wrap">
+    <button class="ck-yes" onclick="setCk('yes')" style="border:0;border-radius:999px;padding:9px 13px;background:#d8a94f;color:#102b23;font-weight:800;cursor:pointer">Akceptuję</button>
+    <button class="ck-no" onclick="setCk('no')" style="border:1px solid rgba(255,255,255,.35);border-radius:999px;padding:9px 13px;background:transparent;color:#fff;font-weight:800;cursor:pointer">Tylko niezbędne</button>
+  </div>
+</div>
+<script>
+try {
+  var initialCookie = document.getElementById('cookie');
+  if (localStorage.getItem('cookie_consent')) initialCookie.style.display = 'none';
+  else if (!window.matchMedia('(max-width: 600px)').matches) initialCookie.style.bottom = '16px';
+} catch (e) {}
+</script>
+
 <div class="ticker">
   <div class="ticker-inner">
     <span>Kompleksowa obsługa farmera</span><span>🇨🇭 Oficjalny dystrybutor BRUNIMAT w Polsce</span><span>Dystrybucja automatów Sielaff</span><span>Drewniany pawilon pod klucz</span><span>Mleko i produkty świeże 24/7</span><span>Pomoc przy finansowaniu inwestycji</span><span>Leasing rolniczy</span><span>Instalacja i serwis — cała Polska</span><span>Kompleksowa obsługa farmera</span><span>🇨🇭 Oficjalny dystrybutor BRUNIMAT w Polsce</span><span>Dystrybucja automatów Sielaff</span><span>Drewniany pawilon pod klucz</span><span>Mleko i produkty świeże 24/7</span><span>Pomoc przy finansowaniu inwestycji</span><span>Leasing rolniczy</span><span>Instalacja i serwis — cała Polska</span>
@@ -305,7 +328,11 @@
 <section class="hero">
 <div class="wrap">
   <div class="hero-photo">
-    <img src="pawilon-1.webp" srcset="pawilon-1-800.webp 800w, pawilon-1.webp 1200w" sizes="100vw" width="1200" height="600" alt="Drewniany pawilon handlowy przy gospodarstwie" fetchpriority="high" decoding="async">
+    <picture>
+      <source media="(max-width: 600px)" type="image/avif" srcset="pawilon-1-mobile.avif">
+      <source media="(max-width: 600px)" type="image/webp" srcset="pawilon-1-mobile.webp">
+      <img src="pawilon-1.webp" srcset="pawilon-1-800.webp 800w, pawilon-1.webp 1200w" sizes="100vw" width="1200" height="600" alt="Drewniany pawilon handlowy przy gospodarstwie" fetchpriority="high" decoding="async">
+    </picture>
   </div>
   <div class="hero-content">
     <p class="hero-eyebrow" data-r="fade">Kompleksowa obsługa farmera</p>
@@ -328,7 +355,7 @@
   <div class="wrap distributor-inner">
     <p class="distributor-label">WYŁĄCZNY DYSTRYBUTOR MLEKOMATÓW BRUNIMAT W POLSCE</p>
     <div class="distributor-logo">
-      <img src="brunimat-logo.webp" width="1068" height="264" alt="BRUNIMAT" loading="lazy" decoding="async">
+      <img src="brunimat-logo-420.webp" width="420" height="104" alt="BRUNIMAT" loading="lazy" decoding="async">
     </div>
   </div>
 </section>
@@ -347,7 +374,7 @@
       </div>
     </div>
     <div class="demo-video-frame" data-r data-d="1">
-      <video controls preload="none" playsinline poster="automat2.webp" width="1280" height="720">
+      <video controls preload="none" playsinline poster="automat2-500.webp" width="1280" height="720">
         <source src="mlekomat-demo.mp4" type="video/mp4">
         Twoja przeglądarka nie obsługuje odtwarzania wideo.
       </video>
@@ -791,14 +818,6 @@
   </div>
 </footer>
 
-<div class="cookie" id="cookie">
-  <p>Ta strona używa plików cookies. <a href="polityka.html">Polityka prywatności</a></p>
-  <div class="cookie-btns">
-    <button class="ck-yes" onclick="setCk('yes')">Akceptuję</button>
-    <button class="ck-no" onclick="setCk('no')">Tylko niezbędne</button>
-  </div>
-</div>
-
 <script>
   // Jednorazowe czyszczenie starego klucza 'ck' z poprzedniej wersji
   if(localStorage.getItem('ck') && !localStorage.getItem('cookie_consent')){
@@ -876,7 +895,7 @@ var _scPlayed = false;
 
 function animCount(el, to, dur, prefix, suffix){
   if(!el) return;
-  el.classList.remove('counting'); void el.offsetWidth; el.classList.add('counting');
+  el.classList.add('counting');
   var start=null;
   function step(ts){
     if(!start) start=ts;
