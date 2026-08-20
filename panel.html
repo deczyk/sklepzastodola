@@ -7050,9 +7050,131 @@ function renderFollowupItem(c){
 // Wysyłka maila z panelu przez prawdziwy Gmail (api/mail-send.js), nie przez zewnętrzny
 // serwis transakcyjny - Kuba/tata boją się, że mail wysłany przez coś innego niż normalna
 // skrzynka firmowa częściej trafia do spamu.
+const CLIENT_MAIL_TEMPLATES = {
+  advisor: {
+    label: "Pierwsza odpowiedź po Advisorze",
+    build: c => ({
+      subject: "Dalsze kroki po analizie gospodarstwa",
+      body: `${clientMailGreeting(c)}
+
+dziękuję za wypełnienie Advisora. Odpowiedzi pokazują, że warto dokładniej omówić uruchomienie sprzedaży bezpośredniej w Twoim gospodarstwie.
+
+Podczas krótkiej rozmowy doprecyzujemy skalę sprzedaży, miejsce ustawienia punktu, interesujące Cię urządzenia oraz możliwe finansowanie. Na tej podstawie przygotujemy rozwiązanie dopasowane do gospodarstwa, zamiast wysyłać ogólną konfigurację.
+
+Po uruchomieniu nie zostawiamy klienta samego - pomagamy również wystartować z lokalną promocją i rozkręcić sprzedaż.
+
+Napisz proszę, kiedy możemy krótko porozmawiać.`
+    })
+  },
+  offer: {
+    label: "Oferta gotowa do omówienia",
+    build: c => ({
+      subject: `Oferta - ${clientMailSubjectName(c)}`,
+      body: `${clientMailGreeting(c)}
+
+na podstawie dotychczasowych ustaleń przygotowaliśmy propozycję dotyczącą: ${clientProduct(c) || "punktu sprzedaży bezpośredniej"}.
+
+Chcę ją krótko omówić przed ustaleniem ostatecznego zakresu. Możemy dopasować konfigurację urządzeń, zakres pawilonu, sposób płatności, wyposażenie dodatkowe oraz finansowanie do rzeczywistych potrzeb gospodarstwa.
+
+W ramach wdrożenia pomagamy także przygotować start sprzedaży i działania marketingowe, które ułatwią dotarcie do pierwszych stałych klientów.
+
+Proszę o informację, kiedy możemy omówić propozycję, pytania i dalsze kroki.`
+    })
+  },
+  followup: {
+    label: "Follow-up po wysłaniu oferty",
+    build: c => ({
+      subject: `Pytania do oferty - ${clientMailSubjectName(c)}`,
+      body: `${clientMailGreeting(c)}
+
+wracam do przesłanej oferty dotyczącej: ${clientProduct(c) || "sprzedaży bezpośredniej przy gospodarstwie"}.
+
+Czy udało się już zapoznać z materiałem? Chętnie odpowiem na pytania i doprecyzuję konfigurację, koszty poszczególnych elementów, finansowanie oraz plan uruchomienia sprzedaży.
+
+Możemy omówić wszystko podczas krótkiej rozmowy. Napisz proszę, jaki termin będzie wygodny.`
+    })
+  },
+  details: {
+    label: "Prośba o dane do przygotowania oferty",
+    build: c => ({
+      subject: `Dane potrzebne do przygotowania oferty - ${clientMailSubjectName(c)}`,
+      body: `${clientMailGreeting(c)}
+
+żeby przygotować właściwą konfigurację i rzetelną ofertę, proszę o przesłanie kilku informacji:
+
+- jakie produkty mają być sprzedawane,
+- jaka jest planowana dzienna skala sprzedaży,
+- gdzie ma stanąć punkt i czy miejsce ma dostęp do energii,
+- czy interesuje Cię sam automat, czy również pawilon i pełne wyposażenie,
+- jakie formy płatności mają być dostępne,
+- czy rozważane jest finansowanie, leasing albo wsparcie inwestycji.
+
+Przydatne będą również zdjęcia planowanego miejsca i jego orientacyjne wymiary. Po otrzymaniu danych przygotujemy rekomendowany zakres.`
+    })
+  },
+  summary: {
+    label: "Podsumowanie rozmowy",
+    build: c => ({
+      subject: `Podsumowanie rozmowy - ${clientMailSubjectName(c)}`,
+      body: `${clientMailGreeting(c)}
+
+dziękuję za rozmowę dotyczącą uruchomienia sprzedaży bezpośredniej.
+
+Ustalony kierunek: ${clientProduct(c) || "dobór kompletnego punktu sprzedaży przy gospodarstwie"}.
+
+Kolejne kroki:
+- potwierdzenie potrzebnej konfiguracji,
+- zebranie brakujących danych i zdjęć miejsca,
+- przygotowanie lub aktualizacja oferty,
+- ustalenie finansowania, terminu realizacji i planu uruchomienia,
+- przygotowanie działań promujących punkt po starcie.
+
+Jeżeli coś wymaga uzupełnienia albo korekty, proszę odpowiedzieć na tę wiadomość.`
+    })
+  }
+};
+
+function clientMailGreeting(c){
+  const contact = String(c?.osoba || "").trim();
+  const firstName = contact.split(/\s+/)[0] || "";
+  return firstName ? `Dzień dobry, ${firstName},` : "Dzień dobry,";
+}
+
+function clientMailSubjectName(c){
+  return String(c?.firma || c?.osoba || "gospodarstwo").trim();
+}
+
+function applyClientMailTemplate(clientId, templateId){
+  if(!templateId) return;
+  const c = (data.klienci || []).find(client => client.id === clientId);
+  const template = CLIENT_MAIL_TEMPLATES[templateId];
+  const subjectEl = document.getElementById(`mailComposeSubject-${clientId}`);
+  const bodyEl = document.getElementById(`mailComposeBody-${clientId}`);
+  const selectEl = document.getElementById(`mailComposeTemplate-${clientId}`);
+  if(!c || !template || !subjectEl || !bodyEl) return;
+  if((subjectEl.value.trim() || bodyEl.value.trim()) && !confirm("Zastąpić obecną treść wybranym szablonem?")){
+    if(selectEl) selectEl.value = "";
+    return;
+  }
+  const message = template.build(c);
+  subjectEl.value = message.subject;
+  bodyEl.value = message.body;
+  bodyEl.focus();
+}
+
 function renderMailComposeSection(c){
   if(!c || !c.email) return `<p style="font-size:13px;color:var(--text-muted)">Klient nie ma zapisanego adresu e-mail - dodaj go w polu "E-mail" wyżej, żeby móc stąd wysłać maila.</p>`;
+  const templateOptions = Object.entries(CLIENT_MAIL_TEMPLATES)
+    .map(([id, template]) => `<option value="${crmEsc(id)}">${crmEsc(template.label)}</option>`)
+    .join("");
   return `
+    <div class="clientCardField" style="margin-top:8px"><b>Gotowy szablon</b>
+      <select id="mailComposeTemplate-${c.id}" onchange="applyClientMailTemplate('${c.id}',this.value)">
+        <option value="">Własna wiadomość</option>
+        ${templateOptions}
+      </select>
+      <div class="formHint" style="margin-top:6px">Szablon uzupełni temat i treść. Możesz je dowolnie zmienić przed wysłaniem.</div>
+    </div>
     <div class="clientCardGrid">
       <div class="clientCardField"><b>Wyślij z</b>
         <select id="mailComposeFrom-${c.id}">
