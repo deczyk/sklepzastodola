@@ -220,15 +220,45 @@
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
-  "@type": "Organization",
-  "name": "Sklep za Stodołą Sp. z o.o.",
-  "url": "https://www.sklepzastodola.pl/",
-  "logo": "https://www.sklepzastodola.pl/favicon-192.png",
-  "description": "Sklep za Stodołą pomaga rolnikom uruchamiać gotowe systemy sprzedaży bezpośredniej 24/7: mlekomat BRUNIMAT, automaty chłodnicze i automaty Sielaff do produktów świeżych, pawilon, wdrożenie, dokumenty, finansowanie, marketing lokalny i opiekę po starcie.",
-  "areaServed": "PL",
-  "sameAs": [
-    "https://www.facebook.com/profile.php?id=61591710038575",
-    "https://www.instagram.com/sklepzastodola/"
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "https://www.sklepzastodola.pl/#organization",
+      "name": "Sklep za Stodołą Sp. z o.o.",
+      "url": "https://www.sklepzastodola.pl/",
+      "logo": "https://www.sklepzastodola.pl/favicon-192.png",
+      "description": "Sklep za Stodołą pomaga rolnikom uruchamiać gotowe systemy sprzedaży bezpośredniej 24/7: mlekomat BRUNIMAT, automaty chłodnicze Sielaff, pawilon, wdrożenie, dokumenty, finansowanie, marketing lokalny i opiekę po starcie.",
+      "areaServed": "PL",
+      "taxID": "9542911300",
+      "telephone": "+48 735 115 427",
+      "email": "kontakt@sklepzastodola.pl",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "ul. Warszawska 40/2A",
+        "postalCode": "40-008",
+        "addressLocality": "Katowice",
+        "addressCountry": "PL"
+      },
+      "contactPoint": {
+        "@type": "ContactPoint",
+        "telephone": "+48 735 115 427",
+        "contactType": "sales",
+        "areaServed": "PL",
+        "availableLanguage": "pl"
+      },
+      "sameAs": [
+        "https://www.facebook.com/profile.php?id=61591710038575",
+        "https://www.instagram.com/sklepzastodola/"
+      ]
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://www.sklepzastodola.pl/#website",
+      "url": "https://www.sklepzastodola.pl/",
+      "name": "Sklep za Stodołą",
+      "inLanguage": "pl-PL",
+      "publisher": { "@id": "https://www.sklepzastodola.pl/#organization" }
+    }
   ]
 }
 </script>
@@ -413,12 +443,12 @@
 <!-- <div class="strip">
   <div class="strip-grid" data-r>
     <div class="strip-row-top">
-      <img src="npawilony2.webp" srcset="npawilony2-800.webp 800w, npawilony2.webp 1400w" sizes="(max-width: 600px) 100vw, 50vw" alt="Pawilon pod mlekomat przy gospodarstwie">
-      <img src="npawilon3.webp" srcset="npawilon3-800.webp 800w, npawilon3.webp 1400w" sizes="(max-width: 600px) 100vw, 50vw" alt="Pawilon sklepu gospodarczego">
+      <img src="npawilony2.webp" srcset="npawilony2-800.webp 800w, npawilony2.webp 1400w" sizes="(max-width: 600px) 100vw, 50vw" width="1400" height="1077" alt="Pawilon pod mlekomat przy gospodarstwie" loading="lazy" decoding="async">
+      <img src="npawilon3.webp" srcset="npawilon3-800.webp 800w, npawilon3.webp 1400w" sizes="(max-width: 600px) 100vw, 50vw" width="1200" height="600" alt="Pawilon sklepu gospodarczego" loading="lazy" decoding="async">
     </div>
     <div class="strip-row-bottom">
-      <img src="automat2.webp" srcset="automat2-500.webp 500w, automat2.webp 750w" sizes="(max-width: 600px) 100vw, 50vw" alt="Mlekomat Brunimat Premium — front">
-      <img src="automat3.webp" srcset="automat3-500.webp 500w, automat3.webp 750w" sizes="(max-width: 600px) 100vw, 50vw" alt="Mlekomat Brunimat Premium — wnętrze">
+      <img src="automat2.webp" srcset="automat2-500.webp 500w, automat2.webp 750w" sizes="(max-width: 600px) 100vw, 50vw" width="750" height="1282" alt="Mlekomat Brunimat Premium — front" loading="lazy" decoding="async">
+      <img src="automat3.webp" srcset="automat3-500.webp 500w, automat3.webp 750w" sizes="(max-width: 600px) 100vw, 50vw" width="750" height="1002" alt="Mlekomat Brunimat Premium — wnętrze" loading="lazy" decoding="async">
     </div>
   </div>
 </div> -->

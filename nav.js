@@ -146,22 +146,37 @@
     'poradnik-marketing-lokalny-punkt-sprzedazy.html': { trail:[['Poradnik','poradnik.html'],['Marketing lokalny punktu sprzedaży','']], links:[['Jak sprzedawać mleko bezpośrednio','poradnik-jak-sprzedac-mleko-bezposrednio.html'],['Automat chłodniczy w gospodarstwie','poradnik-automat-chlodniczy-produkty-z-gospodarstwa.html'],['Sprawdź gospodarstwo','advisor.html']] },
     'poradnik-jak-dobrac-automat-sielaff.html': { trail:[['Poradnik','poradnik.html'],['Jak dobrać automat Sielaff','']], links:[['Poznaj automaty Sielaff','automat-chlodniczy.html'],['Sielaff outdoor przez cały rok','poradnik-automat-sielaff-outdoor-caloroczny.html'],['Produkty w automacie chłodniczym','poradnik-automat-chlodniczy-produkty-z-gospodarstwa.html']] },
     'poradnik-automat-sielaff-outdoor-caloroczny.html': { trail:[['Poradnik','poradnik.html'],['Sielaff outdoor przez cały rok','']], links:[['Poznaj automaty Sielaff','automat-chlodniczy.html'],['Jak dobrać automat Sielaff','poradnik-jak-dobrac-automat-sielaff.html'],['Zapytaj o punkt całoroczny','kontakt.html']] },
+    'poradnik-jak-sprzedac-mleko-bezposrednio.html': { trail:[['Poradnik','poradnik.html'],['Jak sprzedawać mleko bezpośrednio','']], links:[['Mlekomat BRUNIMAT','mlekomat.html'],['Mlekomat a RHD','poradnik-mlekomat-a-rhd.html'],['Sprawdź gospodarstwo','advisor.html']] },
+    'poradnik-ile-kosztuje-mlekomat.html': { trail:[['Poradnik','poradnik.html'],['Ile kosztuje mlekomat','']], links:[['Poznaj mlekomat BRUNIMAT','mlekomat.html'],['Leasing mlekomatu','poradnik-leasing-mlekomat.html'],['Dotacja ARiMR','poradnik-dotacja-arimr-mlekomat.html']] },
+    'poradnik-czy-mlekomat-jest-legalny.html': { trail:[['Poradnik','poradnik.html'],['Czy mlekomat jest legalny','']], links:[['Certyfikaty BRUNIMAT','certyfikaty.html'],['Mlekomat a RHD','poradnik-mlekomat-a-rhd.html'],['Jak uruchomić mlekomat','poradnik-jak-uruchomic-mlekomat.html']] },
+    'poradnik-mlekomat-a-rhd.html': { trail:[['Poradnik','poradnik.html'],['Mlekomat a RHD','']], links:[['RHD krok po kroku','poradnik-rhd-krok-po-kroku.html'],['Sprzedaż mleka surowego','poradnik-sprzedaz-mleka-surowego-przepisy.html'],['Mlekomat BRUNIMAT','mlekomat.html']] },
+    'poradnik-jak-uruchomic-mlekomat.html': { trail:[['Poradnik','poradnik.html'],['Jak uruchomić mlekomat','']], links:[['Jak działamy','jak-dzialamy.html'],['Czy mlekomat jest legalny','poradnik-czy-mlekomat-jest-legalny.html'],['Sprawdź gospodarstwo','advisor.html']] },
+    'poradnik-rhd-krok-po-kroku.html': { trail:[['Poradnik','poradnik.html'],['RHD krok po kroku','']], links:[['Mlekomat a RHD','poradnik-mlekomat-a-rhd.html'],['RHD: jaja, sery i przetwory','poradnik-rhd-jaja-sery-przetwory.html'],['Kontakt','kontakt.html']] },
+    'poradnik-dotacja-arimr-mlekomat.html': { trail:[['Poradnik','poradnik.html'],['Dotacja ARiMR na mlekomat','']], links:[['Leasing mlekomatu','poradnik-leasing-mlekomat.html'],['Ile kosztuje mlekomat','poradnik-ile-kosztuje-mlekomat.html'],['Sprawdź gospodarstwo','advisor.html']] },
+    'poradnik-krotkie-lancuchy-dostaw.html': { trail:[['Poradnik','poradnik.html'],['Krótkie łańcuchy dostaw','']], links:[['Jak sprzedawać mleko bezpośrednio','poradnik-jak-sprzedac-mleko-bezposrednio.html'],['Automat chłodniczy w gospodarstwie','poradnik-automat-chlodniczy-produkty-z-gospodarstwa.html'],['Pełna oferta','oferta.html']] },
+    'poradnik-sprzedaz-mleka-surowego-przepisy.html': { trail:[['Poradnik','poradnik.html'],['Sprzedaż mleka surowego','']], links:[['Mlekomat a RHD','poradnik-mlekomat-a-rhd.html'],['Czy mlekomat jest legalny','poradnik-czy-mlekomat-jest-legalny.html'],['Mlekomat BRUNIMAT','mlekomat.html']] },
+    'poradnik-mlekomat-czy-skup-oplacalnosc.html': { trail:[['Poradnik','poradnik.html'],['Mlekomat czy skup','']], links:[['Ile kosztuje mlekomat','poradnik-ile-kosztuje-mlekomat.html'],['Jak sprzedawać mleko bezpośrednio','poradnik-jak-sprzedac-mleko-bezposrednio.html'],['Sprawdź gospodarstwo','advisor.html']] },
+    'poradnik-leasing-mlekomat.html': { trail:[['Poradnik','poradnik.html'],['Leasing mlekomatu','']], links:[['Ile kosztuje mlekomat','poradnik-ile-kosztuje-mlekomat.html'],['Dotacja ARiMR','poradnik-dotacja-arimr-mlekomat.html'],['Kontakt','kontakt.html']] },
+    'poradnik-rhd-jaja-sery-przetwory.html': { trail:[['Poradnik','poradnik.html'],['RHD: jaja, sery i przetwory','']], links:[['Automaty chłodnicze Sielaff','automat-chlodniczy.html'],['RHD krok po kroku','poradnik-rhd-krok-po-kroku.html'],['Jak dobrać automat Sielaff','poradnik-jak-dobrac-automat-sielaff.html']] },
     'faq.html': { trail:[['FAQ','']], links:[['Jak działamy','jak-dzialamy.html'],['Poradniki','poradnik.html'],['Bezpłatna konsultacja','kontakt.html']] },
     'kontakt.html': { trail:[['Kontakt','']], links:[] },
     'polityka.html': { trail:[['Polityka prywatności','']], links:[] }
   };
 
   const currentPage = pageData[pageName];
-  if(currentPage && !document.querySelector('.site-breadcrumb, .breadcrumb')){
+  if(currentPage){
+    const items = [['Start','index.html']].concat(currentPage.trail);
     const heroWrap = document.querySelector('.page-hero .wrap');
-    if(heroWrap){
-      const items = [['Start','index.html']].concat(currentPage.trail);
+    if(heroWrap && !document.querySelector('.site-breadcrumb, .breadcrumb')){
       const html = items.map((item, index)=>{
         const last = index === items.length - 1;
         return last ? '<span aria-current="page">' + item[0] + '</span>' : '<a href="' + item[1] + '">' + item[0] + '</a><span aria-hidden="true">/</span>';
       }).join('');
       heroWrap.insertAdjacentHTML('afterbegin', '<nav class="site-breadcrumb" aria-label="Okruszki">' + html + '</nav>');
-
+    }
+    const hasBreadcrumbSchema = Array.from(document.querySelectorAll('script[type="application/ld+json"]'))
+      .some(script=>script.textContent.includes('"BreadcrumbList"'));
+    if(!hasBreadcrumbSchema){
       const schema = {
         '@context':'https://schema.org',
         '@type':'BreadcrumbList',
