@@ -1593,7 +1593,7 @@
       <p>Prywatne centrum CRM, dokumentów, kontaktów i operacji.</p>
     </div>
     <div class="globalSearchBox">
-      <input type="text" id="globalSearchInput" placeholder="🔍 Szukaj wszędzie: telefon, e-mail, nazwa..." oninput="renderGlobalSearch()" onfocus="renderGlobalSearch()" onblur="setTimeout(closeGlobalSearch, 150)">
+      <input type="text" id="globalSearchInput" placeholder="🔍 Szukaj wszędzie: telefon, e-mail, nazwa..." oninput="debouncedGlobalSearch()" onfocus="renderGlobalSearch()" onblur="setTimeout(closeGlobalSearch, 150)">
       <div id="globalSearchResults" class="globalSearchResults"></div>
     </div>
     <span id="syncStatus" style="font-size:11px;color:#cfe8d6;margin-left:auto;margin-right:4px"></span>
@@ -2019,15 +2019,15 @@
         </details>
       </div>
       <div class="docToolbar">
-        <input type="text" id="searchDokumenty" class="docSearch" placeholder="🔍 Szukaj dokumentu (nazwa, opis, kategoria)..." oninput="render()">
+        <input type="text" id="searchDokumenty" class="docSearch" placeholder="🔍 Szukaj dokumentu (nazwa, opis, kategoria)..." oninput="debouncedRenderDocuments()">
         <span id="docResultCount" class="docCount"></span>
       </div>
       <div class="docFilterBar">
-        <select id="filterDocCategory" onchange="render()"><option value="">Wszystkie kategorie</option></select>
-        <select id="filterDocType" onchange="render()"><option value="">Wszystkie typy</option></select>
-        <select id="filterDocStatus" onchange="render()"><option value="">Wszystkie statusy</option></select>
-        <select id="filterDocConfidentiality" onchange="render()"><option value="">Każda poufność</option></select>
-        <select id="filterDocClient" onchange="render()"><option value="">Wszyscy klienci</option></select>
+        <select id="filterDocCategory" onchange="renderDocuments()"><option value="">Wszystkie kategorie</option></select>
+        <select id="filterDocType" onchange="renderDocuments()"><option value="">Wszystkie typy</option></select>
+        <select id="filterDocStatus" onchange="renderDocuments()"><option value="">Wszystkie statusy</option></select>
+        <select id="filterDocConfidentiality" onchange="renderDocuments()"><option value="">Każda poufność</option></select>
+        <select id="filterDocClient" onchange="renderDocuments()"><option value="">Wszyscy klienci</option></select>
       </div>
       <div class="organizeHint">Filtr „Do uporządkowania” pokazuje pliki bez opisu, bez linku, bez sensownej kategorii albo oferty/dokumenty klienta bez przypisanego klienta.</div>
       <div id="list-dokumenty"></div>
@@ -2077,7 +2077,7 @@
           <option value="advisor-missing-email">Advisor bez adresu e-mail</option>
           <option value="no-activity">Bez żadnego działania</option>
         </select>
-        <input type="text" id="filterText" placeholder="Szukaj (nazwa, miasto, telefon...)" oninput="renderClients()">
+        <input type="text" id="filterText" placeholder="Szukaj (nazwa, miasto, telefon...)" oninput="debouncedRenderClients()">
         <select id="sortBy" onchange="renderClients()">
           <option value="">Bez sortowania</option>
           <option value="ostatnieDzialanie">Sortuj: najnowsze działania</option>
@@ -2126,7 +2126,7 @@
           <input type="text" id="olxLeadNotatka" placeholder="Notatka (opcjonalnie)" style="flex:2;min-width:200px">
           <button class="save" onclick="addOlxLead()">Dodaj</button>
         </div>
-        <input type="text" id="searchOlxLeads" placeholder="Szukaj po telefonie, linku albo notatce..." oninput="renderClients()" style="margin-bottom:12px;max-width:360px;width:100%">
+        <input type="text" id="searchOlxLeads" placeholder="Szukaj po telefonie, linku albo notatce..." oninput="debouncedRenderClients()" style="margin-bottom:12px;max-width:360px;width:100%">
         <div id="list-olxpotencjalni"></div>
       </div>
     </div>
@@ -2136,7 +2136,7 @@
     <div class="section">
       <h2>Telefony klientów <button class="addBtn" onclick="exportTelefonyToXlsx()">⬇ Eksportuj do Excela</button></h2>
       <p style="color:var(--muted);margin:-8px 0 14px">Wszystkie numery telefonów klientów w jednym miejscu — do szybkiego dzwonienia i eksportu.</p>
-      <input type="text" id="searchTelefony" placeholder="Szukaj po nazwie lub numerze..." oninput="renderTelefony()" style="margin-bottom:14px;max-width:360px;width:100%">
+      <input type="text" id="searchTelefony" placeholder="Szukaj po nazwie lub numerze..." oninput="debouncedRenderTelefony()" style="margin-bottom:14px;max-width:360px;width:100%">
       <div id="list-telefony"></div>
     </div>
     </div>
@@ -2595,7 +2595,6 @@
     </div><!-- /.appMain -->
   </div><!-- /.appShell -->
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script>
 const STORAGE_KEY = "panel_items_v2";
 const PANEL_SESSION_KEY = "panel_session_password";
@@ -2603,6 +2602,31 @@ const PENDING_SYNC_KEY = "panel_pending_sync_v1";
 const LAST_REMOTE_SNAPSHOT_KEY = "panel_last_remote_snapshot_v1";
 const SYNC_ENABLED = true;
 const ACTIVE_DRIVE_CATALOG_ID = "shared_drive_0ACFzxkUrgaMkUk9PVA_20260810";
+let xlsxLoadPromise = null;
+
+async function ensureXlsxLoaded(){
+  if(window.XLSX) return true;
+  if(!xlsxLoadPromise){
+    xlsxLoadPromise = new Promise((resolve, reject) => {
+      const script = document.createElement("script");
+      script.src = "https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js";
+      script.async = true;
+      script.onload = () => window.XLSX ? resolve() : reject(new Error("Biblioteka Excel nie została uruchomiona."));
+      script.onerror = () => reject(new Error("Nie udało się pobrać obsługi plików Excel."));
+      document.head.appendChild(script);
+    }).catch(error => {
+      xlsxLoadPromise = null;
+      throw error;
+    });
+  }
+  try{
+    await xlsxLoadPromise;
+    return true;
+  }catch(error){
+    alert(error?.message || "Nie udało się uruchomić obsługi plików Excel.");
+    return false;
+  }
+}
 
 // Lokalny cache w localStorage ma limit (zwykle ~5-10MB na domenę). Przy dużych importach
 // (np. baza doradców) potrafi się przepełnić. Chmura (Supabase) i tak jest źródłem prawdy,
@@ -2889,7 +2913,7 @@ function setSubView(subViewKey){
     const search = document.getElementById("searchDokumenty");
     if(search) search.value = view.documentSearch;
   }
-  if(view.tab) switchTab(view.tab, {preserveSubView:true});
+  if(view.tab) switchTab(view.tab, {preserveSubView:true, deferRender:!!view.clientsView});
   if(view.clientsView) setClientsView(view.clientsView, {preserveNavigation:true});
   if(view.focusId) scrollToPanelTarget(view.focusId);
 }
@@ -2902,6 +2926,7 @@ function switchTab(name, options={}){
     if(search) search.value = "";
   }
   if(!options.preserveSubView) syncNavigationFromTab(name);
+  if(!options.deferRender) renderActiveTab(name);
 }
 
 function defaultFacebookContentPlan(){
@@ -3502,6 +3527,7 @@ function setSyncStatus(text, warn){
 function renderPanelSettings(){
   document.getElementById("themeChoiceLight")?.classList.toggle("active", !document.body.classList.contains("dark-theme"));
   document.getElementById("themeChoiceDark")?.classList.toggle("active", document.body.classList.contains("dark-theme"));
+  if(typeof currentPanelTab === "function" && currentPanelTab() !== "ustawienia") return;
   const meta = document.getElementById("panelSettingsMeta");
   if(!meta) return;
   const syncText = document.getElementById("syncStatus")?.textContent || "Brak danych";
@@ -5259,20 +5285,11 @@ function documentSortTime(item){
   return Date.parse(item.driveModifiedTime || item.dataDokumentu || item.zaktualizowano || item.utworzono || "") || 0;
 }
 
-function render(){
-  document.getElementById("whoAmI").value = getWhoAmI();
-  renderNavigation();
-  renderStatsBar();
-  renderActivityLog();
-  renderClients();
-  renderTelefony();
-  renderDiary();
-  renderDoradcyRolni();
-  renderGlobalSearch(); // odśwież wyniki, gdyby refresh danych (np. z drugiej karty) przyszedł w trakcie wpisywania
-  fillDocumentClientOptions();
-
+function renderDocuments(){
   // --- Dokumenty: grupowane wg kategorii, z wyszukiwarką ---
   const dokList = document.getElementById("list-dokumenty");
+  if(!dokList) return;
+  fillDocumentClientOptions();
   const searchEl = document.getElementById("searchDokumenty");
   const searchQ = searchEl ? searchEl.value.trim().toLowerCase() : "";
   dokList.innerHTML = "";
@@ -5312,33 +5329,73 @@ function render(){
         .forEach(item=>dokList.appendChild(renderItemCard(item, "dokumenty")));
     });
   }
+}
 
+function renderCases(){
   // --- Sprawy: lista płaska, bez grupowania ---
   const sprawyList = document.getElementById("list-sprawy");
+  if(!sprawyList) return;
   sprawyList.innerHTML = "";
   if(!data.sprawy || data.sprawy.length===0){
     sprawyList.innerHTML = '<div class="empty">Brak pozycji — dodaj pierwszą.</div>';
   } else {
     data.sprawy.forEach(item=>sprawyList.appendChild(renderItemCard(item, "sprawy")));
   }
+}
 
-  renderTerminy();
-  renderInstalacje();
-  renderFinanse();
-  renderBudzetStartowy();
-  renderLinki();
-  renderPodwykonawcy();
-  renderZadania();
-  renderChecklisty();
-  renderJulyActionPlan();
-  renderAIWorkflow();
-  renderFacebookContentPlan();
-  renderBackupStats();
-  renderPriceDocuments();
-  renderLoanCalc();
-  renderDashboard();
-  renderFacebookReminder();
-  renderPanelSettings();
+function currentPanelTab(){
+  return document.querySelector(".tabPane.active")?.id.replace("tabpane-", "") || "dashboard";
+}
+
+const panelRenderTimers = new Map();
+function debouncePanelRender(key, callback, delay = 140){
+  clearTimeout(panelRenderTimers.get(key));
+  panelRenderTimers.set(key, setTimeout(()=>{
+    panelRenderTimers.delete(key);
+    callback();
+  }, delay));
+}
+function debouncedGlobalSearch(){ debouncePanelRender("global-search", renderGlobalSearch, 100); }
+function debouncedRenderClients(){ debouncePanelRender("clients", renderClients); }
+function debouncedRenderDocuments(){ debouncePanelRender("documents", renderDocuments); }
+function debouncedRenderTelefony(){ debouncePanelRender("phones", renderTelefony); }
+
+function renderActiveTab(name = currentPanelTab()){
+  const renderers = {
+    dashboard: ()=>{ renderActivityLog(); renderDashboard(); renderFacebookReminder(); },
+    klienci: renderClients,
+    telefony: renderTelefony,
+    dziennik: renderDiary,
+    doradcy: renderDoradcyRolni,
+    dokumenty: renderDocuments,
+    cenniki: renderPriceDocuments,
+    sprawy: renderCases,
+    terminy: renderTerminy,
+    instalacje: renderInstalacje,
+    finanse: ()=>{ renderFinanse(); renderLoanCalc(); },
+    budzet: renderBudzetStartowy,
+    linki: renderLinki,
+    podwykonawcy: renderPodwykonawcy,
+    zadania: renderZadania,
+    checklisty: renderChecklisty,
+    planlipiec: renderJulyActionPlan,
+    aiworkflow: renderAIWorkflow,
+    backup: renderBackupStats,
+    materialy: renderSalesMaterials,
+    marketing: renderFacebookContentPlan,
+    mailtemplates: renderAdvisorMailTemplates,
+    ustawienia: renderPanelSettings
+  };
+  renderers[name]?.();
+}
+
+function render(){
+  const who = document.getElementById("whoAmI");
+  if(who) who.value = getWhoAmI();
+  renderNavigation();
+  renderStatsBar();
+  renderGlobalSearch();
+  renderActiveTab();
 }
 
 function toggleForm(cat){
@@ -8517,7 +8574,8 @@ function removeDuplicateClients(){
   document.getElementById("importMsg").textContent = `Usunięto ${removed} duplikatów.`;
 }
 
-function exportClientsToXlsx(){
+async function exportClientsToXlsx(){
+  if(!await ensureXlsxLoaded()) return;
   const rows = (data.klienci||[]).map(c => ({
     "Firma / gospodarstwo": c.firma, "Imię i nazwisko": c.osoba, "Województwo": c.wojewodztwo,
     "Miejscowość": c.miejscowosc, "Ulica": c.ulica, "Telefon": c.telefon, "E-mail": c.email,
@@ -8632,7 +8690,7 @@ function addOlxLead(){
   renderClients();
 }
 
-function exportOlxLeadsToXlsx(){
+async function exportOlxLeadsToXlsx(){
   const rows = (data.klienci||[]).filter(c => c.segment === "olx_potencjalny").map(c => ({
     "Sprzedawca / nick OLX": c.osoba || "",
     "Telefon": c.telefon || "",
@@ -8643,6 +8701,7 @@ function exportOlxLeadsToXlsx(){
     "Notatka": c.notatki || ""
   }));
   if(!rows.length){ alert("Brak potencjalnych klientów OLX do eksportu."); return; }
+  if(!await ensureXlsxLoaded()) return;
   const ws = XLSX.utils.json_to_sheet(rows);
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, "Potencjalni OLX");
@@ -8651,7 +8710,7 @@ function exportOlxLeadsToXlsx(){
   logActivity("wyeksportował(a) listę potencjalnych klientów OLX do XLSX");
 }
 
-function exportOlxLeadsNamesToXlsx(){
+async function exportOlxLeadsNamesToXlsx(){
   const seen = new Set();
   const rows = [];
   (data.klienci||[]).filter(c => c.segment === "olx_potencjalny").forEach(c => {
@@ -8661,6 +8720,7 @@ function exportOlxLeadsNamesToXlsx(){
     rows.push({ "Telefon": c.telefon || "", "Nazwa": clientName(c) || "" });
   });
   if(!rows.length){ alert("Brak potencjalnych klientów OLX do eksportu."); return; }
+  if(!await ensureXlsxLoaded()) return;
   const ws = XLSX.utils.json_to_sheet(rows);
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, "Potencjalni OLX");
@@ -8675,6 +8735,7 @@ async function importOlxLeadsFromSelectedXlsx(input){
   if(!file) return;
   if(msg) msg.textContent = `Wczytuję: ${file.name}...`;
   try{
+    if(!await ensureXlsxLoaded()) return;
     const buf = await file.arrayBuffer();
     const wb = XLSX.read(buf, {type:"array", cellDates:true});
     const ws = wb.Sheets[wb.SheetNames[0]];
@@ -8757,7 +8818,7 @@ function renderTelefony(){
   `).join("");
 }
 
-function exportTelefonyToXlsx(){
+async function exportTelefonyToXlsx(){
   const rows = clientsWithPhone().map(c => ({
     "Klient": clientName(c),
     "Telefon": c.telefon,
@@ -8765,6 +8826,7 @@ function exportTelefonyToXlsx(){
     "Status": STATUS_OPTS.find(s=>s[0]===c.status)?.[1] || c.status || ""
   }));
   if(!rows.length){ alert("Brak zapisanych numerów telefonów do eksportu."); return; }
+  if(!await ensureXlsxLoaded()) return;
   const ws = XLSX.utils.json_to_sheet(rows);
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, "Telefony");
@@ -8911,6 +8973,7 @@ async function importClientsFromSelectedXlsx(input){
   if(btn) btn.disabled = true;
   if(msg) msg.textContent = `Importuje: ${file.name}...`;
   try{
+    if(!await ensureXlsxLoaded()) return;
     const buf = await file.arrayBuffer();
     const wb = XLSX.read(buf, {type:"array", cellDates:true});
     const rows = rowsFromClientsWorkbook(wb);
@@ -9137,6 +9200,7 @@ async function importDoradcyFromSelectedXlsx(input){
   if(btn) btn.disabled = true;
   if(msg) msg.textContent = `Importuję: ${file.name}...`;
   try{
+    if(!await ensureXlsxLoaded()) return;
     const buf = await file.arrayBuffer();
     const wb = XLSX.read(buf, {type:"array", cellDates:true});
     const { headerRow, dataRows } = rowsFromDoradcyWorkbook(wb);
@@ -9285,7 +9349,7 @@ function renderDoradcyRolni(){
   }
 }
 
-function exportDoradcyToXlsx(){
+async function exportDoradcyToXlsx(){
   const rows = (data.doradcyRolni || []).map(item => ({
     "Imię": item.imie,
     "Nazwisko": item.nazwisko,
@@ -9305,6 +9369,7 @@ function exportDoradcyToXlsx(){
     "Data weryfikacji": item.dataWeryfikacji,
     "Uwagi": item.uwagi
   }));
+  if(!await ensureXlsxLoaded()) return;
   const ws = XLSX.utils.json_to_sheet(rows);
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, "Baza_doradcow");
@@ -11991,24 +12056,6 @@ function copyAdvisorMailTemplate(id, includeSubject){
     ()=>alert("Nie udało się skopiować automatycznie. Zaznacz treść ręcznie.")
   );
 }
-
-// Dopinamy render materiałów, planu Facebook i szablonów maili do istniejącego startu panelu, bez zmieniania logiki CRM.
-const originalSwitchTabForSales = switchTab;
-switchTab = function(name, options){
-  originalSwitchTabForSales(name, options || {});
-  if(name === "materialy") renderSalesMaterials();
-  if(name === "marketing") renderFacebookContentPlan();
-  if(name === "mailtemplates") renderAdvisorMailTemplates();
-};
-
-const originalRenderForSales = render;
-render = function(){
-  originalRenderForSales();
-  renderSalesMaterials();
-  renderFacebookContentPlan();
-  renderFacebookReminder();
-  renderAdvisorMailTemplates();
-};
 
 </script>
 </body>
