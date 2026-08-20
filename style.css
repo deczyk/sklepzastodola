@@ -87,6 +87,21 @@
 .error-shortcuts a{padding:.85rem 1rem;background:var(--paper);border:1px solid var(--line);border-radius:var(--r);font-weight:700;color:var(--forest);text-decoration:none}
 @media(max-width:720px){.related-links-grid,.error-shortcuts{grid-template-columns:1fr}.related-links-grid a{border-right:0;border-bottom:1px solid var(--line)}.related-links-grid a:last-child{border-bottom:0}.site-breadcrumb{margin-bottom:1rem}}
 
+/* Wspólne elementy rozbudowanych poradników. */
+.article-practical{margin:2.2rem 0;padding:1.5rem;background:var(--paper);border:1px solid var(--line);border-radius:var(--r-lg)}
+.article-practical h2,.article-practical h3{margin-top:0!important}
+.article-practical-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.8rem;margin:1rem 0}
+.article-practical-card{padding:1rem;border:1px solid var(--line);border-radius:var(--r);background:var(--bg)}
+.article-practical-card strong{display:block;margin-bottom:.35rem;color:var(--forest)}
+.article-checklist{list-style:none!important;margin:1rem 0!important;padding:0!important;counter-reset:guide-step}
+.article-checklist li{position:relative;padding:.85rem .9rem .85rem 3rem;margin:0 0 .65rem!important;background:var(--bg);border:1px solid var(--line);border-radius:var(--r)}
+.article-checklist li::before{counter-increment:guide-step;content:counter(guide-step);position:absolute;left:.9rem;top:.78rem;width:1.35rem;height:1.35rem;display:grid;place-items:center;border-radius:50%;background:var(--forest);color:#fff;font-size:.72rem;font-weight:800}
+.article-table-wrap{overflow-x:auto;margin:1rem 0}
+.article-table{width:100%;border-collapse:collapse;min-width:560px;font-size:.9rem}
+.article-table th,.article-table td{padding:.8rem;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+.article-table th{color:var(--forest);background:var(--sage);font-size:.78rem;text-transform:uppercase;letter-spacing:.04em}
+@media(max-width:700px){.article-practical-grid{grid-template-columns:1fr}.article-practical{padding:1.1rem}.article-checklist li{padding-right:.75rem}}
+
 /* Baner cookies (statyczny div #cookie wbudowany w każdą stronę - patrz nav.js dla logiki
    pokaż/ukryj i przesunięcia nad mobilny pasek "Zadzwoń"). Reguły przywrócone po regresji
    z 5d41e7e, która błędnie usunęła je jako "martwe" - w rzeczywistości to jedyny styling

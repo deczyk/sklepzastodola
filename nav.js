@@ -141,7 +141,9 @@
     'certyfikaty.html': { trail:[['Oferta','oferta.html'],['Certyfikaty','']], links:[['Mlekomaty BRUNIMAT','mlekomat.html'],['Jak działamy','jak-dzialamy.html'],['Kontakt','kontakt.html']] },
     'jak-dzialamy.html': { trail:[['Jak działamy','']], links:[['Zobacz pełną ofertę','oferta.html'],['Sprawdź gospodarstwo','advisor.html'],['Najczęstsze pytania','faq.html']] },
     'dlaczego.html': { trail:[['Dlaczego to działa?','']], links:[['Jak uruchomić punkt','jak-dzialamy.html'],['Poradniki','poradnik.html'],['Sprawdź gospodarstwo','advisor.html']] },
-    'poradnik.html': { trail:[['Poradnik','']], links:[['Ile kosztuje mlekomat?','poradnik-ile-kosztuje-mlekomat.html'],['Mlekomat a RHD','poradnik-mlekomat-a-rhd.html'],['Pełna oferta','oferta.html']] },
+    'poradnik.html': { trail:[['Poradnik','']], links:[['Automat chłodniczy w gospodarstwie','poradnik-automat-chlodniczy-produkty-z-gospodarstwa.html'],['Marketing lokalny punktu','poradnik-marketing-lokalny-punkt-sprzedazy.html'],['Pełna oferta','oferta.html']] },
+    'poradnik-automat-chlodniczy-produkty-z-gospodarstwa.html': { trail:[['Poradnik','poradnik.html'],['Automat chłodniczy w gospodarstwie','']], links:[['Automaty chłodnicze Sielaff','automat-chlodniczy.html'],['Marketing lokalny punktu','poradnik-marketing-lokalny-punkt-sprzedazy.html'],['Sprawdź gospodarstwo','advisor.html']] },
+    'poradnik-marketing-lokalny-punkt-sprzedazy.html': { trail:[['Poradnik','poradnik.html'],['Marketing lokalny punktu sprzedaży','']], links:[['Jak sprzedawać mleko bezpośrednio','poradnik-jak-sprzedac-mleko-bezposrednio.html'],['Automat chłodniczy w gospodarstwie','poradnik-automat-chlodniczy-produkty-z-gospodarstwa.html'],['Sprawdź gospodarstwo','advisor.html']] },
     'faq.html': { trail:[['FAQ','']], links:[['Jak działamy','jak-dzialamy.html'],['Poradniki','poradnik.html'],['Bezpłatna konsultacja','kontakt.html']] },
     'kontakt.html': { trail:[['Kontakt','']], links:[] },
     'polityka.html': { trail:[['Polityka prywatności','']], links:[] }
