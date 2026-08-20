@@ -12,6 +12,12 @@ const PANEL_BASIC_PASSWORD = process.env.PANEL_BASIC_PASSWORD;
 const SENDER_DISPLAY_NAME = "Sklep za Stodołą";
 const MAX_BODY_CHARS = 20000;
 const MAX_SUBJECT_CHARS = 300;
+const MAX_ATTACHMENTS = 4;
+const MAX_ATTACHMENTS_BYTES = Math.floor(2.6 * 1024 * 1024);
+const DEFAULT_MAIL_SIGNATURES = {
+  kontakt: "Pozdrawiam\nSklep za Stodołą Sp. z o.o.\n+48 735 115 427\nkontakt@sklepzastodola.pl\nwww.sklepzastodola.pl",
+  jdeczynski: "Pozdrawiam\nJakub Deczyński\nSklep za Stodołą Sp. z o.o.\n+48 735 115 427\nj.deczynski@sklepzastodola.pl\nwww.sklepzastodola.pl"
+};
 
 function getBasicAuth(req) {
   const header = req.headers.authorization || "";
@@ -46,6 +52,23 @@ function isValidEmail(value) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(value || "").trim());
 }
 
+function parseImageAttachments(value) {
+  if (value == null) return [];
+  if (!Array.isArray(value) || value.length > MAX_ATTACHMENTS) throw new Error(`Maksymalnie ${MAX_ATTACHMENTS} zdjęcia.`);
+  let totalBytes = 0;
+  return value.map((item, index) => {
+    const mimeType = String(item && item.mimeType || "").toLowerCase();
+    const contentBase64 = String(item && item.contentBase64 || "").replace(/\s+/g, "");
+    if (!/^image\/(jpeg|png|webp)$/.test(mimeType)) throw new Error(`Załącznik ${index + 1} nie jest obsługiwanym zdjęciem.`);
+    if (!contentBase64 || !/^[a-z0-9+/]+={0,2}$/i.test(contentBase64)) throw new Error(`Załącznik ${index + 1} ma nieprawidłową zawartość.`);
+    const bytes = Buffer.from(contentBase64, "base64");
+    totalBytes += bytes.length;
+    if (totalBytes > MAX_ATTACHMENTS_BYTES) throw new Error("Łączny rozmiar zdjęć jest zbyt duży.");
+    const filename = String(item.filename || `zdjecie-${index + 1}.jpg`).replace(/[\r\n"\\]/g, "_").slice(0, 160);
+    return { filename, mimeType, contentBase64: bytes.toString("base64") };
+  });
+}
+
 module.exports = async function handler(req, res) {
   res.setHeader("Cache-Control", "no-store");
   if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed." });
@@ -70,6 +93,12 @@ module.exports = async function handler(req, res) {
 
   const senderName = String(payload.senderName || "").trim() || SENDER_DISPLAY_NAME;
   const clientId = payload.clientId ? String(payload.clientId) : "";
+  let attachments;
+  try {
+    attachments = parseImageAttachments(payload.attachments);
+  } catch (e) {
+    return res.status(400).json({ error: e.message || "Invalid attachments." });
+  }
 
   // Podpis zależny od skrzynki (kontakt@ vs j.deczynski@) - edytowalny w panelu (Ustawienia),
   // czytany tu na świeżo z tego samego magazynu co reszta danych panelu, więc zmiana w
@@ -78,7 +107,7 @@ module.exports = async function handler(req, res) {
   if (hasPanelStoreConfig()) {
     try {
       const store = await readPanelStore();
-      const signature = String((store.data && store.data.mailSignatures && store.data.mailSignatures[mailboxKey]) || "").trim();
+      const signature = String((store.data && store.data.mailSignatures && store.data.mailSignatures[mailboxKey]) || DEFAULT_MAIL_SIGNATURES[mailboxKey] || "").trim();
       if (signature) fullBody = `${body}\n\n${signature}`;
     } catch (e) {
       // Brak podpisu nie powinien blokować wysyłki - wyślij bez niego.
@@ -87,7 +116,7 @@ module.exports = async function handler(req, res) {
 
   let sent;
   try {
-    sent = await sendMessage(mailboxEmail, { fromName: senderName, to, subject, body: fullBody });
+    sent = await sendMessage(mailboxEmail, { fromName: senderName, to, subject, body: fullBody, attachments });
   } catch (e) {
     return res.status(502).json({ error: "Gmail send failed.", message: e && e.message ? e.message : String(e) });
   }
@@ -104,7 +133,7 @@ module.exports = async function handler(req, res) {
         if (!Array.isArray(client.historia)) client.historia = [];
         const now = new Date().toISOString();
         client.historia.push({
-          tekst: `[Mail wychodzący] Temat: ${subject}\n\n${fullBody}`,
+          tekst: `[Mail wychodzący] Temat: ${subject}${attachments.length ? `\nZałączone zdjęcia: ${attachments.map(item => item.filename).join(", ")}` : ""}\n\n${fullBody}`,
           kto: `${senderName} (panel, ${mailboxEmail})`,
           data: now,
           utworzono: now,
@@ -118,5 +147,5 @@ module.exports = async function handler(req, res) {
     }
   }
 
-  return res.status(200).json({ ok: true, messageId: sent.id, threadId: sent.threadId, logged });
+  return res.status(200).json({ ok: true, messageId: sent.id, threadId: sent.threadId, attachmentCount: attachments.length, logged });
 };

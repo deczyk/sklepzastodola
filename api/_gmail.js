@@ -227,26 +227,56 @@ function encodeRfc2047(text) {
   return `=?UTF-8?B?${Buffer.from(value, "utf8").toString("base64")}?=`;
 }
 
-function buildRawMessage({ fromEmail, fromName, to, subject, body, inReplyToMessageId, references }) {
+function wrapBase64Lines(value) {
+  return String(value || "").replace(/\s+/g, "").match(/.{1,76}/g)?.join("\r\n") || "";
+}
+
+function safeAttachmentName(value) {
+  return String(value || "zalacznik")
+    .replace(/[\r\n"\\]/g, "_")
+    .slice(0, 160) || "zalacznik";
+}
+
+function buildRawMessage({ fromEmail, fromName, to, subject, body, attachments = [], inReplyToMessageId, references }) {
   const headerLines = [
     `From: ${fromName ? `${encodeRfc2047(fromName)} <${fromEmail}>` : fromEmail}`,
     `To: ${to}`,
     `Subject: ${encodeRfc2047(subject)}`,
-    "MIME-Version: 1.0",
-    'Content-Type: text/plain; charset="UTF-8"',
-    "Content-Transfer-Encoding: 8bit"
+    "MIME-Version: 1.0"
   ];
   if (inReplyToMessageId) headerLines.push(`In-Reply-To: ${inReplyToMessageId}`);
   if (references) headerLines.push(`References: ${references}`);
-  const raw = `${headerLines.join("\r\n")}\r\n\r\n${body}`;
+  let raw;
+  if (!attachments.length) {
+    headerLines.push('Content-Type: text/plain; charset="UTF-8"', "Content-Transfer-Encoding: 8bit");
+    raw = `${headerLines.join("\r\n")}\r\n\r\n${body}`;
+  } else {
+    const boundary = `szs_${crypto.randomBytes(18).toString("hex")}`;
+    headerLines.push(`Content-Type: multipart/mixed; boundary="${boundary}"`);
+    const parts = [
+      `--${boundary}\r\nContent-Type: text/plain; charset="UTF-8"\r\nContent-Transfer-Encoding: 8bit\r\n\r\n${body}`
+    ];
+    attachments.forEach(attachment => {
+      const filename = safeAttachmentName(attachment.filename);
+      const encodedName = encodeURIComponent(filename);
+      parts.push(
+        `--${boundary}\r\n` +
+        `Content-Type: ${attachment.mimeType}; name="${filename}"; name*=UTF-8''${encodedName}\r\n` +
+        `Content-Disposition: attachment; filename="${filename}"; filename*=UTF-8''${encodedName}\r\n` +
+        `Content-Transfer-Encoding: base64\r\n\r\n${wrapBase64Lines(attachment.contentBase64)}`
+      );
+    });
+    parts.push(`--${boundary}--`);
+    raw = `${headerLines.join("\r\n")}\r\n\r\n${parts.join("\r\n")}`;
+  }
   return base64url(Buffer.from(raw, "utf8"));
 }
 
 // mailboxEmail wysyła JAKO siebie (impersonacja przez "sub" w tokenie) - to jest prawdziwa
 // wysyłka z konta Gmail, nie przez zewnętrzny serwis, więc trafia do Wysłanych na tej
 // skrzynce i ma normalną reputację nadawcy zamiast transakcyjnej.
-async function sendMessage(mailboxEmail, { fromName, to, subject, body, threadId }) {
-  const raw = buildRawMessage({ fromEmail: mailboxEmail, fromName, to, subject, body });
+async function sendMessage(mailboxEmail, { fromName, to, subject, body, attachments, threadId }) {
+  const raw = buildRawMessage({ fromEmail: mailboxEmail, fromName, to, subject, body, attachments });
   const json = await gmailFetch(mailboxEmail, "messages/send", null, {
     raw,
     ...(threadId ? { threadId } : {})
