@@ -2066,10 +2066,18 @@
         <select id="filterPrio" onchange="renderClients()">
           <option value="">Wszystkie priorytety</option>
         </select>
+        <select id="filterWorkflow" onchange="renderClients()">
+          <option value="">Wszystkie etapy obsługi</option>
+          <option value="advisor-awaiting-config">Advisor → czeka na konfigurator</option>
+          <option value="config-completed">Konfigurator wypełniony</option>
+          <option value="advisor-missing-email">Advisor bez adresu e-mail</option>
+          <option value="no-activity">Bez żadnego działania</option>
+        </select>
         <input type="text" id="filterText" placeholder="Szukaj (nazwa, miasto, telefon...)" oninput="renderClients()">
         <select id="sortBy" onchange="renderClients()">
           <option value="">Bez sortowania</option>
           <option value="ostatnieDzialanie">Sortuj: najnowsze działania</option>
+          <option value="etapObslugi">Sortuj: etap obsługi</option>
           <option value="priorytet">Sortuj: priorytet</option>
           <option value="status">Sortuj: status</option>
           <option value="miejscowosc">Sortuj: miejscowość</option>
@@ -6393,6 +6401,47 @@ function isAdvisorClient(c){
   return category === "advisor" || source === "advisor" || source.includes("advisor");
 }
 
+function clientHasHistoryType(c, type){
+  const expected = String(type || "").toLowerCase();
+  return (Array.isArray(c.historia) ? c.historia : []).some(entry =>
+    parseHistoryText(entry && entry.tekst || "").type.toLowerCase() === expected
+  );
+}
+
+function clientWorkflowStage(c){
+  // Tylko zwykły Advisor wysyła automatyczny mail z linkiem do brief.html.
+  // Advisor OLX ma osobny proces i nie powinien trafiać do tej kolejki.
+  const hasAdvisor = isAdvisorClient(c) || clientHasHistoryType(c, "advisor");
+  const hasConfig = clientHasHistoryType(c, "brief");
+  if(hasConfig) return "config-completed";
+  if(hasAdvisor && !String(c.email || "").trim()) return "advisor-missing-email";
+  if(hasAdvisor) return "advisor-awaiting-config";
+  if(!latestClientActivity(c)) return "no-activity";
+  return "other";
+}
+
+function clientWorkflowLabel(c){
+  const labels = {
+    "advisor-awaiting-config":"Czeka na konfigurator",
+    "config-completed":"Konfigurator wypełniony",
+    "advisor-missing-email":"Brak e-maila do konfiguratora",
+    "no-activity":"Brak działania"
+  };
+  return labels[clientWorkflowStage(c)] || "";
+}
+
+function compareClientsByWorkflow(a, b){
+  const order = {
+    "advisor-awaiting-config":0,
+    "advisor-missing-email":1,
+    "config-completed":2,
+    "no-activity":3,
+    "other":4
+  };
+  const byStage = (order[clientWorkflowStage(a)] ?? 9) - (order[clientWorkflowStage(b)] ?? 9);
+  return byStage || compareClientsByLatestActivity(a, b);
+}
+
 function getLeadNotifications(){
   return (Array.isArray(data.powiadomienia) ? data.powiadomienia : []).filter(item => item && (item.typ === "lead" || item.typ === "mail_unmatched"));
 }
@@ -6901,6 +6950,7 @@ function renderClientDirectory(list){
           <span class="kanbanPill">${crmEsc(labelFrom(STATUS_OPTS, c.status))}</span>
           <span class="kanbanPill">${crmEsc(labelFrom(PRIO_OPTS, c.priorytet))}</span>
           ${product ? `<span class="kanbanPill">${crmEsc(product)}</span>` : ""}
+          ${clientWorkflowLabel(c) ? `<span class="kanbanPill gold">${crmEsc(clientWorkflowLabel(c))}</span>` : ""}
         </div>
         <div class="clientMobileContact">${contact}</div>
         ${renderClientFollowupPreview(c)}
@@ -7945,11 +7995,13 @@ function renderClients(){
 
   const fStatus = document.getElementById("filterStatus").value;
   const fPrio = document.getElementById("filterPrio").value;
+  const fWorkflow = document.getElementById("filterWorkflow")?.value || "";
   const fText = document.getElementById("filterText").value.trim().toLowerCase();
   const sortBy = document.getElementById("sortBy").value;
 
   if(fStatus) list = list.filter(c=>c.status===fStatus);
   if(fPrio) list = list.filter(c=>c.priorytet===fPrio);
+  if(fWorkflow) list = list.filter(c=>clientWorkflowStage(c)===fWorkflow);
   if(fText){
     list = list.filter(c => ["firma","osoba","miejscowosc","telefon","email","wojewodztwo","zainteresowanie","produkt","zrodloLeada","obiekcje"]
       .some(f => (c[f]||"").toLowerCase().includes(fText)));
@@ -7958,6 +8010,7 @@ function renderClients(){
   if(sortBy==="status") list.sort((a,b)=>(a.status||"").localeCompare(b.status||""));
   if(sortBy==="miejscowosc") list.sort((a,b)=>(a.miejscowosc||"").localeCompare(b.miejscowosc||""));
   if(sortBy==="ostatnieDzialanie") list.sort(compareClientsByLatestActivity);
+  if(sortBy==="etapObslugi") list.sort(compareClientsByWorkflow);
 
   setClientsViewContainers();
   updateClientsViewHint();
