@@ -8949,11 +8949,13 @@ function renderDoradcyRolni(){
     ["Zweryfikowane", verified],
     ["Prywatni doradcy", privateAdvisors]
   ].map(([label, value]) => `<div class="statCard"><div class="num">${value}</div><div class="lbl">${crmEsc(label)}</div></div>`).join("");
-  // Doradcy z bezpośrednim kontaktem (telefon/email) mają iść na górę listy, reszta (sam
-  // adres instytucji, bez indywidualnego kontaktu) na dół — łatwiej trafić do właściwych osób.
+  // Doradcy z telefonem mają pierwszeństwo przed tymi z samym e-mailem, a ci przed resztą —
+  // przy dużych bazach (np. import listy ODR, gdzie prawie każdy ma e-mail, ale tylko część
+  // telefon) samo "ma jakikolwiek kontakt" nie wystarcza, żeby telefon-owcy byli widoczni
+  // w limicie 250 wierszy renderowanych na raz.
   const sorted = filtered.slice().sort((a, b) => {
-    const aHas = (a.telefon || a.email) ? 1 : 0;
-    const bHas = (b.telefon || b.email) ? 1 : 0;
+    const aHas = a.telefon ? 2 : (a.email ? 1 : 0);
+    const bHas = b.telefon ? 2 : (b.email ? 1 : 0);
     return bHas - aHas;
   });
   const visible = sorted.slice(0, 250);
