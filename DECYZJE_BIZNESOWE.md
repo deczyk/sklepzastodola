@@ -404,3 +404,16 @@ Uzasadnienie:
 Do sprawdzenia / następne kroki:
 - Zaplanować i wdrożyć Fazę 2 (Klienci) i kolejne, w osobnych sesjach.
 - Panel-sidebar-dashboard-refresh (poprzedni refresh z sierpnia 2026) i ten redesign to dwie różne, następujące po sobie fazy tego samego kierunku — nie mylić ich w przyszłych rozmowach.
+
+## 2026-08-20 — marketing po uruchomieniu w każdym wdrożeniu
+
+Status: potwierdzone
+
+Decyzja / założenie:
+- Sklep za Stodołą zawsze pomaga klientowi rozkręcić sprzedaż po postawieniu mlekomatu lub uruchomieniu punktu sprzedaży.
+- Dostawa i instalacja nie kończą współpracy: klient otrzymuje wsparcie przy starcie, lokalnej promocji i pozyskaniu pierwszych stałych klientów.
+- Pakiety mogą różnić się zakresem i intensywnością działań marketingowych, ale każdy wariant zawiera co najmniej podstawową pomoc marketingową po uruchomieniu.
+- W przyszłych treściach strony, ofertach, Advisorze i materiałach sprzedażowych nie przedstawiać wariantu podstawowego jako rozwiązania bez wsparcia marketingowego.
+
+Uzasadnienie:
+- Celem firmy jest uruchomienie działającej sprzedaży bezpośredniej, a nie samo dostarczenie urządzenia.

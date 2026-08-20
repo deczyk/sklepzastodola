@@ -14,6 +14,7 @@ Firma może obejmować ofertą:
 - wsparcie przy finansowaniu, leasingu, ARiMR i dotacjach,
 - marketing lokalny, OLX, grafiki, treści i komunikaty,
 - wdrożenie i start sprzedaży,
+- pomoc w rozkręceniu sprzedaży po uruchomieniu punktu — w każdym wariancie oferty, ze skalą wsparcia dopasowaną do pakietu,
 - analizę opłacalności i pomoc w ustawieniu modelu sprzedaży.
 
 ## Strategia przychodów i oferty
@@ -36,10 +37,15 @@ Dokumentacja / konsulting ARiMR:
 - Prywatnie traktować jako osobne źródło przychodu za wiedzę, czas i analizę.
 
 Trzy poziomy oferty:
-- Podstawowy: sam mlekomat / minimum wdrożenia / minimum formalności. Opcja budżetowa, nie domyślna rekomendacja.
+- Podstawowy: sam mlekomat / minimum wdrożenia / minimum formalności + podstawowe wsparcie marketingowe po uruchomieniu. Opcja budżetowa, nie domyślna rekomendacja.
 - Standard: mlekomat + pawilon + pełne wdrożenie + pomoc w dotacji + prosty marketing lokalny. Logiczny środek oferty.
 - Premium: Standard + lepsze opcje urządzenia + rozbudowany pawilon + priorytetowa opieka/wsparcie od startu. Domyślna rekomendacja dla klienta, który chce gotowy system.
 - Trzymać się maksymalnie 3 poziomów, żeby rolnik się nie pogubił.
+
+Stała zasada wdrożenia:
+- Marketing nie kończy się na postawieniu urządzenia. Zawsze pomagamy klientowi uruchomić i rozkręcić lokalną sprzedaż po starcie.
+- Zakres może obejmować m.in. komunikację otwarcia, materiały startowe, treści i grafiki, promocję lokalną, obecność w social mediach oraz wskazówki dotyczące pozyskania pierwszych stałych klientów.
+- Pakiety różnią się zakresem i intensywnością wsparcia, ale żaden klient nie zostaje po instalacji bez pomocy marketingowej.
 
 Abonament serwisowy / opieka:
 - Robocze poziomy prywatne: 299 / 449 / 649 zł miesięcznie.

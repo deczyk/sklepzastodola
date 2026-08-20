@@ -20,6 +20,8 @@ Przy zmianach strony, panelu i materiałów sprzedażowych traktuj Sklep za Stod
 
 Publiczna komunikacja ma iść w stronę: „gotowy system sprzedaży bezpośredniej”, „uruchom punkt sprzedaży przy gospodarstwie”, „mlekomat + pawilon + wdrożenie + dokumenty + marketing + opieka”. Nie sprowadzaj oferty do hasła „kup mlekomat”.
 
+Pomoc marketingowa po uruchomieniu jest stałym elementem każdego wdrożenia. Komunikuj, że nie kończymy pracy na dostawie i instalacji: pomagamy klientowi wystartować, wypromować punkt lokalnie i rozkręcić sprzedaż. Pakiety mogą różnić się zakresem i intensywnością tej pomocy, ale nie przedstawiaj żadnego wariantu jako pozbawionego wsparcia marketingowego po starcie.
+
 Cena 14 500 EUR może być publicznie opisywana tylko ostrożnie jako Premium / pełny pakiet / BRUNIMAT 650 Premium DUO netto. Nie opisywać jej jako „sam mlekomat” i nie sugerować, że to jedna cena dla wszystkich.
 
 Nie ujawniaj publicznie kosztów zakupu, marż, cenników partnerskich, prowizji ani prywatnych kalkulacji. Przy ARiMR nie obiecuj wygrania dotacji; bezpieczny język to: „pomagamy przygotować dokumenty i przejść proces”, „decyzja zależy od programu, naboru i instytucji”, „wymaga aktualnej weryfikacji”.
