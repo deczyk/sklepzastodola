@@ -270,17 +270,6 @@ async function buildOfferPdf(data) {
       }
       ctx.y -= priceBoxH + 18;
     }
-    if (individualQuoteItems.length) {
-      ensureSpace(20 + individualQuoteItems.length * 13);
-      page().drawText("Do osobnej wyceny", { x: MARGIN, y: ctx.y, size: 10.5, font: fontBold, color: INK });
-      page().drawText("(nie wliczone w cenę powyżej — wyceniamy indywidualnie po rozmowie)", { x: MARGIN, y: ctx.y - 11, size: 7.8, font, color: DIM });
-      ctx.y -= 26;
-      individualQuoteItems.forEach(label => {
-        page().drawText("—", { x: MARGIN, y: ctx.y, size: 9.5, font, color: GOLD });
-        page().drawText(label, { x: MARGIN + 12, y: ctx.y, size: 9.5, font, color: INK });
-        ctx.y -= 13;
-      });
-    }
     ctx.y -= 10;
   }
 
@@ -312,6 +301,20 @@ async function buildOfferPdf(data) {
       }
     }
     ctx.y -= photoH + 26;
+  }
+
+  // ── 5. Do osobnej wyceny (pod zdjęciami, nie nad nimi) ────────
+  if (individualQuoteItems.length) {
+    ensureSpace(20 + individualQuoteItems.length * 13);
+    page().drawText("Do osobnej wyceny", { x: MARGIN, y: ctx.y, size: 10.5, font: fontBold, color: INK });
+    page().drawText("(nie wliczone w cenę powyżej — wyceniamy indywidualnie po rozmowie)", { x: MARGIN, y: ctx.y - 11, size: 7.8, font, color: DIM });
+    ctx.y -= 26;
+    individualQuoteItems.forEach(label => {
+      page().drawText("—", { x: MARGIN, y: ctx.y, size: 9.5, font, color: GOLD });
+      page().drawText(label, { x: MARGIN + 12, y: ctx.y, size: 9.5, font, color: INK });
+      ctx.y -= 13;
+    });
+    ctx.y -= 10;
   }
 
   // ── Footer (right after content — no forced bottom placement, so it
