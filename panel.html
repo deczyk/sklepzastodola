@@ -2559,6 +2559,12 @@
             <label class="addClientLabel" style="margin-top:10px;display:block">j.deczynski@sklepzastodola.pl</label>
             <textarea id="mailSignatureJdeczynski" rows="4" placeholder="Np. Pozdrawiam, Jarosław Deczyński, Prezes Zarządu, Sklep za Stodołą Sp. z o.o." oninput="stageMailSignature('jdeczynski', this.value)" onblur="commitMailSignatures()"></textarea>
           </div>
+          <div class="settingsCard">
+            <h3>Stare nagrania głosowe w bazie panelu</h3>
+            <p>Notatki głosowe od pewnego czasu trafiają na Google Drive (w bazie panelu zostaje tylko link). Te sprzed tej zmiany nadal mają plik zakodowany wprost w danych — to one najbardziej obciążają synchronizację i transfer danych na Vercelu. Ten przycisk przenosi je na Drive, bez utraty żadnego nagrania (jeśli wysyłka się nie powiedzie, plik zostaje jak był).</p>
+            <button class="save" onclick="migrateLegacyAudioNotesToDrive()">Prześlij stare nagrania na Drive</button>
+            <div id="audioMigrateStatus" style="margin-top:8px;font-size:12.5px;color:var(--text-muted)"></div>
+          </div>
         </div>
       </div>
     </div>
@@ -3873,7 +3879,11 @@ let livePollTimer = null;
 let liveCheckInFlight = false;
 let liveSyncListenersBound = false;
 let panelSyncChannel = null;
-const LIVE_POLL_MS = 5000;
+// Podniesione z 5000 - sprawdzanie nowej wersji co 5s (choć samo w sobie lekkie,
+// versionOnly=1) mnożone przez cały dzień pracy kilku osób z otwartym panelem zbędnie
+// dokłada się do transferu danych na Vercelu (Fast Origin Transfer). 20s nadal wygląda
+// na "prawie live" dla użytkownika, a to 4x mniej odpytywań w tle.
+const LIVE_POLL_MS = 20000;
 
 function isSomethingLikelyBeingEdited(){
   const openModal = document.querySelector(".previewModal.open");
@@ -4331,6 +4341,58 @@ async function uploadAudioNote(audio, statusElId){
     console.warn("Nie udało się wysłać nagrania na Drive, zapisuję w bazie panelu (stary tryb):", e);
     return { audio, driveFailed: true };
   }
+}
+
+// Jednorazowe (uruchamiane ręcznie z Ustawień) domykanie migracji na Drive dla starych
+// notatek głosowych, które powstały PRZED wdrożeniem uploadAudioNote() i nadal mają plik
+// zakodowany wprost w danych panelu (h.audioData, bez h.audioUrl). To one - do 2 MB każda,
+// przesyłane w całości przy KAŻDYM zapisie/odświeżeniu panelu - są głównym powodem, dla
+// którego panel zużywa dużo transferu danych na Vercelu (Fast Origin Transfer).
+let audioMigrateRunning = false;
+
+async function migrateLegacyAudioNotesToDrive(){
+  if(audioMigrateRunning) return;
+  const statusEl = document.getElementById("audioMigrateStatus");
+  const candidates = [];
+  (data.klienci || []).forEach(c => {
+    (c.historia || []).forEach(h => {
+      if(h && h.audioData && !h.audioUrl) candidates.push(h);
+    });
+  });
+  if(!candidates.length){
+    if(statusEl) statusEl.textContent = "Brak starych nagrań do przeniesienia — wszystko już jest na Drive.";
+    return;
+  }
+  audioMigrateRunning = true;
+  let done = 0, failed = 0;
+  const setStatus = () => { if(statusEl) statusEl.textContent = `Przenoszę nagrania na Drive (${done + failed}/${candidates.length})...`; };
+  setStatus();
+  for(const entry of candidates){
+    try{
+      const { audio, driveFailed } = await uploadAudioNote(entry);
+      if(!driveFailed && audio && audio.audioUrl){
+        entry.audioUrl = audio.audioUrl;
+        delete entry.audioData;
+        done++;
+      } else {
+        failed++;
+      }
+    }catch(e){
+      failed++;
+    }
+    setStatus();
+    // Checkpoint co kilka nagrań - jeśli coś przerwie migrację w połowie (zamknięcie karty,
+    // utrata sieci), już przeniesione nagrania nie wracają do stanu "do zrobienia od nowa".
+    if((done + failed) % 3 === 0) await saveData();
+  }
+  await saveData();
+  render();
+  if(statusEl){
+    statusEl.textContent = failed
+      ? `Gotowe: przeniesiono ${done}, nie udało się ${failed} (zostały jak było — spróbuj ponownie później, np. przy lepszym połączeniu).`
+      : `Gotowe: przeniesiono ${done} nagrań na Drive. Baza panelu jest teraz mniejsza.`;
+  }
+  audioMigrateRunning = false;
 }
 
 function renderHistoryAudio(h){
