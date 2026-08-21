@@ -145,7 +145,15 @@ async function syncMailbox(mailboxKey, mailboxEmail, data, log) {
 
     matchedClients.forEach(client => {
       if (!Array.isArray(client.historia)) client.historia = [];
-      const alreadyThere = client.historia.some(h => h && h._mailMessageId === id);
+      // Dedup po json.id (ta sama skrzynka, ponowny przebieg cronu) ORAZ po nagłówku
+      // Message-ID (ta sama wiadomość widziana w DRUGIEJ skrzynce - np. klient odpisał
+      // "do wszystkich" i trafiło jednocześnie do kontakt@ i j.deczynski@). Bez tego
+      // drugiego warunku taka wiadomość dublowała się w historii klienta - patrz
+      // komentarz przy rfcMessageId w _gmail.js.
+      const alreadyThere = client.historia.some(h => h && (
+        h._mailMessageId === id ||
+        (message.rfcMessageId && h._mailRfcMessageId === message.rfcMessageId)
+      ));
       if (alreadyThere) return;
       client.historia.push({
         tekst,
@@ -153,6 +161,7 @@ async function syncMailbox(mailboxKey, mailboxEmail, data, log) {
         data: entryDate,
         utworzono: new Date().toISOString(),
         _mailMessageId: id,
+        ...(message.rfcMessageId ? { _mailRfcMessageId: message.rfcMessageId } : {}),
         ...(attachmentImages.length ? { images: attachmentImages } : {})
       });
       client.zaktualizowano = new Date().toISOString();

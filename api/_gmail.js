@@ -206,7 +206,15 @@ async function getMessage(mailboxEmail, id, htmlToPlainFallback) {
     to: headerValue(headers, "To"),
     subject: headerValue(headers, "Subject"),
     body: extractPlainTextBody(json.payload, htmlToPlainFallback),
-    attachments: extractAttachmentMeta(json.payload)
+    attachments: extractAttachmentMeta(json.payload),
+    // Nagłówek "Message-ID:" (RFC 822) - w przeciwieństwie do json.id (który Gmail nadaje
+    // OSOBNO w każdej skrzynce, nawet dla tej samej wiadomości) ten nagłówek ustawia
+    // nadawca RAZ i zostaje identyczny we wszystkich kopiach: w Wysłanych nadawcy i w
+    // Odebranych u każdego odbiorcy. Gdy klient odpowiada "do wszystkich" i wiadomość
+    // trafia jednocześnie do kontakt@ i j.deczynski@, obie skrzynki widzą ją pod innym
+    // json.id, ale z tym samym Message-ID - mail-sync.js używa go, żeby nie dopisać
+    // tej samej wiadomości do historii klienta dwa razy (patrz rfcMessageId tam).
+    rfcMessageId: headerValue(headers, "Message-ID")
   };
 }
 
