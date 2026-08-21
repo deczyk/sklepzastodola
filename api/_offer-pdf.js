@@ -286,11 +286,15 @@ async function buildOfferPdf(data) {
 
   // ── 4. Zdjęcia urządzenia ────────────────────────────────────
   if (photos.length) {
-    sectionTitle("Zdjęcia urządzenia");
     const gap = 16;
     const photoW = (CONTENT_W - gap * (photos.length - 1)) / photos.length;
     const photoH = photoW * 1.3;
-    ensureSpace(photoH + 30);
+    // Sprawdzamy miejsce PRZED narysowaniem nagłówka sekcji, nie po - inaczej ensureSpace
+    // poniżej mogło złamać stronę PO TYM, jak "Zdjęcia urządzenia" już wylądowało na
+    // poprzedniej stronie: zostawiało to biały obszar pod nagłówkiem, a samo zdjęcie
+    // trafiało na kolejną stronę. 40 = miejsce, które realnie zajmuje sectionTitle().
+    ensureSpace(40 + photoH + 30);
+    sectionTitle("Zdjęcia urządzenia");
     for (let i = 0; i < photos.length; i++) {
       const ph = photos[i];
       try {
