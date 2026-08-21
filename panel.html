@@ -310,6 +310,11 @@
   .imagePendingItem button{position:absolute;top:2px;right:2px;width:18px;height:18px;border-radius:50%;border:0;
                             background:rgba(0,0,0,.65);color:#fff;font-size:11px;line-height:1;cursor:pointer;padding:0}
   .imageUploadStatus{display:block;margin-top:6px;font-size:11px;color:var(--text-muted)}
+  .imagePendingItem.mailAttachmentPdf{width:auto;height:auto;display:flex;align-items:center;gap:6px;
+      padding:6px 26px 6px 9px;border-radius:8px;background:var(--surface-soft);font-size:11.5px;color:var(--text)}
+  .mailAttachmentPdfIcon{font-size:16px;flex-shrink:0}
+  .mailAttachmentPdfName{max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .mailAttachmentPdfSize{color:var(--text-muted);white-space:nowrap;flex-shrink:0}
   .audioHint{display:block;margin-top:6px;color:var(--text-muted);font-size:11px;text-transform:none;letter-spacing:0;font-weight:normal}
   .audioTools{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:8px}
   .audioStatus{font-size:12px;color:var(--text-muted);text-transform:none;letter-spacing:0;font-weight:normal}
@@ -892,7 +897,6 @@
   .mailSignaturePreview{margin-top:8px;padding:10px 12px;border:1px dashed var(--border);border-radius:8px;background:var(--surface-soft);font-size:12px;line-height:1.5;color:var(--text-muted);white-space:pre-wrap}
   .mailAttachmentBox{margin-top:8px;padding:10px 12px;border:1px solid var(--border);border-radius:8px;background:var(--surface-soft)}
   .mailAttachmentRow{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:7px}
-  .mailAttachmentList{font-size:12px;color:var(--text-muted);line-height:1.45}
   .clientDangerZone{display:flex;justify-content:flex-end;margin-top:12px;padding-top:12px;border-top:1px solid #f0d0cb}
   .dangerBtn{border:1px solid #d8a19b;background:#fff5f4;color:#a33b33;border-radius:8px;padding:8px 12px;font-weight:bold;cursor:pointer}
   .dangerBtn:hover{background:#ffecea;border-color:#c66b62}
@@ -7379,13 +7383,16 @@ function renderMailComposeSection(c){
     <div class="clientCardField" style="margin-top:8px"><b>Treść</b><textarea id="mailComposeBody-${c.id}" rows="8" placeholder="Treść maila..."></textarea></div>
     <div class="mailSignaturePreview" id="mailSignaturePreview-${c.id}"><b>Podpis dodawany automatycznie:</b>\n${crmEsc(mailSignatureFor("kontakt"))}\n\n<i>W mailu dojdzie też graficzna wersja stopki (logo + dane), widoczna u odbiorcy.</i></div>
     <div class="mailAttachmentBox">
-      <b>Zdjęcia do wiadomości</b>
-      <div class="formHint">Możesz dodać maksymalnie 4 zdjęcia JPG, PNG lub WebP. Panel zmniejszy je przed wysłaniem, żeby mail nie był zbyt ciężki.</div>
-      <div class="mailAttachmentRow">
-        <input type="file" id="mailComposeImages-${c.id}" accept="image/jpeg,image/png,image/webp" multiple onchange="updateClientMailImageList('${c.id}')">
-        <button type="button" class="histBtn" onclick="clearClientMailImages('${c.id}')">Wyczyść</button>
+      <b>Załączniki (zdjęcia lub PDF)</b>
+      <div class="formHint">Maksymalnie 4 pliki (JPG, PNG, WebP lub PDF — np. wygenerowana oferta), łącznie do 8 MB. Zdjęcia panel zmniejszy przed wysyłką.</div>
+      <div class="imageDropZone" data-mail-attach-drop="${c.id}">Przeciągnij pliki tutaj, wklej (Ctrl+V) albo <a data-mail-attach-pick>wybierz plik</a>
+        <input type="file" accept="image/jpeg,image/png,image/webp,application/pdf" multiple data-mail-attach-input style="display:none">
       </div>
-      <div class="mailAttachmentList" id="mailComposeImagesList-${c.id}">Nie wybrano zdjęć.</div>
+      <div class="imagePendingStrip" id="mailComposeImagesList-${c.id}"></div>
+      <div class="mailAttachmentRow">
+        <button type="button" class="histBtn" onclick="clearClientMailImages('${c.id}')">Wyczyść wszystko</button>
+      </div>
+      <span class="imageUploadStatus" id="mailComposeAttachStatus-${c.id}"></span>
     </div>
     <div class="advisorScenarioDofin" style="border:0;padding:10px 0 0">
       <button class="save" onclick="sendClientMail('${c.id}')">Wyślij mail</button>
@@ -7400,20 +7407,131 @@ function updateClientMailSignaturePreview(clientId){
   if(preview) preview.innerHTML = `<b>Podpis dodawany automatycznie:</b>\n${crmEsc(mailSignatureFor(mailboxKey))}\n\n<i>W mailu dojdzie też graficzna wersja stopki (logo + dane), widoczna u odbiorcy.</i>`;
 }
 
-function updateClientMailImageList(clientId){
-  const input = document.getElementById(`mailComposeImages-${clientId}`);
-  const list = document.getElementById(`mailComposeImagesList-${clientId}`);
-  if(!input || !list) return;
-  const files = Array.from(input.files || []);
-  list.textContent = files.length
-    ? files.map(file => `${file.name} (${Math.max(1, Math.round(file.size / 1024))} KB)`).join(" · ")
-    : "Nie wybrano zdjęć.";
+// Załączniki maila (zdjęcia + PDF, np. wygenerowana oferta) - jeden globalny bufor,
+// bo w danej chwili otwarta jest zawsze tylko jedna karta klienta (tak samo jak
+// pendingQuickImages/pendingHistoryImages). Reset przy każdym openClientCard().
+let pendingMailAttachments = [];
+
+function mailAttachmentBytes(att){
+  return Math.floor(((att && att.contentBase64) || "").length * 3 / 4);
+}
+
+function readFileAsDataUrl(file){
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = () => reject(new Error(`Nie udało się odczytać pliku "${file.name}".`));
+    reader.readAsDataURL(file);
+  });
+}
+
+const MAIL_ATTACHMENT_MAX_COUNT = 4;
+// Zgodne z limitem po stronie serwera (MAX_ATTACHMENTS_BYTES w api/mail-send.js) -
+// sprawdzamy to samo tutaj, żeby użytkownik dostał czytelny komunikat od razu w panelu,
+// zamiast dopiero po nieudanej wysyłce.
+const MAIL_ATTACHMENT_MAX_TOTAL_BYTES = 8 * 1024 * 1024;
+const MAIL_PDF_MAX_BYTES = 8 * 1024 * 1024;
+
+async function convertFileToMailAttachment(file){
+  if(/^image\/(jpeg|png|webp)$/i.test(file.type || "")){
+    const att = await canvasToMailAttachment(file);
+    return { ...att, previewDataUrl: `data:${att.mimeType};base64,${att.contentBase64}` };
+  }
+  const looksPdf = file.type === "application/pdf" || /\.pdf$/i.test(file.name || "");
+  if(looksPdf){
+    if(file.size > MAIL_PDF_MAX_BYTES) throw new Error(`Plik "${file.name}" jest większy niż ${Math.round(MAIL_PDF_MAX_BYTES/1024/1024)} MB.`);
+    const dataUrl = await readFileAsDataUrl(file);
+    return {
+      filename: (file.name || "dokument.pdf").replace(/[\r\n"\\]/g, "_").slice(0, 160),
+      mimeType: "application/pdf",
+      contentBase64: dataUrl.split(",")[1] || "",
+      previewDataUrl: null
+    };
+  }
+  throw new Error(`Nieobsługiwany format pliku "${file.name}" (obsługujemy JPG, PNG, WebP i PDF).`);
+}
+
+async function addMailAttachmentFiles(fileList, clientId){
+  const files = Array.from(fileList || []).filter(f =>
+    /^image\/(jpeg|png|webp)$/i.test(f.type || "") || f.type === "application/pdf" || /\.pdf$/i.test(f.name || "")
+  );
+  if(!files.length) return;
+  const statusEl = document.getElementById(`mailComposeAttachStatus-${clientId}`);
+  const room = MAIL_ATTACHMENT_MAX_COUNT - pendingMailAttachments.length;
+  if(room <= 0){
+    if(statusEl) statusEl.textContent = `Możesz dodać maksymalnie ${MAIL_ATTACHMENT_MAX_COUNT} załączniki do jednej wiadomości.`;
+    return;
+  }
+  if(statusEl) statusEl.textContent = "Przygotowuję załączniki...";
+  for(const file of files.slice(0, room)){
+    try{
+      const att = await convertFileToMailAttachment(file);
+      const currentBytes = pendingMailAttachments.reduce((sum, a) => sum + mailAttachmentBytes(a), 0);
+      if(currentBytes + mailAttachmentBytes(att) > MAIL_ATTACHMENT_MAX_TOTAL_BYTES){
+        if(statusEl) statusEl.textContent = `Łączny rozmiar załączników przekroczyłby limit — pomiń "${file.name}" albo usuń coś innego.`;
+        continue;
+      }
+      pendingMailAttachments.push(att);
+    }catch(e){
+      if(statusEl) statusEl.textContent = e.message || "Nie udało się dodać załącznika.";
+    }
+  }
+  if(statusEl && statusEl.textContent === "Przygotowuję załączniki...") statusEl.textContent = "";
+  renderMailAttachmentsList(clientId);
+}
+
+function renderMailAttachmentsList(clientId){
+  const el = document.getElementById(`mailComposeImagesList-${clientId}`);
+  if(!el) return;
+  el.innerHTML = pendingMailAttachments.map((att, i) => {
+    if(att.previewDataUrl){
+      return `<div class="imagePendingItem"><img src="${crmEsc(att.previewDataUrl)}" alt=""><button type="button" onclick="removeMailAttachment(${i},'${clientId}')" title="Usuń">✕</button></div>`;
+    }
+    const kb = Math.max(1, Math.round(mailAttachmentBytes(att) / 1024));
+    return `<div class="imagePendingItem mailAttachmentPdf" title="${crmEsc(att.filename)}"><span class="mailAttachmentPdfIcon">📄</span><span class="mailAttachmentPdfName">${crmEsc(att.filename)}</span><span class="mailAttachmentPdfSize">${kb} KB</span><button type="button" onclick="removeMailAttachment(${i},'${clientId}')" title="Usuń">✕</button></div>`;
+  }).join("");
+}
+
+function removeMailAttachment(index, clientId){
+  pendingMailAttachments.splice(index, 1);
+  renderMailAttachmentsList(clientId);
+}
+
+function wireMailAttachDropZone(clientId){
+  const zone = document.querySelector(`[data-mail-attach-drop="${clientId}"]`);
+  if(!zone) return;
+  const input = zone.querySelector("[data-mail-attach-input]");
+  const picker = zone.querySelector("[data-mail-attach-pick]");
+  const openPicker = () => input?.click();
+  zone.addEventListener("click", e => {
+    if(e.target === input || e.target.closest("[data-mail-attach-pick]")) return;
+    openPicker();
+  });
+  zone.addEventListener("keydown", e => {
+    if(e.key === "Enter" || e.key === " "){ e.preventDefault(); openPicker(); }
+  });
+  picker?.addEventListener("click", e => { e.stopPropagation(); openPicker(); });
+  input?.addEventListener("change", () => { addMailAttachmentFiles(input.files, clientId); input.value = ""; });
+  zone.addEventListener("dragover", e => { e.preventDefault(); zone.classList.add("dragover"); });
+  zone.addEventListener("dragleave", () => zone.classList.remove("dragover"));
+  zone.addEventListener("drop", e => {
+    e.preventDefault();
+    zone.classList.remove("dragover");
+    addMailAttachmentFiles(e.dataTransfer.files, clientId);
+  });
+  zone.addEventListener("paste", e => {
+    const items = Array.from((e.clipboardData && e.clipboardData.items) || []);
+    const files = items.filter(it => it.kind === "file").map(it => it.getAsFile()).filter(Boolean);
+    if(files.length) addMailAttachmentFiles(files, clientId);
+  });
+  zone.setAttribute("tabindex", "0"); // żeby zone mogła złapać zdarzenie paste po kliknięciu w nią
 }
 
 function clearClientMailImages(clientId){
-  const input = document.getElementById(`mailComposeImages-${clientId}`);
-  if(input) input.value = "";
-  updateClientMailImageList(clientId);
+  pendingMailAttachments = [];
+  renderMailAttachmentsList(clientId);
+  const statusEl = document.getElementById(`mailComposeAttachStatus-${clientId}`);
+  if(statusEl) statusEl.textContent = "";
 }
 
 function canvasToMailAttachment(file){
@@ -7462,24 +7580,6 @@ function canvasToMailAttachment(file){
   });
 }
 
-async function prepareClientMailImages(clientId){
-  const input = document.getElementById(`mailComposeImages-${clientId}`);
-  const files = Array.from(input?.files || []);
-  if(files.length > 4) throw new Error("Możesz wysłać maksymalnie 4 zdjęcia w jednej wiadomości.");
-  const attachments = [];
-  let totalBytes = 0;
-  for(const file of files){
-    const attachment = await canvasToMailAttachment(file);
-    const bytes = Math.floor((attachment.contentBase64.length * 3) / 4);
-    totalBytes += bytes;
-    if(totalBytes > 2.5 * 1024 * 1024){
-      throw new Error("Zdjęcia po zmniejszeniu nadal są zbyt duże. Wyślij mniej zdjęć.");
-    }
-    attachments.push(attachment);
-  }
-  return attachments;
-}
-
 async function sendClientMail(clientId){
   const statusEl = document.getElementById(`mailComposeStatus-${clientId}`);
   const to = document.getElementById(`mailComposeTo-${clientId}`)?.value.trim();
@@ -7492,14 +7592,16 @@ async function sendClientMail(clientId){
   }
   if(statusEl) statusEl.textContent = "Wysyłam...";
   try{
-    const attachments = await prepareClientMailImages(clientId);
+    // contentBase64/mimeType/filename - dokładnie to, czego oczekuje api/mail-send.js;
+    // previewDataUrl to tylko podgląd w panelu, serwer go nie dostaje.
+    const attachments = pendingMailAttachments.map(({filename, mimeType, contentBase64}) => ({filename, mimeType, contentBase64}));
     await driveApi("/api/mail-send", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ mailboxKey, to, subject, body, attachments, clientId, senderName: getWhoAmI() })
     });
     logActivity(`wysłał(a) maila do ${to}`);
-    const successText = `Wysłano z właściwym podpisem${attachments.length ? ` i ${attachments.length} ${attachments.length === 1 ? "zdjęciem" : "zdjęciami"}` : ""}.`;
+    const successText = `Wysłano z właściwym podpisem${attachments.length ? ` i ${attachments.length} ${attachments.length === 1 ? "załącznikiem" : "załącznikami"}` : ""}.`;
     clearClientMailImages(clientId);
     if(currentClientCardId === clientId) openClientCard(clientId); // odśwież - pokaże się w historii
     const refreshedStatus = document.getElementById(`mailComposeStatus-${clientId}`);
@@ -7576,7 +7678,9 @@ function openClientCard(clientId){
     </div>
   `;
   pendingQuickImages = [];
+  pendingMailAttachments = [];
   wireImageDropZone(document.getElementById("quickImageDropZone"), document.getElementById("quickImageFile"), addQuickImageFiles);
+  wireMailAttachDropZone(c.id);
   wireClientOfferDropZone(c.id);
   document.getElementById("clientCardModal").classList.add("open");
   hydrateHistoryAudioPlayers(document.getElementById("clientCardModal"));

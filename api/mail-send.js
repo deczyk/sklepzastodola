@@ -13,7 +13,11 @@ const SENDER_DISPLAY_NAME = "Sklep za Stodołą";
 const MAX_BODY_CHARS = 20000;
 const MAX_SUBJECT_CHARS = 300;
 const MAX_ATTACHMENTS = 4;
-const MAX_ATTACHMENTS_BYTES = Math.floor(2.6 * 1024 * 1024);
+// Podniesione z 2.6 MB (tylko zdjęcia) - PDF (np. wygenerowana oferta) zwykle waży
+// więcej niż skompresowane zdjęcie, ale i tak zostajemy daleko poniżej limitu Gmaila
+// na wiadomość (25 MB) i limitu treści requestu na Vercelu.
+const MAX_ATTACHMENTS_BYTES = Math.floor(8 * 1024 * 1024);
+const ALLOWED_ATTACHMENT_MIME = /^(image\/(jpeg|png|webp)|application\/pdf)$/;
 const DEFAULT_MAIL_SIGNATURES = {
   kontakt: "Pozdrawiam\nJakub Deczyński\nSklep za Stodołą Sp. z o.o.\n+48 690 000 923\nkontakt@sklepzastodola.pl\nwww.sklepzastodola.pl",
   jdeczynski: "Pozdrawiam\nJarosław Deczyński\nSklep za Stodołą Sp. z o.o.\n+48 735 115 427\nj.deczynski@sklepzastodola.pl\nwww.sklepzastodola.pl"
@@ -110,19 +114,23 @@ function isValidEmail(value) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(value || "").trim());
 }
 
-function parseImageAttachments(value) {
+// Zdjęcia (JPEG/PNG/WebP) i PDF (np. wygenerowana oferta) - ta sama walidacja i ten sam
+// limit łączny, bo _gmail.js buildRawMessage() dokłada je do maila identycznie (multipart/
+// mixed, base64), bez różnicy między typem pliku.
+function parseAttachments(value) {
   if (value == null) return [];
-  if (!Array.isArray(value) || value.length > MAX_ATTACHMENTS) throw new Error(`Maksymalnie ${MAX_ATTACHMENTS} zdjęcia.`);
+  if (!Array.isArray(value) || value.length > MAX_ATTACHMENTS) throw new Error(`Maksymalnie ${MAX_ATTACHMENTS} załączniki.`);
   let totalBytes = 0;
   return value.map((item, index) => {
     const mimeType = String(item && item.mimeType || "").toLowerCase();
     const contentBase64 = String(item && item.contentBase64 || "").replace(/\s+/g, "");
-    if (!/^image\/(jpeg|png|webp)$/.test(mimeType)) throw new Error(`Załącznik ${index + 1} nie jest obsługiwanym zdjęciem.`);
+    if (!ALLOWED_ATTACHMENT_MIME.test(mimeType)) throw new Error(`Załącznik ${index + 1} ma nieobsługiwany format (obsługujemy JPG, PNG, WebP i PDF).`);
     if (!contentBase64 || !/^[a-z0-9+/]+={0,2}$/i.test(contentBase64)) throw new Error(`Załącznik ${index + 1} ma nieprawidłową zawartość.`);
     const bytes = Buffer.from(contentBase64, "base64");
     totalBytes += bytes.length;
-    if (totalBytes > MAX_ATTACHMENTS_BYTES) throw new Error("Łączny rozmiar zdjęć jest zbyt duży.");
-    const filename = String(item.filename || `zdjecie-${index + 1}.jpg`).replace(/[\r\n"\\]/g, "_").slice(0, 160);
+    if (totalBytes > MAX_ATTACHMENTS_BYTES) throw new Error("Łączny rozmiar załączników jest zbyt duży.");
+    const defaultName = mimeType === "application/pdf" ? `dokument-${index + 1}.pdf` : `zdjecie-${index + 1}.jpg`;
+    const filename = String(item.filename || defaultName).replace(/[\r\n"\\]/g, "_").slice(0, 160);
     return { filename, mimeType, contentBase64: bytes.toString("base64") };
   });
 }
@@ -157,7 +165,7 @@ module.exports = async function handler(req, res) {
   const clientId = payload.clientId ? String(payload.clientId) : "";
   let attachments;
   try {
-    attachments = parseImageAttachments(payload.attachments);
+    attachments = parseAttachments(payload.attachments);
   } catch (e) {
     return res.status(400).json({ error: e.message || "Invalid attachments." });
   }
@@ -206,7 +214,7 @@ module.exports = async function handler(req, res) {
         if (!Array.isArray(client.historia)) client.historia = [];
         const now = new Date().toISOString();
         client.historia.push({
-          tekst: `[Mail wychodzący] Temat: ${subject}${attachments.length ? `\nZałączone zdjęcia: ${attachments.map(item => item.filename).join(", ")}` : ""}\n\n${fullBody}`,
+          tekst: `[Mail wychodzący] Temat: ${subject}${attachments.length ? `\nZałączniki: ${attachments.map(item => item.filename).join(", ")}` : ""}\n\n${fullBody}`,
           kto: `${actorName} (panel, ${mailboxEmail} → ${to})`,
           data: now,
           utworzono: now,
