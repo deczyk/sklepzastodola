@@ -161,6 +161,11 @@ async function syncMailbox(mailboxKey, mailboxEmail, data, log) {
         data: entryDate,
         utworzono: new Date().toISOString(),
         _mailMessageId: id,
+        // Patrz identyczny komentarz w api/mail-send.js - bez nadania _syncId tutaj,
+        // panel.html nadałby go sam przy pierwszym pobraniu (hash zależny od indeksu
+        // w tablicy), co nie zgadzałoby się z kluczem używanym przez serwer do
+        // deduplikacji i dublowało wpis w historii przy kolejnym zapisie z panelu.
+        _syncId: `hist_${client.id}_mail_${id}`,
         ...(message.rfcMessageId ? { _mailRfcMessageId: message.rfcMessageId } : {}),
         ...(attachmentImages.length ? { images: attachmentImages } : {})
       });

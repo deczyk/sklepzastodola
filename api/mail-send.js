@@ -218,7 +218,15 @@ module.exports = async function handler(req, res) {
           kto: `${actorName} (panel, ${mailboxEmail} → ${to})`,
           data: now,
           utworzono: now,
-          _mailMessageId: sent.id
+          _mailMessageId: sent.id,
+          // Bez tego panel.html (ensurePanelSyncIds) nadałby ten identyfikator SAM przy
+          // pierwszym pobraniu tego wpisu do przeglądarki - a że tamten hash zależy od
+          // pozycji w tablicy (index), przy kolejnym zapisie z panelu nie zgadzałby się
+          // z kluczem, którego używa serwer (historyEntryKey w _panel-store.js) do
+          // deduplikacji. Efekt: wpis dublował się na stałe w bazie przy niemal każdym
+          // kolejnym zapisie z panelu po wysłaniu maila. _mailMessageId jest unikalny
+          // i stabilny od razu, więc nadajemy _syncId tutaj, zanim ktokolwiek to pobierze.
+          _syncId: `hist_${clientId}_mail_${sent.id}`
         });
         client.zaktualizowano = now;
       });
