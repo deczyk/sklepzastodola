@@ -7395,7 +7395,7 @@ function renderMailComposeSection(c){
       <span class="imageUploadStatus" id="mailComposeAttachStatus-${c.id}"></span>
     </div>
     <div class="advisorScenarioDofin" style="border:0;padding:10px 0 0">
-      <button class="save" onclick="sendClientMail('${c.id}')">Wyślij mail</button>
+      <button class="save" id="mailComposeSendBtn-${c.id}" onclick="sendClientMail('${c.id}')">Wyślij mail</button>
       <span id="mailComposeStatus-${c.id}" style="font-size:13px;color:var(--text-muted)"></span>
     </div>
   `;
@@ -7580,7 +7580,15 @@ function canvasToMailAttachment(file){
   });
 }
 
+// Strażnik przeciwko podwójnej wysyłce - bez tego podwójny klik (albo jeden klik przy
+// wolnym połączeniu, gdy user nie widzi żadnej natychmiastowej reakcji i klika ponownie)
+// wysyłał DWA osobne, prawdziwe maile do klienta i dwa razy zapisywał je w historii.
+// To nie kwestia deduplikacji po stronie serwera - to dwie różne wiadomości z dwoma
+// różnymi ID Gmaila, więc jedyna skuteczna ochrona jest tutaj, przed wysłaniem requestu.
+const clientMailSendInFlight = new Set();
+
 async function sendClientMail(clientId){
+  if(clientMailSendInFlight.has(clientId)) return;
   const statusEl = document.getElementById(`mailComposeStatus-${clientId}`);
   const to = document.getElementById(`mailComposeTo-${clientId}`)?.value.trim();
   const subject = document.getElementById(`mailComposeSubject-${clientId}`)?.value.trim();
@@ -7590,6 +7598,9 @@ async function sendClientMail(clientId){
     if(statusEl) statusEl.textContent = "Wypełnij adresata, temat i treść.";
     return;
   }
+  clientMailSendInFlight.add(clientId);
+  const btn = document.getElementById(`mailComposeSendBtn-${clientId}`);
+  if(btn) btn.disabled = true;
   if(statusEl) statusEl.textContent = "Wysyłam...";
   try{
     // contentBase64/mimeType/filename - dokładnie to, czego oczekuje api/mail-send.js;
@@ -7603,11 +7614,15 @@ async function sendClientMail(clientId){
     logActivity(`wysłał(a) maila do ${to}`);
     const successText = `Wysłano z właściwym podpisem${attachments.length ? ` i ${attachments.length} ${attachments.length === 1 ? "załącznikiem" : "załącznikami"}` : ""}.`;
     clearClientMailImages(clientId);
-    if(currentClientCardId === clientId) openClientCard(clientId); // odśwież - pokaże się w historii
+    if(currentClientCardId === clientId) openClientCard(clientId); // odśwież - pokaże się w historii (odtwarza świeży, odblokowany przycisk)
     const refreshedStatus = document.getElementById(`mailComposeStatus-${clientId}`);
     if(refreshedStatus) refreshedStatus.textContent = successText;
   }catch(e){
     if(statusEl) statusEl.textContent = `Błąd wysyłki: ${e.message}`;
+  }finally{
+    clientMailSendInFlight.delete(clientId);
+    const btnAfter = document.getElementById(`mailComposeSendBtn-${clientId}`);
+    if(btnAfter) btnAfter.disabled = false;
   }
 }
 
