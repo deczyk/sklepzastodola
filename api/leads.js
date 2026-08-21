@@ -37,18 +37,32 @@ function mlekomatIncludedItems(konfigText) {
   if (t.includes("płukanie") || t.includes("plukanie")) items.push("Automatyczne płukanie strefy dozowania");
   if (t.includes("alarm")) items.push("Alarm i syrena antywłamaniowa");
   if (t.includes("kartą") || t.includes("karta") || t.includes("nayax")) items.push("Płatność kartą (terminal Nayax)");
+  if (t.includes("wózek")) items.push("Wózek do kannych 50 L");
   return items;
 }
 
-function sielaffIncludedItems() {
-  return [
-    "Chłodzenie zapewniające świeżość produktów przez cały dzień",
-    "Ekran dotykowy z czytelną prezentacją oferty",
-    "Płatność gotówką i/lub kartą, w zależności od wybranej opcji"
+// Zgodne z opisem realnego automatu na automat-chlodniczy.html (nie wymyślone) - "spiralna
+// lub z popychaczami" i "ekran za szybą bezpieczną" to dosłowne sformułowania stamtąd.
+// Banknoty/karta to płatne opcje w konfiguratorze (brief.html), nie standard - pokazujemy
+// je warunkowo, tak jak GSM/płukanie przy mlekomacie wyżej. Ta sama poprawka co w panel.html
+// (offerIncludedItems) - patrz komentarz tam.
+function sielaffIncludedItems(konfigText) {
+  const t = (konfigText || "").toLowerCase();
+  const items = [
+    "Konfiguracja pod Twój asortyment — układ spiralny lub z popychaczami, dla produktów stojących, leżących, butelek PET lub szklanych",
+    "Dotykowy ekran za szybą bezpieczną — prezentacja produktów i komunikaty dla klienta",
+    "Chłodzenie utrzymujące świeżość produktów",
+    "Zabezpieczony odbiór — silnikowo blokowana klapa ograniczająca manipulacje przy odbiorze"
   ];
+  if (t.includes("banknot")) items.push("Płatność banknotami");
+  if (t.includes("cashless") || t.includes("nayax")) items.push("Płatność kartą i BLIK (Nayax)");
+  if (!t.includes("banknot") && !t.includes("cashless") && !t.includes("nayax")) {
+    items.push("Standardowy system płatności monetami — płatność banknotami i kartą/BLIK można dodać jako opcję");
+  }
+  return items;
 }
 
-function buildInsightCards(payload, priorHistoria) {
+function buildInsightCards(payload, priorHistoria, konfigText) {
   const cards = [];
   const krowy = String(payload.krowy || "");
   const litry = String(payload.litry || "");
@@ -90,15 +104,42 @@ function buildInsightCards(payload, priorHistoria) {
     }
   }
 
-  cards.push({
-    title: "Sprzedaż przez cały rok",
-    desc: "Konfiguracja z ogrzewaniem Anti-Frost pozwala sprzedawać bez przerw również zimą."
-  });
-  cards.push({
-    title: "Rozbudowa w kolejnych etapach",
-    desc: "Automat na butelki i urządzenia na inne produkty można dołączyć po uruchomieniu mlekomatu."
-  });
+  // Anti-Frost i "po uruchomieniu mlekomatu" dotyczą wyłącznie mlekomatu - w ofercie samego
+  // Sielaffa (automat uniwersalny: jaja, sery itd., bez związku z mlekiem) nie mają się
+  // pojawiać. Sielaff dostaje własną, ogólną wersję karty "Rozbudowa" (bez wymieniania
+  // z nazwy mlekomatu/butelek). Ta sama poprawka co w panel.html (offerInsightCards).
+  const t = (konfigText || "").toLowerCase();
+  if (t.includes("mlekomat")) {
+    cards.push({
+      title: "Sprzedaż przez cały rok",
+      desc: "Konfiguracja z ogrzewaniem Anti-Frost pozwala sprzedawać bez przerw również zimą."
+    });
+    cards.push({
+      title: "Rozbudowa w kolejnych etapach",
+      desc: "Automat chłodniczy Sielaff (jaja, sery, napoje) albo szklane butelki z etykietą można dołączyć po uruchomieniu mlekomatu."
+    });
+  } else if (t.includes("sielaff")) {
+    cards.push({
+      title: "Rozbudowa w kolejnych etapach",
+      desc: "Automat Sielaff możesz w każdej chwili rozbudować o kolejne urządzenia i etapy sprzedaży bezpośredniej."
+    });
+  }
   return cards.slice(0, 6);
+}
+
+// Podtytuł w nagłówku PDF-a - dopasowany do wybranych produktów, żeby oferta samego
+// Sielaffa nie zaczynała się od "mlekomatów BRUNIMAT" w nagłówku. Ta sama logika co
+// offerHeaderTagline w panel.html (tam dla ręcznego konfiguratora oferty w panelu,
+// tutaj dla PDF-a automatycznie wysyłanego po zgłoszeniu z brief.html/advisor.html).
+function offerHeaderTagline(sel) {
+  const only = Object.keys(sel).filter(k => sel[k]);
+  if (only.length === 1) {
+    if (only[0] === "mlekomat") return "Dystrybucja, instalacja i serwis mlekomatów BRUNIMAT w Polsce";
+    if (only[0] === "sielaff") return "Dystrybucja, instalacja i serwis automatów sprzedażowych Sielaff w Polsce";
+    if (only[0] === "butelki") return "Butelki i etykiety pod sprzedaż bezpośrednią z gospodarstwa";
+    if (only[0] === "pawilon") return "Pawilony pod punkt sprzedaży bezpośredniej z gospodarstwa";
+  }
+  return "Sprzedaż bezpośrednia z gospodarstwa — urządzenia, punkty sprzedaży, wdrożenie";
 }
 
 function buildPhotos(konfigText) {
@@ -138,7 +179,7 @@ async function buildBriefPdfAttachment(payload, lead, priorHistoria) {
 
     const includedItems = [
       ...(mNetto > 0 ? mlekomatIncludedItems(konfigText) : []),
-      ...(sNetto > 0 ? sielaffIncludedItems() : [])
+      ...(sNetto > 0 ? sielaffIncludedItems(konfigText) : [])
     ];
 
     const pdfBuffer = await buildOfferPdf({
@@ -151,7 +192,8 @@ async function buildBriefPdfAttachment(payload, lead, priorHistoria) {
       priceLines,
       totalNetto: (mNetto > 0 || sNetto > 0) ? (payload.cena_netto && payload.cena_netto !== "—" ? payload.cena_netto : "") : "",
       totalBrutto: (mNetto > 0 || sNetto > 0) ? (payload.cena_brutto && payload.cena_brutto !== "—" ? payload.cena_brutto : "") : "",
-      insightCards: buildInsightCards(payload, priorHistoria),
+      headerTagline: offerHeaderTagline({ mlekomat: mNetto > 0, sielaff: sNetto > 0, butelki: hasButelki, pawilon: hasPawilon }),
+      insightCards: buildInsightCards(payload, priorHistoria, konfigText),
       includedItems,
       photos: buildPhotos(konfigText)
     });
