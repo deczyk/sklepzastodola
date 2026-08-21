@@ -810,6 +810,51 @@
   .advisorScenarioResults{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:4px 16px;font-size:13px;line-height:1.5}
   .advisorScenarioResults b{color:#6b766f;font-weight:600}
   .advisorScenarioMeta{margin-top:8px;font-size:11px;color:var(--text-muted);font-style:italic}
+
+  /* --- Konfigurator oferty (offerConfigModal) — patrz openOfferConfigModal --- */
+  .offerCfgBox{width:640px}
+  .offerCfgHint{font-size:12.5px;color:var(--text-muted);margin-bottom:14px;line-height:1.4}
+  .offerCfgProducts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-bottom:16px}
+  @media(max-width:560px){.offerCfgProducts{grid-template-columns:1fr}}
+  .offerCfgProductCard{position:relative;border:2px solid var(--border);border-radius:10px;padding:12px 34px 12px 14px;cursor:pointer;background:var(--surface-soft);transition:border-color .15s,background .15s}
+  .offerCfgProductCard:hover{border-color:var(--green)}
+  .offerCfgProductCard.selected{border-color:var(--green);background:var(--surface-muted)}
+  .offerCfgProductCheck{position:absolute;top:10px;right:10px;width:20px;height:20px;border-radius:50%;border:2px solid var(--border);background:var(--surface);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:bold;color:transparent}
+  .offerCfgProductCard.selected .offerCfgProductCheck{background:var(--green);border-color:var(--green);color:#fff}
+  .offerCfgProductIcon{font-size:22px;margin-bottom:4px}
+  .offerCfgProductName{font-weight:800;color:var(--green);font-size:13.5px}
+  .offerCfgProductDesc{font-size:11.5px;color:var(--text-muted);margin-top:2px;line-height:1.35}
+  .offerCfgSection{border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:14px;background:var(--surface)}
+  .offerCfgSectionHead{font-weight:800;color:var(--green);margin-bottom:10px;font-size:14px}
+  .offerCfgKanny{display:flex;justify-content:space-between;align-items:center;gap:10px;border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-bottom:12px;background:var(--surface-soft)}
+  .offerCfgKanny b{display:block;font-size:13px}
+  .offerCfgKanny span{font-size:11.5px;color:var(--text-muted)}
+  .offerCfgKannyCtrl{display:flex;align-items:center;gap:10px;flex-shrink:0}
+  .offerCfgKannyCtrl button{width:28px;height:28px;border-radius:50%;border:2px solid var(--green);background:none;color:var(--green);font-weight:bold;font-size:16px;cursor:pointer;line-height:1}
+  .offerCfgKannyCtrl button:hover{background:var(--green);color:#fff}
+  .offerCfgKannyCtrl span{font-weight:800;min-width:20px;text-align:center}
+  .offerCfgOpts{display:grid;gap:6px}
+  .offerCfgOpt{display:flex;align-items:center;gap:10px;border:1px solid var(--line);border-radius:9px;padding:8px 10px;cursor:pointer;background:var(--surface-soft)}
+  .offerCfgOpt:hover{border-color:var(--green)}
+  .offerCfgOpt.selected{border-color:var(--green);background:var(--surface-muted)}
+  .offerCfgOpt input{margin:0;flex-shrink:0}
+  .offerCfgOptName{font-size:12.5px;font-weight:700;color:var(--text)}
+  .offerCfgOptDesc{font-size:11px;color:var(--text-muted)}
+  .offerCfgOptPrice{margin-left:auto;font-size:11.5px;font-weight:800;color:var(--green);white-space:nowrap}
+  .offerCfgSubtotal{margin-top:10px;font-size:12.5px;color:var(--text-muted)}
+  .offerCfgPriceCards{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+  @media(max-width:560px){.offerCfgPriceCards{grid-template-columns:1fr}}
+  .offerCfgPriceCard{border:2px solid var(--line);border-radius:10px;padding:10px 12px;cursor:pointer;background:var(--surface-soft)}
+  .offerCfgPriceCard.selected{border-color:var(--green);background:var(--surface-muted)}
+  .offerCfgPriceCard b{display:block;font-size:12.5px;color:var(--text)}
+  .offerCfgPriceCard span{font-size:11px;color:var(--text-muted)}
+  .offerCfgPriceCard .p{margin-top:6px;font-weight:800;color:var(--green);font-size:13px}
+  .offerCfgTotal{display:flex;justify-content:space-between;align-items:center;border:1px solid var(--border);border-radius:12px;padding:12px 16px;background:var(--surface-muted);margin-top:4px}
+  .offerCfgTotalSub{font-size:11.5px;color:var(--text-muted);margin-top:2px}
+  .offerCfgTotalNum{font-size:22px;font-weight:800;color:var(--green);white-space:nowrap}
+  .offerCfgFooter{display:flex;justify-content:flex-end;gap:10px;margin-top:16px;position:sticky;bottom:-22px;background:var(--surface);padding:10px 0 2px}
+  .offerCfgFooter .cancel{background:var(--surface-soft);color:var(--text);border:1px solid var(--border);border-radius:8px;padding:9px 16px;font-size:13px;cursor:pointer}
+  .offerCfgFooter .save{background:var(--green);color:#fff;border:none;border-radius:8px;padding:9px 18px;font-size:13px;font-weight:bold;cursor:pointer}
   .lastActivity{margin-top:6px;font-size:12px;color:var(--text-muted);line-height:1.35}
   .lastActivityBadge{display:inline-flex;max-width:100%;border:1px solid #ead99a;background:#fff8df;color:#755c15;border-radius:8px;
       padding:4px 7px;font-size:12px;line-height:1.3}
@@ -2589,6 +2634,21 @@
       </div>
       <div id="addClientError" style="color:#a34747;font-size:13px;margin:6px 0;display:none">Podaj przynajmniej firmę/gospodarstwo lub osobę kontaktową.</div>
       <button class="save" onclick="submitAddClient()">Zapisz klienta</button>
+    </div>
+  </div>
+
+  <!-- Konfigurator oferty — ten sam wybór produktu/opcji co w brief.html, tylko do wewnętrznego
+       generowania PDF-a dla konkretnego klienta z panelu (patrz openOfferConfigModal). -->
+  <div id="offerConfigModal" class="previewModal" onclick="if(event.target===this) closeOfferConfigModal()">
+    <div class="clientCardBox offerCfgBox">
+      <button class="previewClose" onclick="closeOfferConfigModal()">✕ Zamknij</button>
+      <h2 id="offerConfigClientName" style="margin-top:0;color:var(--green)">Konfiguracja oferty</h2>
+      <div class="offerCfgHint">Wybierz produkt(y) i opcje — tak jak w konfiguratorze na stronie (brief.html). Oferta PDF powstanie dokładnie z tego wyboru, z realną wyceną katalogową.</div>
+      <div id="offerConfigBody"></div>
+      <div class="offerCfgFooter">
+        <button class="cancel" onclick="closeOfferConfigModal()">Anuluj</button>
+        <button class="save" onclick="generateOfferPdfFromConfig()">📄 Generuj ofertę PDF</button>
+      </div>
     </div>
   </div>
 </div><!-- /.wrap -->
@@ -6797,7 +6857,7 @@ function renderClientOffers(c){
     <div class="clientOffers">
       <div class="clientOffersHead">
         <b>Oferty (${offers.length})</b>
-        <button class="histBtn" onclick="generateOfferPdf('${crmEsc(c.id)}')">📄 Generuj ofertę PDF</button>
+        <button class="histBtn" onclick="openOfferConfigModal('${crmEsc(c.id)}')">🛒 Skonfiguruj i generuj ofertę</button>
         <button class="histBtn" onclick="toggleOfferForm('${crmEsc(c.id)}')">+ Dodaj ofertę</button>
       </div>
       <div class="offerPdfDrop" data-offer-pdf-drop-for="${crmEsc(c.id)}" role="button" tabindex="0" aria-label="Dodaj ofertę PDF dla klienta">
@@ -7708,8 +7768,9 @@ function findAdvisorHistoryText(c){
 
 // Konfiguracja z konfiguratora (brief.html) trafia do historii jako notatka [Brief], w formacie
 // "Klient skonfigurował mlekomat w konfiguratorze. Konfiguracja: ...; Stado: ...; Produkcja: ...".
-// generateOfferPdf() już dzieli ją po "; " do budowy PDF-a - używamy dokładnie tego samego podziału
-// tutaj, żeby pokazać to samo w czytelnej liście w karcie klienta, zamiast tylko w historii kontaktu.
+// Dzielimy ją po "; ", żeby pokazać to w czytelnej liście w karcie klienta, zamiast tylko
+// w historii kontaktu (do generowania PDF-a służy teraz osobny konfigurator oferty, patrz
+// openOfferConfigModal - nie zgaduje już z tego tekstu).
 function renderBriefConfigSection(c){
   const entry = findLatestBriefHistory(c);
   if(!entry) return "";
@@ -7947,26 +8008,373 @@ function offerPhotos(konfigText){
   return photos;
 }
 
-function guessOfferAmount(text){
-  const m = (text || "").match(/([\d][\d\s]{2,})\s*zł/);
-  return m ? m[1].replace(/\s+/g,"") : "";
+// ================= Konfigurator oferty (panel) =================
+// Ten sam wybór produktu/opcji i DOKŁADNIE ten sam cennik co brief.html (konfigurator
+// na stronie) - stałe i wzory skopiowane 1:1 stamtąd, żeby liczby się zgadzały. Dzięki
+// temu "Generuj ofertę" nie zgaduje już z tekstu w historii (często pusty, gdy klient
+// nie przeszedł konfiguratora online) - Kuba/Jarek wybierają produkt i opcje ręcznie,
+// tak jak robiłby to klient na stronie, i oferta zawsze wychodzi konkretna.
+const OFFER_KURS = 4.25;
+const OFFER_TRANSPORT_PLN = 2250;
+const OFFER_MARKUP = 1.55;
+const OFFER_BASE_EUR = { duo:5435, cemid:150, combo:1250, drukarka:530, ogrzewanie:100 };
+const OFFER_KANNA_EUR = 230;
+const OFFER_OPT_EUR = { gsm_full:500, gsm_poziom:160, plukanie:200, karta:650, alarm:200, wozek:280 };
+const OFFER_OPT_DEFS = [
+  ["gsm_full","GSM — powiadomienia SMS (pełny pakiet)","Zdalny podgląd pracy urządzenia, alarm SMS przy awarii, włamaniu i różne statusy maszyny"],
+  ["gsm_poziom","GSM — alarm niskiego poziomu mleka","SMS gdy zbiornik spada poniżej ustawionego progu (np. 50 L)"],
+  ["plukanie","Automatyczne płukanie strefy dozowania","Czyszczenie po każdej sprzedaży mleka — higiena HACCP bez pracy ręcznej"],
+  ["alarm","Alarm + syrena antywłamaniowa","SMS + syrena przy naruszeniu szafy sterowniczej"],
+  ["karta","Płatność kartą (terminal Nayax)","Karta, BLIK, Apple Pay"],
+  ["wozek","Wózek do kannych 50 L","Ułatwia codzienną wymianę zbiornika"]
+];
+const OFFER_OPT_LABELS = Object.fromEntries(OFFER_OPT_DEFS.map(([k,name])=>[k,name]));
+const OFFER_SIELAFF_VARIANTS = {
+  combi_m_1ro: { label:"SiLine SÜ Combi-M — 1 RO (na zewnątrz, pod butelki)", sub:"1 RO — na zewnątrz, pod butelki", netto:53570, brutto:65891 },
+  combi_m_3rb: { label:"SiLine SÜ Combi-M — 3 RB (do wnętrza, wydawanie bezpośrednie + schowek)", sub:"3 RB — do wnętrza, wydawanie bezpośrednie + schowek", netto:54470, brutto:66998 }
+};
+const OFFER_SIELAFF_ADDONS = {
+  banknoty: { label:"System banknotów", netto:2590 },
+  cashless: { label:"Cashless / Nayax (karta + BLIK)", netto:2590 }
+};
+const OFFER_PAWILON_SIZES = {
+  pawilon_s: "Pawilon S — kompaktowy (pod mlekomat i podstawowe produkty)",
+  pawilon_m: "Pawilon M — standardowy (mlekomat + automaty + regały)",
+  pawilon_l: "Pawilon L — duży (pełny sklep przy gospodarstwie)"
+};
+const OFFER_PRODUCT_DEFS = [
+  { key:"mlekomat", icon:"🥛", name:"Mlekomat BRUNIMAT", desc:"Automat do świeżego mleka — kanny, płatności, higiena." },
+  { key:"sielaff", icon:"🥤", name:"Automat chłodniczy Sielaff", desc:"Jaja, sery, napoje, produkty świeże — seria do wyboru." },
+  { key:"butelki", icon:"🍾", name:"Szklane butelki z etykietą", desc:"Butelki pod punkt sprzedaży — ilość i etykieta." },
+  { key:"pawilon", icon:"🏠", name:"Pawilon drewniany", desc:"Pawilon pod punkt sprzedaży — rozmiar i wykończenie." }
+];
+
+let offerConfigState = null;
+
+function offerFmt(n){ return Math.round(n).toLocaleString("pl-PL") + " zł"; }
+
+// Cena pojedynczej opcji dodatkowej pokazywana w panelu (np. "3 300 zł" dla GSM pełny
+// pakiet) - ten sam wzór, którym brief.html wyliczył swoje statyczne etykiety cen.
+function offerOptDisplayPrice(eur){
+  return Math.round(eur * OFFER_KURS * OFFER_MARKUP / 100) * 100;
+}
+
+function offerCalcMlekomatPrice(kanny, optsSet){
+  let totalEUR = Object.values(OFFER_BASE_EUR).reduce((a,b)=>a+b,0);
+  totalEUR += kanny * OFFER_KANNA_EUR;
+  optsSet.forEach(k => { totalEUR += OFFER_OPT_EUR[k] || 0; });
+  const costPLN = totalEUR * OFFER_KURS + OFFER_TRANSPORT_PLN;
+  const netto = Math.round(costPLN * OFFER_MARKUP / 100) * 100;
+  const brutto = Math.round(netto * 1.23 / 100) * 100;
+  return { netto, brutto };
+}
+
+function defaultOfferConfig(){
+  return {
+    products: new Set(["mlekomat"]),
+    mlekomat: { kanny:2, opts:new Set() },
+    sielaff: { variant:"combi_m_1ro", addons:new Set(), produkty:"" },
+    butelki: { qty:200 },
+    pawilon: { size:"pawilon_s" }
+  };
+}
+
+// Odtwarza stan z zapisanej (płaskiej, JSON-owalnej) konfiguracji klienta - patrz
+// zapis w generateOfferPdfFromConfig(). Braki/uszkodzone dane -> spadamy na domyślne.
+function hydrateOfferConfig(saved){
+  const d = defaultOfferConfig();
+  if(!saved || typeof saved !== "object") return d;
+  return {
+    products: new Set(Array.isArray(saved.products) && saved.products.length ? saved.products : [...d.products]),
+    mlekomat: {
+      kanny: Number.isFinite(saved.mlekomat?.kanny) ? saved.mlekomat.kanny : d.mlekomat.kanny,
+      opts: new Set(Array.isArray(saved.mlekomat?.opts) ? saved.mlekomat.opts : [])
+    },
+    sielaff: {
+      variant: OFFER_SIELAFF_VARIANTS[saved.sielaff?.variant] ? saved.sielaff.variant : d.sielaff.variant,
+      addons: new Set(Array.isArray(saved.sielaff?.addons) ? saved.sielaff.addons : []),
+      produkty: typeof saved.sielaff?.produkty === "string" ? saved.sielaff.produkty : ""
+    },
+    butelki: { qty: Number.isFinite(saved.butelki?.qty) ? saved.butelki.qty : d.butelki.qty },
+    pawilon: { size: OFFER_PAWILON_SIZES[saved.pawilon?.size] ? saved.pawilon.size : d.pawilon.size }
+  };
+}
+
+function serializeOfferConfig(s){
+  return {
+    products: [...s.products],
+    mlekomat: { kanny: s.mlekomat.kanny, opts: [...s.mlekomat.opts] },
+    sielaff: { variant: s.sielaff.variant, addons: [...s.sielaff.addons], produkty: s.sielaff.produkty },
+    butelki: { qty: s.butelki.qty },
+    pawilon: { size: s.pawilon.size }
+  };
+}
+
+function openOfferConfigModal(clientId){
+  const c = data.klienci.find(x=>x.id===clientId);
+  if(!c) return;
+  offerConfigState = hydrateOfferConfig(c.offerConfig);
+  offerConfigState.clientId = clientId;
+  document.getElementById("offerConfigClientName").textContent = `Konfiguracja oferty — ${c.firma || c.osoba || "bez nazwy"}`;
+  renderOfferConfigModal();
+  document.getElementById("offerConfigModal").classList.add("open");
+}
+
+function closeOfferConfigModal(){
+  document.getElementById("offerConfigModal").classList.remove("open");
+  offerConfigState = null;
+}
+
+function offerConfigTotals(s){
+  let netto=0, brutto=0, hasPriced=false, hasUnpriced=false;
+  if(s.products.has("mlekomat")){
+    const p = offerCalcMlekomatPrice(s.mlekomat.kanny, s.mlekomat.opts);
+    netto += p.netto; brutto += p.brutto; hasPriced = true;
+  }
+  if(s.products.has("sielaff")){
+    const variant = OFFER_SIELAFF_VARIANTS[s.sielaff.variant];
+    let addonsNetto = 0;
+    s.sielaff.addons.forEach(k => { addonsNetto += OFFER_SIELAFF_ADDONS[k]?.netto || 0; });
+    const sNetto = variant.netto + addonsNetto;
+    netto += sNetto; brutto += Math.round(sNetto * 1.23);
+    hasPriced = true;
+  }
+  if(s.products.has("butelki") || s.products.has("pawilon")) hasUnpriced = true;
+  return { netto, brutto, hasPriced, hasUnpriced };
+}
+
+function offerConfigLines(s){
+  const lines = [];
+  if(s.products.has("mlekomat")){
+    const optNames = [...s.mlekomat.opts].map(k => OFFER_OPT_LABELS[k]).filter(Boolean);
+    lines.push(`Mlekomat BRUNIMAT 650 Premium DUO — ${s.mlekomat.kanny} kanny${optNames.length ? ", opcje: " + optNames.join(", ") : ""}`);
+  }
+  if(s.products.has("sielaff")){
+    const variant = OFFER_SIELAFF_VARIANTS[s.sielaff.variant];
+    const addonNames = [...s.sielaff.addons].map(k => OFFER_SIELAFF_ADDONS[k]?.label).filter(Boolean);
+    let line = `Automat chłodniczy Sielaff — ${variant.label}`;
+    if(addonNames.length) line += ` + ${addonNames.join(", ")}`;
+    if(s.sielaff.produkty.trim()) line += ` | co sprzedawać: ${s.sielaff.produkty.trim()}`;
+    lines.push(line);
+  }
+  if(s.products.has("butelki")) lines.push(`Szklane butelki z etykietą — ${s.butelki.qty} szt.`);
+  if(s.products.has("pawilon")) lines.push(`Pawilon drewniany — ${OFFER_PAWILON_SIZES[s.pawilon.size]}`);
+  return lines;
+}
+
+function offerConfigPriceLines(s){
+  const lines = [];
+  if(s.products.has("mlekomat")){
+    const base = offerCalcMlekomatPrice(s.mlekomat.kanny, new Set());
+    lines.push({ label:`Mlekomat BRUNIMAT 650 Premium DUO — bazowa konfiguracja (${s.mlekomat.kanny} kanny, wyposażenie standardowe)`, netto: offerFmt(base.netto) });
+    s.mlekomat.opts.forEach(k => {
+      lines.push({ label: OFFER_OPT_LABELS[k] || k, netto: offerFmt(offerOptDisplayPrice(OFFER_OPT_EUR[k] || 0)) });
+    });
+  }
+  if(s.products.has("sielaff")){
+    const variant = OFFER_SIELAFF_VARIANTS[s.sielaff.variant];
+    lines.push({ label:`Automat chłodniczy Sielaff — ${variant.label}`, netto: offerFmt(variant.netto) });
+    s.sielaff.addons.forEach(k => {
+      const addon = OFFER_SIELAFF_ADDONS[k];
+      if(addon) lines.push({ label: addon.label, netto: offerFmt(addon.netto) });
+    });
+  }
+  if(s.products.has("butelki")) lines.push({ label:`Szklane butelki z etykietą — ${s.butelki.qty} szt.`, netto:"wycena indywidualna" });
+  if(s.products.has("pawilon")) lines.push({ label:`Pawilon drewniany — ${OFFER_PAWILON_SIZES[s.pawilon.size]}`, netto:"wycena indywidualna" });
+  return lines;
+}
+
+function toggleOfferProduct(key){
+  if(!offerConfigState) return;
+  if(offerConfigState.products.has(key)) offerConfigState.products.delete(key);
+  else offerConfigState.products.add(key);
+  renderOfferConfigModal();
+}
+
+function changeOfferKanny(delta){
+  if(!offerConfigState) return;
+  offerConfigState.mlekomat.kanny = Math.max(2, Math.min(4, offerConfigState.mlekomat.kanny + delta));
+  renderOfferConfigModal();
+}
+
+function toggleOfferMlekomatOpt(key){
+  if(!offerConfigState) return;
+  const opts = offerConfigState.mlekomat.opts;
+  // GSM - pełny pakiet i sam alarm niskiego poziomu wykluczają się (tak samo jak w brief.html)
+  if(key==="gsm_full" && opts.has("gsm_poziom")) opts.delete("gsm_poziom");
+  if(key==="gsm_poziom" && opts.has("gsm_full")) opts.delete("gsm_full");
+  if(opts.has(key)) opts.delete(key); else opts.add(key);
+  renderOfferConfigModal();
+}
+
+function selectOfferSielaffVariant(key){
+  if(!offerConfigState || !OFFER_SIELAFF_VARIANTS[key]) return;
+  offerConfigState.sielaff.variant = key;
+  renderOfferConfigModal();
+}
+
+function toggleOfferSielaffAddon(key){
+  if(!offerConfigState) return;
+  const addons = offerConfigState.sielaff.addons;
+  if(addons.has(key)) addons.delete(key); else addons.add(key);
+  renderOfferConfigModal();
+}
+
+function changeOfferButelki(delta){
+  if(!offerConfigState) return;
+  offerConfigState.butelki.qty = Math.max(50, Math.min(1000, offerConfigState.butelki.qty + delta));
+  renderOfferConfigModal();
+}
+
+function selectOfferPawilon(key){
+  if(!offerConfigState || !OFFER_PAWILON_SIZES[key]) return;
+  offerConfigState.pawilon.size = key;
+  renderOfferConfigModal();
+}
+
+function renderOfferMlekomatSection(s){
+  const price = offerCalcMlekomatPrice(s.mlekomat.kanny, s.mlekomat.opts);
+  return `
+    <div class="offerCfgSection">
+      <div class="offerCfgSectionHead">🥛 Mlekomat BRUNIMAT 650 Premium DUO</div>
+      <div class="offerCfgKanny">
+        <div><b>Kanny 50 L — stal nierdzewna</b><span>DUO wymaga min. 2 szt.</span></div>
+        <div class="offerCfgKannyCtrl">
+          <button type="button" onclick="changeOfferKanny(-1)">−</button>
+          <span>${s.mlekomat.kanny}</span>
+          <button type="button" onclick="changeOfferKanny(1)">+</button>
+        </div>
+      </div>
+      <div class="offerCfgOpts">
+        ${OFFER_OPT_DEFS.map(([key,name,desc]) => `
+          <label class="offerCfgOpt ${s.mlekomat.opts.has(key) ? "selected" : ""}">
+            <input type="checkbox" ${s.mlekomat.opts.has(key) ? "checked" : ""} onchange="toggleOfferMlekomatOpt('${key}')">
+            <div><div class="offerCfgOptName">${name}</div><div class="offerCfgOptDesc">${desc}</div></div>
+            <div class="offerCfgOptPrice">${offerFmt(offerOptDisplayPrice(OFFER_OPT_EUR[key]))}</div>
+          </label>
+        `).join("")}
+      </div>
+      <div class="offerCfgSubtotal">Mlekomat razem: <b>${offerFmt(price.netto)}</b> netto / ${offerFmt(price.brutto)} brutto</div>
+    </div>
+  `;
+}
+
+function renderOfferSielaffSection(s){
+  return `
+    <div class="offerCfgSection">
+      <div class="offerCfgSectionHead">🥤 Automat chłodniczy Sielaff</div>
+      <div class="offerCfgPriceCards">
+        ${Object.keys(OFFER_SIELAFF_VARIANTS).map(key => {
+          const v = OFFER_SIELAFF_VARIANTS[key];
+          return `<div class="offerCfgPriceCard ${s.sielaff.variant===key ? "selected" : ""}" onclick="selectOfferSielaffVariant('${key}')">
+            <b>SiLine SÜ Combi-M</b><span>${v.sub}</span>
+            <div class="p">${offerFmt(v.netto)} netto</div>
+          </div>`;
+        }).join("")}
+      </div>
+      <div class="offerCfgOpts">
+        ${Object.keys(OFFER_SIELAFF_ADDONS).map(key => {
+          const a = OFFER_SIELAFF_ADDONS[key];
+          return `<label class="offerCfgOpt ${s.sielaff.addons.has(key) ? "selected" : ""}">
+            <input type="checkbox" ${s.sielaff.addons.has(key) ? "checked" : ""} onchange="toggleOfferSielaffAddon('${key}')">
+            <div class="offerCfgOptName">${a.label}</div>
+            <div class="offerCfgOptPrice">${offerFmt(a.netto)}</div>
+          </label>`;
+        }).join("")}
+      </div>
+      <label style="display:block;margin-top:10px;font-size:12px;color:var(--text-muted)">Co planujesz sprzedawać z automatu?
+        <textarea style="width:100%;box-sizing:border-box;margin-top:4px;border:1px solid var(--line);border-radius:8px;background:var(--input-bg);color:var(--text);padding:7px 9px;font:inherit;min-height:50px" placeholder="Np. jajka, sery, wędliny, napoje..." oninput="offerConfigState.sielaff.produkty=this.value">${crmEsc(s.sielaff.produkty)}</textarea>
+      </label>
+    </div>
+  `;
+}
+
+function renderOfferButelkiSection(s){
+  return `
+    <div class="offerCfgSection">
+      <div class="offerCfgSectionHead">🍾 Szklane butelki z etykietą</div>
+      <div class="offerCfgKanny">
+        <div><b>Liczba butelek</b><span>Orientacyjna ilość na start</span></div>
+        <div class="offerCfgKannyCtrl">
+          <button type="button" onclick="changeOfferButelki(-50)">−</button>
+          <span>${s.butelki.qty}</span>
+          <button type="button" onclick="changeOfferButelki(50)">+</button>
+        </div>
+      </div>
+      <div class="offerCfgSubtotal">Cena katalogowa — indywidualna, po kontakcie.</div>
+    </div>
+  `;
+}
+
+function renderOfferPawilonSection(s){
+  return `
+    <div class="offerCfgSection">
+      <div class="offerCfgSectionHead">🏠 Pawilon drewniany</div>
+      <div class="offerCfgOpts">
+        ${Object.keys(OFFER_PAWILON_SIZES).map(key => `
+          <label class="offerCfgOpt ${s.pawilon.size===key ? "selected" : ""}" onclick="selectOfferPawilon('${key}')">
+            <input type="radio" name="offerPawilonSize" ${s.pawilon.size===key ? "checked" : ""} style="pointer-events:none">
+            <div class="offerCfgOptName">${OFFER_PAWILON_SIZES[key]}</div>
+          </label>
+        `).join("")}
+      </div>
+      <div class="offerCfgSubtotal">Cena katalogowa — indywidualna, po ustaleniu wymiarów i wykończenia.</div>
+    </div>
+  `;
+}
+
+function renderOfferConfigModal(){
+  const s = offerConfigState;
+  const root = document.getElementById("offerConfigBody");
+  if(!s || !root) return;
+  const scrollTop = root.scrollTop;
+  const totals = offerConfigTotals(s);
+  root.innerHTML = `
+    <div class="offerCfgProducts">
+      ${OFFER_PRODUCT_DEFS.map(p => `
+        <div class="offerCfgProductCard ${s.products.has(p.key) ? "selected" : ""}" onclick="toggleOfferProduct('${p.key}')">
+          <div class="offerCfgProductCheck">✓</div>
+          <div class="offerCfgProductIcon">${p.icon}</div>
+          <div class="offerCfgProductName">${p.name}</div>
+          <div class="offerCfgProductDesc">${p.desc}</div>
+        </div>
+      `).join("")}
+    </div>
+    ${s.products.has("mlekomat") ? renderOfferMlekomatSection(s) : ""}
+    ${s.products.has("sielaff") ? renderOfferSielaffSection(s) : ""}
+    ${s.products.has("butelki") ? renderOfferButelkiSection(s) : ""}
+    ${s.products.has("pawilon") ? renderOfferPawilonSection(s) : ""}
+    <div class="offerCfgTotal">
+      <div><b>Szacunkowa cena netto</b><div class="offerCfgTotalSub">${totals.hasPriced ? `brutto ${offerFmt(totals.brutto)}${totals.hasUnpriced ? " + inne (indywidualnie)" : ""}` : "wycena indywidualna"}</div></div>
+      <div class="offerCfgTotalNum">${totals.hasPriced ? offerFmt(totals.netto) : "—"}</div>
+    </div>
+  `;
+  root.scrollTop = scrollTop;
 }
 
 // Generuje PDF oferty po stronie serwera (pdf-lib + NotoSans — poprawne
 // polskie znaki, zdjęcia urządzeń obok siebie) i pokazuje podgląd w nowej
 // karcie przeglądarki, zamiast wymuszać pobranie pliku. Ten sam silnik
 // (api/_offer-pdf.js) generuje też PDF wysyłany mailem z brief.html /
-// advisor.html, więc oba źródła zawsze wyglądają identycznie.
-async function generateOfferPdf(clientId){
+// advisor.html, więc oba źródła zawsze wyglądają identycznie. Konfiguracja
+// (produkt/opcje) pochodzi z modala openOfferConfigModal, nie z zgadywania
+// po historii - patrz komentarz przy stałych cennika wyżej.
+async function generateOfferPdfFromConfig(){
+  const s = offerConfigState;
+  if(!s || !s.clientId) return;
+  const clientId = s.clientId;
   const c = data.klienci.find(x=>x.id===clientId);
   if(!c) return;
-  const briefEntry = findLatestBriefHistory(c);
-  const briefText = briefEntry ? parseHistoryText(briefEntry.tekst || "").text : "";
-  const configLines = briefText
-    ? briefText.replace(/^Klient skonfigurował mlekomat w konfiguratorze\.\s*/,"").split(/;\s*/).filter(Boolean)
-    : [];
-  const kwota = guessOfferAmount(briefText);
-  const titleText = c.produkt || c.zainteresowanie || "Oferta dla Twojego gospodarstwa";
+  if(!s.products.size){ alert("Wybierz przynajmniej jeden produkt."); return; }
+
+  const configLines = offerConfigLines(s);
+  const konfigText = configLines.join("; ");
+  const priceLines = offerConfigPriceLines(s);
+  const totals = offerConfigTotals(s);
+  const kwota = totals.hasPriced ? String(Math.round(totals.netto)) : "";
+  const titleText = s.products.size > 1
+    ? "Oferta — punkt sprzedaży bezpośredniej"
+    : (OFFER_PRODUCT_DEFS.find(p => s.products.has(p.key))?.name || c.produkt || c.zainteresowanie || "Oferta dla Twojego gospodarstwa");
 
   const payload = {
     clientName: getClientDisplayName(c),
@@ -7974,14 +8382,14 @@ async function generateOfferPdf(clientId){
     dateStr: new Date().toLocaleDateString("pl-PL"),
     productTitle: titleText,
     docTitle: titleText,
-    recommendation: "Oferta przygotowana na podstawie wybranej konfiguracji w naszym konfiguratorze. Poniżej znajdziesz szczegóły, co wchodzi w skład zestawu i orientacyjną cenę katalogową.",
+    recommendation: "Oferta przygotowana na podstawie wybranej konfiguracji. Poniżej znajdziesz szczegóły, co wchodzi w skład zestawu i orientacyjną cenę katalogową.",
     configLines,
-    priceLines: [],
-    totalNetto: kwota ? (kwota + " zł") : "",
-    totalBrutto: "",
-    insightCards: offerInsightCards(c, briefText),
-    includedItems: offerIncludedItems(briefText),
-    photos: offerPhotos(briefText),
+    priceLines,
+    totalNetto: totals.hasPriced ? offerFmt(totals.netto) : "",
+    totalBrutto: totals.hasPriced ? offerFmt(totals.brutto) : "",
+    insightCards: offerInsightCards(c, konfigText),
+    includedItems: offerIncludedItems(konfigText),
+    photos: offerPhotos(konfigText),
     filenameHint: c.firma || c.osoba || "klient"
   };
 
@@ -8027,13 +8435,15 @@ async function generateOfferPdf(clientId){
     linkOferta:"",
     nazwaPliku: filename,
     nastepnyFollowup:"",
-    notatka:"Wygenerowano automatycznie z danych konfiguratora (brief.html). Otwarto podgląd PDF w nowej karcie — zapisz lub wyślij ręcznie mailem.",
+    notatka:"Wygenerowano z konfiguratora oferty w panelu. Otwarto podgląd PDF w nowej karcie — zapisz lub wyślij ręcznie mailem.",
     dataUtworzenia: now,
     dataAktualizacji: now
   });
+  c.offerConfig = serializeOfferConfig(s);
   c.zaktualizowano = now;
   logActivity(`wygenerował(a) ofertę PDF dla klienta „${c.firma||c.osoba||'bez nazwy'}”`);
   await saveData();
+  closeOfferConfigModal();
   renderClients();
   openClientCard(clientId);
 }
