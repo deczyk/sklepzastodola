@@ -58,6 +58,12 @@ if (window.matchMedia('(min-width: 601px)').matches) {
 .hero-scroll::after { content: ''; display: block; width: 1px; height: 2.8rem; background: linear-gradient(to bottom, var(--forest), transparent); animation: sc 2s ease-in-out infinite; }
 @keyframes sc { 0%,100%{opacity:.4} 50%{opacity:1} }
 
+/* QUICK PRODUCT LINKS - od razu pod hero, zanim ktokolwiek zacznie przewijać */
+.quicklinks-band { background: var(--paper); border-bottom: 1px solid var(--line); padding: 1.1rem 5vw; text-align: center; }
+.quicklinks-inner { display: flex; flex-wrap: wrap; justify-content: center; gap: .7rem; }
+.quicklink-pill { display: inline-flex; align-items: center; gap: .45rem; padding: .55rem 1.15rem; border-radius: 999px; border: 1.5px solid var(--forest); color: var(--forest); font-weight: 700; font-size: .85rem; transition: background .15s, color .15s; }
+.quicklink-pill:hover { background: var(--forest); color: #fff; }
+
 /* EXCLUSIVE DISTRIBUTOR */
 .distributor-band { background: var(--wheat-bg); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); padding: 2rem 5vw 2.2rem; text-align: center; }
 .distributor-inner { display: flex; flex-direction: column; align-items: center; gap: 1.1rem; }
@@ -349,6 +355,14 @@ try {
     </div>
   </div>
   <div class="hero-scroll" aria-hidden="true">przewiń</div>
+</section>
+
+<section class="quicklinks-band" aria-label="Szybkie przejście do produktów">
+  <div class="wrap quicklinks-inner">
+    <a href="mlekomat.html" class="quicklink-pill">🥛 Mlekomat BRUNIMAT</a>
+    <a href="automat-chlodniczy.html" class="quicklink-pill">❄ Automaty chłodnicze</a>
+    <a href="pawilony.html" class="quicklink-pill">🏡 Pawilony</a>
+  </div>
 </section>
 
 <section class="distributor-band" aria-label="Wyłączny dystrybutor BRUNIMAT w Polsce">
