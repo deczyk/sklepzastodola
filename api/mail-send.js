@@ -27,10 +27,15 @@ const SIGNATURE_PEOPLE = {
 const LOGO_URL = "https://www.sklepzastodola.pl/favicon-192.png";
 // Te same adresy, których strona www używa konsekwentnie we wszystkich stopkach
 // (index.html, kontakt.html, itd.) - żeby link w mailu prowadził na ten sam profil.
+// Ikony jako emoji (nie obrazki) - w stopce maila to jedyny sposób na prawdziwą
+// ikonkę zamiast litery, który renderuje się wszędzie bez pobierania czegokolwiek:
+// klienci pocztowi (zwłaszcza Outlook) często blokują/łamą obrazki i inline SVG
+// w stopkach, a emoji to zwykły znak Unicode rysowany przez system/klienta.
+// Te same emoji (📘/📷), których strona już używa jako ikon FB/IG w kontakt.html.
 const SOCIAL_LINKS = [
-  { label: "Facebook", href: "https://www.facebook.com/profile.php?id=61591710038575", letter: "f" },
-  { label: "Instagram", href: "https://www.instagram.com/sklepzastodola/", letter: "ig" },
-  { label: "TikTok", href: "https://www.tiktok.com/@sklepzastodola", letter: "tt" }
+  { label: "Facebook", href: "https://www.facebook.com/profile.php?id=61591710038575", icon: "📘" },
+  { label: "Instagram", href: "https://www.instagram.com/sklepzastodola/", icon: "📷" },
+  { label: "TikTok", href: "https://www.tiktok.com/@sklepzastodola", icon: "🎵" }
 ];
 
 function escapeHtml(value) {
@@ -56,7 +61,7 @@ function buildHtmlSignature(mailboxKey, mailboxEmail) {
     `<div style="font-size:13px;color:#3d3b35;margin:2px 0;">&#9993; <a href="mailto:${mailboxEmail}" style="color:#3d3b35;text-decoration:none;">${mailboxEmail}</a></div>`,
     `<div style="font-size:13px;color:#3d3b35;margin:2px 0;">&#9742; <a href="tel:${person.phoneHref}" style="color:#3d3b35;text-decoration:none;">${escapeHtml(person.phone)}</a></div>`,
     `<div style="margin-top:8px;">${SOCIAL_LINKS.map(social =>
-      `<a href="${social.href}" style="display:inline-block;width:22px;height:22px;line-height:22px;margin-right:6px;text-align:center;border-radius:50%;background:#0f4a2f;color:#ffffff;font-size:10px;font-weight:bold;font-family:Arial,Helvetica,sans-serif;text-decoration:none;" target="_blank" rel="noopener">${social.letter}</a>`
+      `<a href="${social.href}" title="${social.label}" style="display:inline-block;margin-right:10px;font-size:17px;line-height:1;text-decoration:none;" target="_blank" rel="noopener">${social.icon}</a>`
     ).join("")}</div>`,
     "</td>",
     "</tr>",
