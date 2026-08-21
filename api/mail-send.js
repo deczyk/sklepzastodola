@@ -25,6 +25,13 @@ const SIGNATURE_PEOPLE = {
   jdeczynski: { name: "Jarosław Deczyński", phone: "+48 735 115 427", phoneHref: "+48735115427" }
 };
 const LOGO_URL = "https://www.sklepzastodola.pl/favicon-192.png";
+// Te same adresy, których strona www używa konsekwentnie we wszystkich stopkach
+// (index.html, kontakt.html, itd.) - żeby link w mailu prowadził na ten sam profil.
+const SOCIAL_LINKS = [
+  { label: "Facebook", href: "https://www.facebook.com/profile.php?id=61591710038575", letter: "f" },
+  { label: "Instagram", href: "https://www.instagram.com/sklepzastodola/", letter: "ig" },
+  { label: "TikTok", href: "https://www.tiktok.com/@sklepzastodola", letter: "tt" }
+];
 
 function escapeHtml(value) {
   return String(value || "")
@@ -48,6 +55,9 @@ function buildHtmlSignature(mailboxKey, mailboxEmail) {
     `<div style="font-size:16px;font-weight:bold;color:#0f4a2f;margin:2px 0 6px;">${escapeHtml(person.name)}</div>`,
     `<div style="font-size:13px;color:#3d3b35;margin:2px 0;">&#9993; <a href="mailto:${mailboxEmail}" style="color:#3d3b35;text-decoration:none;">${mailboxEmail}</a></div>`,
     `<div style="font-size:13px;color:#3d3b35;margin:2px 0;">&#9742; <a href="tel:${person.phoneHref}" style="color:#3d3b35;text-decoration:none;">${escapeHtml(person.phone)}</a></div>`,
+    `<div style="margin-top:8px;">${SOCIAL_LINKS.map(social =>
+      `<a href="${social.href}" style="display:inline-block;width:22px;height:22px;line-height:22px;margin-right:6px;text-align:center;border-radius:50%;background:#0f4a2f;color:#ffffff;font-size:10px;font-weight:bold;font-family:Arial,Helvetica,sans-serif;text-decoration:none;" target="_blank" rel="noopener">${social.letter}</a>`
+    ).join("")}</div>`,
     "</td>",
     "</tr>",
     "</table>"
