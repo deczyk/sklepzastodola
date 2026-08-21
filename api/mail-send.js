@@ -24,6 +24,14 @@ const SIGNATURE_PEOPLE = {
   kontakt: { name: "Jakub Deczyński", phone: "+48 690 000 923", phoneHref: "+48690000923" },
   jdeczynski: { name: "Jarosław Deczyński", phone: "+48 735 115 427", phoneHref: "+48735115427" }
 };
+// Nazwa widoczna u odbiorcy w polu "Od" - zależna od SKRZYNKI, nie od tego, kto akurat
+// jest zalogowany w panelu (payload.senderName/getWhoAmI() bywa inną osobą, np. gdy Jakub
+// wysyła w zastępstwie z j.deczynski@). Mail z kontakt@ ma zawsze podpisywać się jako
+// Jakub, mail z j.deczynski@ zawsze jako Jarosław - patrz użycie w handlerze niżej.
+const MAIL_FROM_DISPLAY_NAMES = {
+  kontakt: "Jakub | Sklep za Stodołą",
+  jdeczynski: "Jarosław | Sklep za Stodołą"
+};
 const LOGO_URL = "https://www.sklepzastodola.pl/favicon-192.png";
 // Te same adresy, których strona www używa konsekwentnie we wszystkich stopkach
 // (index.html, kontakt.html, itd.) - żeby link w mailu prowadził na ten sam profil.
@@ -141,7 +149,11 @@ module.exports = async function handler(req, res) {
   const body = String(payload.body || "").trim().slice(0, MAX_BODY_CHARS);
   if (!body) return res.status(400).json({ error: "Body is required." });
 
-  const senderName = String(payload.senderName || "").trim() || SENDER_DISPLAY_NAME;
+  // actorName = kto fizycznie kliknął "Wyślij" w panelu (do wewnętrznego śladu w historii
+  // klienta). fromDisplayName = co widzi odbiorca w polu "Od" - zależne wyłącznie od
+  // skrzynki, patrz komentarz przy MAIL_FROM_DISPLAY_NAMES.
+  const actorName = String(payload.senderName || "").trim() || SENDER_DISPLAY_NAME;
+  const fromDisplayName = MAIL_FROM_DISPLAY_NAMES[mailboxKey] || SENDER_DISPLAY_NAME;
   const clientId = payload.clientId ? String(payload.clientId) : "";
   let attachments;
   try {
@@ -177,7 +189,7 @@ module.exports = async function handler(req, res) {
 
   let sent;
   try {
-    sent = await sendMessage(mailboxEmail, { fromName: senderName, to, subject, body: fullBody, html: htmlBody, attachments });
+    sent = await sendMessage(mailboxEmail, { fromName: fromDisplayName, to, subject, body: fullBody, html: htmlBody, attachments });
   } catch (e) {
     return res.status(502).json({ error: "Gmail send failed.", message: e && e.message ? e.message : String(e) });
   }
@@ -195,7 +207,7 @@ module.exports = async function handler(req, res) {
         const now = new Date().toISOString();
         client.historia.push({
           tekst: `[Mail wychodzący] Temat: ${subject}${attachments.length ? `\nZałączone zdjęcia: ${attachments.map(item => item.filename).join(", ")}` : ""}\n\n${fullBody}`,
-          kto: `${senderName} (panel, ${mailboxEmail} → ${to})`,
+          kto: `${actorName} (panel, ${mailboxEmail} → ${to})`,
           data: now,
           utworzono: now,
           _mailMessageId: sent.id
