@@ -27,15 +27,15 @@ const SIGNATURE_PEOPLE = {
 const LOGO_URL = "https://www.sklepzastodola.pl/favicon-192.png";
 // Te same adresy, których strona www używa konsekwentnie we wszystkich stopkach
 // (index.html, kontakt.html, itd.) - żeby link w mailu prowadził na ten sam profil.
-// Ikony jako emoji (nie obrazki) - w stopce maila to jedyny sposób na prawdziwą
-// ikonkę zamiast litery, który renderuje się wszędzie bez pobierania czegokolwiek:
-// klienci pocztowi (zwłaszcza Outlook) często blokują/łamą obrazki i inline SVG
-// w stopkach, a emoji to zwykły znak Unicode rysowany przez system/klienta.
-// Te same emoji (📘/📷), których strona już używa jako ikon FB/IG w kontakt.html.
+// Prawdziwe ikony marek (oficjalne loga Facebook/Instagram/TikTok z Wikimedia Commons,
+// domena publiczna/wolna licencja - używane tu tylko jako link do własnych profili firmy),
+// wgrane jako małe PNG-i do repo (social-*.png) i hostowane na własnej domenie - tak jak
+// LOGO_URL. Nie hotlinkujemy do Wikipedii (wolniej, mniej niezawodnie) i nie używamy SVG
+// (Outlook i część klientów pocztowych nie renderuje SVG w mailach).
 const SOCIAL_LINKS = [
-  { label: "Facebook", href: "https://www.facebook.com/profile.php?id=61591710038575", icon: "📘" },
-  { label: "Instagram", href: "https://www.instagram.com/sklepzastodola/", icon: "📷" },
-  { label: "TikTok", href: "https://www.tiktok.com/@sklepzastodola", icon: "🎵" }
+  { label: "Facebook", href: "https://www.facebook.com/profile.php?id=61591710038575", iconUrl: "https://www.sklepzastodola.pl/social-facebook.png" },
+  { label: "Instagram", href: "https://www.instagram.com/sklepzastodola/", iconUrl: "https://www.sklepzastodola.pl/social-instagram.png" },
+  { label: "TikTok", href: "https://www.tiktok.com/@sklepzastodola", iconUrl: "https://www.sklepzastodola.pl/social-tiktok.png" }
 ];
 
 function escapeHtml(value) {
@@ -61,7 +61,7 @@ function buildHtmlSignature(mailboxKey, mailboxEmail) {
     `<div style="font-size:13px;color:#3d3b35;margin:2px 0;">&#9993; <a href="mailto:${mailboxEmail}" style="color:#3d3b35;text-decoration:none;">${mailboxEmail}</a></div>`,
     `<div style="font-size:13px;color:#3d3b35;margin:2px 0;">&#9742; <a href="tel:${person.phoneHref}" style="color:#3d3b35;text-decoration:none;">${escapeHtml(person.phone)}</a></div>`,
     `<div style="margin-top:8px;">${SOCIAL_LINKS.map(social =>
-      `<a href="${social.href}" title="${social.label}" style="display:inline-block;margin-right:10px;font-size:17px;line-height:1;text-decoration:none;" target="_blank" rel="noopener">${social.icon}</a>`
+      `<a href="${social.href}" title="${social.label}" style="display:inline-block;margin-right:8px;text-decoration:none;" target="_blank" rel="noopener"><img src="${social.iconUrl}" width="20" height="20" alt="${social.label}" style="display:block;"></a>`
     ).join("")}</div>`,
     "</td>",
     "</tr>",
