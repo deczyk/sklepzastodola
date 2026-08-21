@@ -814,8 +814,9 @@
   /* --- Konfigurator oferty (offerConfigModal) — patrz openOfferConfigModal --- */
   .offerCfgBox{width:640px}
   .offerCfgHint{font-size:12.5px;color:var(--text-muted);margin-bottom:14px;line-height:1.4}
-  .offerCfgProducts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-bottom:16px}
+  .offerCfgProducts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-bottom:8px}
   @media(max-width:560px){.offerCfgProducts{grid-template-columns:1fr}}
+  .offerCfgSelInfo{font-size:11.5px;color:var(--text-muted);margin-bottom:16px}
   .offerCfgProductCard{position:relative;border:2px solid var(--border);border-radius:10px;padding:12px 34px 12px 14px;cursor:pointer;background:var(--surface-soft);transition:border-color .15s,background .15s}
   .offerCfgProductCard:hover{border-color:var(--green)}
   .offerCfgProductCard.selected{border-color:var(--green);background:var(--surface-muted)}
@@ -8007,6 +8008,7 @@ function offerIncludedItems(konfigText){
     items.push("Chłodzenie zapewniające świeżość produktów przez cały dzień");
     items.push("Ekran dotykowy z czytelną prezentacją oferty");
     items.push("Płatność gotówką i/lub kartą, w zależności od wybranej opcji");
+    items.push("Konfiguracja wnętrza pod Twój asortyment — układ pionowy lub poziomy, liczba i rozmiar przegródek do ustalenia");
   }
   return items;
 }
@@ -8081,7 +8083,11 @@ function offerCalcMlekomatPrice(kanny, optsSet){
 
 function defaultOfferConfig(){
   return {
-    products: new Set(["mlekomat"]),
+    // Celowo PUSTY zestaw na start - żaden produkt nie jest wstępnie zaznaczony.
+    // Wcześniej domyślnie zaznaczony był mlekomat, więc kliknięcie samego "Sielaff"
+    // po cichu zaznaczało OBA produkty naraz (stąd CE-MID/drukarka/Anti-Frost -
+    // wyposażenie mlekomatu - w ofercie, która miała być czystym Sielaffem).
+    products: new Set(),
     mlekomat: { kanny:2, opts:new Set() },
     sielaff: { variant:"combi_m_1ro", addons:new Set(), produkty:"" },
     butelki: { qty:200 },
@@ -8364,6 +8370,7 @@ function renderOfferConfigModal(){
         </div>
       `).join("")}
     </div>
+    <div class="offerCfgSelInfo">Wybrano: ${s.products.size} z ${OFFER_PRODUCT_DEFS.length}${s.products.size > 1 ? " — sprawdź, czy naprawdę chcesz wszystkie te produkty w jednej ofercie" : ""}</div>
     ${s.products.has("mlekomat") ? renderOfferMlekomatSection(s) : ""}
     ${s.products.has("sielaff") ? renderOfferSielaffSection(s) : ""}
     ${s.products.has("butelki") ? renderOfferButelkiSection(s) : ""}
