@@ -7982,17 +7982,27 @@ function offerInsightCards(c, konfigText){
   if(t.includes("gotowe miejsce") || t.includes("tak — mam gotowe")){
     cards.push({title:"Gotowe miejsce na start", desc:"Klient ma już miejsce pod automat — krótszy czas wdrożenia."});
   }
-  cards.push({title:"Sprzedaż przez cały rok", desc:"Konfiguracja z ogrzewaniem Anti-Frost pozwala sprzedawać bez przerw również zimą."});
-  cards.push({title:"Rozbudowa w kolejnych etapach", desc:"Automat na butelki i urządzenia na inne produkty można dołączyć po uruchomieniu mlekomatu."});
+  // Anti-Frost i "po uruchomieniu mlekomatu" dotyczą wyłącznie mlekomatu - w ofercie
+  // samego Sielaffa (automat uniwersalny: jaja, sery itd., bez związku z mlekiem) nie
+  // mają być wspominane ani mlekomat, ani butelki - patrz też gating w offerIncludedItems.
+  if(t.includes("mlekomat")){
+    cards.push({title:"Sprzedaż przez cały rok", desc:"Konfiguracja z ogrzewaniem Anti-Frost pozwala sprzedawać bez przerw również zimą."});
+    cards.push({title:"Rozbudowa w kolejnych etapach", desc:"Automat na butelki i urządzenia na inne produkty można dołączyć po uruchomieniu mlekomatu."});
+  }
   return cards.slice(0,4);
 }
 
 function offerIncludedItems(konfigText){
-  const items = ["Certyfikat CE-MID — legalizowany pomiar wydawanej ilości","System gotówkowy — monety i banknoty z automatycznym wydawaniem reszty","Drukarka paragonów po każdej transakcji","Ogrzewanie termostatyczne Anti-Frost"];
+  const items = [];
   const t = (konfigText||"").toLowerCase();
-  if(t.includes("gsm")) items.push("Monitoring GSM — zdalny podgląd i kontrola poziomu mleka");
-  if(t.includes("płukanie")||t.includes("plukanie")) items.push("Automatyczne płukanie strefy dozowania");
-  if(t.includes("alarm")) items.push("Alarm i syrena antywłamaniowa");
+  // CE-MID, system gotówkowy, drukarka i Anti-Frost to wyposażenie MLEKOMATU - w ofercie
+  // samego Sielaffa (uniwersalny automat: jaja, sery, napoje itd.) nie mają się pojawiać.
+  if(t.includes("mlekomat")){
+    items.push("Certyfikat CE-MID — legalizowany pomiar wydawanej ilości","System gotówkowy — monety i banknoty z automatycznym wydawaniem reszty","Drukarka paragonów po każdej transakcji","Ogrzewanie termostatyczne Anti-Frost");
+    if(t.includes("gsm")) items.push("Monitoring GSM — zdalny podgląd i kontrola poziomu mleka");
+    if(t.includes("płukanie")||t.includes("plukanie")) items.push("Automatyczne płukanie strefy dozowania");
+    if(t.includes("alarm")) items.push("Alarm i syrena antywłamaniowa");
+  }
   if(t.includes("sielaff")){
     items.push("Chłodzenie zapewniające świeżość produktów przez cały dzień");
     items.push("Ekran dotykowy z czytelną prezentacją oferty");
@@ -8160,6 +8170,20 @@ function offerConfigLines(s){
   if(s.products.has("butelki")) lines.push(`Szklane butelki z etykietą — ${s.butelki.qty} szt.`);
   if(s.products.has("pawilon")) lines.push(`Pawilon drewniany — ${OFFER_PAWILON_SIZES[s.pawilon.size]}`);
   return lines;
+}
+
+// Podtytuł w nagłówku PDF-a (pod "SKLEP ZA STODOŁĄ") - dopasowany do wybranych
+// produktów, żeby oferta samego Sielaffa (uniwersalny automat: jaja, sery, napoje itd.,
+// bez związku z mlekiem) nie zaczynała się od "mlekomatów BRUNIMAT" w samym nagłówku.
+function offerHeaderTagline(s){
+  const only = [...s.products];
+  if(only.length === 1){
+    if(only[0] === "mlekomat") return "Dystrybucja, instalacja i serwis mlekomatów BRUNIMAT w Polsce";
+    if(only[0] === "sielaff") return "Dystrybucja, instalacja i serwis automatów sprzedażowych Sielaff w Polsce";
+    if(only[0] === "butelki") return "Butelki i etykiety pod sprzedaż bezpośrednią z gospodarstwa";
+    if(only[0] === "pawilon") return "Pawilony pod punkt sprzedaży bezpośredniej z gospodarstwa";
+  }
+  return "Sprzedaż bezpośrednia z gospodarstwa — urządzenia, punkty sprzedaży, wdrożenie";
 }
 
 function offerConfigPriceLines(s){
@@ -8382,6 +8406,7 @@ async function generateOfferPdfFromConfig(){
     dateStr: new Date().toLocaleDateString("pl-PL"),
     productTitle: titleText,
     docTitle: titleText,
+    headerTagline: offerHeaderTagline(s),
     recommendation: "Oferta przygotowana na podstawie wybranej konfiguracji. Poniżej znajdziesz szczegóły, co wchodzi w skład zestawu i orientacyjną cenę katalogową.",
     configLines,
     priceLines,

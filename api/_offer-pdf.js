@@ -58,6 +58,7 @@ async function buildOfferPdf(data) {
     includedItems = [],
     photos = [],
     docTitle = "BRUNIMAT 650 Premium DUO",
+    headerTagline = "Dystrybucja, instalacja i serwis mlekomatów BRUNIMAT w Polsce",
   } = data;
 
   const doc = await PDFDocument.create();
@@ -77,7 +78,7 @@ async function buildOfferPdf(data) {
     page.drawImage(logoImage, { x: MARGIN, y: PAGE_H - 30 - logoSize, width: logoSize, height: logoSize });
     const textX = MARGIN + logoSize + 12;
     page.drawText("SKLEP ZA STODOŁĄ", { x: textX, y: PAGE_H - 40, size: 17, font: fontBold, color: WHITE });
-    page.drawText("Dystrybucja, instalacja i serwis mlekomatów BRUNIMAT w Polsce", {
+    page.drawText(headerTagline, {
       x: textX, y: PAGE_H - 58, size: 9, font, color: rgb(0.85, 0.9, 0.85)
     });
     const badgeText = "OFERTA WSTĘPNA";
