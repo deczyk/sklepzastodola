@@ -7986,9 +7986,14 @@ function offerInsightCards(c, konfigText){
   // Anti-Frost i "po uruchomieniu mlekomatu" dotyczą wyłącznie mlekomatu - w ofercie
   // samego Sielaffa (automat uniwersalny: jaja, sery itd., bez związku z mlekiem) nie
   // mają być wspominane ani mlekomat, ani butelki - patrz też gating w offerIncludedItems.
+  // Sielaff dostaje własną, ogólną wersję karty "Rozbudowa" (bez wymieniania z nazwy
+  // mlekomatu/butelek) - "else if", żeby przy ofercie łączącej oba produkty nie dublować
+  // tej samej myśli dwiema kartami.
   if(t.includes("mlekomat")){
     cards.push({title:"Sprzedaż przez cały rok", desc:"Konfiguracja z ogrzewaniem Anti-Frost pozwala sprzedawać bez przerw również zimą."});
     cards.push({title:"Rozbudowa w kolejnych etapach", desc:"Automat na butelki i urządzenia na inne produkty można dołączyć po uruchomieniu mlekomatu."});
+  } else if(t.includes("sielaff")){
+    cards.push({title:"Rozbudowa w kolejnych etapach", desc:"Automat Sielaff możesz w każdej chwili rozbudować o kolejne urządzenia i etapy sprzedaży bezpośredniej."});
   }
   return cards.slice(0,4);
 }
@@ -8005,10 +8010,19 @@ function offerIncludedItems(konfigText){
     if(t.includes("alarm")) items.push("Alarm i syrena antywłamaniowa");
   }
   if(t.includes("sielaff")){
-    items.push("Chłodzenie zapewniające świeżość produktów przez cały dzień");
-    items.push("Ekran dotykowy z czytelną prezentacją oferty");
-    items.push("Płatność gotówką i/lub kartą, w zależności od wybranej opcji");
-    items.push("Konfiguracja wnętrza pod Twój asortyment — układ pionowy lub poziomy, liczba i rozmiar przegródek do ustalenia");
+    // Zgodne z opisem realnego automatu na automat-chlodniczy.html (nie wymyślone) -
+    // "spiralna lub z popychaczami" i "ekran za szybą bezpieczną" to dosłowne sformułowania
+    // stamtąd. Banknoty/karta to u nas płatne opcje (patrz OFFER_SIELAFF_ADDONS) - bazowo
+    // automat ma system monetowy, więc pokazujemy je warunkowo, tak jak GSM/płukanie przy mlekomacie.
+    items.push("Konfiguracja pod Twój asortyment — układ spiralny lub z popychaczami, dla produktów stojących, leżących, butelek PET lub szklanych");
+    items.push("Dotykowy ekran za szybą bezpieczną — prezentacja produktów i komunikaty dla klienta");
+    items.push("Chłodzenie utrzymujące świeżość produktów");
+    items.push("Zabezpieczony odbiór — silnikowo blokowana klapa ograniczająca manipulacje przy odbiorze");
+    if(t.includes("banknot")) items.push("Płatność banknotami");
+    if(t.includes("cashless")||t.includes("nayax")) items.push("Płatność kartą i BLIK (Nayax)");
+    if(!t.includes("banknot") && !t.includes("cashless") && !t.includes("nayax")){
+      items.push("Standardowy system płatności monetami — płatność banknotami i kartą/BLIK można dodać jako opcję");
+    }
   }
   return items;
 }

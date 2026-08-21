@@ -69,7 +69,7 @@ function buildHtmlSignature(mailboxKey, mailboxEmail) {
     `<div style="font-size:13px;color:#3d3b35;margin:2px 0;">&#9993; <a href="mailto:${mailboxEmail}" style="color:#3d3b35;text-decoration:none;">${mailboxEmail}</a></div>`,
     `<div style="font-size:13px;color:#3d3b35;margin:2px 0;">&#9742; <a href="tel:${person.phoneHref}" style="color:#3d3b35;text-decoration:none;">${escapeHtml(person.phone)}</a></div>`,
     `<div style="margin-top:8px;">${SOCIAL_LINKS.map(social =>
-      `<a href="${social.href}" title="${social.label}" style="display:inline-block;margin-right:8px;text-decoration:none;" target="_blank" rel="noopener"><img src="${social.iconUrl}" width="20" height="20" alt="${social.label}" style="display:block;"></a>`
+      `<a href="${social.href}" title="${social.label}" style="display:inline-block;margin-right:14px;text-decoration:none;" target="_blank" rel="noopener"><img src="${social.iconUrl}" width="20" height="20" alt="${social.label}" style="display:block;"></a>`
     ).join("")}</div>`,
     "</td>",
     "</tr>",
