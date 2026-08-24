@@ -514,7 +514,12 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--cr);color:var(
         sielaff_netto: sielaffPrice ? sielaffPrice.netto : '', sielaff_brutto: sielaffPrice ? sielaffPrice.brutto : '',
         notes:uwagi?'['+id+'] '+uwagi:'['+id+']',website:honeypot,brief_id:id
       };
-      var btn=document.getElementById('btn-step0-next'),subBtn=document.querySelector('.btn-submit'),disable=btn?btn:subBtn;
+      // Blokujemy realny przycisk wysyłki (id="send-btn" na kroku 4), nie
+      // "Dalej — konfiguracja" z kroku 0 — ten drugi jest zawsze w DOM, więc
+      // document.getElementById('btn-step0-next') zawsze go znajdzie i to
+      // JEGO błędnie blokowało, a przycisk "Wyślij" zostawał aktywny i dało
+      // się go kliknąć drugi raz (podwójne wysłanie zgłoszenia).
+      var disable=document.getElementById('send-btn')||document.querySelector('.btn-submit');
       if(disable)disable.disabled=true;
       fetch('/api/leads',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)})
         .then(function(r){return r.json();})
@@ -1203,6 +1208,13 @@ function goStep(n) {
   currentStep = n;
   document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
   document.getElementById('step' + n).classList.add('active');
+  // Na kroku 4 (podsumowanie + wysyłka) pływająca "Szacunkowa cena" na mobile
+  // zajmuje całą szerokość na dole ekranu i potrafi zasłonić przycisk "Wyślij
+  // zapytanie" pod spodem — pierwszy dotyk trafiał w badge (scrollToSummary),
+  // nie w submit, więc realnie trzeba było kliknąć dwa razy. Cena i tak jest
+  // już widoczna w podsumowaniu na tym kroku, więc badge tu niepotrzebny.
+  const priceBadgeEl = document.querySelector('.price-badge');
+  if (priceBadgeEl) priceBadgeEl.style.display = (n === 3) ? 'none' : '';
   // update progress
   for (let i = 0; i <= 3; i++) {
     const ps = document.getElementById('ps' + i);
