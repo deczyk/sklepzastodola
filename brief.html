@@ -1167,14 +1167,19 @@ function selectPawilon(el, key) {
 
 // ── OPTIONS ───────────────────────────────────────────────────────────────────
 function toggleOpt(el, key) {
-  // gsm — only one can be selected
-  if (key === 'gsm_full' && selected.has('gsm_poziom')) selected.delete('gsm_poziom');
-  if (key === 'gsm_poziom' && selected.has('gsm_full')) selected.delete('gsm_full');
-  document.querySelectorAll('[data-key]').forEach(e => {
-    if ((e.dataset.key === 'gsm_full' || e.dataset.key === 'gsm_poziom') && e !== el) {
-      e.classList.remove('selected');
-    }
-  });
+  // gsm — only one can be selected. Ten blok musi działać WYŁĄCZNIE przy kliknięciu
+  // opcji GSM — wcześniej odpalał się przy każdym kliknięciu (np. "Płukanie") i czyścił
+  // wizualnie zaznaczenie GSM w DOM, mimo że w Secie `selected` GSM zostawało zaznaczone
+  // (checkbox "odklikiwał się" na oko, choć dane były poprawne).
+  if (key === 'gsm_full' || key === 'gsm_poziom') {
+    if (key === 'gsm_full' && selected.has('gsm_poziom')) selected.delete('gsm_poziom');
+    if (key === 'gsm_poziom' && selected.has('gsm_full')) selected.delete('gsm_full');
+    document.querySelectorAll('[data-key]').forEach(e => {
+      if ((e.dataset.key === 'gsm_full' || e.dataset.key === 'gsm_poziom') && e !== el) {
+        e.classList.remove('selected');
+      }
+    });
+  }
 
   if (selected.has(key)) {
     selected.delete(key);
