@@ -2579,6 +2579,7 @@
     <div class="historyBox">
       <button class="previewClose" onclick="closeHistoryModal()">✕ Zamknij</button>
       <h3 id="historyClientName">Historia kontaktu</h3>
+      <button class="importBtn" style="background:#a34747" onclick="removeDuplicateHistoryEntries()">🗑 Usuń duplikaty wiadomości</button>
       <div id="historyEntries"></div>
       <div class="historyAdd">
         <div class="historyAddGrid">
@@ -4931,6 +4932,53 @@ function renderHistoryEntries(c){
   const el = document.getElementById("historyEntries");
   el.innerHTML = renderHistoryTimeline(c, true);
   hydrateHistoryAudioPlayers(el);
+}
+
+// Duplikaty wiadomości w historii jednej karty klienta — inne niż "Usuń duplikaty"
+// na liście klientów (to dotyczy całych kart, to tutaj dotyczy pojedynczych wpisów).
+// Najczęstsza przyczyna: podwójne kliknięcie/wysyłka formularza (np. konfigurator)
+// tworzy dwa niemal identyczne wpisy "System" w ciągu kilku sekund/minut.
+function removeDuplicateHistoryEntries(){
+  const c = data.klienci.find(x=>x.id===currentHistoryClientId);
+  if(!c || !Array.isArray(c.historia) || !c.historia.length){
+    alert("Ten klient nie ma jeszcze historii.");
+    return;
+  }
+  const DUPLICATE_WINDOW_MS = 5*60*1000; // 5 minut - łapie podwójne wysyłki tego samego formularza
+  const entries = c.historia
+    .map((h,index)=>({h,index}))
+    .sort((a,b)=>(Date.parse(a.h.data||a.h.utworzono||0)||0) - (Date.parse(b.h.data||b.h.utworzono||0)||0));
+  const kept = [];
+  const toRemove = new Set();
+  entries.forEach(({h,index})=>{
+    const norm = normalizeAutomationText(h.tekst||"") + "|" + normalizeAutomationText(h.kto||"");
+    const ts = Date.parse(h.data || h.utworzono || 0) || 0;
+    const dupe = norm.trim() !== "|" && kept.find(k => k.norm===norm && Math.abs(k.ts-ts) <= DUPLICATE_WINDOW_MS);
+    if(dupe){
+      toRemove.add(index);
+    } else {
+      kept.push({norm, ts});
+    }
+  });
+  if(toRemove.size===0){
+    alert("Nie znaleziono duplikatów wiadomości w historii tego klienta.");
+    return;
+  }
+  const preview = Array.from(toRemove).slice(0,5).map(i => `„${crmShort(c.historia[i].tekst||"", 70)}” (${c.historia[i].kto||"?"})`).join("\n");
+  if(!confirm(`Znaleziono ${toRemove.size} duplikat(ów) wiadomości (ten sam tekst i autor w odstępie do 5 minut):\n\n${preview}${toRemove.size>5 ? "\n…" : ""}\n\nUsunąć je? Zostaje najwcześniejszy wpis z każdej pary.`)) return;
+  ensurePanelSyncIds(data);
+  if(!Array.isArray(c._deletedHistoryIds)) c._deletedHistoryIds = [];
+  c.historia.forEach((h,index)=>{
+    if(toRemove.has(index) && h._syncId && !c._deletedHistoryIds.includes(h._syncId)){
+      c._deletedHistoryIds.push(h._syncId);
+    }
+  });
+  c.historia = c.historia.filter((h,index)=>!toRemove.has(index));
+  c.zaktualizowano = new Date().toISOString();
+  logActivity(`usunął(-ęła) ${toRemove.size} duplikat(ów) wiadomości z historii klienta „${c.firma||c.osoba||'bez nazwy'}”`);
+  saveData();
+  renderHistoryEntries(c);
+  renderClients();
 }
 
 async function saveQuickClientUpdate(clientId){
