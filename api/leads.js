@@ -537,9 +537,10 @@ module.exports = async function handler(req, res) {
     });
 
     if (hasEmailConfig() && lead.email && (source === "advisor" || source === "brief")) {
+      let emailResult = null;
       try {
         if (source === "advisor") {
-          await sendEmail({
+          emailResult = await sendEmail({
             to: lead.email,
             subject: "Twój wynik z kalkulatora — Sklep za Stodołą",
             html: buildAdvisorEmailHtml(payload),
@@ -574,7 +575,7 @@ module.exports = async function handler(req, res) {
             totalBrutto: (mNetto > 0 || sNetto > 0) ? (payload.cena_brutto && payload.cena_brutto !== "—" ? payload.cena_brutto : "") : "",
             individualQuoteItems: DEFAULT_INDIVIDUAL_QUOTE_ITEMS
           };
-          await sendEmail({
+          emailResult = await sendEmail({
             to: lead.email,
             subject: "Twoja oferta — Sklep za Stodołą",
             html: buildOfferShowcaseEmailHtml(showcaseData),
@@ -584,6 +585,32 @@ module.exports = async function handler(req, res) {
         }
       } catch (emailError) {
         console.error("Offer email failed", emailError && emailError.message ? emailError.message : emailError);
+        emailResult = { ok: false, error: emailError && emailError.message };
+      }
+
+      // Wcześniej błąd wysyłki trafiał WYŁĄCZNIE do console.error (widoczne tylko
+      // w logach Vercela, które i tak trzymają się krótko) — nikt tego nie widział,
+      // a klient dostawał "sukces" w przeglądarce mimo braku maila. Zostawiamy więc
+      // ślad wprost w karcie klienta w panelu.
+      if (emailResult && !emailResult.ok && !emailResult.skipped) {
+        const failureLabel = source === "advisor"
+          ? "Automatyczny mail z wynikiem kalkulatora NIE wysłał się"
+          : "Automatyczny mail z ofertą NIE wysłał się";
+        const failureDetail = emailResult.status ? `status ${emailResult.status}` : (emailResult.error || "nieznany błąd dostawcy poczty");
+        try {
+          await mutatePanelStore((data) => {
+            const client = (data.klienci || []).find(c => c.id === mutation.result.clientId);
+            if (!client) return;
+            if (!Array.isArray(client.historia)) client.historia = [];
+            client.historia.push({
+              tekst: `⚠️ ${failureLabel} (${failureDetail}). Sprawdź adres e-mail klienta i skrzynkę Resend.`,
+              kto: "System",
+              data: new Date().toISOString()
+            });
+          });
+        } catch (noteError) {
+          console.error("Failed to record email failure note", noteError && noteError.message ? noteError.message : noteError);
+        }
       }
     }
 
