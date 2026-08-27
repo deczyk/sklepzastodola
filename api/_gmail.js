@@ -246,10 +246,18 @@ function safeAttachmentName(value) {
 }
 
 function buildRawMessage({ fromEmail, fromName, to, subject, body, html, attachments = [], inReplyToMessageId, references }) {
+  // Generujemy Message-ID SAMI (zamiast zdać się na to, co dopisze Gmail przy wysyłce),
+  // żeby znać go od razu w mail-send.js, bez dodatkowego zapytania do API po wysłaniu.
+  // Bez tego wpis w historii klienta dopisany od razu przez panel nie miał _mailRfcMessageId,
+  // więc gdyby ta sama wiadomość była widoczna też w DRUGIEJ obserwowanej skrzynce (mail-sync.js
+  // dedupuje po rfcMessageId właśnie na taki wypadek - patrz komentarz tam), trafiała do
+  // historii klienta drugi raz.
+  const messageId = `<${crypto.randomBytes(16).toString("hex")}@sklepzastodola.pl>`;
   const headerLines = [
     `From: ${fromName ? `${encodeRfc2047(fromName)} <${fromEmail}>` : fromEmail}`,
     `To: ${to}`,
     `Subject: ${encodeRfc2047(subject)}`,
+    `Message-ID: ${messageId}`,
     "MIME-Version: 1.0"
   ];
   if (inReplyToMessageId) headerLines.push(`In-Reply-To: ${inReplyToMessageId}`);
@@ -302,19 +310,19 @@ function buildRawMessage({ fromEmail, fromName, to, subject, body, html, attachm
     parts.push(`--${boundary}--`);
     raw = `${headerLines.join("\r\n")}\r\n\r\n${parts.join("\r\n")}`;
   }
-  return base64url(Buffer.from(raw, "utf8"));
+  return { raw: base64url(Buffer.from(raw, "utf8")), messageId };
 }
 
 // mailboxEmail wysyła JAKO siebie (impersonacja przez "sub" w tokenie) - to jest prawdziwa
 // wysyłka z konta Gmail, nie przez zewnętrzny serwis, więc trafia do Wysłanych na tej
 // skrzynce i ma normalną reputację nadawcy zamiast transakcyjnej.
 async function sendMessage(mailboxEmail, { fromName, to, subject, body, html, attachments, threadId }) {
-  const raw = buildRawMessage({ fromEmail: mailboxEmail, fromName, to, subject, body, html, attachments });
+  const built = buildRawMessage({ fromEmail: mailboxEmail, fromName, to, subject, body, html, attachments });
   const json = await gmailFetch(mailboxEmail, "messages/send", null, {
-    raw,
+    raw: built.raw,
     ...(threadId ? { threadId } : {})
   });
-  return { id: json.id, threadId: json.threadId };
+  return { id: json.id, threadId: json.threadId, rfcMessageId: built.messageId };
 }
 
 module.exports = {

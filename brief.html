@@ -478,6 +478,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--cr);color:var(
 
     window.sendBrief=function(){
       var name=readVal('f-name'),tel=readVal('f-tel'),email=readVal('f-email'),woj=readVal('f-woj'),krowy=readVal('f-krowy'),litry=readVal('f-litry');
+      var miejscowosc=readVal('f-miejscowosc'),ulica=readVal('f-ulica');
       var emailValid=/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
       var missing=[];
       if(!name)missing.push('imię i nazwisko');
@@ -508,6 +509,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--cr);color:var(
 
       var payload={
         source:'brief',osoba:name,telefon:tel,email:readVal('f-email'),wojewodztwo:readVal('f-woj'),
+        miejscowosc:miejscowosc,ulica:ulica,
         krowy:readVal('f-krowy'),litry:readVal('f-litry'),pawilon:readVal('f-pawilon'),dotacja:readVal('f-dotacja'),
         konfiguracja:konfiguracja,cena_netto:netto,cena_brutto:brutto,po_dotacji:poDotacji,
         mlekomat_netto: mlekomatNetto || '', mlekomat_brutto: mlekomatBrutto || '',
@@ -929,6 +931,14 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--cr);color:var(
           <option>Świętokrzyskie</option><option>Warmińsko-mazurskie</option>
           <option>Wielkopolskie</option><option>Zachodniopomorskie</option>
         </select>
+      </div>
+      <div class="field">
+        <label>Miejscowość</label>
+        <input type="text" id="f-miejscowosc" placeholder="Np. Nowa Wieś"/>
+      </div>
+      <div class="field">
+        <label>Ulica / adres gospodarstwa</label>
+        <input type="text" id="f-ulica" placeholder="Np. ul. Polna 5"/>
       </div>
       <div class="field">
         <label>Liczba krów mlecznych *</label>

@@ -244,6 +244,34 @@ function clampText(value, max) {
   return String(value || "").trim().slice(0, max);
 }
 
+const DOTACJA_LABELS = {
+  tak: "Tak — chce cenę po dotacji",
+  nie: "Nie",
+  nie_wiem: "Nie wiem jeszcze"
+};
+
+// Dane z konfiguratora (brief.html) trafiały wcześniej WYŁĄCZNIE jako jeden zlepiony
+// tekst w historii klienta (patrz `detale` w buildLeadData) - w panelu było je widać
+// dopiero po rozwinięciu historii i doczytaniu zdania. Budujemy je tu dodatkowo jako
+// osobne, płaskie pola na karcie klienta (konf*), żeby panel mógł je pokazać i
+// edytować jak zwykłe pola CRM, a nie jako sparsowany tekst.
+function buildBriefConfigFields(payload) {
+  const konfKonfiguracja = clampText(String(payload.konfiguracja || "").replace(/^\[[^\]]*\]\s*/, ""), 2000);
+  const dotacjaRaw = clampText(payload.dotacja, 40);
+  const out = {
+    konfKrowy: clampText(payload.krowy, 120),
+    konfLitry: clampText(payload.litry, 120),
+    konfPawilon: clampText(payload.pawilon, 120),
+    konfDotacja: DOTACJA_LABELS[dotacjaRaw] || dotacjaRaw,
+    konfKonfiguracja,
+    konfCenaNetto: clampText(payload.cena_netto, 60),
+    konfCenaBrutto: clampText(payload.cena_brutto, 60),
+    konfPoDotacji: clampText(payload.po_dotacji, 60)
+  };
+  const hasAny = Object.values(out).some(Boolean);
+  return hasAny ? out : null;
+}
+
 function normalizeEmail(value) {
   return clampText(value, 120).toLowerCase();
 }
@@ -357,6 +385,7 @@ function buildLeadData(payload, source) {
   }
   const priorytet = inferPriority(source, payload, answersText);
   const calcInputs = (source === "advisor" || source === "advisor_olx") ? sanitizeCalcInputs(payload.calcInputs) : null;
+  const briefConfig = source === "brief" ? buildBriefConfigFields(payload) : null;
 
   let historyText = "";
   if (source === "kontakt") {
@@ -385,7 +414,8 @@ function buildLeadData(payload, source) {
     answersText,
     historyText,
     priorytet,
-    calcInputs
+    calcInputs,
+    briefConfig
   };
 }
 
@@ -493,6 +523,13 @@ module.exports = async function handler(req, res) {
         if (!existing.produkt && lead.produkt) existing.produkt = lead.produkt;
         if (!existing.obiekcje && lead.obiekcje) existing.obiekcje = lead.obiekcje;
         existing.notatki = mergeNotes(existing.notatki, lead.notes);
+        // Konfiguracja z brief.html nadpisuje poprzednią - to najświeższy stan
+        // konfiguratora klienta, w przeciwieństwie do np. telefonu/adresu, które
+        // się nie zmieniają, więc tam trzymamy pierwszą podaną wartość.
+        if (lead.briefConfig) {
+          Object.assign(existing, lead.briefConfig);
+          existing.konfZaktualizowano = now;
+        }
         if (existing.priorytet !== "A" && lead.priorytet === "A") existing.priorytet = "A";
         if (!existing.status) existing.status = lead.sourceCfg.status;
         // Ten sam numer telefonu/e-mail wypełnił teraz prawdziwy formularz —
@@ -523,6 +560,8 @@ module.exports = async function handler(req, res) {
         obiekcje: lead.obiekcje,
         notatki: lead.notes,
         nastepnyFollowup: "",
+        ...(lead.briefConfig || {}),
+        ...(lead.briefConfig ? { konfZaktualizowano: now } : {}),
         utworzono: now,
         zaktualizowano: now,
         historia: [{ tekst: lead.historyText, kto: "System", data: now, ...(lead.calcInputs ? { calcInputs: lead.calcInputs } : {}) }],

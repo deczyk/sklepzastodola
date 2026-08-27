@@ -8001,7 +8001,35 @@ function findAdvisorHistoryText(c){
 // Dzielimy ją po "; ", żeby pokazać to w czytelnej liście w karcie klienta, zamiast tylko
 // w historii kontaktu (do generowania PDF-a służy teraz osobny konfigurator oferty, patrz
 // openOfferConfigModal - nie zgaduje już z tego tekstu).
+// Pola konf* (od 2026-08-27) to osobne, edytowalne pola karty klienta zamiast
+// jednego zlepionego zdania w historii - trafiają tu wprost z payloadu brief.html
+// (patrz buildBriefConfigFields w api/leads.js). Starsze leady sprzed tej zmiany
+// tych pól nie mają, więc dla nich zostaje dawne parsowanie tekstu z historii.
+const BRIEF_CONFIG_ROWS = [
+  ["Liczba krów", "konfKrowy"],
+  ["Dzienna produkcja mleka", "konfLitry"],
+  ["Miejsce / pawilon pod automat", "konfPawilon"],
+  ["Zainteresowanie dotacją ARiMR", "konfDotacja"],
+  ["Wybrana konfiguracja", "konfKonfiguracja"],
+  ["Cena netto", "konfCenaNetto"],
+  ["Cena brutto", "konfCenaBrutto"],
+  ["Cena po dotacji ARiMR", "konfPoDotacji"]
+];
+
 function renderBriefConfigSection(c){
+  const hasStructured = BRIEF_CONFIG_ROWS.some(([, field]) => c[field]);
+  if(hasStructured){
+    return `
+      <div class="clientBriefSection">
+        <div class="sectionHead"><b>🛒 Konfiguracja z konfiguratora (Brief)</b>${c.konfZaktualizowano ? `<span class="sectionDate">${crmEsc(historyDateInputValue(c.konfZaktualizowano) || "")}</span>` : ""}</div>
+        <div class="clientCardGrid">
+          ${BRIEF_CONFIG_ROWS.filter(([, field]) => c[field]).map(([label, field]) =>
+            `<div class="clientCardField"><b>${crmEsc(label)}</b>${field === "konfKonfiguracja" ? clientField(c, field, "textarea") : clientField(c, field)}</div>`
+          ).join("")}
+        </div>
+      </div>
+    `;
+  }
   const entry = findLatestBriefHistory(c);
   if(!entry) return "";
   const text = parseHistoryText(entry.tekst || "").text || "";
@@ -8443,11 +8471,20 @@ function offerHeaderTagline(s){
 function offerConfigPriceLines(s){
   const lines = [];
   if(s.products.has("mlekomat")){
-    const base = offerCalcMlekomatPrice(s.mlekomat.kanny, new Set());
-    lines.push({ label:`Mlekomat BRUNIMAT 650 Premium DUO — bazowa konfiguracja (${s.mlekomat.kanny} kanny, wyposażenie standardowe)`, netto: offerFmt(base.netto) });
-    s.mlekomat.opts.forEach(k => {
-      lines.push({ label: OFFER_OPT_LABELS[k] || k, netto: offerFmt(offerOptDisplayPrice(OFFER_OPT_EUR[k] || 0)) });
-    });
+    // Każda opcja jest zaokrąglana do pełnych 100 zł niezależnie, a "bazowa
+    // konfiguracja" dostaje RESZTĘ z całości (offerCalcMlekomatPrice z opcjami),
+    // a nie własną, osobno zaokrągloną cenę bazy bez opcji. Inaczej suma
+    // wypisanych pozycji potrafiła się różnić o 100-300 zł od dużego pola
+    // "RAZEM — CENA KATALOGOWA NETTO" (dwa niezależne zaokrąglenia tej samej kwoty).
+    const optLines = [...s.mlekomat.opts].map(k => ({
+      label: OFFER_OPT_LABELS[k] || k,
+      value: offerOptDisplayPrice(OFFER_OPT_EUR[k] || 0)
+    }));
+    const optsNetto = optLines.reduce((sum, o) => sum + o.value, 0);
+    const total = offerCalcMlekomatPrice(s.mlekomat.kanny, s.mlekomat.opts);
+    const baseNetto = total.netto - optsNetto;
+    lines.push({ label:`Mlekomat BRUNIMAT 650 Premium DUO — bazowa konfiguracja (${s.mlekomat.kanny} kanny, wyposażenie standardowe)`, netto: offerFmt(baseNetto) });
+    optLines.forEach(o => lines.push({ label: o.label, netto: offerFmt(o.value) }));
   }
   if(s.products.has("sielaff")){
     const variant = OFFER_SIELAFF_VARIANTS[s.sielaff.variant];

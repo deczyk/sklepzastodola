@@ -226,7 +226,14 @@ module.exports = async function handler(req, res) {
           // deduplikacji. Efekt: wpis dublował się na stałe w bazie przy niemal każdym
           // kolejnym zapisie z panelu po wysłaniu maila. _mailMessageId jest unikalny
           // i stabilny od razu, więc nadajemy _syncId tutaj, zanim ktokolwiek to pobierze.
-          _syncId: `hist_${clientId}_mail_${sent.id}`
+          _syncId: `hist_${clientId}_mail_${sent.id}`,
+          // _mailMessageId to Gmail ID W TEJ konkretnej skrzynce - jeśli ta sama wiadomość
+          // jest widoczna też w DRUGIEJ obserwowanej skrzynce (kontakt@ / j.deczynski@),
+          // mail-sync.js zobaczy ją tam pod INNYM id i bez _mailRfcMessageId nie rozpozna,
+          // że to ten sam mail - dopisze go do historii klienta drugi raz. rfcMessageId
+          // (nagłówek Message-ID, ustawiany jawnie w _gmail.js buildRawMessage) jest
+          // identyczny niezależnie od skrzynki, więc to on jest tu prawdziwym kluczem.
+          ...(sent.rfcMessageId ? { _mailRfcMessageId: sent.rfcMessageId } : {})
         });
         client.zaktualizowano = now;
       });

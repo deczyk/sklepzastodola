@@ -17,3 +17,5 @@ _AUDYT_STRONY/
 _source_instrukcja_brunimat/
 BACKUP_prywatne_pliki_repo/
 *.rar
+.vercel
+.env*
