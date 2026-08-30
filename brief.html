@@ -1329,6 +1329,55 @@ function scrollToSummary() {
 
 // init
 updateBadge();
+
+// ── PREFILL Z ADVISORA ──
+// Jeśli klient przyszedł od razu z advisor.html (ten sam odwiedziny, ten sam
+// klik "Skonfiguruj teraz"), odczytujemy dane zebrane tam i wypełniamy nimi
+// krok 1 i 3, żeby nie pytać o to samo drugi raz.
+(function(){
+  try {
+    var raw = sessionStorage.getItem('szs_handoff');
+    if (!raw) return;
+    sessionStorage.removeItem('szs_handoff'); // jednorazowy odczyt
+    var d = JSON.parse(raw);
+
+    function setVal(id, val){
+      if (!val) return;
+      var el = document.getElementById(id);
+      if (el) el.value = val;
+    }
+    function setSelect(id, val){
+      if (!val) return;
+      var el = document.getElementById(id);
+      if (!el) return;
+      for (var i = 0; i < el.options.length; i++) {
+        if (el.options[i].value.toLowerCase() === String(val).toLowerCase()) { el.selectedIndex = i; return; }
+      }
+    }
+
+    setVal('f-name', d.name);
+    setVal('f-tel', d.tel);
+    setVal('f-email', d.email);
+    setSelect('f-woj', d.woj);
+    setVal('f-miejscowosc', d.miejscowosc);
+    setSelect('f-krowy', d.krowy);
+    setSelect('f-litry', d.litry);
+    setSelect('f-dotacja', d.dotacja);
+    setVal('f-uwagi', d.uwagi);
+
+    if (d.products && d.products.length && window.toggleProduct) {
+      d.products.forEach(function(p){ window.toggleProduct(p); });
+    }
+
+    var head = document.querySelector('#step0 .step-head');
+    if (head) {
+      var banner = document.createElement('div');
+      banner.style.cssText = 'margin-top:14px;padding:.7rem 1rem;background:var(--gl);border:1px solid var(--g);border-radius:8px;font-size:.85rem;color:var(--ink)';
+      banner.textContent = 'Uzupełniliśmy dane z Twojej analizy Advisor — sprawdź je w kroku 3 i popraw, jeśli trzeba.';
+      head.appendChild(banner);
+    }
+  } catch(e) { /* prefill to udogodnienie — błąd nie może zablokować konfiguratora */ }
+})();
 </script>
 </body>
 </html>

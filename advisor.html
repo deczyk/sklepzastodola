@@ -455,6 +455,46 @@ function saveData(){const data={};document.querySelectorAll("input,select,textar
 function loadData(){const data=JSON.parse(localStorage.getItem("advisorDataEU")||"{}");Object.entries(data).forEach(([k,val])=>{const el=document.getElementById(k);if(el){if(el.type==="checkbox")el.checked=!!val;else el.value=val;}});calculate();}
 function resetAll(){localStorage.removeItem("advisorDataEU");location.reload();}
 
+// ── HANDOFF DO KONFIGURATORA (brief.html) ──
+// Zamiast kończyć na "dziękujemy" i czekać na osobnego maila z linkiem do
+// konfiguratora, przekazujemy zebrane dane dalej przez sessionStorage, żeby
+// klient mógł od razu dokończyć konfigurację w tej samej wizycie.
+function mapRange(n, steps){
+  // steps: [[limit, label], ..., [Infinity, label]]
+  for (const [limit, label] of steps) if (n <= limit) return label;
+  return steps[steps.length - 1][1];
+}
+function interestToProducts(interest){
+  if (interest === "start") return ["mlekomat", "pawilon"];
+  if (interest === "sprzedazowy") return ["mlekomat", "sielaff", "pawilon"];
+  if (interest === "premium") return ["mlekomat", "sielaff", "pawilon"];
+  return ["mlekomat"];
+}
+function buildHandoff(shortMode, interestVal, farm, owner, phone, email, region, county){
+  const data = {
+    name: owner,
+    tel: phone,
+    email,
+    woj: region,
+    miejscowosc: [farm, county].filter(Boolean).join(", "),
+    products: interestToProducts(interestVal),
+    dotacja: (interestVal === "premium" || document.getElementById("euEnable").checked) ? "tak" : "",
+    uwagi: `Klient wypełnił wcześniej Advisor (wynik potencjału: ${document.getElementById("scoreTxt").innerText}). ${document.getElementById("notes").value.trim()}`.trim()
+  };
+  if (!shortMode) {
+    const cows = Number(document.getElementById("cows").value) || 0;
+    const yieldL = Number(document.getElementById("yield").value) || 0;
+    if (cows > 0) {
+      data.krowy = mapRange(cows, [[10,"do 10 krów"],[20,"10–20 krów"],[50,"20–50 krów"],[100,"50–100 krów"],[Infinity,"powyżej 100 krów"]]);
+    }
+    const totalProd = cows * yieldL;
+    if (totalProd > 0) {
+      data.litry = mapRange(totalProd, [[50,"do 50 L/dzień"],[100,"50–100 L/dzień"],[200,"100–200 L/dzień"],[500,"200–500 L/dzień"],[Infinity,"powyżej 500 L/dzień"]]);
+    }
+  }
+  return data;
+}
+
 async function sendToUs(){
   calculate();
   const statusEl = document.getElementById("sendStatus");
@@ -566,10 +606,19 @@ async function sendToUs(){
   }
 
   if (formspreeOk) {
-    statusEl.textContent = "Dziękujemy. Wynik wysłany — skontaktujemy się z Tobą.";
     statusEl.style.color = "#2f7a45";
     sessionStorage.setItem('lead_conversion_source', location.search.includes('mode=short') ? 'advisor_olx' : 'advisor');
-    window.location.href = "dziekujemy.html";
+    try {
+      const handoff = buildHandoff(shortMode, interestVal, farm, owner, phone, email, region, county);
+      sessionStorage.setItem('szs_handoff', JSON.stringify(handoff));
+    } catch(e) { /* prefill jest tylko udogodnieniem — brak nie blokuje wysyłki */ }
+    statusEl.innerHTML =
+      '<p style="margin:0 0 12px;font-weight:800;color:#2f7a45">Dziękujemy! Wynik wysłany — mamy Twoje dane.</p>' +
+      '<p style="margin:0 0 14px;color:#61706a;font-weight:500">Możesz od razu skonfigurować dokładny model i cenę — bez czekania na naszego maila.</p>' +
+      '<div class="actions">' +
+        '<a class="btn btn-primary" href="brief.html">Skonfiguruj teraz swój system →</a>' +
+        '<a class="btn btn-ghost" href="dziekujemy.html">Nie teraz, dziękuję</a>' +
+      '</div>';
   } else {
     statusEl.textContent = "Nie udało się wysłać. Zadzwoń: +48 735 115 427 albo napisz: kontakt@sklepzastodola.pl";
     statusEl.style.color = "#b44";
