@@ -2199,6 +2199,7 @@
         <input type="file" id="doradcyXlsxInput" accept=".xlsx,.xls,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel" style="display:none" onchange="importDoradcyFromSelectedXlsx(this)">
         <button class="importBtn" id="doradcyImportBtn" onclick="importDoradcyFromXlsx()">⇩ Wczytaj bazę doradców XLSX</button>
         <button class="importBtn" style="background:#3a6b4a" onclick="exportDoradcyToXlsx()">⇧ Eksportuj do XLSX</button>
+        <button class="importBtn" style="background:#3a6b4a" onclick="openAddDoradcaModal()">➕ Dodaj doradcę ręcznie</button>
         <button class="importBtn" style="background:#a34747" onclick="clearDoradcyRolni()">Wyczyść bazę doradców</button>
         <span id="doradcyImportMsg"></span>
       </div>
@@ -2425,7 +2426,7 @@
             </select>
           </div>
           <div class="row">
-            <input type="text" id="osoba-podwykonawcy" placeholder="Osoba kontaktowa">
+            <input type="text" id="osoba-podwykonawcy" placeholder="Imię i nazwisko">
             <input type="text" id="telefon-podwykonawcy" placeholder="Telefon">
             <input type="email" id="email-podwykonawcy" placeholder="E-mail">
           </div>
@@ -2628,7 +2629,7 @@
       <h2 style="margin-top:0;color:#263b2b">Dodaj klienta</h2>
       <div class="clientCardGrid">
         <div><label class="addClientLabel">Firma / gospodarstwo</label><input type="text" id="ac_firma"></div>
-        <div><label class="addClientLabel">Osoba kontaktowa</label><input type="text" id="ac_osoba"></div>
+        <div><label class="addClientLabel">Imię i nazwisko</label><input type="text" id="ac_osoba"></div>
         <div><label class="addClientLabel">Telefon</label><input type="text" id="ac_telefon"></div>
         <div><label class="addClientLabel">E-mail</label><input type="text" id="ac_email"></div>
         <div><label class="addClientLabel">Województwo</label><input type="text" id="ac_wojewodztwo"></div>
@@ -2644,8 +2645,31 @@
           <select id="ac_produkt"></select>
         </div>
       </div>
-      <div id="addClientError" style="color:#a34747;font-size:13px;margin:6px 0;display:none">Podaj przynajmniej firmę/gospodarstwo lub osobę kontaktową.</div>
+      <div id="addClientError" style="color:#a34747;font-size:13px;margin:6px 0;display:none">Podaj przynajmniej firmę/gospodarstwo lub imię i nazwisko.</div>
       <button class="save" onclick="submitAddClient()">Zapisz klienta</button>
+    </div>
+  </div>
+
+  <div id="addDoradcaModal" class="previewModal" onclick="if(event.target===this) closeAddDoradcaModal()">
+    <div class="clientCardBox">
+      <button class="previewClose" onclick="closeAddDoradcaModal()">Zamknij</button>
+      <h2 style="margin-top:0;color:#263b2b">Dodaj doradcę ręcznie</h2>
+      <div class="clientCardGrid">
+        <div><label class="addClientLabel">Imię</label><input type="text" id="ad_imie"></div>
+        <div><label class="addClientLabel">Nazwisko</label><input type="text" id="ad_nazwisko"></div>
+        <div><label class="addClientLabel">Instytucja / miejsce</label><input type="text" id="ad_miejsce" placeholder="np. PFHBiPM"></div>
+        <div><label class="addClientLabel">Powiat / miasto</label><input type="text" id="ad_powiat"></div>
+        <div><label class="addClientLabel">Województwo</label><input type="text" id="ad_wojewodztwo"></div>
+        <div><label class="addClientLabel">Typ podmiotu</label><input type="text" id="ad_typPodmiotu" placeholder="np. doradca zootechniczny"></div>
+        <div><label class="addClientLabel">Telefon</label><input type="text" id="ad_telefon"></div>
+        <div><label class="addClientLabel">E-mail</label><input type="text" id="ad_email"></div>
+        <div><label class="addClientLabel">Rodzaj kontaktu</label><input type="text" id="ad_rodzajKontaktu" placeholder="np. doradca ogólny"></div>
+        <div><label class="addClientLabel">Status kontaktu</label><input type="text" id="ad_statusKontaktu" placeholder="np. zweryfikowany"></div>
+        <div><label class="addClientLabel">Źródło kontaktu</label><input type="text" id="ad_zrodloKontaktu" placeholder="np. strona pfhb.pl"></div>
+      </div>
+      <div style="margin-top:10px"><label class="addClientLabel">Uwagi</label><textarea id="ad_uwagi" style="width:100%;min-height:60px" placeholder="Specjalizacja, region działania, link do profilu..."></textarea></div>
+      <div id="addDoradcaError" style="color:#a34747;font-size:13px;margin:6px 0;display:none">Podaj przynajmniej imię lub nazwisko.</div>
+      <button class="save" onclick="submitAddDoradca()">Zapisz doradcę</button>
     </div>
   </div>
 
@@ -7769,7 +7793,7 @@ function openClientCard(clientId){
     </div>` : ""}
     <div class="clientCardGrid">
       <div class="clientCardField"><b>Firma / gospodarstwo</b>${clientField(c,"firma")}</div>
-      <div class="clientCardField"><b>Osoba kontaktowa</b>${clientField(c,"osoba")}</div>
+      <div class="clientCardField"><b>Imię i nazwisko</b>${clientField(c,"osoba")}</div>
       <div class="clientCardField"><b>Telefon</b>${clientField(c,"telefon")}</div>
       <div class="clientCardField"><b>E-mail</b>${clientField(c,"email")}</div>
       <div class="clientCardField"><b>Województwo</b>${clientField(c,"wojewodztwo")}</div>
@@ -10112,6 +10136,49 @@ function clearDoradcyRolni(){
   saveData();
   renderDoradcyRolni();
   renderStatsBar();
+}
+
+function openAddDoradcaModal(){
+  ["ad_imie","ad_nazwisko","ad_miejsce","ad_powiat","ad_wojewodztwo","ad_typPodmiotu","ad_telefon","ad_email","ad_rodzajKontaktu","ad_statusKontaktu","ad_zrodloKontaktu","ad_uwagi"].forEach(id=>{
+    const el = document.getElementById(id);
+    if(el) el.value = "";
+  });
+  document.getElementById("addDoradcaError").style.display = "none";
+  document.getElementById("addDoradcaModal").classList.add("open");
+  document.getElementById("ad_imie").focus();
+}
+
+function closeAddDoradcaModal(){
+  document.getElementById("addDoradcaModal").classList.remove("open");
+}
+
+function submitAddDoradca(){
+  const val = id => document.getElementById(id).value.trim();
+  const imie = val("ad_imie"), nazwisko = val("ad_nazwisko");
+  if(!imie && !nazwisko){
+    document.getElementById("addDoradcaError").style.display = "block";
+    return;
+  }
+  const now = new Date().toISOString();
+  if(!data.doradcyRolni) data.doradcyRolni = [];
+  data.doradcyRolni.push({
+    id: "dr_" + Date.now(),
+    imie, nazwisko,
+    miejsce: val("ad_miejsce"), powiat: val("ad_powiat"), wojewodztwo: val("ad_wojewodztwo"),
+    typPodmiotu: val("ad_typPodmiotu"),
+    telefon: formatPhonePL(val("ad_telefon")), email: val("ad_email"),
+    adres: "", podmiotKontaktowy: "",
+    rodzajKontaktu: val("ad_rodzajKontaktu"), statusKontaktu: val("ad_statusKontaktu"),
+    pelnyWpis: "", stronaRejestru: "", urlCdr: "",
+    zrodloKontaktu: val("ad_zrodloKontaktu"), dataWeryfikacji: "",
+    uwagi: val("ad_uwagi"),
+    utworzono: now, zaktualizowano: now
+  });
+  logActivity(`dodał(a) ręcznie doradcę „${[imie, nazwisko].filter(Boolean).join(" ")}”`);
+  saveData();
+  renderDoradcyRolni();
+  renderStatsBar();
+  closeAddDoradcaModal();
 }
 
 // ================= Terminy =================
