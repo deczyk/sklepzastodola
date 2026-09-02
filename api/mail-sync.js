@@ -50,6 +50,16 @@ function findPodwykonawcaByEmail(podwykonawcy, email) {
   return (podwykonawcy || []).find(p => (p.email || "").toLowerCase().trim() === needle) || null;
 }
 
+// Baza doradców rolnych ma - tak jak klienci - pełną historię kontaktu (karta doradcy w panelu
+// używa dokładnie tego samego "Napisz maila" i tej samej historii co karta klienta), więc
+// dopasowanych doradców traktujemy tak samo jak matchedClients, a nie jak podwykonawców
+// (którzy mają tylko płaskie pole notatek).
+function findDoradcaByEmail(doradcy, email) {
+  const needle = String(email || "").toLowerCase().trim();
+  if (!needle) return null;
+  return (doradcy || []).find(d => (d.email || "").toLowerCase().trim() === needle) || null;
+}
+
 // Automatyczne skrzynki (no-reply, powiadomienia systemowe itd.) nie są potencjalnymi
 // klientami/podwykonawcami - nie chcemy zaśmiecać dashboardu takimi "zapytaniami".
 const AUTOMATED_SENDER_PATTERN = /(no-?reply|do-?not-?reply|mailer-daemon|notifications?|postmaster|newsletter)@/i;
@@ -99,6 +109,7 @@ async function syncMailbox(mailboxKey, mailboxEmail, data, log) {
   const newIds = ids.filter(id => !alreadyProcessed.has(id));
 
   if (!Array.isArray(data.podwykonawcy)) data.podwykonawcy = [];
+  if (!Array.isArray(data.doradcyRolni)) data.doradcyRolni = [];
   if (!Array.isArray(data.powiadomienia)) data.powiadomienia = [];
 
   let maxInternalDateSec = Number(state.lastInternalDateSec) || 0;
@@ -131,19 +142,24 @@ async function syncMailbox(mailboxKey, mailboxEmail, data, log) {
     const tekst = `[${tag}] Temat: ${subject}\n\n${body}`;
 
     const matchedClients = new Set();
+    const matchedAdvisors = new Set();
     const matchedVendors = new Set();
     otherPartyEmails.forEach(email => {
       const client = findClientByEmail(data.klienci, email);
       if (client) matchedClients.add(client);
+      const advisor = findDoradcaByEmail(data.doradcyRolni, email);
+      if (advisor) matchedAdvisors.add(advisor);
       const vendor = findPodwykonawcaByEmail(data.podwykonawcy, email);
       if (vendor) matchedVendors.add(vendor);
     });
 
-    const attachmentImages = matchedClients.size
+    const attachmentImages = (matchedClients.size || matchedAdvisors.size)
       ? await uploadMessageAttachments(mailboxEmail, id, message.attachments, log)
       : [];
 
-    matchedClients.forEach(client => {
+    // Doradcy mają tę samą strukturę historii co klienci (patrz openDoradcaCard w panel.html),
+    // więc dopasowanego doradcę traktujemy identycznie jak dopasowanego klienta.
+    new Set([...matchedClients, ...matchedAdvisors]).forEach(client => {
       if (!Array.isArray(client.historia)) client.historia = [];
       // Dedup po json.id (ta sama skrzynka, ponowny przebieg cronu) ORAZ po nagłówku
       // Message-ID (ta sama wiadomość widziana w DRUGIEJ skrzynce - np. klient odpisał
@@ -187,7 +203,7 @@ async function syncMailbox(mailboxKey, mailboxEmail, data, log) {
     // Nierozpoznany, przychodzący mail (nie od automatu) - trafia na dashboard z przyciskami
     // do rozesłania: klient / podwykonawca / potencjalny podwykonawca. Maile WYCHODZĄCE do
     // nieznanych adresów pomijamy - to zwykle korespondencja z dostawcami/urzędami, nie leady.
-    if (!matchedClients.size && !matchedVendors.size && !isOutgoing && otherPartyEmails.length) {
+    if (!matchedClients.size && !matchedAdvisors.size && !matchedVendors.size && !isOutgoing && otherPartyEmails.length) {
       const otherEmail = otherPartyEmails[0];
       if (!AUTOMATED_SENDER_PATTERN.test(otherEmail)) {
         data.powiadomienia.unshift({

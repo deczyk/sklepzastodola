@@ -209,7 +209,11 @@ module.exports = async function handler(req, res) {
   if (clientId && hasPanelStoreConfig()) {
     try {
       await mutatePanelStore((data) => {
-        const client = (data.klienci || []).find(c => c.id === clientId);
+        // clientId może wskazywać na klienta CRM albo na wpis w bazie doradców rolnych -
+        // karta doradcy w panelu używa dokładnie tego samego "Napisz maila" co karta klienta
+        // (patrz renderMailComposeSection w panel.html), więc historia maila trafia tam,
+        // gdzie faktycznie żyje ten rekord.
+        const client = (data.klienci || []).find(c => c.id === clientId) || (data.doradcyRolni || []).find(c => c.id === clientId);
         if (!client) return;
         if (!Array.isArray(client.historia)) client.historia = [];
         const now = new Date().toISOString();

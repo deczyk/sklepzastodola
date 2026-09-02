@@ -2220,11 +2220,11 @@
       <div class="tableWrap">
         <table class="clients">
           <colgroup>
-            <col class="osoba"><col class="woj"><col class="miejsc"><col class="firma"><col class="tel"><col class="zain"><col class="hist">
+            <col class="osoba"><col class="woj"><col class="miejsc"><col class="firma"><col class="tel"><col class="zain"><col class="hist"><col class="akcje">
           </colgroup>
           <thead>
             <tr>
-              <th>Doradca</th><th>Województwo</th><th>Powiat / miasto</th><th>Podmiot</th><th>Kontakt</th><th>Status / typ</th><th>Źródło</th>
+              <th>Doradca</th><th>Województwo</th><th>Powiat / miasto</th><th>Podmiot</th><th>Kontakt</th><th>Status / typ</th><th>Źródło</th><th>Akcje</th>
             </tr>
           </thead>
           <tbody id="doradcyBody"></tbody>
@@ -2623,6 +2623,13 @@
     </div>
   </div>
 
+  <div id="doradcaCardModal" class="previewModal" onclick="if(event.target===this) closeDoradcaCard()">
+    <div class="clientCardBox">
+      <button class="previewClose" onclick="closeDoradcaCard()">Zamknij</button>
+      <div id="doradcaCardContent"></div>
+    </div>
+  </div>
+
   <div id="addClientModal" class="previewModal" onclick="if(event.target===this) closeAddClientModal()">
     <div class="clientCardBox">
       <button class="previewClose" onclick="closeAddClientModal()">Zamknij</button>
@@ -2859,7 +2866,7 @@ function globalSearchCandidates(){
     if(!d) return;
     const label = [d.imie, d.nazwisko].filter(Boolean).join(" ") || "Doradca rolny";
     items.push({
-      type:"doradca", id:"", searchValue: d.telefon || d.nazwisko || label,
+      type:"doradca", id:d.id || "", searchValue: d.telefon || d.nazwisko || label,
       label,
       meta: [d.telefon, d.email, d.powiat || d.wojewodztwo].filter(Boolean).join(" · "),
       haystack: [d.imie,d.nazwisko,d.telefon,d.email,d.powiat,d.wojewodztwo].filter(Boolean).join(" ").toLowerCase()
@@ -2926,6 +2933,7 @@ function openGlobalSearchResult(index){
     const search = document.getElementById("searchDoradcy");
     if(search){ search.value = r.searchValue || r.label; renderDoradcyRolni(); }
     scrollToPanelTarget("doradcyBody");
+    if(r.id) openDoradcaCard(r.id);
   }
 }
 
@@ -3262,22 +3270,39 @@ function syncHash(value){
 }
 
 function ensurePanelSyncIds(payload){
-  if(!payload || !Array.isArray(payload.klienci)) return payload;
-  payload.klienci.forEach(client=>{
-    if(!client || !client.id) return;
-    if(Array.isArray(client.historia)){
-      client.historia.forEach((entry,index)=>{
-        if(!entry || entry._syncId) return;
-        entry._syncId = `hist_${client.id}_${syncHash([entry.data||"",entry.kto||"",entry.tekst||"",entry.audioName||"",index].join("|"))}`;
-      });
-    }
-    if(Array.isArray(client.oferty)){
-      client.oferty.forEach((offer,index)=>{
-        if(!offer || offer.id) return;
-        offer.id = `offer_${client.id}_${syncHash([offer.googleDriveId||"",offer.linkOferta||"",offer.nazwaPliku||"",offer.dataUtworzenia||"",index].join("|"))}`;
-      });
-    }
-  });
+  if(!payload) return payload;
+  if(Array.isArray(payload.klienci)){
+    payload.klienci.forEach(client=>{
+      if(!client || !client.id) return;
+      if(Array.isArray(client.historia)){
+        client.historia.forEach((entry,index)=>{
+          if(!entry || entry._syncId) return;
+          entry._syncId = `hist_${client.id}_${syncHash([entry.data||"",entry.kto||"",entry.tekst||"",entry.audioName||"",index].join("|"))}`;
+        });
+      }
+      if(Array.isArray(client.oferty)){
+        client.oferty.forEach((offer,index)=>{
+          if(!offer || offer.id) return;
+          offer.id = `offer_${client.id}_${syncHash([offer.googleDriveId||"",offer.linkOferta||"",offer.nazwaPliku||"",offer.dataUtworzenia||"",index].join("|"))}`;
+        });
+      }
+    });
+  }
+  // Baza doradców rolnych ma tę samą historię kontaktu co klienci (karta doradcy działa
+  // na tym samym silniku) - potrzebuje tych samych stabilnych _syncId, m.in. do
+  // deduplikacji wpisów "Mail wychodzący"/"Mail przychodzący" (patrz api/mail-send.js,
+  // api/mail-sync.js) i do trwałego usuwania pojedynczych wpisów (deleteHistoryEntry).
+  if(Array.isArray(payload.doradcyRolni)){
+    payload.doradcyRolni.forEach(doradca=>{
+      if(!doradca || !doradca.id) return;
+      if(Array.isArray(doradca.historia)){
+        doradca.historia.forEach((entry,index)=>{
+          if(!entry || entry._syncId) return;
+          entry._syncId = `hist_${doradca.id}_${syncHash([entry.data||"",entry.kto||"",entry.tekst||"",entry.audioName||"",index].join("|"))}`;
+        });
+      }
+    });
+  }
   return payload;
 }
 
@@ -4205,9 +4230,9 @@ let currentHistoryEditIndex = null;
 function openHistoryModal(clientId){
   currentHistoryClientId = clientId;
   currentHistoryEditIndex = null;
-  const c = data.klienci.find(x=>x.id===clientId);
+  const {rec:c, kind} = crmEntity(clientId);
   if(!c) return;
-  document.getElementById("historyClientName").textContent = `Historia kontaktu — ${c.firma || c.osoba || "bez nazwy"}`;
+  document.getElementById("historyClientName").textContent = `Historia kontaktu — ${entityDisplayName(c, kind)}`;
   document.getElementById("historyNewDate").value = todayInputValue();
   document.getElementById("historyNewWho").value = getWhoAmI();
   const followupEl0 = document.getElementById("historyNewFollowup");
@@ -4921,12 +4946,12 @@ function inferClientAutomation(note, client){
   return changes.filter(Boolean);
 }
 
-function renderQuickClientUpdate(c){
+function renderQuickClientUpdate(c, kind="klient"){
   const today = todayInputValue();
   return `
     <div class="quickUpdate">
       <div class="quickUpdateHead">
-        <b>Ręczna notatka klienta</b>
+        <b>Ręczna notatka ${kind==="doradca" ? "doradcy" : "klienta"}</b>
         <span class="kanbanContact">Dopisuje wpis do historii kontaktu</span>
       </div>
       <div class="quickUpdateGrid">
@@ -4963,9 +4988,9 @@ function renderHistoryEntries(c){
 // Najczęstsza przyczyna: podwójne kliknięcie/wysyłka formularza (np. konfigurator)
 // tworzy dwa niemal identyczne wpisy "System" w ciągu kilku sekund/minut.
 function removeDuplicateHistoryEntries(){
-  const c = data.klienci.find(x=>x.id===currentHistoryClientId);
+  const {rec:c, kind} = crmEntity(currentHistoryClientId);
   if(!c || !Array.isArray(c.historia) || !c.historia.length){
-    alert("Ten klient nie ma jeszcze historii.");
+    alert("Ten kontakt nie ma jeszcze historii.");
     return;
   }
   const DUPLICATE_WINDOW_MS = 5*60*1000; // 5 minut - łapie podwójne wysyłki tego samego formularza
@@ -4999,14 +5024,14 @@ function removeDuplicateHistoryEntries(){
   });
   c.historia = c.historia.filter((h,index)=>!toRemove.has(index));
   c.zaktualizowano = new Date().toISOString();
-  logActivity(`usunął(-ęła) ${toRemove.size} duplikat(ów) wiadomości z historii klienta „${c.firma||c.osoba||'bez nazwy'}”`);
+  logActivity(`usunął(-ęła) ${toRemove.size} duplikat(ów) wiadomości z historii ${kind==="doradca" ? "doradcy" : "klienta"} „${entityDisplayName(c, kind)}”`);
   saveData();
   renderHistoryEntries(c);
-  renderClients();
+  if(kind==="doradca") renderDoradcyRolni(); else renderClients();
 }
 
 async function saveQuickClientUpdate(clientId){
-  const c = data.klienci.find(x=>x.id===clientId);
+  const {rec:c, kind} = crmEntity(clientId);
   const form = document.querySelector(`.quickUpdate [data-quick-field="note"]`)?.closest(".quickUpdate");
   if(!c || !form) return;
   const get = field => (form.querySelector(`[data-quick-field="${field}"]`)?.value || "").trim();
@@ -5028,9 +5053,11 @@ async function saveQuickClientUpdate(clientId){
     : { uploaded: [], failed: [] };
   if(!Array.isArray(c.historia)) c.historia = [];
   c.historia.push({tekst: note || "[notatka głosowa]", kto: who, data: historyDateValue(date), utworzono: new Date().toISOString(), ...(audioToSave || {}), ...(images.length ? {images} : {})});
-  const automation = inferClientAutomation(note, c);
+  // Wykrywanie automatyczne (status/priorytet/produkt z treści notatki) ma sens tylko dla
+  // pipeline'u sprzedażowego klientów - u doradcy te pola nic nie znaczą, więc pomijamy.
+  const automation = kind==="klient" ? inferClientAutomation(note, c) : [];
   c.zaktualizowano = new Date().toISOString();
-  logActivity(`dodał(a) ręczną notatkę klienta „${c.firma||c.osoba||'bez nazwy'}”${automation.length ? ` i panel ustawił: ${automation.join(", ")}` : ""}`);
+  logActivity(`dodał(a) ręczną notatkę ${kind==="doradca" ? "doradcy" : "klienta"} „${entityDisplayName(c, kind)}”${automation.length ? ` i panel ustawił: ${automation.join(", ")}` : ""}`);
   await saveData({immediate: true});
   pendingQuickImages = [];
   if(failedImages.length){
@@ -5043,8 +5070,25 @@ async function saveQuickClientUpdate(clientId){
     const reason = document.getElementById("syncStatus")?.textContent || "nieznany błąd";
     alert(`Notatka została zapisana lokalnie, ale NIE zsynchronizowała się jeszcze z chmurą.\n\nPowód: ${reason}\n\nPanel spróbuje wysłać ją ponownie automatycznie — nie czyść danych przeglądarki, dopóki nie zobaczysz statusu "Zsynchronizowano ✓".`);
   }
-  renderClients();
-  openClientCard(clientId);
+  if(kind==="doradca"){
+    renderDoradcyRolni();
+    openDoradcaCard(clientId);
+  } else {
+    renderClients();
+    openClientCard(clientId);
+  }
+}
+
+// Odświeża tabelę i - jeśli aktualnie otwarta - kartę, po zmianie w historii kontaktu.
+// Wspólne dla klienta i doradcy, bo obaj używają tego samego modala historii.
+function reopenCrmCardAfterHistoryChange(id, kind){
+  if(kind==="doradca"){
+    renderDoradcyRolni();
+    if(currentDoradcaCardId === id) openDoradcaCard(id);
+  } else {
+    renderClients();
+    if(currentClientCardId === id) openClientCard(id);
+  }
 }
 
 async function addHistoryEntry(){
@@ -5055,7 +5099,7 @@ async function addHistoryEntry(){
   const followupEl = document.getElementById("historyNewFollowup");
   const tekst = ta.value.trim();
   if(!currentHistoryClientId) return;
-  const c = data.klienci.find(x=>x.id===currentHistoryClientId);
+  const {rec:c, kind} = crmEntity(currentHistoryClientId);
   if(!c) return;
   let audio = null;
   try{
@@ -5073,7 +5117,9 @@ async function addHistoryEntry(){
   c.historia.push({tekst: tekst || "[notatka głosowa]", kto: (whoEl.value || getWhoAmI()).trim(), data: historyDateValue(dateEl.value), utworzono: new Date().toISOString(), ...(audioToSave || {}), ...(images.length ? {images} : {})});
   pendingHistoryImages = [];
   const followupBefore = c.nastepnyFollowup || "";
-  const automation = inferClientAutomation(tekst, c);
+  // Wykrywanie automatyczne (status/priorytet/produkt z treści notatki) - tylko dla klientów,
+  // patrz identyczny komentarz w saveQuickClientUpdate.
+  const automation = kind==="klient" ? inferClientAutomation(tekst, c) : [];
   // Ręczna data w polu "Termin następnego kontaktu" ma priorytet nad automatycznym wykrywaniem z treści notatki —
   // ustawiamy ją tylko, jeśli user faktycznie ją zmienił względem stanu przy otwarciu modala (inaczej nadpisywalibyśmy
   // co notatkę, nawet gdy pole zostało tylko podejrzane).
@@ -5084,9 +5130,9 @@ async function addHistoryEntry(){
     automation.push(followupVal ? `termin kontaktu: ${followupVal}` : "termin kontaktu: wyczyszczony");
   }
   c.zaktualizowano = new Date().toISOString();
-  logActivity(`dodał(a) notatkę w historii kontaktu klienta „${c.firma||c.osoba||'bez nazwy'}”${automation.length ? ` i panel ustawił: ${automation.join(", ")}` : ""}`);
+  logActivity(`dodał(a) notatkę w historii kontaktu ${kind==="doradca" ? "doradcy" : "klienta"} „${entityDisplayName(c, kind)}”${automation.length ? ` i panel ustawił: ${automation.join(", ")}` : ""}`);
   await saveData({immediate: true});
-  if((c.nastepnyFollowup || "") !== followupBefore) syncFollowupToCalendar(c);
+  if(kind==="klient" && (c.nastepnyFollowup || "") !== followupBefore) syncFollowupToCalendar(c);
   if(!lastCloudSaveOk){
     const reason = document.getElementById("syncStatus")?.textContent || "nieznany błąd";
     alert(`Notatka została zapisana lokalnie, ale NIE zsynchronizowała się jeszcze z chmurą.\n\nPowód: ${reason}\n\nPanel spróbuje wysłać ją ponownie automatycznie — nie czyść danych przeglądarki, dopóki nie zobaczysz statusu "Zsynchronizowano ✓".`);
@@ -5099,8 +5145,7 @@ async function addHistoryEntry(){
   followupEl.dataset.initial = followupEl.value;
   renderPendingHistoryImages();
   renderHistoryEntries(c);
-  renderClients();
-  if(currentClientCardId === c.id) openClientCard(c.id);
+  reopenCrmCardAfterHistoryChange(c.id, kind);
   if(failedImages.length){
     alert(`Notatka zapisana, ale ${failedImages.length} zdjęcie(a) nie wysłały się na Drive:\n\n${failedImages.map(f=>`"${f.name}" — ${f.error}`).join("\n")}`);
   }
@@ -5111,18 +5156,18 @@ async function addHistoryEntry(){
 
 function editHistoryEntry(index){
   currentHistoryEditIndex = index;
-  const c = data.klienci.find(x=>x.id===currentHistoryClientId);
+  const {rec:c} = crmEntity(currentHistoryClientId);
   if(c) renderHistoryEntries(c);
 }
 
 function cancelEditHistoryEntry(){
   currentHistoryEditIndex = null;
-  const c = data.klienci.find(x=>x.id===currentHistoryClientId);
+  const {rec:c} = crmEntity(currentHistoryClientId);
   if(c) renderHistoryEntries(c);
 }
 
 function saveHistoryEntryEdit(index){
-  const c = data.klienci.find(x=>x.id===currentHistoryClientId);
+  const {rec:c, kind} = crmEntity(currentHistoryClientId);
   if(!c || !Array.isArray(c.historia) || !c.historia[index]) return;
   const text = document.getElementById(`historyEditText-${index}`).value.trim();
   const who = document.getElementById(`historyEditWho-${index}`).value.trim();
@@ -5133,14 +5178,13 @@ function saveHistoryEntryEdit(index){
   currentHistoryEditIndex = null;
   saveData();
   renderHistoryEntries(c);
-  renderClients();
-  if(currentClientCardId === c.id) openClientCard(c.id);
+  reopenCrmCardAfterHistoryChange(c.id, kind);
 }
 
 function deleteHistoryEntry(index){
-  const c = data.klienci.find(x=>x.id===currentHistoryClientId);
+  const {rec:c, kind} = crmEntity(currentHistoryClientId);
   if(!c || !Array.isArray(c.historia) || !c.historia[index]) return;
-  if(!confirm("Usunąć tę notatkę z historii klienta?")) return;
+  if(!confirm("Usunąć tę notatkę z historii?")) return;
   ensurePanelSyncIds(data);
   const deletedId = c.historia[index]._syncId;
   if(deletedId){
@@ -5152,8 +5196,7 @@ function deleteHistoryEntry(index){
   currentHistoryEditIndex = null;
   saveData();
   renderHistoryEntries(c);
-  renderClients();
-  if(currentClientCardId === c.id) openClientCard(c.id);
+  reopenCrmCardAfterHistoryChange(c.id, kind);
 }
 
 // ================= Podsumowanie u góry =================
@@ -6208,6 +6251,7 @@ function populateFilterOptions(){
 
 let currentClientsView = "directory";
 let currentClientCardId = null;
+let currentDoradcaCardId = null;
 let currentOfferEdit = null;
 let currentMainCategory = "start";
 let currentSubView = "dashboard";
@@ -7464,18 +7508,18 @@ Jeżeli coś wymaga uzupełnienia albo korekty, proszę odpowiedzieć na tę wia
 };
 
 function clientMailGreeting(c){
-  const contact = String(c?.osoba || "").trim();
+  const contact = String(c?.osoba || c?.imie || "").trim();
   const firstName = contact.split(/\s+/)[0] || "";
   return firstName ? `Dzień dobry, ${firstName},` : "Dzień dobry,";
 }
 
 function clientMailSubjectName(c){
-  return String(c?.firma || c?.osoba || "gospodarstwo").trim();
+  return String(c?.firma || c?.osoba || [c?.imie, c?.nazwisko].filter(Boolean).join(" ") || "gospodarstwo").trim();
 }
 
 function applyClientMailTemplate(clientId, templateId){
   if(!templateId) return;
-  const c = (data.klienci || []).find(client => client.id === clientId);
+  const {rec:c} = crmEntity(clientId);
   const template = CLIENT_MAIL_TEMPLATES[templateId];
   const subjectEl = document.getElementById(`mailComposeSubject-${clientId}`);
   const bodyEl = document.getElementById(`mailComposeBody-${clientId}`);
@@ -7491,8 +7535,8 @@ function applyClientMailTemplate(clientId, templateId){
   bodyEl.focus();
 }
 
-function renderMailComposeSection(c){
-  if(!c || !c.email) return `<p style="font-size:13px;color:var(--text-muted)">Klient nie ma zapisanego adresu e-mail - dodaj go w polu "E-mail" wyżej, żeby móc stąd wysłać maila.</p>`;
+function renderMailComposeSection(c, kind="klient"){
+  if(!c || !c.email) return `<p style="font-size:13px;color:var(--text-muted)">${kind==="doradca" ? "Doradca" : "Klient"} nie ma zapisanego adresu e-mail - dodaj go w polu "E-mail" wyżej, żeby móc stąd wysłać maila.</p>`;
   const templateOptions = Object.entries(CLIENT_MAIL_TEMPLATES)
     .map(([id, template]) => `<option value="${crmEsc(id)}">${crmEsc(template.label)}</option>`)
     .join("");
@@ -7748,7 +7792,9 @@ async function sendClientMail(clientId){
     logActivity(`wysłał(a) maila do ${to}`);
     const successText = `Wysłano z właściwym podpisem${attachments.length ? ` i ${attachments.length} ${attachments.length === 1 ? "załącznikiem" : "załącznikami"}` : ""}.`;
     clearClientMailImages(clientId);
-    if(currentClientCardId === clientId) openClientCard(clientId); // odśwież - pokaże się w historii (odtwarza świeży, odblokowany przycisk)
+    // odśwież - pokaże się w historii (odtwarza świeży, odblokowany przycisk)
+    if(currentClientCardId === clientId) openClientCard(clientId);
+    if(currentDoradcaCardId === clientId) openDoradcaCard(clientId);
     const refreshedStatus = document.getElementById(`mailComposeStatus-${clientId}`);
     if(refreshedStatus) refreshedStatus.textContent = successText;
   }catch(e){
@@ -7844,6 +7890,98 @@ function closeClientCard(){
   currentClientCardId = null;
   currentOfferEdit = null;
   scheduleLiveUpdateCheck(100);
+}
+
+// Karta doradcy rolnego - 1:1 z kartą klienta (pola, szybka notatka, mail z podpisem
+// i historią, dokumenty, pełna historia kontaktu), tylko z polami właściwymi dla bazy
+// doradców zamiast pipeline'u sprzedażowego (bez "Zainteresowania", statusu/priorytetu
+// z lejka sprzedaży czy sekcji Brief/Advisor/Oferty, które dotyczą tylko klientów).
+function openDoradcaCard(doradcaId){
+  currentDoradcaCardId = doradcaId;
+  const d = (data.doradcyRolni || []).find(x=>x.id===doradcaId);
+  const box = document.getElementById("doradcaCardContent");
+  if(!d || !box) return;
+  const historyCount = (d.historia || []).length;
+  const lastActivity = clientActivitySummary(d, 150);
+  const name = entityDisplayName(d, "doradca");
+  const fallbackContact = [d.miejsce, d.powiat, d.wojewodztwo].filter(Boolean).join(", ");
+  box.innerHTML = `
+    <div class="clientCardTop">
+      <div>
+        <h2>${crmEsc(name)}</h2>
+        <div class="kanbanContact">${renderClientContactLinks(d) || crmEsc(clientContact(d) || fallbackContact || "brak kontaktu")}</div>
+        <div class="lastActivity">${lastActivity ? `<span class="lastActivityBadge">Ostatnie działanie: ${crmEsc(lastActivity)}</span>` : '<span class="lastActivityBadge">Ostatnie działanie: brak</span>'}</div>
+      </div>
+      <div class="clientCardBadges">
+        ${d.statusKontaktu ? `<span class="kanbanPill">${crmEsc(d.statusKontaktu)}</span>` : ""}
+        ${d.typPodmiotu ? `<span class="kanbanPill">${crmEsc(d.typPodmiotu)}</span>` : ""}
+      </div>
+    </div>
+    <div class="clientCardGrid">
+      <div class="clientCardField"><b>Imię</b>${clientField(d,"imie")}</div>
+      <div class="clientCardField"><b>Nazwisko</b>${clientField(d,"nazwisko")}</div>
+      <div class="clientCardField"><b>Telefon</b>${clientField(d,"telefon")}</div>
+      <div class="clientCardField"><b>E-mail</b>${clientField(d,"email")}</div>
+      <div class="clientCardField"><b>Województwo</b>${clientField(d,"wojewodztwo")}</div>
+      <div class="clientCardField"><b>Powiat / miasto</b>${clientField(d,"powiat")}</div>
+      <div class="clientCardField"><b>Instytucja / miejsce</b>${clientField(d,"miejsce")}</div>
+      <div class="clientCardField"><b>Adres</b>${clientField(d,"adres")}</div>
+      <div class="clientCardField"><b>Typ podmiotu</b>${clientField(d,"typPodmiotu")}</div>
+      <div class="clientCardField"><b>Podmiot kontaktowy</b>${clientField(d,"podmiotKontaktowy")}</div>
+      <div class="clientCardField"><b>Rodzaj kontaktu</b>${clientField(d,"rodzajKontaktu")}</div>
+      <div class="clientCardField"><b>Status kontaktu</b>${clientField(d,"statusKontaktu")}</div>
+      <div class="clientCardField"><b>Źródło kontaktu</b>${clientField(d,"zrodloKontaktu")}</div>
+      <div class="clientCardField"><b>Data weryfikacji</b>${clientField(d,"dataWeryfikacji","date")}</div>
+      <div class="clientCardField"><b>Termin następnego kontaktu</b>${clientField(d,"nastepnyFollowup","datetime")}</div>
+      <div class="clientCardField"><b>Strona rejestru</b>${clientField(d,"stronaRejestru")}${d.stronaRejestru ? ` <a href="${crmEsc(safeDocumentHref(d.stronaRejestru) || ("https://"+d.stronaRejestru))}" target="_blank" rel="noopener" class="mapPin" title="Otwórz stronę rejestru">↗</a>` : ""}</div>
+      <div class="clientCardField"><b>Link do wpisu CDR</b>${clientField(d,"urlCdr")}${d.urlCdr ? ` <a href="${crmEsc(d.urlCdr)}" target="_blank" rel="noopener" class="mapPin" title="Otwórz wpis CDR">↗</a>` : ""}</div>
+    </div>
+    <div class="clientCardField" style="margin-top:8px"><b>Uwagi</b>${clientField(d,"uwagi","textarea")}</div>
+    ${wrapCollapsible("✏️ Szybka aktualizacja", renderQuickClientUpdate(d, "doradca"), true)}
+    ${wrapCollapsible("✉️ Napisz maila", renderMailComposeSection(d, "doradca"), false)}
+    ${wrapCollapsible("📁 Dokumenty", renderClientDocuments(d), false)}
+    <details class="clientCardSection" open>
+      <summary>Historia kontaktu (${historyCount})</summary>
+      <div class="clientCardHistory">
+        <div class="clientCardHistoryHead">
+          <button class="histBtn" onclick="openHistoryModal(currentDoradcaCardId)">Zarządzaj historią</button>
+        </div>
+        ${renderHistoryTimeline(d, false)}
+      </div>
+    </details>
+    <div class="clientDangerZone">
+      <button class="dangerBtn" onclick="deleteDoradca('${crmEsc(d.id)}')">Usuń doradcę</button>
+    </div>
+  `;
+  pendingQuickImages = [];
+  pendingMailAttachments = [];
+  wireImageDropZone(document.getElementById("quickImageDropZone"), document.getElementById("quickImageFile"), addQuickImageFiles);
+  wireMailAttachDropZone(d.id);
+  document.getElementById("doradcaCardModal").classList.add("open");
+  hydrateHistoryAudioPlayers(document.getElementById("doradcaCardModal"));
+}
+
+function closeDoradcaCard(){
+  document.getElementById("doradcaCardModal").classList.remove("open");
+  document.getElementById("doradcaCardContent").innerHTML = "";
+  currentDoradcaCardId = null;
+  scheduleLiveUpdateCheck(100);
+}
+
+function deleteDoradca(id){
+  const index = (data.doradcyRolni || []).findIndex(x=>x.id===id);
+  if(index < 0) return;
+  const d = data.doradcyRolni[index];
+  if(!confirm("Na pewno trwale usunąć tego doradcę? Usunięta zostanie też jego historia kontaktu.")) return;
+  const typed = prompt("To jest trwałe usunięcie doradcy. Wpisz USUŃ, aby potwierdzić.");
+  if(typed !== "USUŃ") return;
+  data.doradcyRolni.splice(index, 1);
+  logActivity(`trwale usunął(-ęła) doradcę „${entityDisplayName(d, "doradca")}”`);
+  if(currentDoradcaCardId === id) closeDoradcaCard();
+  if(currentHistoryClientId === id) closeHistoryModal();
+  saveData();
+  renderDoradcyRolni();
+  renderStatsBar();
 }
 
 function toggleOfferForm(clientId){
@@ -9121,9 +9259,30 @@ function clientFieldValue(el, normalize = false){
   return normalize && el.dataset.field === "telefon" ? formatPhonePL(el.value) : el.value;
 }
 
+// Wspólny resolver dla dwóch kolekcji, które mają "kartę" ze wspólnym silnikiem pól/historii/maila:
+// klienci CRM i baza doradców rolnych. Karta doradcy (openDoradcaCard) jest zbudowana 1:1 na tym
+// samym silniku co karta klienta - zamiast duplikować stageClientField/commitClientField/historię/
+// mail itd., te funkcje szukają rekordu w obu kolekcjach po id i rozgałęziają się tylko tam, gdzie
+// zachowanie faktycznie różni się między klientem a doradcą (status z listy, kalendarz, statystyki).
+function crmEntity(id){
+  let rec = (data.klienci || []).find(x=>x.id===id);
+  if(rec) return {rec, kind:"klient"};
+  rec = (data.doradcyRolni || []).find(x=>x.id===id);
+  if(rec) return {rec, kind:"doradca"};
+  return {rec:null, kind:null};
+}
+
+function entityDisplayName(rec, kind){
+  if(!rec) return "bez nazwy";
+  if(kind==="doradca") return [rec.imie, rec.nazwisko].filter(Boolean).join(" ") || "bez nazwiska";
+  return rec.firma || rec.osoba || "bez nazwy";
+}
+
+const DORADCA_EDITABLE_FIELDS = ["imie","nazwisko","telefon","email","wojewodztwo","powiat","miejsce","adres","typPodmiotu","podmiotKontaktowy","rodzajKontaktu","statusKontaktu","zrodloKontaktu","dataWeryfikacji","stronaRejestru","urlCdr","uwagi","nastepnyFollowup"];
+
 function stageClientField(el){
   const id = el.dataset.id, field = el.dataset.field;
-  const c = data.klienci.find(x=>x.id===id);
+  const {rec:c} = crmEntity(id);
   if(!c || !field) return;
   const value = clientFieldValue(el, false);
   if(c[field] === value) return;
@@ -9134,7 +9293,7 @@ function stageClientField(el){
 
 function commitClientField(el){
   const id = el.dataset.id, field = el.dataset.field;
-  const c = data.klienci.find(x=>x.id===id);
+  const {rec:c, kind} = crmEntity(id);
   if(!c || !field) return;
   const oldVal = c[field];
   const value = clientFieldValue(el, true);
@@ -9145,17 +9304,23 @@ function commitClientField(el){
     persistLocalCache(JSON.stringify(data));
   }
   if(field === "telefon" && el.value !== value) el.value = value;
-  if(field==="status" && changed){
+  if(kind==="klient" && field==="status" && changed){
     const status = STATUS_OPTS.find(s=>s[0]===value);
     logActivity(`zmienił(a) status klienta „${c.firma||c.osoba||'bez nazwy'}” na ${status ? status[1] : value}`);
   }
   if(liveFieldSavePending) flushLiveFieldSave();
   else if(changed) saveData();
-  if(field==="nastepnyFollowup" && changed) syncFollowupToCalendar(c);
-  if(field==="status" || field==="priorytet") renderStatsBar();
-  if(["firma","osoba","telefon","email","wojewodztwo","miejscowosc","ulica","zainteresowanie","produkt","nastepnyFollowup","zrodloLeada","obiekcje","status","priorytet"].includes(field)){
+  // Termin kontaktu doradcy celowo NIE trafia do wspólnego kalendarza Google - tamten kalendarz
+  // ma sens dla pipeline'u sprzedażowego klientów, a baza doradców bywa duża (setki kontaktów).
+  if(kind==="klient" && field==="nastepnyFollowup" && changed) syncFollowupToCalendar(c);
+  if(kind==="klient" && (field==="status" || field==="priorytet")) renderStatsBar();
+  if(kind==="klient" && ["firma","osoba","telefon","email","wojewodztwo","miejscowosc","ulica","zainteresowanie","produkt","nastepnyFollowup","zrodloLeada","obiekcje","status","priorytet"].includes(field)){
     renderClients();
     if(currentClientCardId===id) openClientCard(id);
+  }
+  if(kind==="doradca" && DORADCA_EDITABLE_FIELDS.includes(field)){
+    renderDoradcyRolni();
+    if(currentDoradcaCardId===id) openDoradcaCard(id);
   }
 }
 
@@ -10090,6 +10255,7 @@ function renderDoradcyRolni(){
         <td><div class="advisorContact">${contact || '<span class="advisorMuted">Brak kontaktu</span>'}</div></td>
         <td><span class="advisorStatusBadge">${crmEsc(item.statusKontaktu || "brak statusu")}</span><div class="advisorMuted">${crmEsc(item.typPodmiotu || "")}</div></td>
         <td>${cdr}<div class="advisorMuted">${crmEsc(item.zrodloKontaktu || "")}${item.dataWeryfikacji ? `<br>${crmEsc(item.dataWeryfikacji)}` : ""}</div></td>
+        <td><button class="histBtn" onclick="openDoradcaCard('${crmEsc(item.id)}')">Otwórz</button></td>
       </tr>
     `;
   }).join("");
